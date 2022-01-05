@@ -2,6 +2,7 @@ mixed-port: 7890
 allow-lan: false
 external-controller: 127.0.0.1:54614
 secret: ''
+
 rule-providers:
   reject:
     type: http
@@ -166,10 +167,11 @@ proxy-providers:
     type: http
     path: proxy-providers/free886.yaml
     url: "https://free886.herokuapp.com/clash/proxies"
+    #url: "https://zua426.cf/clash/proxies?nc=CN&speed=500"
     interval: 86400
     health-check:
       enable: true
-      url: https://www.google.com
+      url: http://www.gstatic.com/generate_204
       interval: 300
   zua426:
     type: http
@@ -178,16 +180,16 @@ proxy-providers:
     interval: 86400
     health-check:
       enable: true
-      url: https://www.google.com
+      url: http://www.gstatic.com/generate_204
       interval: 300
   oslookClash:
     type: http
     path: proxy-providers/oslookClash.yaml
-    url: "https://raw.githubusercontent.com/oslook/clash-freenode/main/clash.yaml"
+    url: "https://cdn.jsdelivr.net/gh/oslook/clash-freenode@main/clash.yaml"
     interval: 86400
     health-check:
       enable: true
-      url: https://www.google.com
+      url: http://www.gstatic.com/generate_204
       interval: 300
   adispeed:
     type: http
@@ -196,7 +198,7 @@ proxy-providers:
     interval: 86400
     health-check:
       enable: true
-      url: https://www.google.com
+      url: http://www.gstatic.com/generate_204
       interval: 300
   ssrsub:
     type: http
@@ -205,8 +207,14 @@ proxy-providers:
     interval: 86400
     health-check:
       enable: true
-      url: https://www.google.com
+      url: http://www.gstatic.com/generate_204
       interval: 300
     
+dns:
+  enable: false
+  listen: 0.0.0.0:53
+  enhanced-mode: fake-ip
+  nameserver:
+   - 119.29.29.29
+   - 223.5.5.5
 
-    
