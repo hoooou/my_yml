@@ -2,7 +2,7 @@ mixed-port: 7890
 allow-lan: false
 external-controller: 127.0.0.1:54614
 secret: ''
-
+mode: rule
 rule-providers:
   reject:
     type: http
@@ -166,8 +166,7 @@ proxy-providers:
   free886:
     type: http
     path: proxy-providers/free886.yaml
-    url: "https://free886.herokuapp.com/clash/proxies"
-    #url: "https://zua426.cf/clash/proxies?nc=CN&speed=500"
+    url: "https://free886.herokuapp.com/clash/config"
     interval: 86400
     health-check:
       enable: true
@@ -211,10 +210,4 @@ proxy-providers:
       interval: 300
     
 dns:
-  enable: false
-  listen: 0.0.0.0:53
-  enhanced-mode: fake-ip
-  nameserver:
-   - 119.29.29.29
-   - 223.5.5.5
-
+    enable: false
