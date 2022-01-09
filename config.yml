@@ -1,4 +1,4 @@
-mixed-port: 7890
+port: 7890
 allow-lan: false
 external-controller: 127.0.0.1:54614
 secret: ''
@@ -106,6 +106,9 @@ rules:
   - RULE-SET,applications,DIRECT
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
+  - DOMAIN,gitee.com,DIRECT
+  - DOMAIN,free886.herokuapp.com,DIRECT
+  - DOMAIN,sub.v6mc.xyz,DIRECT
   - RULE-SET,private,DIRECT
   - RULE-SET,reject,REJECT
   - RULE-SET,icloud,DIRECT
@@ -206,8 +209,8 @@ proxy-providers:
   ssrsub:
     type: http
     path: proxy-providers/ssrsub.yaml
-    url: "https://raw.githubusercontent.com/ssrsub/ssr/master/Clash.yml"
-    #url: "https://rawcdn.githack.com/ssrsub/ssr/6307fce90cc34948a8957c7f6e1c727038997eef/Clash.yml"
+    # url: "https://raw.githubusercontent.com/ssrsub/ssr/master/Clash.yml"
+    url: "https://cdn.jsdelivr.net/gh/ssrsub/ssr@master/Clash.yml"
     interval: 86400
     health-check:
       enable: true
@@ -216,8 +219,7 @@ proxy-providers:
   free886:
     type: http
     path: proxy-providers/free886.yaml
-    url: "https://subcon.dlj.tf/sub?target=clash&url=https%3A%2F%2Ffree886.herokuapp.com%2Fclash%2Fproxies&insert=false&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online.ini"
-    #url: "https://free886.herokuapp.com/clash/proxies"
+    url: "https://free886.herokuapp.com/clash/proxies"
     interval: 86400
     health-check:
       enable: false
