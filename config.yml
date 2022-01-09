@@ -106,6 +106,9 @@ rules:
   - RULE-SET,applications,DIRECT
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
+  - DOMAIN,cdn.jiuse.cloud,DIRECT
+  - DOMAIN,vod7eu52.128100.xyz,DIRECT
+  - DOMAIN,jzmedia.xyz,DIRECT
   - DOMAIN,gitee.com,DIRECT
   - DOMAIN,free886.herokuapp.com,DIRECT
   - DOMAIN,sub.v6mc.xyz,DIRECT
@@ -126,6 +129,7 @@ rules:
 #rules:
 #  - RULE-SET,applications,DIRECT
 #  - DOMAIN,clash.razord.top,DIRECT
+#  - DOMAIN,cdn.jiuse.cloud,DIRECT
 #  - DOMAIN,yacd.haishan.me,DIRECT
 #  - RULE-SET,private,DIRECT
 #  - RULE-SET,reject,REJECT
@@ -150,6 +154,7 @@ proxy-groups:
     interval: 300
     tolerance: 50
     use:
+      - QFnyq2
       - zua426
       - oslookClash
       - adispeed
@@ -160,6 +165,7 @@ proxy-groups:
   - name: 🎯 手动选择
     type: select
     use:
+      - QFnyq2
       - zua426
       - oslookClash
       - adispeed
@@ -230,9 +236,9 @@ proxy-providers:
       enable: false
       url: http://www.gstatic.com/generate_204
       interval: 300
-  1.02:
+  QFnyq2:
     type: http
-    path: proxy-providers/1.02.yaml
+    path: proxy-providers/QFnyq2.yaml
     url: "https://dwz.mk/QFnyq2"
     interval: 86400
     health-check:
