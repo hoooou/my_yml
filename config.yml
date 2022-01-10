@@ -118,14 +118,14 @@ rules:
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,google,DIRECT
-  - RULE-SET,proxy,🎯 手动选择
+  - RULE-SET,proxy,🚀 全局选择
   - RULE-SET,direct,DIRECT
   - RULE-SET,lancidr,DIRECT
   - RULE-SET,cncidr,DIRECT
-  - RULE-SET,telegramcidr,🎯 手动选择
+  - RULE-SET,telegramcidr,🚀 全局选择
   - GEOIP,,DIRECT
   - GEOIP,CN,DIRECT
-  - MATCH,🎯 手动选择
+  - MATCH,🚀 全局选择
 #黑名单模式
 #rules:
 #  - RULE-SET,applications,DIRECT
@@ -148,7 +148,7 @@ proxy-groups:
       - REJECT
       - 🎯 手动选择
       - ♻️ 自动选择
-
+      - ♻️ 高速频道高可用(自动切换节点)
   - name: ♻️ 自动选择
     type: url-test
     url: 'https://www.google.com'
@@ -174,19 +174,12 @@ proxy-groups:
       - free886
       - sspool.nl
 
-  - name: ♻️ Gloab专用
-    type: select
-    url: 'https://www.google.com'
-    interval: 300
-    tolerance: 50
+  - name: ♻️ 高速频道高可用(自动切换节点)
+    type: url-test
     use:
-      - zua426
-      - oslookClash
+      - QFnyq2
       - adispeed
-      - ssrsub
-      - free886
-      - sspool.nl
-
+      
 proxy-providers:
 
   zua426:
