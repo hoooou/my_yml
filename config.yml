@@ -167,6 +167,8 @@ proxy-groups:
       - adispeed
       - ssrsub
       - free886
+      - ioii121
+
 #      - sspool.nl
 
   - name: 🎯 手动选择
@@ -182,6 +184,8 @@ proxy-groups:
       - adispeed
       - ssrsub
       - free886
+      - ioii121
+
 #      - sspool.nl
 
   - name: ♻️ 高速频道高可用(自动切换节点)
@@ -193,7 +197,7 @@ proxy-groups:
     use:
       - ioii
       - adispeed
-      
+      - ioii121
 proxy-providers:
 
   zua426:
@@ -253,6 +257,16 @@ proxy-providers:
       enable: true
       url: http://www.gstatic.com/generate_204
       interval: 300
+  ioii121:
+    type: http
+    path: proxy-providers/ioii121.yaml
+    url: "https://gitee.com/ioii/iioii/raw/master/1.21"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+
   sub.v6mc.xyz:
     type: http
     path: proxy-providers/v6mc.yaml
@@ -272,13 +286,13 @@ proxy-providers:
   #     enable: false
   #     url: http://www.gstatic.com/generate_204
   #     interval: 300
-  sspool.nl:
-    type: http
-    path: proxy-providers/test.yaml
-    url: "https://sspool.nl/clash/proxies?nc=CN"
-    interval: 86400
-    health-check:
-      enable: false
-      url: http://www.gstatic.com/generate_204
-      interval: 300
+#   sspool.nl:
+#     type: http
+#     path: proxy-providers/test.yaml
+#     url: "https://sspool.nl/clash/proxies?nc=CN"
+#     interval: 86400
+#     health-check:
+#       enable: false
+#       url: http://www.gstatic.com/generate_204
+#       interval: 300
 
