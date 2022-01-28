@@ -1,0 +1,300 @@
+port: 7890
+allow-lan: false
+external-controller: 127.0.0.1:54614
+secret: ''
+mode: rule
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    path: ./ruleset/reject.yaml
+    interval: 86400
+
+  icloud:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+
+  apple:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
+    path: ./ruleset/apple.yaml
+    interval: 86400
+
+  google:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt"
+    path: ./ruleset/google.yaml
+    interval: 86400
+
+  proxy:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+
+  direct:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./ruleset/direct.yaml
+    interval: 86400
+
+  private:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    path: ./ruleset/private.yaml
+    interval: 86400
+
+  gfw:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+
+  greatfire:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/greatfire.txt"
+    path: ./ruleset/greatfire.yaml
+    interval: 86400
+
+  tld-not-cn:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
+    path: ./ruleset/tld-not-cn.yaml
+    interval: 86400
+
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+
+  applications:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
+    path: ./ruleset/applications.yaml
+    interval: 86400
+#白名单模式
+#rules:
+#  - RULE-SET,applications,DIRECT
+#  - DOMAIN,clash.razord.top,DIRECT
+#  - DOMAIN,yacd.haishan.me,DIRECT
+#  - DOMAIN,cdn.jiuse.cloud,DIRECT
+#  - DOMAIN,cdn.jsdelivr.net,DIRECT
+#  - DOMAIN,vdownload.hembed.com,DIRECT
+#  - DOMAIN,vdownload-6.sb-cd.com,DIRECT
+#  - DOMAIN,edge.microsoft.com,DIRECT
+#  # - DOMAIN-SUFFIX,128100.xyz,DIRECT
+#  - DOMAIN-SUFFIX,motherlessmedia.com,DIRECT
+#  - DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
+#  - DOMAIN-SUFFIX,gitee.com,DIRECT
+#  - DOMAIN,free886.herokuapp.com,DIRECT
+#  - DOMAIN,sub.v6mc.xyz,DIRECT
+#  - RULE-SET,private,DIRECT
+#  - RULE-SET,reject,REJECT
+#  - RULE-SET,icloud,DIRECT
+#  - RULE-SET,apple,DIRECT
+#  - RULE-SET,google,DIRECT
+#  - RULE-SET,proxy,🚀 全局选择
+#  - RULE-SET,direct,DIRECT
+#  - RULE-SET,lancidr,DIRECT
+#  - RULE-SET,cncidr,DIRECT
+#  - RULE-SET,telegramcidr,🚀 全局选择
+#  - GEOIP,,DIRECT
+#  - GEOIP,CN,DIRECT
+#  - MATCH,🚀 全局选择
+#黑名单模式
+rules:
+  - RULE-SET,applications,DIRECT
+  - DOMAIN,clash.razord.top,DIRECT
+  - DOMAIN,cdn.jiuse.cloud,DIRECT
+  - DOMAIN,yacd.haishan.me,DIRECT
+  - RULE-SET,private,DIRECT
+  - RULE-SET,reject,REJECT
+  - RULE-SET,tld-not-cn,PROXY
+  - RULE-SET,gfw,PROXY
+  - RULE-SET,greatfire,PROXY
+  - RULE-SET,telegramcidr,PROXY
+  - MATCH,DIRECT
+
+proxy-groups:
+  - name: 🚀 全局选择
+    type: select
+    lazy: true
+    interval: 3000
+    tolerance: 50
+    proxies:
+      - DIRECT
+      - REJECT
+      - 🎯 手动选择
+      - ♻️ 自动选择
+      - ♻️ 高速频道高可用(自动切换节点)
+  - name: ♻️ 自动选择
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    lazy: true
+    interval: 3000
+    tolerance: 120
+    use:
+      - ioii
+      - zua426
+      - oslookClash
+      - adispeed
+      - ssrsub
+      - free886
+      - ioii121
+
+#      - sspool.nl
+
+  - name: 🎯 手动选择
+    type: select
+    lazy: true
+    interval: 3000
+    url: http://www.gstatic.com/generate_204
+    tolerance: 120
+    use:
+      - ioii
+      - zua426
+      - oslookClash
+      - adispeed
+      - ssrsub
+      - free886
+      - ioii121
+
+#      - sspool.nl
+
+  - name: ♻️ 高速频道高可用(自动切换节点)
+    lazy: true
+    interval: 3000
+    tolerance: 120
+    url: http://www.gstatic.com/generate_204
+    type: url-test
+    use:
+      - ioii
+      - adispeed
+      - ioii121
+proxy-providers:
+
+  zua426:
+    type: http
+    path: proxy-providers/zua426.yaml
+    # url: "https://zua426.cf/clash/proxies?nc=CN&speed=500"
+    url: "http://zua426.cf/clash/zua93/"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  oslookClash:
+    type: http
+    path: proxy-providers/oslookClash.yaml
+    url: "https://cdn.jsdelivr.net/gh/oslook/clash-freenode@main/clash.yaml"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  adispeed:
+    type: http
+    path: proxy-providers/adispeed.yaml
+    # url: "https://gitee.com/adidesign/freenode/raw/main/test/adidesign.c"
+    url: "https://cdn.jsdelivr.net/gh/adiwzx/freenode@main/test/adidesign.c"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  ssrsub:
+    type: http
+    path: proxy-providers/ssrsub.yaml
+    # url: "https://raw.githubusercontent.com/ssrsub/ssr/master/Clash.yml"
+    url: "https://cdn.jsdelivr.net/gh/ssrsub/ssr@master/Clash.yml"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  free886:
+    type: http
+    path: proxy-providers/free886.yaml
+    url: "https://free886.herokuapp.com/clash/proxies?nc=CN"
+    interval: 86400
+    health-check:
+      enable: false
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  ioii:
+    type: http
+    path: proxy-providers/ioii.yaml
+    url: "https://gitee.com/ioii/iioii/raw/master/1"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  ioii121:
+    type: http
+    path: proxy-providers/ioii121.yaml
+    url: "https://gitee.com/ioii/iioii/raw/master/1.21"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+
+  sub.v6mc.xyz:
+    type: http
+    path: proxy-providers/v6mc.yaml
+    #url:"https://sub.v6mc.xyz/api/v1/client/subscribe?token=1683f272369a229e9dde0999d01c18ff"
+    url: "https://suo.yt/Q5LSlhP"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  # free.kingfu.cf:
+  #   type: http
+  #   path: proxy-providers/kingfu.yaml
+  #   url: "https://free.kingfu.cf/clash/proxies?nc=CN&speed=2000"
+  #   interval: 86400
+  #   health-check:
+  #     enable: false
+  #     url: http://www.gstatic.com/generate_204
+  #     interval: 300
+#   sspool.nl:
+#     type: http
+#     path: proxy-providers/test.yaml
+#     url: "https://sspool.nl/clash/proxies?nc=CN"
+#     interval: 86400
+#     health-check:
+#       enable: false
+#       url: http://www.gstatic.com/generate_204
+#       interval: 300
+
