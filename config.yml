@@ -107,6 +107,10 @@ rules:
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
   - DOMAIN,cdn.jiuse.cloud,DIRECT
+  - DOMAIN,cdn.jsdelivr.net,DIRECT
+  - DOMAIN,vdownload.hembed.com,DIRECT
+  - DOMAIN,vdownload-6.sb-cd.com,DIRECT
+  - DOMAIN,edge.microsoft.com,DIRECT
   # - DOMAIN-SUFFIX,128100.xyz,DIRECT
   - DOMAIN-SUFFIX,motherlessmedia.com,DIRECT
   - DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
@@ -118,14 +122,14 @@ rules:
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,google,DIRECT
-  - RULE-SET,proxy,🎯 手动选择
+  - RULE-SET,proxy,🚀 全局选择
   - RULE-SET,direct,DIRECT
   - RULE-SET,lancidr,DIRECT
   - RULE-SET,cncidr,DIRECT
-  - RULE-SET,telegramcidr,🎯 手动选择
+  - RULE-SET,telegramcidr,🚀 全局选择
   - GEOIP,,DIRECT
   - GEOIP,CN,DIRECT
-  - MATCH,🎯 手动选择
+  - MATCH,🚀 全局选择
 #黑名单模式
 #rules:
 #  - RULE-SET,applications,DIRECT
@@ -143,50 +147,59 @@ rules:
 proxy-groups:
   - name: 🚀 全局选择
     type: select
+    lazy: true
+    interval: 3000
+    tolerance: 50
     proxies:
       - DIRECT
       - REJECT
       - 🎯 手动选择
       - ♻️ 自动选择
-
+      - ♻️ 高速频道高可用(自动切换节点)
   - name: ♻️ 自动选择
     type: url-test
-    url: 'https://www.google.com'
-    interval: 300
-    tolerance: 50
+    url: http://www.gstatic.com/generate_204
+    lazy: true
+    interval: 3000
+    tolerance: 120
     use:
-      - QFnyq2
+      - ioii
       - zua426
       - oslookClash
       - adispeed
       - ssrsub
       - free886
-      - sspool.nl
+      - ioii121
+
+#      - sspool.nl
 
   - name: 🎯 手动选择
     type: select
+    lazy: true
+    interval: 3000
+    url: http://www.gstatic.com/generate_204
+    tolerance: 120
     use:
-      - QFnyq2
+      - ioii
       - zua426
       - oslookClash
       - adispeed
       - ssrsub
       - free886
-      - sspool.nl
+      - ioii121
 
-  - name: ♻️ Gloab专用
-    type: select
-    url: 'https://www.google.com'
-    interval: 300
-    tolerance: 50
+#      - sspool.nl
+
+  - name: ♻️ 高速频道高可用(自动切换节点)
+    lazy: true
+    interval: 3000
+    tolerance: 120
+    url: http://www.gstatic.com/generate_204
+    type: url-test
     use:
-      - zua426
-      - oslookClash
+      - ioii
       - adispeed
-      - ssrsub
-      - free886
-      - sspool.nl
-
+      - ioii121
 proxy-providers:
 
   zua426:
@@ -237,15 +250,25 @@ proxy-providers:
       enable: false
       url: http://www.gstatic.com/generate_204
       interval: 300
-  QFnyq2:
+  ioii:
     type: http
-    path: proxy-providers/QFnyq2.yaml
-    url: "https://dwz.mk/QFnyq2"
+    path: proxy-providers/ioii.yaml
+    url: "https://gitee.com/ioii/iioii/raw/master/2"
     interval: 86400
     health-check:
-      enable: false
+      enable: true
       url: http://www.gstatic.com/generate_204
       interval: 300
+  ioii121:
+    type: http
+    path: proxy-providers/ioii121.yaml
+    url: "https://gitee.com/ioii/iioii/raw/master/2.05"
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+
   sub.v6mc.xyz:
     type: http
     path: proxy-providers/v6mc.yaml
@@ -253,7 +276,7 @@ proxy-providers:
     url: "https://suo.yt/Q5LSlhP"
     interval: 86400
     health-check:
-      enable: false
+      enable: true
       url: http://www.gstatic.com/generate_204
       interval: 300
   # free.kingfu.cf:
@@ -265,13 +288,13 @@ proxy-providers:
   #     enable: false
   #     url: http://www.gstatic.com/generate_204
   #     interval: 300
-  sspool.nl:
-    type: http
-    path: proxy-providers/test.yaml
-    url: "https://sspool.nl/clash/proxies?nc=CN"
-    interval: 86400
-    health-check:
-      enable: false
-      url: http://www.gstatic.com/generate_204
-      interval: 300
+#   sspool.nl:
+#     type: http
+#     path: proxy-providers/test.yaml
+#     url: "https://sspool.nl/clash/proxies?nc=CN"
+#     interval: 86400
+#     health-check:
+#       enable: false
+#       url: http://www.gstatic.com/generate_204
+#       interval: 300
 
