@@ -175,7 +175,7 @@ proxy-groups:
       - ssrsub
       - free886
       - ioii121
-
+      - wxshi
 #      - sspool.nl
 
   - name: 🎯 手动选择
@@ -192,8 +192,7 @@ proxy-groups:
       - ssrsub
       - free886
       - ioii121
-
-#      - sspool.nl
+      - wxshi
 
   - name: ♻️ 高速频道高可用(自动切换节点)
     lazy: true
@@ -203,15 +202,15 @@ proxy-groups:
     type: url-test
     use:
       - ioii
-      - adispeed
+      - wxshi
       - ioii121
 proxy-providers:
 
   zua426:
     type: http
     path: proxy-providers/zua426.yaml
-    # url: "https://zua426.cf/clash/proxies?nc=CN&speed=500"
-    url: "http://zua426.cf/clash/zua93/"
+    url: "https://zua426.cf/clash/proxies?nc=CN&type=trojan"
+    # url: "http://zua426.cf/clash/zua93/"
     interval: 86400
     health-check:
       enable: true
@@ -249,7 +248,7 @@ proxy-providers:
   free886:
     type: http
     path: proxy-providers/free886.yaml
-    url: "https://free886.herokuapp.com/clash/proxies?nc=CN"
+    url: "https://free886.herokuapp.com/clash/proxies?type=trojan"
     interval: 86400
     health-check:
       enable: false
@@ -284,15 +283,15 @@ proxy-providers:
       enable: true
       url: http://www.gstatic.com/generate_204
       interval: 300
-  # free.kingfu.cf:
-  #   type: http
-  #   path: proxy-providers/kingfu.yaml
-  #   url: "https://free.kingfu.cf/clash/proxies?nc=CN&speed=2000"
-  #   interval: 86400
-  #   health-check:
-  #     enable: false
-  #     url: http://www.gstatic.com/generate_204
-  #     interval: 300
+  wxshi:
+    type: http
+    path: proxy-providers/wxshi.yaml
+    url: "http://wxshi.top:9090/clash/proxies"
+    interval: 86400
+    health-check:
+      enable: false
+      url: http://www.gstatic.com/generate_204
+      interval: 300
 #   sspool.nl:
 #     type: http
 #     path: proxy-providers/test.yaml
