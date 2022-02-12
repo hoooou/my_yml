@@ -103,13 +103,13 @@ rule-providers:
     interval: 86400
 #白名单模式
 rules:
-  - RULE-SET,applications,DIRECT
+  - DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
   - DOMAIN,cdn.jiuse.cloud,DIRECT
   - DOMAIN,cdn2.jiuse.cloud,DIRECT
   - DOMAIN-KEYWORD,vdownload,DIRECT
-  - DOMAIN,services.googleapis.cn,🚀 全局选择
+
   # - DOMAIN-SUFFIX,128100.xyz,DIRECT
   # - DOMAIN,128100.xyz,DIRECT
   - DOMAIN,cdn.jsdelivr.net,DIRECT
@@ -122,6 +122,7 @@ rules:
   - DOMAIN-SUFFIX,gitee.com,DIRECT
   - DOMAIN,free886.herokuapp.com,DIRECT
   - DOMAIN,sub.v6mc.xyz,DIRECT
+  - RULE-SET,applications,DIRECT
   - RULE-SET,private,DIRECT
   - RULE-SET,reject,REJECT
   - RULE-SET,icloud,DIRECT
