@@ -175,7 +175,6 @@ proxy-groups:
       - free886
       - ioii121
       - wxshi
-      - ShueryShuai
 
   - name: 🎯 手动选择
     type: select
@@ -186,7 +185,6 @@ proxy-groups:
     use:
       - zua426
       - oslookClash
-      - ShueryShuai
       - ssrsub
       - free886
       - ioii121
@@ -200,7 +198,6 @@ proxy-groups:
     type: url-test
     use:
       - wxshi
-      - ShueryShuai
       - ioii121
 proxy-providers:
 
@@ -250,15 +247,6 @@ proxy-providers:
     interval: 86400
     health-check:
       enable: false
-      url: http://www.gstatic.com/generate_204
-      interval: 300
-  ShueryShuai:
-    type: http
-    path: proxy-providers/Shuai.yaml
-    url: "https://gitee.com/Shuery-Shuai/Profiles_for_Clash/raw/main/Profiles/Public%20from%20V9999.yml"
-    interval: 86400
-    health-check:
-      enable: true
       url: http://www.gstatic.com/generate_204
       interval: 300
   ioii121:
