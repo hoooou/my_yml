@@ -168,13 +168,8 @@ proxy-groups:
     interval: 3000
     tolerance: 120
     use:
-      - zua426
-      - oslookClash
-      - adispeed
-      - ssrsub
-      - free886
-      - ioii121
-      - wxshi
+      - sspool.nl11
+      - bihan
 
   - name: 🎯 手动选择
     type: select
@@ -183,12 +178,9 @@ proxy-groups:
     url: http://www.gstatic.com/generate_204
     tolerance: 120
     use:
-      - zua426
-      - oslookClash
-      - ssrsub
-      - free886
-      - ioii121
-      - wxshi
+      - sspool.nl11
+      - bihan
+
 
   - name: ♻️ 高速频道高可用(自动切换节点)
     lazy: true
@@ -197,8 +189,8 @@ proxy-groups:
     url: http://www.gstatic.com/generate_204
     type: url-test
     use:
-      - wxshi
-      - ioii121
+      - sspool.nl11
+      - bihan
 proxy-providers:
 
   # zua426:
@@ -267,13 +259,62 @@ proxy-providers:
   #     enable: false
   #     url: http://www.gstatic.com/generate_204
   #     interval: 300
-  sspool.nl:
+  sspool.nl11:
     type: http
-    path: proxy-providers/test.yaml
-    url: "https://raw.fastgit.org/FMYC2015/Clash/raw/main/%CE%A3%CE%BA%CF%8D%CE%BB%CE%BF%CF%82%20%CF%84%CE%B1%CF%87%CF%8D%CF%84%CE%B7%CF%84%CE%B1%CF%82"
+    path: proxy-providers/sspool.yaml
+    url: "https://raw.fastgit.org/FMYC2015/Clash/main/%CE%A3%CE%BA%CF%8D%CE%BB%CE%BF%CF%82%20%CF%84%CE%B1%CF%87%CF%8D%CF%84%CE%B7%CF%84%CE%B1%CF%82"
     interval: 86400
     health-check:
       enable: false
       url: http://www.gstatic.com/generate_204
       interval: 300
 
+  bihan:
+    type: http
+    url: "https://v2ray-lcx12901.vercel.app/sspool.herokuapp.com/bihai.yaml"
+    path: sspool.herokuapp.com/bihai.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
+  ednovas:
+    type: http
+    url: "https://v2ray-lcx12901.vercel.app/sspool.herokuapp.com/ednovas.yaml"
+    path: sspool.herokuapp.com/bihai1.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
+  other:
+    type: http
+    url: "https://v2ray-lcx12901.vercel.app/sspool.herokuapp.com/provider-other.yaml"
+    path: sspool.herokuapp.com/provider-other.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
+
+  other1:
+    type: http
+    url: "https://raw.fastgit.org/FMYC2015/Clash/main/%CE%96%CE%B7%CF%84%CE%B5%CE%AF%CF%84%CE%B1%CE%B9/858"
+    path: sspool.herokuapp.com/provider-other1.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
+  other2:
+    type: http
+    url: "https://raw.fastgit.org/FMYC2015/Clash/main/%CE%9C%CE%AF%CE%B3%CE%BC%CE%B1%20%CE%B1%CE%B5%CF%81%CE%BF%CE%B4%CF%81%CE%BF%CE%BC%CE%AF%CE%BF%CF%85"
+    path: sspool.herokuapp.com/provider-other2.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
+  other4:
+    type: http
+    url: "https://raw.fastgit.org/FMYC2015/Clash/main/%CE%9A%CF%8C%CF%83%CE%BC%CE%BF%CF%82"
+    path: sspool.herokuapp.com/provider-other4.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.gstatic.com/generate_204
