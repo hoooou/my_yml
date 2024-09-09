@@ -5,7 +5,7 @@ mode: rule
 log-level: info
 external-controller: '127.0.0.1:9090'
 dns:
-    enable: true
+    enable: false
     ipv6: false
     default-nameserver: [223.5.5.5, 119.29.29.29]
     enhanced-mode: fake-ip
@@ -162,6 +162,7 @@ proxy-groups:
     tolerance: 120
     use:
       - aaa
+      - 一元
 
   - name: 🎯 手动选择
     type: select
@@ -171,6 +172,7 @@ proxy-groups:
     tolerance: 120
     use:
       - aaa
+      - 一元
 
 
   - name: ♻️ 高速频道高可用(自动切换节点)
@@ -181,6 +183,7 @@ proxy-groups:
     type: url-test
     use:
       - aaa
+      - 一元
       
 proxy-providers:
 
@@ -232,5 +235,13 @@ proxy-providers:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
-
+   一元:
+    type: http
+    url: "https://sub2.smallstrawberry.com/api/v1/client/subscribe?token=c9a32a1e4f7a556a5ea1d72f6689df1a"
+    path: proxy-providers/yiyuan.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
 
