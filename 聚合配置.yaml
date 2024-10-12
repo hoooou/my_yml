@@ -171,8 +171,6 @@ proxy-groups:
       - ggg
       - kkk
       - lll
-      - mmm
-      - nnn
       - 一元
 
   - name: 🎯 手动选择
@@ -191,8 +189,6 @@ proxy-groups:
       - ggg
       - kkk
       - lll
-      - mmm
-      - nnn
       - 一元
 
   - name: ♻️ 高速频道高可用(自动切换节点)
@@ -211,8 +207,6 @@ proxy-groups:
       - ggg
       - kkk
       - lll
-      - mmm
-      - nnn
       - 一元
       
 proxy-providers:
@@ -337,25 +331,25 @@ proxy-providers:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
-   mmm:
-    type: http
-    url: "https://raw.githubusercontent.com/Leon406/SubCrawler/main/sub/share/all5"
-    path: proxy-providers/lll.yaml
-    interval: 86400
-    health-check:
-      enable: true
-      interval: 5000
-      url: https://www.gstatic.com/generate_204
+  #  mmm:
+  #   type: http
+  #   url: "https://raw.githubusercontent.com/Leon406/SubCrawler/main/sub/share/all5"
+  #   path: proxy-providers/lll.yaml
+  #   interval: 86400
+  #   health-check:
+  #     enable: true
+  #     interval: 5000
+  #     url: https://www.gstatic.com/generate_204
       
-   nnn:
-    type: http
-    url: "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml"
-    path: proxy-providers/lll.yaml
-    interval: 86400
-    health-check:
-      enable: true
-      interval: 5000
-      url: https://www.gstatic.com/generate_204
+  #  nnn:
+  #   type: http
+  #   url: "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml"
+  #   path: proxy-providers/lll.yaml
+  #   interval: 86400
+  #   health-check:
+  #     enable: true
+  #     interval: 5000
+  #     url: https://www.gstatic.com/generate_204
       
    一元:
     type: http
