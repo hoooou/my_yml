@@ -169,6 +169,10 @@ proxy-groups:
       - eee
       - fff
       - ggg
+      - kkk
+      - lll
+      - mmm
+      - nnn
       - 一元
 
   - name: 🎯 手动选择
@@ -185,6 +189,10 @@ proxy-groups:
       - eee
       - fff
       - ggg
+      - kkk
+      - lll
+      - mmm
+      - nnn
       - 一元
 
   - name: ♻️ 高速频道高可用(自动切换节点)
@@ -201,6 +209,10 @@ proxy-groups:
       - eee
       - fff
       - ggg
+      - kkk
+      - lll
+      - mmm
+      - nnn
       - 一元
       
 proxy-providers:
@@ -307,6 +319,44 @@ proxy-providers:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
+   kkk:
+    type: http
+    url: "https://suo.st/22Oq24b"
+    path: proxy-providers/kkk.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   lll:
+    type: http
+    url: "https://raw.githubusercontent.com/ripaojiedian/freenode/main/clash"
+    path: proxy-providers/lll.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   mmm:
+    type: http
+    url: "https://raw.githubusercontent.com/Leon406/SubCrawler/main/sub/share/all5"
+    path: proxy-providers/lll.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+      
+   nnn:
+    type: http
+    url: "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml"
+    path: proxy-providers/lll.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+      
    一元:
     type: http
     url: "https://sub1.smallstrawberry.com/api/v1/client/subscribe?token=f1bc3b70d48f43918bd4cf98bf7b57e4"
