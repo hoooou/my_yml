@@ -163,6 +163,12 @@ proxy-groups:
     tolerance: 120
     use:
       - aaa
+      - bbb
+      - ccc
+      - ddd
+      - eee
+      - fff
+      - ggg
       - 一元
 
   - name: 🎯 手动选择
@@ -173,8 +179,13 @@ proxy-groups:
     tolerance: 120
     use:
       - aaa
+      - bbb
+      - ccc
+      - ddd
+      - eee
+      - fff
+      - ggg
       - 一元
-
 
   - name: ♻️ 高速频道高可用(自动切换节点)
     lazy: true
@@ -184,6 +195,12 @@ proxy-groups:
     type: url-test
     use:
       - aaa
+      - bbb
+      - ccc
+      - ddd
+      - eee
+      - fff
+      - ggg
       - 一元
       
 proxy-providers:
@@ -231,6 +248,60 @@ proxy-providers:
     type: http
     url: "https://ghproxy.net/https://raw.githubusercontent.com/anaer/Sub/main/clash.yaml"
     path: proxy-providers/abc.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   bbb:
+    type: http
+    url: "https://UAsUsF.mcsslk.xyz/e6bcb1134c82489b6f81935a06d6e5e8"
+    path: proxy-providers/bbb.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   ccc:
+    type: http
+    url: "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.yml"
+    path: proxy-providers/ccc.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   ddd:
+    type: http
+    url: "https://nrkL8E.tosslk.xyz/2191f8c2ffbed9006e1723633a1f3984"
+    path: proxy-providers/ddd.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   eee:
+    type: http
+    url: "https://raw.githubusercontent.com/aiboboxx/clashfree/main/clash.yml"
+    path: proxy-providers/eee.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   fff:
+    type: http
+    url: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
+    path: proxy-providers/fff.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   ggg:
+    type: http
+    url: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml"
+    path: proxy-providers/ggg.yaml
     interval: 86400
     health-check:
       enable: true
