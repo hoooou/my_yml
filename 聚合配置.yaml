@@ -180,6 +180,7 @@ proxy-groups:
       - freenode
       - nnn
       - mmm
+      - ooo
 
 
   - name: 🎯 手动选择
@@ -202,6 +203,7 @@ proxy-groups:
       - freenode
       - nnn
       - mmm
+      - ooo
 
 
   - name: ♻️ 高速频道高可用(自动切换节点)
@@ -224,6 +226,7 @@ proxy-groups:
       - freenode
       - nnn
       - mmm
+      - ooo
       
 proxy-providers:
 
@@ -403,4 +406,13 @@ proxy-providers:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
-
+   ooo:
+    type: http
+    url: "https://raw.githubusercontent.com/Barabama/FreeNodes/refs/heads/main/nodes/clashmeta.yaml"
+    path: proxy-providers/ooo.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+      
