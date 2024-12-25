@@ -178,6 +178,9 @@ proxy-groups:
       - lll
       - 一元
       - freenode
+      - nnn
+      - mmm
+
 
   - name: 🎯 手动选择
     type: select
@@ -197,6 +200,9 @@ proxy-groups:
       - lll
       - 一元
       - freenode
+      - nnn
+      - mmm
+
 
   - name: ♻️ 高速频道高可用(自动切换节点)
     lazy: true
@@ -216,6 +222,8 @@ proxy-groups:
       - lll
       - 一元
       - freenode
+      - nnn
+      - mmm
       
 proxy-providers:
 
@@ -377,5 +385,22 @@ proxy-providers:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
-
+   nnn:
+    type: http
+    url: "https://raw.githubusercontent.com/mai19950/clash_config/refs/heads/main/sub/Free.yaml"
+    path: proxy-providers/nnn.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+   mmm:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/vxiaov/free_proxies@main/clash/clash.provider.yaml"
+    path: proxy-providers/mmm.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
 
