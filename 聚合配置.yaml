@@ -168,10 +168,10 @@ proxy-groups:
     tolerance: 120
     use:
       - aaa
-      - bbb
+      # - bbb
       - ccc
-      - ddd
-      - eee
+      # - ddd
+      # - eee
       - fff
       - ggg
       - kkk
@@ -191,10 +191,10 @@ proxy-groups:
     tolerance: 120
     use:
       - aaa
-      - bbb
+      # - bbb
       - ccc
-      - ddd
-      - eee
+      # - ddd
+      # - eee
       - fff
       - ggg
       - kkk
@@ -214,10 +214,10 @@ proxy-groups:
     type: url-test
     use:
       - aaa
-      - bbb
+      # - bbb
       - ccc
-      - ddd
-      - eee
+      # - ddd
+      # - eee
       - fff
       - ggg
       - kkk
@@ -278,15 +278,15 @@ proxy-providers:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
-   bbb:
-    type: http
-    url: "https://UAsUsF.mcsslk.xyz/e6bcb1134c82489b6f81935a06d6e5e8"
-    path: proxy-providers/bbb.yaml
-    interval: 86400
-    health-check:
-      enable: true
-      interval: 5000
-      url: https://www.gstatic.com/generate_204
+  #  bbb:
+  #   type: http
+  #   url: "https://UAsUsF.mcsslk.xyz/e6bcb1134c82489b6f81935a06d6e5e8"
+  #   path: proxy-providers/bbb.yaml
+  #   interval: 86400
+  #   health-check:
+  #     enable: true
+  #     interval: 5000
+  #     url: https://www.gstatic.com/generate_204
    ccc:
     type: http
     url: "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.yml"
@@ -296,24 +296,24 @@ proxy-providers:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
-   ddd:
-    type: http
-    url: "https://nrkL8E.tosslk.xyz/2191f8c2ffbed9006e1723633a1f3984"
-    path: proxy-providers/ddd.yaml
-    interval: 86400
-    health-check:
-      enable: true
-      interval: 5000
-      url: https://www.gstatic.com/generate_204
-   eee:
-    type: http
-    url: "https://raw.githubusercontent.com/aiboboxx/clashfree/main/clash.yml"
-    path: proxy-providers/eee.yaml
-    interval: 86400
-    health-check:
-      enable: true
-      interval: 5000
-      url: https://www.gstatic.com/generate_204
+  #  ddd:
+  #   type: http
+  #   url: "https://nrkL8E.tosslk.xyz/2191f8c2ffbed9006e1723633a1f3984"
+  #   path: proxy-providers/ddd.yaml
+  #   interval: 86400
+  #   health-check:
+  #     enable: true
+  #     interval: 5000
+  #     url: https://www.gstatic.com/generate_204
+  #  eee:
+  #   type: http
+  #   url: "https://raw.githubusercontent.com/aiboboxx/clashfree/main/clash.yml"
+  #   path: proxy-providers/eee.yaml
+  #   interval: 86400
+  #   health-check:
+  #     enable: true
+  #     interval: 5000
+  #     url: https://www.gstatic.com/generate_204
    fff:
     type: http
     url: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
