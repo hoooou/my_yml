@@ -110,7 +110,9 @@ rules:
   - DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
   - DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
   - DOMAIN-SUFFIX,yiche.com,DIRECT
+  - DOMAIN-SUFFIX,live.com,🚀 全局选择
   - DOMAIN-SUFFIX,video.twimg.com,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
   - DOMAIN-SUFFIX,video-t-2.twimg.com,DIRECT
   - DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
   - DOMAIN-SUFFIX,bitautotech.com,DIRECT
@@ -175,6 +177,7 @@ proxy-groups:
       - kkk
       - lll
       - 一元
+      - freenode
 
   - name: 🎯 手动选择
     type: select
@@ -193,6 +196,7 @@ proxy-groups:
       - kkk
       - lll
       - 一元
+      - freenode
 
   - name: ♻️ 高速频道高可用(自动切换节点)
     lazy: true
@@ -211,6 +215,7 @@ proxy-groups:
       - kkk
       - lll
       - 一元
+      - freenode
       
 proxy-providers:
 
@@ -356,11 +361,21 @@ proxy-providers:
       
    一元:
     type: http
-    url: "https://sub1.smallstrawberry.com/api/v1/client/subscribe?token=f1bc3b70d48f43918bd4cf98bf7b57e4"
+    url: "https://sub3.smallstrawberry.com/api/v1/client/subscribe?token=bc3236675b534bb280812915c1f35478"
     path: proxy-providers/yiyuan.yaml
     interval: 86400
     health-check:
       enable: true
       interval: 5000
       url: https://www.gstatic.com/generate_204
+   freenode:
+    type: http
+    url: "https://fastly.jsdelivr.net/gh/freenodes/freenodes@main/ClashPremiumFree.yaml"
+    path: proxy-providers/freenode.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      interval: 5000
+      url: https://www.gstatic.com/generate_204
+
 
