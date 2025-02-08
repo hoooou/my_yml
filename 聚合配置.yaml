@@ -5,8 +5,8 @@ mode: rule
 log-level: info
 external-controller: '127.0.0.1:9090'
 dns:
-    enable: true
-    ipv6: false
+    enable: false
+    ipv6: true
     default-nameserver: [218.30.118.6, 223.6.6.6]
     enhanced-mode: fake-ip
     fake-ip-range: 198.18.0.1/16
@@ -110,6 +110,8 @@ rules:
   - DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
   - DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
   - DOMAIN-SUFFIX,yiche.com,DIRECT
+  - DOMAIN-SUFFIX,bitautotech.com,DIRECT
+  # - DOMAIN-SUFFIX,cursor.sh,DIRECT
   - DOMAIN-SUFFIX,live.com,🚀 全局选择
  # - DOMAIN-SUFFIX,video.twimg.com,DIRECT
   - DOMAIN-SUFFIX,microsoft.com,DIRECT
