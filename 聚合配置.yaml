@@ -172,32 +172,6 @@ proxy-groups:
       - REJECT
       - 🎯 手动选择
       - ♻️ 自动选择
-  - name: ♻️ 自动选择
-    type: url-test
-    url: https://www.gstatic.com/generate_204	
-    lazy: true
-    interval: 86400
-    tolerance: 120
-    use:
-      - a1
-      - a2
-      - a3
-      - a4
-      - a5
-      - a6
-      - a7
-      - a9
-      - a10
-      - a11
-      - a13
-      - a14
-      - a15
-      - a16
-      - a17
-      # - a18
-      - a19
-      - a20
-      - a21
 
   - name: 🎯 手动选择
     type: select
@@ -225,6 +199,34 @@ proxy-groups:
       - a19
       - a20
       - a21
+  - name: ♻️ 自动选择
+    type: url-test
+    url: https://www.gstatic.com/generate_204	
+    lazy: true
+    interval: 86400
+    tolerance: 120
+    use:
+      - a1
+      - a2
+      - a3
+      - a4
+      - a5
+      - a6
+      - a7
+      - a9
+      - a10
+      - a11
+      - a13
+      - a14
+      - a15
+      - a16
+      - a17
+      # - a18
+      - a19
+      - a20
+      - a21
+
+
 
 p: &p
     type: http
