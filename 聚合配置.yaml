@@ -19,7 +19,7 @@ rule-providers:
     type: http
     behavior: domain
     url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
-    path: ./ruleset/reject.yaml
+    path: ./ruleset/reject_rule.yaml
     interval: 86400
 
   icloud:
@@ -117,7 +117,6 @@ rules:
   - DOMAIN-SUFFIX,microsoft.com,DIRECT
 #  - DOMAIN-SUFFIX,video-t-2.twimg.com,DIRECT
   - DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
-  - DOMAIN-SUFFIX,bitautotech.com,DIRECT
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
   - DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
@@ -134,8 +133,8 @@ rules:
   - RULE-SET,lancidr,DIRECT
   - RULE-SET,cncidr,DIRECT
   - RULE-SET,telegramcidr,🚀 全局选择
-  - GEOIP,LAN,DIRECT
   - GEOIP,CN,DIRECT
+  - GEOIP,LAN,DIRECT
   - MATCH,🚀 全局选择
 #黑名单模式
 #rules:
@@ -251,7 +250,7 @@ proxy-providers:
      interval: 86400
      health-check:
        enable: true
-       interval: 5000
+       interval: 60000
        url: https://www.gstatic.com/generate_204
     a2:
       type: http
@@ -260,7 +259,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a3:
       type: http
@@ -269,7 +268,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a4:
       type: http
@@ -278,7 +277,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a5:
       type: http
@@ -287,7 +286,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a6:
       type: http
@@ -296,7 +295,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a7:
       type: http
@@ -305,7 +304,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a9:
       type: http
@@ -314,7 +313,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a10:
       type: http
@@ -323,7 +322,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a11:
       type: http
@@ -332,7 +331,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a13:
       type: http
@@ -341,7 +340,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
 
     a14:
@@ -351,7 +350,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a15:
       type: http
@@ -360,7 +359,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
 
     a16:
@@ -370,7 +369,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a17:
       type: http
@@ -379,7 +378,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a18:
       type: http
@@ -388,7 +387,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a19:
       type: http
@@ -397,7 +396,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a20:
       type: http
@@ -406,7 +405,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
     a21:
       type: http
@@ -415,7 +414,7 @@ proxy-providers:
       interval: 86400
       health-check:
         enable: true
-        interval: 5000
+        interval: 60000
         url: https://www.gstatic.com/generate_204
 
 
