@@ -7,7 +7,7 @@ external-controller: '127.0.0.1:9090'
 dns:
     enable: false
     ipv6: true
-    default-nameserver: [218.30.118.6, 223.6.6.6]
+    default-nameserver: [218.30.118.6, 223.6.6.6,192.168.70.49]
     enhanced-mode: fake-ip
     fake-ip-range: 198.18.0.1/16
     use-hosts: false
@@ -232,7 +232,7 @@ p: &p
     type: http
     interval: 86400
     health-check:
-        enable: true
+        enable: false
         url: https://www.gstatic.com/generate_204
         interval: 3000
         timeout: 5000
