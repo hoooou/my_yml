@@ -169,20 +169,29 @@ proxy-groups:
     interval: 3000
     tolerance: 120
     use:
-      - aaa
-      # - bbb
-      - ccc
-      # - ddd
-      # - eee
-      - fff
-      - ggg
-      - kkk
-      - lll
-      - 一元
-      - freenode
-      - nnn
-      - mmm
-      - ooo
+      - a1
+      - a2
+      - a3
+      - a4
+      - a5
+      - a6
+      - a7
+      - a8
+      - a9
+      - a10
+      - a11
+      - a12
+      - a13
+      - a14
+      - a15
+      - a16
+      - a17
+      - a18
+      - a19
+      - a20
+      - a21
+      - a22
+      - a23      
 
 
   - name: 🎯 手动选择
@@ -192,21 +201,29 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204	
     tolerance: 120
     use:
-      - aaa
-      # - bbb
-      - ccc
-      # - ddd
-      # - eee
-      - fff
-      - ggg
-      - kkk
-      - lll
-      - 一元
-      - freenode
-      - nnn
-      - mmm
-      - ooo
-
+      - a1
+      - a2
+      - a3
+      - a4
+      - a5
+      - a6
+      - a7
+      - a8
+      - a9
+      - a10
+      - a11
+      - a12
+      - a13
+      - a14
+      - a15
+      - a16
+      - a17
+      - a18
+      - a19
+      - a20
+      - a21
+      - a22
+      - a23
 
   - name: ♻️ 高速频道高可用(自动切换节点)
     lazy: true
@@ -215,190 +232,52 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204	
     type: url-test
     use:
-      - aaa
-      # - bbb
-      - ccc
-      # - ddd
-      # - eee
-      - fff
-      - ggg
-      - kkk
-      - lll
-      - 一元
-      - freenode
-      - nnn
-      - mmm
-      - ooo
+      - a1
+      - a2
+      - a3
+      - a4
+      - a5
+      - a6
+      - a7
+      - a8
+      - a9
+      - a10
+      - a11
+      - a12
+      - a13
+      - a14
+      - a15
+      - a16
+      - a17
+      - a18
+      - a19
+      - a20
+      - a21
+      - a22
+      - a23
       
 proxy-providers:
-    aaa:
+    a1:
      type: http
      url: "https://202502181121431.chibaba.ggff.net/api/v1/client/subscribe?token=b5756287f05633d9068afb2a9fe375ba"
-     path: proxy-providers/aaa.yaml
+     path: proxy-providers/a1.yaml
      interval: 86400
      health-check:
        enable: true
        interval: 5000
        url: https://www.gstatic.com/generate_204
-  #  bbb:
-  #   type: http
-  #   url: "https://UAsUsF.mcsslk.xyz/e6bcb1134c82489b6f81935a06d6e5e8"
-  #   path: proxy-providers/bbb.yaml
-  #   interval: 86400
-  #   health-check:
-  #     enable: true
-  #     interval: 5000
-  #     url: https://www.gstatic.com/generate_204
-    ccc:
-      type: http
-      url: "https://epclub.xyz/api/epclub?token=b8877e23d8e96dae30e161f3fad4d39a"
-      path: proxy-providers/ccc.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-  #  ddd:
-  #   type: http
-  #   url: "https://nrkL8E.tosslk.xyz/2191f8c2ffbed9006e1723633a1f3984"
-  #   path: proxy-providers/ddd.yaml
-  #   interval: 86400
-  #   health-check:
-  #     enable: true
-  #     interval: 5000
-  #     url: https://www.gstatic.com/generate_204
-  #  eee:
-  #   type: http
-  #   url: "https://raw.githubusercontent.com/aiboboxx/clashfree/main/clash.yml"
-  #   path: proxy-providers/eee.yaml
-  #   interval: 86400
-  #   health-check:
-  #     enable: true
-  #     interval: 5000
-  #     url: https://www.gstatic.com/generate_204
-    fff:
-      type: http
-      url: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
-      path: proxy-providers/fff.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    ggg:
-      type: http
-      url: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml"
-      path: proxy-providers/ggg.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    kkk:
-      type: http
-      url: "https://sub.xn--4gqvd492adjr.com/s/d818ae121176fd8c3ff2d942c665e584"
-      path: proxy-providers/kkk.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    lll:
-      type: http
-      url: "https://raw.githubusercontent.com/ripaojiedian/freenode/main/clash"
-      path: proxy-providers/lll.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    #  mmm:
-    #   type: http
-    #   url: "https://raw.githubusercontent.com/Leon406/SubCrawler/main/sub/share/all5"
-    #   path: proxy-providers/lll.yaml
-    #   interval: 86400
-    #   health-check:
-    #     enable: true
-    #     interval: 5000
-    #     url: https://www.gstatic.com/generate_204
-        
-    #  nnn:
-    #   type: http
-    #   url: "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml"
-    #   path: proxy-providers/lll.yaml
-    #   interval: 86400
-    #   health-check:
-    #     enable: true
-    #     interval: 5000
-    #     url: https://www.gstatic.com/generate_204
-        
-    一元:
-      type: http
-      url: "https://sub3.smallstrawberry.com/api/v1/client/subscribe?token=bc3236675b534bb280812915c1f35478"
-      path: proxy-providers/yiyuan.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    freenode:
-      type: http
-      url: "https://fastly.jsdelivr.net/gh/freenodes/freenodes@main/ClashPremiumFree.yaml"
-      path: proxy-providers/freenode.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    nnn:
-      type: http
-      url: "https://raw.githubusercontent.com/mai19950/clash_config/refs/heads/main/sub/Free.yaml"
-      path: proxy-providers/nnn.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    mmm:
-      type: http
-      url: "https://cdn.jsdelivr.net/gh/vxiaov/free_proxies@main/clash/clash.provider.yaml"
-      path: proxy-providers/mmm.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    ooo:
-      type: http
-      url: "https://raw.githubusercontent.com/Barabama/FreeNodes/refs/heads/main/nodes/clashmeta.yaml"
-      path: proxy-providers/ooo.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
-    aa:
-      type: http
-      url: "https://paste.gg/p/anonymous/6e1b3f2aec804d80b4dd73a691fbd635/files/deb8313f637c44bd981786e3e4c75e95/raw"
-      path: proxy-providers/aa.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        interval: 5000
-        url: https://www.gstatic.com/generate_204
     a2:
       type: http
-      url: "https://sub.vip.sd/JPa6vvFgygVtNP2sGJ2r/download/YuanZhang"
+      url: "https://epclub.xyz/api/epclub?token=b8877e23d8e96dae30e161f3fad4d39a"
       path: proxy-providers/a2.yaml
       interval: 86400
       health-check:
         enable: true
         interval: 5000
         url: https://www.gstatic.com/generate_204
-
     a3:
       type: http
-      url: "https://sub.tuanzi.xyz/s/99d6184c02bd5abaf697e249e1829b5d"
+      url: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
       path: proxy-providers/a3.yaml
       interval: 86400
       health-check:
@@ -407,17 +286,16 @@ proxy-providers:
         url: https://www.gstatic.com/generate_204
     a4:
       type: http
-      url: "https://epclub.xyz/api/epclub?token=a4ad607b25573b878ba4141766805d45"
+      url: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml"
       path: proxy-providers/a4.yaml
       interval: 86400
       health-check:
         enable: true
         interval: 5000
         url: https://www.gstatic.com/generate_204
-
     a5:
       type: http
-      url: "https://sub.xn--4gqvd492adjr.com/s/83afc5169b0d9140e8635c1f12b7f6e5"
+      url: "https://sub.xn--4gqvd492adjr.com/s/d818ae121176fd8c3ff2d942c665e584"
       path: proxy-providers/a5.yaml
       interval: 86400
       health-check:
@@ -426,7 +304,7 @@ proxy-providers:
         url: https://www.gstatic.com/generate_204
     a6:
       type: http
-      url: "https://sub.nexc.cc/api/v1/client/subscribe?token=6653dae74bb2813201976ce8561b37c8"
+      url: "https://raw.githubusercontent.com/ripaojiedian/freenode/main/clash"
       path: proxy-providers/a6.yaml
       interval: 86400
       health-check:
@@ -435,10 +313,161 @@ proxy-providers:
         url: https://www.gstatic.com/generate_204
     a7:
       type: http
-      url: "https://sub.xn--4gqvd492adjr.com/s/d818ae121176fd8c3ff2d942c665e584"
+      url: "https://sub3.smallstrawberry.com/api/v1/client/subscribe?token=bc3236675b534bb280812915c1f35478"
       path: proxy-providers/a7.yaml
       interval: 86400
       health-check:
         enable: true
         interval: 5000
         url: https://www.gstatic.com/generate_204
+    a8:
+      type: http
+      url: "https://fastly.jsdelivr.net/gh/freenodes/freenodes@main/ClashPremiumFree.yaml"
+      path: proxy-providers/a8.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a9:
+      type: http
+      url: "https://raw.githubusercontent.com/mai19950/clash_config/refs/heads/main/sub/Free.yaml"
+      path: proxy-providers/a9.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a10:
+      type: http
+      url: "https://cdn.jsdelivr.net/gh/vxiaov/free_proxies@main/clash/clash.provider.yaml"
+      path: proxy-providers/a10.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a11:
+      type: http
+      url: "https://raw.githubusercontent.com/Barabama/FreeNodes/refs/heads/main/nodes/clashmeta.yaml"
+      path: proxy-providers/a11.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a12:
+      type: http
+      url: "https://paste.gg/p/anonymous/6e1b3f2aec804d80b4dd73a691fbd635/files/deb8313f637c44bd981786e3e4c75e95/raw"
+      path: proxy-providers/a12.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a13:
+      type: http
+      url: "https://sub.vip.sd/JPa6vvFgygVtNP2sGJ2r/download/YuanZhang"
+      path: proxy-providers/a13.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+
+    a14:
+      type: http
+      url: "https://sub.tuanzi.xyz/s/99d6184c02bd5abaf697e249e1829b5d"
+      path: proxy-providers/a14.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a15:
+      type: http
+      url: "https://epclub.xyz/api/epclub?token=a4ad607b25573b878ba4141766805d45"
+      path: proxy-providers/a15.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+
+    a16:
+      type: http
+      url: "https://sub.xn--4gqvd492adjr.com/s/83afc5169b0d9140e8635c1f12b7f6e5"
+      path: proxy-providers/a16.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a17:
+      type: http
+      url: "https://sub.nexc.cc/api/v1/client/subscribe?token=6653dae74bb2813201976ce8561b37c8"
+      path: proxy-providers/a17.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a18:
+      type: http
+      url: "https://sub.xn--4gqvd492adjr.com/s/d818ae121176fd8c3ff2d942c665e584"
+      path: proxy-providers/a18.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a19:
+      type: http
+      url: "https://sub.vip.sd/JPa6vvFgygVtNP2sGJ2r/download/YuanZhang?target=ShadowRocket"
+      path: proxy-providers/a19.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a20:
+      type: http
+      url: "https://v1.mk/wpSPBUX"
+      path: proxy-providers/a20.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a21:
+      type: http
+      url: "https://www.ckckssl.top/api/v1/client/subscribe?token=cdc96d354d96b6e6e2670c7611611bdf"
+      path: proxy-providers/a21.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a22:
+      type: http
+      url: "https://sub.xn--4gqvd492adjr.com/s/6a401b142084ee1cbae1251e76f25118"
+      path: proxy-providers/a22.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+    a23:
+      type: http
+      url: "https://202502181121431.chibaba.ggff.net/api/v1/client/subscribe?token=b5756287f05633d9068afb2a9fe375ba"
+      path: proxy-providers/a23.yaml
+      interval: 86400
+      health-check:
+        enable: true
+        interval: 5000
+        url: https://www.gstatic.com/generate_204
+
+
+
+
+
