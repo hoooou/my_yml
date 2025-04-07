@@ -241,239 +241,77 @@ proxy-groups:
       - a19
       - a20
       - a21
-      
+
+p: &p
+    type: http
+    interval: 86400
+    health-check:
+        enable: true
+        url: https://www.gstatic.com/generate_204
+        interval: 300
+        timeout: 5000
+        lazy: true
+        expected-status: 204
 proxy-providers:
     a1:
-      type: http
+      <<: *p
       url: "https://202502181121431.chibaba.ggff.net/api/v1/client/subscribe?token=b5756287f05633d9068afb2a9fe375ba"
       path: proxy-providers/a1.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a2:
-      type: http
       url: "https://epclub.xyz/api/epclub?token=b8877e23d8e96dae30e161f3fad4d39a"
       path: proxy-providers/a2.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a3:
-      type: http
       url: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
       path: proxy-providers/a3.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a4:
-      type: http
       url: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml"
       path: proxy-providers/a4.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a5:
-      type: http
       url: "https://sub.xn--4gqvd492adjr.com/s/d818ae121176fd8c3ff2d942c665e584"
       path: proxy-providers/a5.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a6:
-      type: http
       url: "https://raw.githubusercontent.com/ripaojiedian/freenode/main/clash"
       path: proxy-providers/a6.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a7:
-      type: http
       url: "https://sub3.smallstrawberry.com/api/v1/client/subscribe?token=bc3236675b534bb280812915c1f35478"
       path: proxy-providers/a7.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a9:
-      type: http
       url: "https://raw.githubusercontent.com/mai19950/clash_config/refs/heads/main/sub/Free.yaml"
       path: proxy-providers/a9.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a10:
-      type: http
       url: "https://cdn.jsdelivr.net/gh/vxiaov/free_proxies@main/clash/clash.provider.yaml"
       path: proxy-providers/a10.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a11:
-      type: http
       url: "https://raw.githubusercontent.com/Barabama/FreeNodes/refs/heads/main/nodes/clashmeta.yaml"
       path: proxy-providers/a11.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a13:
-      type: http
       url: "https://sub.vip.sd/JPa6vvFgygVtNP2sGJ2r/download/YuanZhang"
       path: proxy-providers/a13.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
-
     a14:
-      type: http
       url: "https://sub.tuanzi.xyz/s/99d6184c02bd5abaf697e249e1829b5d"
       path: proxy-providers/a14.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a15:
-      type: http
       url: "https://epclub.xyz/api/epclub?token=a4ad607b25573b878ba4141766805d45"
       path: proxy-providers/a15.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
-
     a16:
-      type: http
       url: "https://sub.xn--4gqvd492adjr.com/s/83afc5169b0d9140e8635c1f12b7f6e5"
       path: proxy-providers/a16.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a17:
-      type: http
       url: "https://sub.nexc.cc/api/v1/client/subscribe?token=6653dae74bb2813201976ce8561b37c8"
       path: proxy-providers/a17.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a18:
-      type: http
       url: "https://sub.vip.sd/JPa6vvFgygVtNP2sGJ2r/download/YuanZhang?target=ShadowRocket"
       path: proxy-providers/a18.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a19:
-      type: http
       url: "https://v1.mk/wpSPBUX"
       path: proxy-providers/a19.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a20:
-      type: http
       url: "https://www.ckckssl.top/api/v1/client/subscribe?token=cdc96d354d96b6e6e2670c7611611bdf"
       path: proxy-providers/a20.yaml
-      interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
     a21:
-      type: http
       url: "https://sub.xn--4gqvd492adjr.com/s/6a401b142084ee1cbae1251e76f25118"
       path: proxy-providers/a21.yaml
       interval: 86400
-      health-check:
-        enable: true
-        url: https://www.gstatic.com/generate_204
-        interval: 300
-        timeout: 5000
-        lazy: true
-        expected-status: 204
-
 
 
 
