@@ -107,21 +107,31 @@ rule-providers:
     interval: 86400
 #白名单模式
 rules:
+  # 新增微软服务直连规则（优先级最高）🌟
+  - DOMAIN-SUFFIX,office.com,DIRECT
+  - DOMAIN-SUFFIX,outlook.com,DIRECT
+  - DOMAIN-SUFFIX,onenote.com,DIRECT
+  - DOMAIN-SUFFIX,onedrive.com,DIRECT
+  - DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+  - DOMAIN-SUFFIX,sharepoint.com,DIRECT
+  - DOMAIN-SUFFIX,azure.com,DIRECT
+
+  # 现有显式规则（保持优先级）
   - DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
   - DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
   - DOMAIN-SUFFIX,yiche.com,DIRECT
   - DOMAIN-SUFFIX,bitautotech.com,DIRECT
-  # - DOMAIN-SUFFIX,cursor.sh,DIRECT
   - DOMAIN-SUFFIX,live.com,🚀 全局选择
- # - DOMAIN-SUFFIX,video.twimg.com,DIRECT
-  - DOMAIN-SUFFIX,microsoft.com,DIRECT
-#  - DOMAIN-SUFFIX,video-t-2.twimg.com,DIRECT
   - DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
   - DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
   - DOMAIN-SUFFIX,gitee.com,DIRECT
   - DOMAIN,free886.herokuapp.com,DIRECT
+ # - DOMAIN-SUFFIX,video.twimg.com,DIRECT
+#  - DOMAIN-SUFFIX,video-t-2.twimg.com,DIRECT
+  # 规则集引用（保持原有顺序）
   - RULE-SET,applications,DIRECT
   - RULE-SET,private,DIRECT
   - RULE-SET,reject,REJECT
@@ -133,6 +143,8 @@ rules:
   - RULE-SET,lancidr,DIRECT
   - RULE-SET,cncidr,DIRECT
   - RULE-SET,telegramcidr,🚀 全局选择
+
+  # 地理定位规则
   - GEOIP,CN,DIRECT
   - GEOIP,LAN,DIRECT
   - MATCH,🚀 全局选择
