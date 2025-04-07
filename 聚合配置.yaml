@@ -153,8 +153,8 @@ proxy-groups:
   - name: 🚀 全局选择
     type: select
     lazy: true
-    interval: 300
-    tolerance: 50
+    interval: 86400
+    tolerance: 120
     proxies:
       - DIRECT
       - REJECT
@@ -165,7 +165,7 @@ proxy-groups:
     type: url-test
     url: https://www.gstatic.com/generate_204	
     lazy: true
-    interval: 3000
+    interval: 86400
     tolerance: 120
     use:
       - a1
@@ -191,8 +191,8 @@ proxy-groups:
   - name: 🎯 手动选择
     type: select
     lazy: true
-    interval: 300
     url: https://www.gstatic.com/generate_204	
+    interval: 86400
     tolerance: 120
     use:
       - a1
@@ -217,7 +217,7 @@ proxy-groups:
 
   - name: ♻️ 高速频道高可用(自动切换节点)
     lazy: true
-    interval: 3000
+    interval: 86400
     tolerance: 120
     url: https://www.gstatic.com/generate_204	
     type: url-test
