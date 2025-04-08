@@ -199,6 +199,7 @@ proxy-groups:
       - a19
       - a20
       - a21
+      - a22
   - name: ♻️ 自动选择
     type: url-test
     url: https://www.gstatic.com/generate_204	
@@ -225,6 +226,7 @@ proxy-groups:
       - a19
       - a20
       - a21
+      - a22
 
 
 
@@ -353,6 +355,12 @@ proxy-providers:
         additional-prefix: "a21:"
       url: "https://sub.xn--4gqvd492adjr.com/s/6a401b142084ee1cbae1251e76f25118"
       path: proxy-providers/a21.yaml
+    a22:
+      <<: *p
+      override:
+        additional-prefix: "a22:"
+      url: "https://ghproxy.cn/https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml"
+      path: proxy-providers/a22.yaml
 
 
 
