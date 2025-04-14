@@ -182,6 +182,10 @@ usex: &usex
       - a20
       - a21
       - a22
+      - a23
+      - a24
+      - a25
+      - a26
 
 proxy-groups:
   - name: 🚀 全局选择
@@ -342,6 +346,30 @@ proxy-providers:
         additional-prefix: "a22:"
       url: "https://ghproxy.cn/https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml"
       path: proxy-providers/a22.yaml
+    a23:
+      <<: *p
+      override:
+        additional-prefix: "a23:"
+      url: "https://raw.githubusercontent.com/go4sharing/sub/main/sub.yaml"
+      path: proxy-providers/a23.yaml
+    a24:
+      <<: *p
+      override:
+        additional-prefix: "a24:"
+      url: "https://shz.al/aNpJ"
+      path: proxy-providers/a24.yaml
+    a25:
+      <<: *p
+      override:
+        additional-prefix: "a25:"
+      url: "https://raw.githubusercontent.com/mfbpn/tg_mfbpn_sub/main/trial.yaml"
+      path: proxy-providers/a25.yaml
+    a26:
+      <<: *p
+      override:
+        additional-prefix: "a26:"
+      url: "https://super.jack991.filegear-sg.me"
+      path: proxy-providers/a26.yaml
 
 
 
