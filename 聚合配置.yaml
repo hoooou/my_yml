@@ -110,6 +110,7 @@ rules:
   # 新增微软服务直连规则（优先级最高）🌟
   - DOMAIN-SUFFIX,office.com,DIRECT
   - DOMAIN-SUFFIX,outlook.com,DIRECT
+  - DOMAIN-SUFFIX,cursor.sh,🚀 全局选择
   - DOMAIN-SUFFIX,onenote.com,DIRECT
   - DOMAIN-SUFFIX,onedrive.com,DIRECT
   - DOMAIN-SUFFIX,microsoftonline.com,DIRECT
@@ -256,7 +257,7 @@ proxy-providers:
       <<: *p
       override:
         additional-prefix: "a5:"
-      url: "https://sub.xn--4gqvd492adjr.com/s/d818ae121176fd8c3ff2d942c665e584"
+      url: "https://raw.githubusercontent.com/aiboboxx/clashfree/main/clash.yml"
       path: proxy-providers/a5.yaml
     a6:
       <<: *p
