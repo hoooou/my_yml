@@ -197,12 +197,13 @@ proxy-groups:
       - ♻️ 自动选择
       - 🤖 ChatGPT自动选择可用节点
       - 🤖 Google自动选择可用节点
+      - 🤖 推特自动选择可用节点
 
   - name: 🎯 手动选择
     type: select
     lazy: true
     url: https://google.com
-    expected-status: 200/302
+    expected-status: 200-299/300-399
     interval: 86400
     tolerance: 6000
     <<: *usex
@@ -210,7 +211,7 @@ proxy-groups:
   - name: ♻️ 自动选择
     type: url-test
     url: https://google.com
-    expected-status: 200/300-399
+    expected-status: 200-299/300-399
     interval: 86400
     tolerance: 6000
     <<: *usex
@@ -222,7 +223,7 @@ proxy-groups:
     tolerance: 500
     timeout: 3000
     disable-udp: true
-    expected-status: 200/300-399
+    expected-status: 200-299/300-399
     <<: *usex
   - name: 🤖 Google自动选择可用节点
     type: fallback
@@ -231,7 +232,16 @@ proxy-groups:
     tolerance: 200
     timeout: 2000
     disable-udp: true
-    expected-status: 200/300-399
+    expected-status: 200-299/300-399
+    <<: *usex
+  - name: 🤖 推特自动选择可用节点
+    type: fallback
+    url: https://twitter.com/?lang=zh-cn
+    interval: 1500
+    tolerance: 200
+    timeout: 2000
+    disable-udp: true
+    expected-status: 200-299/300-399
     <<: *usex
 p: &p
     type: http
