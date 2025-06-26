@@ -210,18 +210,18 @@ proxy-groups:
   - name: ♻️ 自动选择
     type: url-test
     url: https://google.com
-    expected-status: 200/302
+    expected-status: 200/300-399
     interval: 86400
     tolerance: 6000
     <<: *usex
 
   - name: 🤖 ChatGPT自动选择可用节点
     type: fallback
-    url: https://chat.openai.com
-    interval: 1500
+    url: https://chatgpt.com
+    interval: 600
     tolerance: 500
     timeout: 3000
-    expected-status: 200/302
+    expected-status: 200/300-399
     <<: *usex
   - name: 🤖 Google自动选择可用节点
     type: fallback
@@ -229,7 +229,7 @@ proxy-groups:
     interval: 1500
     tolerance: 200
     timeout: 2000
-    expected-status: 200/302
+    expected-status: 200/300-399
     <<: *usex
 p: &p
     type: http
@@ -239,7 +239,7 @@ p: &p
         url: https://google.com
         interval: 3000
         timeout: 5000
-        expected-status: 200/302
+        expected-status: 200/300-399
 proxy-providers:
     a1:
       <<: *p
