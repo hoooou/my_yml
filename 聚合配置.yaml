@@ -188,39 +188,60 @@ proxy-groups:
     type: select
     lazy: true
     interval: 86400
-    tolerance: 120
-    url: https://cp.cloudflare.com/generate_204	
+    tolerance: 6000
+    url: https://google.com
+    expected-status: 200/302
     proxies:
       - DIRECT
       - 🎯 手动选择
       - ♻️ 自动选择
+      - 🤖 ChatGPT自动选择可用节点
+      - 🤖 Google自动选择可用节点
 
   - name: 🎯 手动选择
     type: select
     lazy: true
-    url: https://cp.cloudflare.com/generate_204	
-    interval: 86400
-    tolerance: 120
-    <<: *usex
-
-  - name: ♻️ 自动选择
-    type: url-test
-    url: https://cp.cloudflare.com/generate_204	
-    lazy: true
+    url: https://google.com
+    expected-status: 200/302
     interval: 86400
     tolerance: 6000
     <<: *usex
 
+  - name: ♻️ 自动选择
+    type: url-test
+    url: https://google.com
+    expected-status: 200/302
+    interval: 86400
+    tolerance: 6000
+    <<: *usex
+
+  - name: 🤖 ChatGPT自动选择可用节点
+    type: fallback
+    url: https://chat.openai.com
+    interval: 600
+    disable-udp: true
+    tolerance: 500
+    timeout: 3000
+    expected-status: 200/302
+    <<: *usex
+  - name: 🤖 Google自动选择可用节点
+    type: fallback
+    url: https://google.com
+    interval: 600
+    disable-udp: true
+    tolerance: 500
+    timeout: 3000
+    expected-status: 200/302
+    <<: *usex
 p: &p
     type: http
     interval: 86400
     health-check:
-        enable: false
-        url: https://cp.cloudflare.com/generate_204
+        enable: true
+        url: https://google.com
         interval: 3000
         timeout: 5000
-        lazy: true
-        expected-status: 204
+        expected-status: 200/302
 proxy-providers:
     a1:
       <<: *p
@@ -265,74 +286,74 @@ proxy-providers:
     a7:
       <<: *p
       override:
-        additional-prefix: "a9:"
+        additional-prefix: "a7:"
       url: "https://raw.githubusercontent.com/mai19950/clash_config/refs/heads/main/sub/clash.yaml"
       path: proxy-providers/a7.yaml
     a8:
       <<: *p
       override:
-        additional-prefix: "a10:"
+        additional-prefix: "a8:"
       url: "https://cdn.jsdelivr.net/gh/vxiaov/free_proxies@main/clash/clash.provider.yaml"
       path: proxy-providers/a8.yaml
 
     a9:
       <<: *p
       override:
-        additional-prefix: "a11:"
+        additional-prefix: "a9:"
       url: "https://raw.githubusercontent.com/Barabama/FreeNodes/refs/heads/main/nodes/clashmeta.yaml"
       path: proxy-providers/a9.yaml
 
     a10:
       <<: *p
       override:
-        additional-prefix: "a13:"
+        additional-prefix: "a10:"
       url: "https://tg.iamdt002.dpdns.org/sub?token=b0b422857bb46aba65da8234c84f38c6"
       path: proxy-providers/a10.yaml
 
     a11:
       <<: *p
       override:
-        additional-prefix: "a15:"
+        additional-prefix: "a11:"
       url: "https://qq.xlm.plus/api/v1/client/subscribe?token=9e5db95336ab586ac6c4e2306c4d25a9"
       path: proxy-providers/a11.yaml
 
     a12:
       <<: *p
       override:
-        additional-prefix: "a16:"
+        additional-prefix: "a12:"
       url: "https://api.wcc.best/sub?target=clash&url=https%3A%2F%2Fking.likelike.ip-ddns.com%2FK&insert=false&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online.ini"
       path: proxy-providers/a12.yaml
 
     a13:
       <<: *p
       override:
-        additional-prefix: "a17:"
+        additional-prefix: "a13:"
       url: "https://sub.nexc.cc/api/v1/client/subscribe?token=6653dae74bb2813201976ce8561b37c8"
       path: proxy-providers/a13.yaml
 
     a14:
       <<: *p
       override:
-        additional-prefix: "a20:"
+        additional-prefix: "a14:"
       url: "https://igdux.top/~ppp"
       path: proxy-providers/a14.yaml
 
     a15:
       <<: *p
       override:
-        additional-prefix: "a22:"
+        additional-prefix: "a15:"
       url: "https://ghproxy.cn/https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml"
       path: proxy-providers/a15.yaml
     a16:
       <<: *p
       override:
-        additional-prefix: "a23:"
+        additional-prefix: "a16:"
       url: "https://raw.githubusercontent.com/go4sharing/sub/main/sub.yaml"
       path: proxy-providers/a16.yaml
     a17:
       <<: *p
       override:
-        additional-prefix: "a25:"
+        additional-prefix: "a17:"
       url: "https://raw.githubusercontent.com/mfbpn/tg_mfbpn_sub/main/trial.yaml"
       path: proxy-providers/a17.yaml
 
