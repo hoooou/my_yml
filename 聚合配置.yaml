@@ -186,7 +186,7 @@ usex: &usex
 proxy-groups:
   - name: 🚀 全局选择
     type: select
-    lazy: false
+    lazy: true
     interval: 86400
     tolerance: 6000
     url: https://google.com
@@ -218,7 +218,7 @@ proxy-groups:
 
   - name: 🤖 ChatGPT自动选择可用节点
     type: fallback
-    url: https://chatgpt.com
+    url: https://www.chatgpt.com
     interval: 600
     tolerance: 100
     timeout: 3000
@@ -240,7 +240,7 @@ proxy-groups:
 
   - name: 🤖 推特自动选择可用节点
     type: fallback
-    url: https://x.com
+    url: https://www.x.com
     interval: 1500
     lazy: false
     tolerance: 100
@@ -253,10 +253,10 @@ p: &p
     interval: 86400
     health-check:
         enable: true
-        url: https://google.com
+        url: https://www.google.com
         interval: 3000
         timeout: 5000
-        expected-status: 200/300-399
+        expected-status: 200-299/300-399
 proxy-providers:
     a1:
       <<: *p
