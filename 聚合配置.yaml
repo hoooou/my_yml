@@ -197,12 +197,13 @@ proxy-groups:
       - ♻️ 自动选择
       - 🤖 ChatGPT自动选择可用节点
       - 🤖 Google自动选择可用节点
+      - 🤖 推特自动选择可用节点
 
   - name: 🎯 手动选择
     type: select
     lazy: true
     url: https://google.com
-    expected-status: 200/302
+    expected-status: 200-299/300-399
     interval: 86400
     tolerance: 6000
     <<: *usex
@@ -210,26 +211,42 @@ proxy-groups:
   - name: ♻️ 自动选择
     type: url-test
     url: https://google.com
-    expected-status: 200/302
+    expected-status: 200-299/300-399
     interval: 86400
     tolerance: 6000
     <<: *usex
 
   - name: 🤖 ChatGPT自动选择可用节点
     type: fallback
-    url: https://chat.openai.com
-    interval: 300
+    url: https://chatgpt.com
+    interval: 600
     tolerance: 500
     timeout: 3000
-    expected-status: 200/302
+    lazy: false
+    disable-udp: true
+    expected-status: 200-299/300-399
     <<: *usex
+    
   - name: 🤖 Google自动选择可用节点
     type: fallback
-    url: https://google.com
-    interval: 300
-    tolerance: 500
+    url: https://www.google.com
+    interval: 1500
+    tolerance: 200
     timeout: 2000
-    expected-status: 200/302
+    lazy: false
+    disable-udp: true
+    expected-status: 200-299/300-399
+    <<: *usex
+
+  - name: 🤖 推特自动选择可用节点
+    type: fallback
+    url: https://x.com
+    interval: 1500
+    lazy: false
+    tolerance: 100
+    timeout: 2000
+    disable-udp: true
+    expected-status: 200-299/300-399
     <<: *usex
 p: &p
     type: http
@@ -239,7 +256,7 @@ p: &p
         url: https://google.com
         interval: 3000
         timeout: 5000
-        expected-status: 200/302
+        expected-status: 200/300-399
 proxy-providers:
     a1:
       <<: *p
@@ -354,7 +371,3 @@ proxy-providers:
         additional-prefix: "a17:"
       url: "https://raw.githubusercontent.com/mfbpn/tg_mfbpn_sub/main/trial.yaml"
       path: proxy-providers/a17.yaml
-
-
-
-
