@@ -186,7 +186,7 @@ usex: &usex
 proxy-groups:
   - name: 🚀 全局选择
     type: select
-    lazy: false
+    lazy: true
     interval: 86400
     tolerance: 6000
     url: https://google.com
@@ -220,7 +220,7 @@ proxy-groups:
     type: fallback
     url: https://chatgpt.com
     interval: 600
-    tolerance: 500
+    tolerance: 100
     timeout: 3000
     lazy: false
     disable-udp: true
