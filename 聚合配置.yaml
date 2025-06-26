@@ -225,9 +225,9 @@ proxy-groups:
     <<: *usex
   - name: 🤖 Google自动选择可用节点
     type: fallback
-    url: https://google.com
+    url: https://www.google.com
     interval: 1500
-    tolerance: 500
+    tolerance: 200
     timeout: 2000
     expected-status: 200/302
     <<: *usex
