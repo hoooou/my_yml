@@ -222,23 +222,28 @@ proxy-groups:
     interval: 600
     tolerance: 500
     timeout: 3000
+    lazy: false
     disable-udp: true
     expected-status: 200-299/300-399
     <<: *usex
+    
   - name: 🤖 Google自动选择可用节点
     type: fallback
     url: https://www.google.com
     interval: 1500
     tolerance: 200
     timeout: 2000
+    lazy: false
     disable-udp: true
     expected-status: 200-299/300-399
     <<: *usex
+
   - name: 🤖 推特自动选择可用节点
     type: fallback
-    url: https://twitter.com/?lang=zh-cn
+    url: https://x.com
     interval: 1500
-    tolerance: 200
+    lazy: false
+    tolerance: 100
     timeout: 2000
     disable-udp: true
     expected-status: 200-299/300-399
