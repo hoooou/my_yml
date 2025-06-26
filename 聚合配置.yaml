@@ -221,6 +221,7 @@ proxy-groups:
     interval: 600
     tolerance: 500
     timeout: 3000
+    disable-udp: true
     expected-status: 200/300-399
     <<: *usex
   - name: 🤖 Google自动选择可用节点
@@ -229,6 +230,7 @@ proxy-groups:
     interval: 1500
     tolerance: 200
     timeout: 2000
+    disable-udp: true
     expected-status: 200/300-399
     <<: *usex
 p: &p
