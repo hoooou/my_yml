@@ -189,8 +189,7 @@ proxy-groups:
     lazy: true
     interval: 86400
     tolerance: 6000
-    url: https://google.com
-    expected-status: 200/302
+    url: http://captive.apple.com
     proxies:
       - DIRECT
       - 🎯 手动选择
@@ -202,16 +201,14 @@ proxy-groups:
   - name: 🎯 手动选择
     type: select
     lazy: true
-    url: https://google.com
-    expected-status: 200-299/300-399
+    url: http://captive.apple.com
     interval: 86400
     tolerance: 6000
     <<: *usex
 
   - name: ♻️ 自动选择
     type: url-test
-    url: https://google.com
-    expected-status: 200-299/300-399
+    url: http://captive.apple.com
     interval: 86400
     tolerance: 6000
     <<: *usex
@@ -231,7 +228,7 @@ proxy-groups:
     type: fallback
     url: https://www.google.com
     interval: 1500
-    tolerance: 200
+    tolerance: 50
     timeout: 2000
     lazy: false
     disable-udp: true
@@ -240,10 +237,10 @@ proxy-groups:
 
   - name: 🤖 推特自动选择可用节点
     type: fallback
-    url: https://www.x.com
+    url: https://twitter.com/favicon.ico
     interval: 1500
     lazy: false
-    tolerance: 100
+    tolerance: 50
     timeout: 2000
     disable-udp: true
     expected-status: 200-299/300-399
@@ -253,10 +250,9 @@ p: &p
     interval: 86400
     health-check:
         enable: true
-        url: https://www.chatgpt.com
+        url: https://twitter.com/favicon.ico
         interval: 3000
         timeout: 5000
-        expected-status: 200-299/300-399
 proxy-providers:
     a1:
       <<: *p
