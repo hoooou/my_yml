@@ -12,7 +12,7 @@ dns:
     fake-ip-range: 198.18.0.1/16
     use-hosts: false
     nameserver: ['https://doh.pub/dns-query', 'https://dns.alidns.com/dns-query']
-    fallback: ['https://doh.dns.sb/dns-query', 'https://dns.cloudflare.com/dns-query', 'https://dns.twnic.tw/dns-query', 'tls://8.8.4.4:853']
+    fallback: ['https://dns.cloudflare.com/dns-query', 'https://doh.dns.sb/dns-query', 'https://dns.twnic.tw/dns-query', 'tls://8.8.4.4:853']
     fallback-filter: { geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32] }
 rule-providers:
   reject:
@@ -189,8 +189,10 @@ proxy-groups:
     type: select
     lazy: true
     interval: 86400
-    tolerance: 6000
+    tolerance: 600
     url: http://captive.apple.com
+    expected-status: 200
+
     proxies:
       - DIRECT
       - 🎯 手动选择
@@ -203,59 +205,58 @@ proxy-groups:
     type: select
     lazy: true
     url: http://captive.apple.com
-    interval: 86400
-    tolerance: 6000
+    expected-status: 200
+    interval: 120
+    tolerance: 600
     <<: *usex
 
   - name: ♻️ 自动选择
     type: url-test
     url: http://captive.apple.com
-    interval: 86400
-    tolerance: 6000
+    expected-status: 200
+    interval: 120
+    tolerance: 600
     <<: *usex
 
   - name: 🤖 ChatGPT自动选择可用节点
     type: fallback
-    url: https://chatgpt.com
-    interval: 60
+    url: https://api.openai.com/compliance/cookie_requirements
+    expected-status: 200
+    interval: 120
     tolerance: 400
-    timeout: 3000
+    timeout: 800
     lazy: false
-    disable-udp: true
-    expected-status: 200-399
     <<: *usex
     
   - name: 🤖 Google自动选择可用节点
     type: fallback
     url: https://www.google.com
-    interval: 60
+    interval: 120
     tolerance: 50
     timeout: 2000
     lazy: false
-    disable-udp: true
-    expected-status: 200-399
+    expected-status: 200
     <<: *usex
 
   - name: 🤖 推特自动选择可用节点
     type: fallback
     url: https://twitter.com/favicon.ico
-    interval: 60
+    interval: 120
     lazy: false
     tolerance: 50
     timeout: 2000
-    disable-udp: true
-    expected-status: 200-399
+    expected-status: 200
     <<: *usex
 p: &p
     type: http
     interval: 86400
     health-check:
         enable: true
-        url: https://chatgpt.com
-        interval: 60
-        timeout: 5000
+        url: https://api.openai.com/compliance/cookie_requirements
+        interval: 30
+        timeout: 2000
         lazy: true
-        expected-status: 200-399
+        expected-status: 200
 
 proxy-providers:
     a1:
