@@ -216,13 +216,13 @@ proxy-groups:
 
   - name: 🤖 ChatGPT自动选择可用节点
     type: fallback
-    url: https://chatgpt.com/favicon.ico
+    url: https://chatgpt.com
     interval: 60
     tolerance: 400
     timeout: 3000
     lazy: false
     disable-udp: true
-    expected-status: 200-299/300-399
+    expected-status: 200-399
     <<: *usex
     
   - name: 🤖 Google自动选择可用节点
@@ -233,7 +233,7 @@ proxy-groups:
     timeout: 2000
     lazy: false
     disable-udp: true
-    expected-status: 200-299/300-399
+    expected-status: 200-399
     <<: *usex
 
   - name: 🤖 推特自动选择可用节点
@@ -244,16 +244,18 @@ proxy-groups:
     tolerance: 50
     timeout: 2000
     disable-udp: true
-    expected-status: 200-299/300-399
+    expected-status: 200-399
     <<: *usex
 p: &p
     type: http
+    interval: 86400
     health-check:
         enable: true
-        url: https://chatgpt.com/favicon.ico
-        interval: 3000
+        url: https://chatgpt.com
+        interval: 60
         timeout: 5000
-        expected-status: 200-299/300-399
+        lazy: true
+        expected-status: 200-399
 
 proxy-providers:
     a1:
