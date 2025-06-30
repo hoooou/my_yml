@@ -222,8 +222,9 @@ proxy-groups:
     type: fallback
     url: https://api.openai.com/compliance/cookie_requirements
     expected-status: 200
+    disable-udp: true
     interval: 120
-    tolerance: 400
+    tolerance: 800
     timeout: 800
     lazy: false
     <<: *usex
@@ -232,8 +233,9 @@ proxy-groups:
     type: fallback
     url: https://www.google.com
     interval: 120
-    tolerance: 50
-    timeout: 2000
+    tolerance: 800
+    timeout: 800
+    disable-udp: true
     lazy: false
     expected-status: 200
     <<: *usex
@@ -241,10 +243,11 @@ proxy-groups:
   - name: 🤖 推特自动选择可用节点
     type: fallback
     url: https://twitter.com/favicon.ico
-    interval: 120
     lazy: false
-    tolerance: 50
-    timeout: 2000
+    interval: 120
+    tolerance: 800
+    disable-udp: true
+    timeout: 800
     expected-status: 200
     <<: *usex
 p: &p
@@ -255,6 +258,7 @@ p: &p
         url: https://api.openai.com/compliance/cookie_requirements
         interval: 30
         timeout: 2000
+        disable-udp: true
         lazy: true
         expected-status: 200
 
