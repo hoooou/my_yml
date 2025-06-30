@@ -187,7 +187,7 @@ usex: &usex
 proxy-groups:
   - name: 🚀 全局选择
     type: select
-    lazy: true
+    lazy: false
     interval: 86400
     tolerance: 600
     url: http://captive.apple.com
@@ -203,7 +203,7 @@ proxy-groups:
 
   - name: 🎯 手动选择
     type: select
-    lazy: true
+    lazy: false
     url: http://captive.apple.com
     expected-status: 200
     interval: 120
@@ -259,7 +259,7 @@ p: &p
         interval: 30
         timeout: 2000
         disable-udp: true
-        lazy: true
+        lazy: false
         expected-status: 200
 
 proxy-providers:
