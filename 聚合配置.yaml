@@ -108,6 +108,7 @@ rule-providers:
 #白名单模式
 rules:
   # 新增微软服务直连规则（优先级最高）🌟
+  - DOMAIN-SUFFIX,zijieapi.com,DIRECT
   - DOMAIN-SUFFIX,office.com,DIRECT
   - DOMAIN-SUFFIX,outlook.com,DIRECT
   - DOMAIN-SUFFIX,cursor.sh,DIRECT
@@ -116,7 +117,6 @@ rules:
   - DOMAIN-SUFFIX,microsoftonline.com,DIRECT
   - DOMAIN-SUFFIX,sharepoint.com,DIRECT
   - DOMAIN-SUFFIX,azure.com,DIRECT
-  - DOMAIN-SUFFIX,zijieapi.com,DIRECT
   - DOMAIN-KEYWORD,tencent,DIRECT
   - DOMAIN-KEYWORD,yuanbao,DIRECT
   - DOMAIN-SUFFIX,qq.com,DIRECT
@@ -269,7 +269,7 @@ proxy-providers:
       <<: *p
       override:
         additional-prefix: "a1:"
-      url: "https://api.wcc.best/sub?target=clash&url=https%3A%2F%2Fsub.dafei.de%2Fshare%2Fsub%2F%25E4%25B8%2580%25E5%2585%2583%25E6%259C%25BA%25E5%259C%25BA%253Assrsub.de%3Ftoken%3D%25E4%25B8%2580%25E5%2585%2583%25E6%259C%25BA%25E5%259C%25BA%253Assrsub.de&insert=false&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online.ini&emoji=true&list=false&tfo=false&scv=true&fdn=false&expand=true&sort=false&new_name=true"
+      url: "https://gist.github.com/go4sharing/85b8d7efb26dd421edc5ed8bd11a5838/raw/69f39ebd482d73ce700fd8c35422863771bda052/gistfile1.txt"
       path: proxy-providers/a1.yaml
 
     a2:
@@ -295,7 +295,7 @@ proxy-providers:
       <<: *p
       override:
         additional-prefix: "a5:"
-      url: "https://xb.inekokkk.com/amei/a7826885f196a1d611929641072de890"
+      url: "https://www.svpn.asia/api/v1/client/subscribe/ff357ccdca8d0be62c6c3c98ec2e9197"
       path: proxy-providers/a5.yaml
 
     a6:
@@ -336,14 +336,14 @@ proxy-providers:
       <<: *p
       override:
         additional-prefix: "a11:"
-      url: "https://qq.xlm.plus/api/v1/client/subscribe?token=9e5db95336ab586ac6c4e2306c4d25a9"
+      url: "https://update.glados-config.com/mihomo/543454/7b9d17e/80064/glados.yaml"
       path: proxy-providers/a11.yaml
 
     a12:
       <<: *p
       override:
         additional-prefix: "a12:"
-      url: "https://api.wcc.best/sub?target=clash&url=https%3A%2F%2Fking.likelike.ip-ddns.com%2FK&insert=false&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online.ini"
+      url: "https://ajsdfbhma.shidianban.shop/api/v1/client/subscribe?token=361151881f4ae3ba0c26e8a5f3d4fc36"
       path: proxy-providers/a12.yaml
 
     a13:
