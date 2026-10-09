@@ -109,11 +109,13 @@ def check_sites(port):
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         for label, url in SITES.items():
             try:
+                started = time.perf_counter()
                 with client.get(url, stream=True, timeout=(5, 8)) as response:
                     # Bound response data and time; never download an entire webpage/video.
                     body = next(response.iter_content(16384), b'')
                     results[label] = classify_page(label, response.status_code, response.url,
                                                    response.headers.get('Content-Type', ''), body)
+                    results[label]['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
             except s.requests.RequestException:
                 results[label] = {'status': 'failed', 'reason': '连接、TLS 或读取失败'}
     return results
