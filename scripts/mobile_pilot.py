@@ -6,6 +6,7 @@ import copy
 import ipaddress
 import json
 import math
+import re
 from pathlib import Path
 import statistics
 import subprocess
@@ -19,8 +20,18 @@ GLOBALPING = 'https://api.globalping.io/v1'
 MOBILE_ASN = 9808
 UDP_TYPES = {'hysteria', 'hysteria2', 'tuic', 'wireguard'}
 SITES = {'Google': 'https://www.google.com/', 'YouTube': 'https://www.youtube.com/',
-         'ChatGPT': 'https://chatgpt.com/'}
+         'ChatGPT': 'https://chatgpt.com/', 'Claude': 'https://claude.ai/',
+         'Gemini': 'https://gemini.google.com/', 'GitHub': 'https://github.com/',
+         'Wikipedia': 'https://www.wikipedia.org/', 'Reddit': 'https://www.reddit.com/',
+         'X': 'https://x.com/', 'Instagram': 'https://www.instagram.com/'}
 PAGE_SITES = tuple(SITES)
+SITE_WORKERS = 5
+PAGE_MARKERS = {
+    'Google': ('google',), 'YouTube': ('youtube',), 'ChatGPT': ('chatgpt', 'openai'),
+    'Claude': ('claude', 'anthropic'), 'Gemini': ('gemini',), 'GitHub': ('github',),
+    'Wikipedia': ('wikipedia',), 'Reddit': ('reddit',),
+    'X': ('twitter', 'x.com', '<title>x</title>'), 'Instagram': ('instagram',),
+}
 CONNECTIVITY_SITES = {
     'Google204': 'https://connectivitycheck.gstatic.com/generate_204',
     'ChatGPTTrace': 'https://chatgpt.com/cdn-cgi/trace',
@@ -100,10 +111,15 @@ def classify_page(label, status, final_url, content_type, body):
     text = body.decode('utf-8', errors='replace').lower()
     host = urlparse(final_url).hostname or ''
     expected_host = urlparse(SITES[label]).hostname
-    if any(word in text for word in ('cf-chl-', 'just a moment', 'verify you are human',
-                                     'captcha', 'unsupported_country', 'unsupported country')):
+    # Normal pages can mention captcha in feature flags or scripts (e.g. GitHub).
+    visible = re.sub(r'<(?:script|style)\b[^>]*>.*?(?:</(?:script|style)>|$)', '', text, flags=re.S)
+    title = re.search(r'<title\b[^>]*>(.*?)</title>', visible, flags=re.S)
+    captcha_wall = (title is not None and 'captcha' in title[1]) or bool(
+        re.search(r'(?:class|id)=["\'][^"\']*(?:g-recaptcha|h-captcha)', visible))
+    if captcha_wall or any(word in text for word in ('cf-chl-', 'just a moment', 'verify you are human',
+                                                     'unsupported_country', 'unsupported country')):
         return {**result, 'status': 'needs_review', 'reason': '登录、风控、验证码或地区限制，无法自动确认服务可用'}
-    if status in (401, 403, 429) or host != expected_host:
+    if status in (401, 403, 429) or 300 <= status < 400 or host != expected_host:
         return {**result, 'status': 'needs_review', 'reason': '需人工确认登录、访问限制或跳转'}
     if label in CONNECTIVITY_SITES:
         if final_url != SITES[label]:
@@ -124,8 +140,7 @@ def classify_page(label, status, final_url, content_type, body):
         return {**result, 'status': 'passed' if passed else 'failed',
                 'reason': '域名 HTTPS 连通正常；未验证登录或对话' if passed else '未返回预期 Cloudflare trace',
                 **({'exit_ip': fields['ip'], 'country_code': fields['loc'], 'colo': fields.get('colo')} if passed else {})}
-    markers = {'Google': ('google',), 'YouTube': ('youtube',), 'ChatGPT': ('chatgpt', 'openai')}
-    passed = status == 200 and 'html' in content_type.lower() and any(word in text for word in markers[label])
+    passed = status == 200 and 'html' in content_type.lower() and any(word in text for word in PAGE_MARKERS[label])
     return {**result, 'status': 'passed' if passed else 'failed',
             'reason': '网页入口正常；实际功能仍需本地测试' if passed else '未返回预期网页'}
 
@@ -148,7 +163,7 @@ def check_site(port, label, url, timeout=(5, 8)):
 def check_sites(port, targets=None):
     # Each target has its own Session; page checks and light probes overlap.
     targets = SITES if targets is None else targets
-    with futures.ThreadPoolExecutor(max_workers=len(targets)) as pool:
+    with futures.ThreadPoolExecutor(max_workers=min(SITE_WORKERS, len(targets))) as pool:
         jobs = {label: pool.submit(check_site, port, label, url) for label, url in targets.items()}
         return {label: job.result() for label, job in jobs.items()}
 

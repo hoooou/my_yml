@@ -25,7 +25,8 @@ COUNTRIES = {'HK': '香港', 'TW': '台湾', 'JP': '日本', 'SG': '新加坡', 
              'AU': '澳大利亚', 'NL': '荷兰', 'IN': '印度', 'RU': '俄罗斯',
              'FI': '芬兰', 'SE': '瑞典', 'CH': '瑞士', 'CN': '中国', 'VN': '越南',
              'AT': '奥地利', 'EE': '爱沙尼亚', 'ES': '西班牙', 'ID': '印度尼西亚',
-             'IE': '爱尔兰', 'IL': '以色列', 'IT': '意大利', 'LT': '立陶宛',
+             'BE': '比利时', 'LU': '卢森堡', 'RS': '塞尔维亚', 'HU': '匈牙利',
+             'CZ': '捷克', 'HR': '克罗地亚', 'IE': '爱尔兰', 'IL': '以色列', 'IT': '意大利', 'LT': '立陶宛',
              'LV': '拉脱维亚', 'PL': '波兰', 'RO': '罗马尼亚', 'TH': '泰国', 'ZA': '南非'}
 CHECK_URL = 'https://www.gstatic.com/generate_204'
 DOWNLOAD_URL = 'https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg'

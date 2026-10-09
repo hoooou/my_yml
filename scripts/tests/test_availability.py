@@ -217,7 +217,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(result['ClaudeTrace']['max_elapsed_ms'], 30)
         self.assertEqual(result['ClaudeTrace']['passed_count'], 2)
         record = {'id': 'n-a', 'entry': {'status': 'passed', 'latency_ms': 10}, 'websites': result}
-        self.assertEqual(a.website_count(record), 3)
+        self.assertEqual(a.website_count(record), len(a.PAGE_SITES))
         self.assertEqual(a.connectivity_count(record), 2)
         faster = copy.deepcopy(record); faster['id'] = 'n-b'; faster['entry']['latency_ms'] = 100
         record['precheck'] = {'median_elapsed_ms': 20}
@@ -225,7 +225,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertLess(a.rank_key(faster), a.rank_key(record))
         # A trace success cannot turn a challenged ChatGPT page into a working page.
         faster['websites']['ChatGPT']['status'] = 'needs_review'
-        self.assertEqual(a.website_count(faster), 2)
+        self.assertEqual(a.website_count(faster), len(a.PAGE_SITES) - 1)
 
     def test_all_categories_remain_importable_for_local_comparison(self):
         records = [{'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
@@ -243,11 +243,36 @@ class AvailabilityTests(unittest.TestCase):
             self.assertEqual(len(groups[group]), 1)
             self.assertNotEqual(groups[group], ['REJECT'])
         self.assertEqual(groups['🏠 非机房 IP'], ['REJECT'])
-        self.assertEqual(groups['✅ 三站通过'], [records[0]['name']])
+        self.assertEqual(groups['⭐ 综合优选'], [records[0]['name']])
+        self.assertEqual(len(groups), 8)
+        self.assertEqual(groups['🎯 全部节点'], [n['name'] for n in config['proxies']])
         self.assertEqual(base, original)
         valid = {p['name'] for p in config['proxies']} | set(groups) | {'DIRECT', 'REJECT'}
         self.assertTrue(all(name in valid for proxies in groups.values() for name in proxies))
         self.assertTrue(all('MiB' not in n['name'] for n in config['proxies']))
+
+    def test_regional_picker_keeps_per_country_quota_without_extra_groups(self):
+        records = []
+        for country in ('JP', 'US'):
+            for index in range(35):
+                records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
+                    'websites': {label: {'status': 'passed'} for label in a.PAGE_SITES},
+                    'precheck': {'status': 'passed', 'median_elapsed_ms': index + 1},
+                    'exit': {'country_code': country, 'exit_ip': f'8.8.{country == "JP"}.{index}'},
+                    'download': {'status': 'passed', 'speed_mib_s': 1}})
+        mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
+        config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
+        groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
+        regional = groups['🌍 按地区选择']
+        self.assertEqual(len(groups), 8)
+        self.assertEqual(sum(name.startswith('日本 |') for name in regional), 30)
+        self.assertEqual(sum(name.startswith('美国 |') for name in regional), 30)
+        self.assertNotIn('日本', groups)
+        self.assertNotIn('美国', groups)
+        self.assertEqual(len(groups['🎯 全部节点']), 70)
+        for country in ('日本', '美国'):
+            included = [name for name in regional if name.startswith(country + ' |')]
+            self.assertTrue(all('204 35ms' not in name for name in included))
 
 
 if __name__ == '__main__':
