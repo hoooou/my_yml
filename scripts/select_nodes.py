@@ -119,22 +119,87 @@ class Core:
             return node['name'], None
 
 
-def collect(base, root, cache=None):
+def canonical_node(node):
+    if not isinstance(node, dict) or not all(k in node for k in ('type', 'server', 'port')):
+        return None
+    raw = copy.deepcopy(node)
+    raw.pop('name', None)
+    # A node must be independently testable, without local interfaces or other proxies.
+    if any(k in raw for k in ('dialer-proxy', 'interface-name', 'routing-mark')):
+        return None
+    if not isinstance(raw['server'], str) or not isinstance(raw['type'], str):
+        return None
+    try:
+        if isinstance(raw['port'], bool) or str(raw['port']) != str(int(raw['port'])):
+            return None
+        raw['port'] = int(raw['port'])
+        if not 1 <= raw['port'] <= 65535:
+            return None
+    except (ValueError, TypeError, OverflowError):
+        return None
+    server = raw['server'].strip().rstrip('.')
+    if not server:
+        return None
+    try:
+        raw['server'] = str(ipaddress.ip_address(server))
+    except ValueError:
+        raw['server'] = server.lower()
+    raw['type'] = raw['type'].lower()
+    if isinstance(raw.get('uuid'), str):
+        raw['uuid'] = raw['uuid'].lower()
+    return raw
+
+
+def load_sources(path):
+    document = yaml.safe_load(path.read_text(encoding='utf-8'))
+    entries = document.get('sources') if isinstance(document, dict) else None
+    if not isinstance(entries, list):
+        raise ValueError('节点来源.yaml 必须包含 sources 列表')
+    sources = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ValueError('节点来源条目必须是映射')
+        if not entry.get('enabled', True):
+            continue
+        name, url = entry.get('id'), entry.get('url')
+        if not isinstance(name, str) or not re.fullmatch('[a-zA-Z0-9_-]+', name):
+            raise ValueError('节点来源 id 必须是字母、数字、下划线或短横线')
+        if name in sources or not isinstance(url, str) or not url.startswith('https://'):
+            raise ValueError('节点来源 id 重复或缺少 HTTPS 地址')
+        sources[name] = entry
+    return sources
+
+
+def collect(base, root, cache=None, extra_sources=None):
+    providers = dict(base.get('proxy-providers') or {})
+    for name, provider in (extra_sources or {}).items():
+        if name in providers:
+            raise ValueError('新增来源 id 与原订阅源重复：' + name)
+        providers[name] = provider
+
     def fetch(item):
         name, provider = item
-        info = {'provider': name, 'downloaded': 0, 'status': 'ok'}
+        info = {'provider': name, 'url': provider.get('url', ''),
+                'repository': provider.get('repository', ''), 'downloaded': 0,
+                'accepted': 0, 'skipped': 0, 'duplicates': 0, 'unique_added': 0, 'status': 'ok',
+                'fetched_at': datetime.now(TZ).isoformat(timespec='seconds')}
         try:
             path = cache / (name + '.txt') if cache else None
             if path and path.exists():
                 data = path.read_bytes()
+                info['cached'] = True
             else:
-                response = requests.get(provider['url'], timeout=(10, 25), headers={'User-Agent': 'mihomo/1.19.32'})
+                if not info['url'].startswith('https://'):
+                    raise ValueError('来源缺少 HTTPS 订阅地址')
+                response = requests.get(info['url'], timeout=(10, 25),
+                                        headers={'User-Agent': 'mihomo/1.19.32', 'Cache-Control': 'no-cache'})
                 response.raise_for_status()
                 data = response.content
             content = yaml.safe_load(data)
             nodes = content.get('proxies') if isinstance(content, dict) else None
             if not isinstance(nodes, list) or not nodes:
                 raise ValueError('订阅没有非空的 YAML proxies 列表')
+            info['sha256'] = hashlib.sha256(data).hexdigest()
             info['downloaded'] = len(nodes)
             return name, nodes, info
         except (requests.RequestException, yaml.YAMLError, ValueError) as error:
@@ -143,20 +208,21 @@ def collect(base, root, cache=None):
 
     identities, source_info = {}, []
     with futures.ThreadPoolExecutor(max_workers=6) as pool:
-        for source, nodes, info in pool.map(fetch, base['proxy-providers'].items()):
+        for source, nodes, info in pool.map(fetch, providers.items()):
             source_info.append(info)
             for node in nodes:
-                if not isinstance(node, dict) or not all(k in node for k in ('name', 'type', 'server', 'port')):
+                raw = canonical_node(node)
+                if raw is None:
+                    info['skipped'] += 1
                     continue
-                raw = copy.deepcopy(node)
-                raw.pop('name', None)
-                # Do not allow a subscription to reference another provider's proxy or local interface.
-                if any(k in raw for k in ('dialer-proxy', 'interface-name', 'routing-mark')):
-                    continue
+                info['accepted'] += 1
                 identity = hashlib.sha256(json.dumps(raw, sort_keys=True, ensure_ascii=False, default=str).encode()).hexdigest()[:12]
                 if identity not in identities:
                     raw['name'] = 'n-' + identity
                     identities[identity] = {'node': raw, 'sources': []}
+                    info['unique_added'] += 1
+                else:
+                    info['duplicates'] += 1
                 identities[identity]['sources'].append(source)
     metadata = {item['node']['name']: {'sources': sorted(set(item['sources']))} for item in identities.values()}
     nodes = [item['node'] for item in identities.values()]
@@ -262,6 +328,7 @@ def main():
     parser.add_argument('--mihomo', required=True)
     parser.add_argument('--speedtest', required=True)
     parser.add_argument('--base', default='聚合配置.yaml')
+    parser.add_argument('--sources', type=Path, default=Path('节点来源.yaml'))
     parser.add_argument('--work-dir', default='.node-work')
     parser.add_argument('--source-cache', type=Path)
     parser.add_argument('--limit', type=int, default=30)
@@ -272,7 +339,7 @@ def main():
     root = Path(args.work_dir).resolve()
     root.mkdir(parents=True, exist_ok=True)
     base = yaml.safe_load(Path(args.base).read_text())
-    nodes, metadata, sources = collect(base, root, args.source_cache)
+    nodes, metadata, sources = collect(base, root, args.source_cache, load_sources(args.sources))
     print(f'订阅拉取完成：{sum(s["downloaded"] for s in sources)} 个节点，去重后 {len(nodes)} 个', flush=True)
     core = Core(str(Path(args.mihomo).resolve()), root, nodes)
     nodes, rejected = core.validate_nodes()
@@ -334,6 +401,8 @@ def main():
     report = {'updated_at': timestamp, 'test_origin': args.test_origin,
               'tool': 'faceair/clash-speedtest v1.8.8', 'input_count': sum(s['downloaded'] for s in sources),
               'unique_count': len(nodes) + len(rejected), 'invalid_count': len(rejected),
+              'duplicate_count': sum(s['duplicates'] for s in sources),
+              'skipped_count': sum(s['skipped'] for s in sources),
               'latency_passed': len(alive), 'file_tested': len(candidates), 'file_passed': len(measured),
               'exit_failures': exit_failures, 'selected_count': len(selected), 'sources': sources,
               'settings': {'latency_url': CHECK_URL, 'download_url': DOWNLOAD_URL,
@@ -351,11 +420,22 @@ def main():
             'MiB/s 是文件下载速度，不是 Mbps。初筛延迟是 Google 204 请求耗时，文件延迟是测速工具 6 次 HEAD 请求的平均值。', '',
             '低延迟候选先测，未进入候选列表的节点不保证比入选节点慢。测速结果仅代表更新时间及该运行地点；'
             '不代表本机速度、UDP 可用性或特定网站解锁。', '',
-            '| 地区 | 节点 | 出口 IP | 初筛延迟 ms | 文件延迟 ms | 下载 MiB/s | HEAD 失败率 |',
-            '|---|---|---|---:|---:|---:|---:|']
+            '| 地区 | 节点 | 出口 IP | 初筛延迟 ms | 文件延迟 ms | 下载 MiB/s | HEAD 失败率 | 来源 |',
+            '|---|---|---|---:|---:|---:|---:|---|']
     for record in selected:
         rows.append(f'| {COUNTRIES.get(record["country_code"], record["country_code"])} | {record["id"]} | {record["exit_ip"]} | '
-                    f'{record["latency_ms"]} | {record["file_latency_ms"]} | {record["speed_mib_s"]:.3f} | {record["head_failure_percent"]:.1f}% |')
+                    f'{record["latency_ms"]} | {record["file_latency_ms"]} | {record["speed_mib_s"]:.3f} | {record["head_failure_percent"]:.1f}% | {", ".join(record["sources"])} |')
+    rows += ['', '## 本次来源拉取', '',
+             f"合并原配置订阅与新增来源，重复 {report['duplicate_count']} 个，无法独立测试或格式无效 {report['skipped_count']} 个。"
+             '只读取来源的 proxies，不执行其规则、分组、脚本或控制端口设置。', '',
+             '新增唯一节点按来源顺序统计；同一节点的全部来源记录在上表与 JSON 报告中。', '',
+             '| 来源 | 拉取状态 | 原始节点 | 新增唯一 | 重复 | 跳过 | 内容 SHA-256（前 12 位） |',
+             '|---|---|---:|---:|---:|---:|---|']
+    for source in sources:
+        link = source['repository'] or source['url']
+        label = f"[{source['provider']}]({link})" if link else source['provider']
+        rows.append(f"| {label} | {source['status']} | {source['downloaded']} | {source['unique_added']} | "
+                    f"{source['duplicates']} | {source['skipped']} | {source.get('sha256', '')[:12]} |")
     Path('测速报告.md').write_text('\n'.join(rows) + '\n', encoding='utf-8')
     print(f'生成成功：{len(selected)} 个节点；最终 Mihomo 配置校验通过', flush=True)
 
