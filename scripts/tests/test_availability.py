@@ -1,8 +1,12 @@
 import copy
+import json
+import os
 from pathlib import Path
 import sys
 import threading
+import tempfile
 import unittest
+import yaml
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -10,6 +14,59 @@ import availability as a
 
 
 class AvailabilityTests(unittest.TestCase):
+    def test_repair_preserves_measurements_and_never_retests_network(self):
+        good = {'name': 'good', 'type': 'trojan', 'server': 'example.com', 'port': 443, 'password': 'same'}
+        bad = {**good, 'name': 'bad', 'sni': 'bad\x9f'}
+        records = [{'id': ident, 'name': name, 'server': 'example.com', 'port': 443,
+                    'protocol': 'trojan', 'entry': {'status': 'unknown'}, 'websites': None,
+                    'exit': None, 'ip_type': {'status': 'unknown'}} for ident, name in [('n-a', 'good'), ('n-b', 'bad')]]
+        report = {'updated_at': '2026-10-09T22:01:27+08:00', 'scope': 'all_subscriptions',
+                  'nodes': records, 'sources': [], 'services': {}, 'input_unique_count': 2,
+                  'invalid_node_ids': [], 'parallel_shards': 4}
+        with tempfile.TemporaryDirectory() as directory:
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(directory)
+                a.s.dump(Path('聚合配置.yaml'), {'rules': ['MATCH,🚀 全局选择']})
+                a.s.dump(Path('优选配置.yaml'), {'proxies': [good, bad]})
+                Path('连通性报告.json').write_text(json.dumps(report))
+                with patch.object(sys, 'argv', ['availability', '--phase', 'repair', '--mihomo', 'unused']), \
+                     patch.object(a, 'probe_pipeline', side_effect=AssertionError('no network retest')), \
+                     patch.object(a.s, 'lookup_ip_types', side_effect=AssertionError('no IP retest')), \
+                     patch.object(a.subprocess, 'run') as run:
+                    run.return_value.returncode = 0
+                    a.main()
+                result = json.loads(Path('连通性报告.json').read_text())
+                config = yaml.safe_load(Path('优选配置.yaml').read_text())
+                self.assertEqual(result['measurements_updated_at'], report['updated_at'])
+                self.assertEqual(result['nodes'][0]['entry'], records[0]['entry'])
+                self.assertEqual(result['invalid_node_ids'], ['n-b'])
+                self.assertEqual(result['parseable_count'], 1)
+                self.assertEqual(config['proxies'][0]['password'], 'same')
+                self.assertEqual(result['parallel_shards'], 4)
+            finally:
+                os.chdir(old_cwd)
+
+    def test_publication_rejects_controls_even_when_source_yaml_escaped_them(self):
+        record = {'id': 'n-a', 'entry': {'status': 'unknown'}, 'websites': None, 'exit': None}
+        original = {'name': 'n-a', 'type': 'trojan', 'server': 'example.com', 'port': 443,
+                    'password': 'unchanged', 'sni': 'https://t.me/wangcai2\xf0\x9f\x87'}
+        decoded = yaml.safe_load(yaml.safe_dump(original))
+        self.assertEqual(decoded, original)
+        with self.assertRaises(ValueError):
+            a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, [record], {'n-a': decoded})
+
+    def test_mobile_filter_drops_corrupt_nodes_without_rewriting_credentials(self):
+        good = {'name': 'n-good', 'type': 'trojan', 'server': 'example.com', 'port': 443,
+                'password': '中文🔑', 'sni': 'example.com'}
+        bad = {**good, 'name': 'n-bad', 'sni': 'bad\x9f\x87'}
+        nested = {**good, 'name': 'n-nested', 'ws-opts': {'headers': {'Host': 'bad\x00'}}}
+        retained, rejected = a.filter_mobile_nodes([good, bad, nested])
+        self.assertEqual(retained, [good])
+        self.assertEqual(set(rejected), {'n-bad', 'n-nested'})
+        self.assertEqual(rejected['n-bad'], ['sni'])
+        self.assertEqual(good['password'], '中文🔑')
+
     def test_shards_cover_all_nodes_and_keep_shared_endpoints_together(self):
         nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': f'8.8.8.{i // 2}', 'port': 443} for i in range(20)]
         parts = [a.shard_nodes(nodes, i, 4) for i in range(4)]
