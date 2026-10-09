@@ -18,7 +18,7 @@ def probe(received=3, asn=9808, country='CN'):
 
 class MobilePilotTests(unittest.TestCase):
     def test_websites_overlap_and_use_independent_sessions(self):
-        barrier, lock = threading.Barrier(len(pilot.SITES)), threading.Lock()
+        barrier, lock = threading.Barrier(pilot.SITE_WORKERS), threading.Lock()
         state = {'active': 0, 'peak': 0, 'sessions': 0}
         class Response:
             status_code = 200
@@ -34,7 +34,7 @@ class MobilePilotTests(unittest.TestCase):
                 if self.url.endswith('/trace'):
                     host = pilot.urlparse(self.url).hostname
                     return iter([f'h={host}\nip=8.8.8.8\nloc=US\nvisit_scheme=https\ncolo=LAX\n'.encode()])
-                return iter([b'<html>Google YouTube ChatGPT</html>'])
+                return iter([('<html>' + ' '.join(pilot.PAGE_SITES) + ' twitter x.com</html>').encode()])
         class Client:
             def __init__(self):
                 with lock: state['sessions'] += 1
@@ -53,10 +53,22 @@ class MobilePilotTests(unittest.TestCase):
                 return Response(url)
         with patch.object(pilot.s, 'session', side_effect=Client):
             results = pilot.check_sites(1234)
-        self.assertEqual(state['peak'], len(pilot.SITES), '网站串行等待，不能重叠处理超时')
+        self.assertEqual(state['peak'], pilot.SITE_WORKERS, '网站并发应保持上限且能重叠处理超时')
         self.assertEqual(state['sessions'], len(pilot.SITES), '线程不能共享 requests Session')
         self.assertEqual(set(results), set(pilot.SITES))
         self.assertTrue(all(r['status'] == 'passed' for r in results.values()))
+
+    def test_new_pages_require_brand_and_captcha_feature_flags_are_not_a_challenge(self):
+        for label in pilot.PAGE_SITES:
+            marker = pilot.PAGE_MARKERS[label][0]
+            result = pilot.classify_page(label, 200, pilot.SITES[label], 'text/html', f'<html>{marker}</html>'.encode())
+            self.assertEqual(result['status'], 'passed', label)
+            self.assertEqual(pilot.classify_page(label, 200, pilot.SITES[label], 'text/html', b'<html>unrelated page</html>')['status'], 'failed', label)
+        normal = b'<script type="application/json">{"flags":["octocaptcha_origin_optimization"]}</script><html>GitHub</html>'
+        self.assertEqual(pilot.classify_page('GitHub', 200, pilot.SITES['GitHub'], 'text/html', normal)['status'], 'passed')
+        wall = b'<title>CAPTCHA verification</title><html>GitHub</html>'
+        self.assertEqual(pilot.classify_page('GitHub', 200, pilot.SITES['GitHub'], 'text/html', wall)['status'], 'needs_review')
+        self.assertEqual(pilot.classify_page('Gemini', 302, pilot.SITES['Gemini'], 'text/html', b'Gemini')['status'], 'needs_review')
 
     def test_https_204_requires_exact_empty_response_and_no_redirect(self):
         url = pilot.SITES['Google204']
