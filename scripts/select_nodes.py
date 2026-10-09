@@ -427,7 +427,7 @@ def measure_regions(binary, speedtest, root, classified, mapping, metadata, sett
                 except (requests.RequestException, ValueError, KeyError):
                     return 'verification_failed', None
             with Core(binary, root, [mapping[r['id']] for r in batch], listeners):
-                with futures.ThreadPoolExecutor(max_workers=2) as pool:
+                with futures.ThreadPoolExecutor(max_workers=4) as pool:
                     for status, result in pool.map(measure, batch):
                         summary['file_tested'] += 1
                         if status != 'file_failed':
