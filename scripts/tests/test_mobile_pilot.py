@@ -70,6 +70,36 @@ class MobilePilotTests(unittest.TestCase):
         self.assertEqual(pilot.classify_page('GitHub', 200, pilot.SITES['GitHub'], 'text/html', wall)['status'], 'needs_review')
         self.assertEqual(pilot.classify_page('Gemini', 302, pilot.SITES['Gemini'], 'text/html', b'Gemini')['status'], 'needs_review')
 
+    def test_page_redirects_are_bounded_and_trace_never_follows_them(self):
+        class Response:
+            headers = {'Content-Type': 'text/html'}
+            def __init__(self, url, status=200, location=None):
+                self.url, self.status_code = url, status
+                self.headers = {**self.headers, **({'Location': location} if location else {})}
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def iter_content(self, size): return iter([b'<html>Claude</html>'])
+        with patch.object(pilot.s, 'session') as session:
+            client = session.return_value.__enter__.return_value
+            client.get.side_effect = [Response('https://claude.ai/',302,'/login'), Response('https://claude.ai/login')]
+            result = pilot.check_site(1234,'Claude',pilot.SITES['Claude'])
+            self.assertEqual(result['status'],'passed')
+            self.assertEqual(result['redirect_hops'],1)
+            self.assertIn('github.com/hoooou/my_yml',client.get.call_args.kwargs['headers']['User-Agent'])
+            self.assertEqual(client.get.call_args.args[0],'https://claude.ai/login')
+        for label, location in [('Claude','https://unrelated.example/'),('Claude','http://claude.ai/login'),
+                                ('ClaudeTrace','/login'),('Google204','/other')]:
+            with patch.object(pilot.s,'session') as session:
+                client = session.return_value.__enter__.return_value
+                client.get.return_value = Response(pilot.SITES[label],302,location)
+                self.assertEqual(pilot.check_site(1234,label,pilot.SITES[label])['status'],'needs_review')
+                self.assertEqual(client.get.call_count,1)
+        with patch.object(pilot.s,'session') as session:
+            client = session.return_value.__enter__.return_value
+            client.get.side_effect = [Response('https://claude.ai/'+str(i),302,'/'+str(i+1)) for i in range(3)]
+            self.assertEqual(pilot.check_site(1234,'Claude',pilot.SITES['Claude'])['status'],'needs_review')
+            self.assertEqual(client.get.call_count,3)
+
     def test_https_204_requires_exact_empty_response_and_no_redirect(self):
         url = pilot.SITES['Google204']
         classify = lambda status, body, final=url: pilot.classify_page('Google204', status, final, 'text/html', body)['status']

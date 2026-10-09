@@ -54,7 +54,7 @@ jobs:
           overwrite: true
 
   probe:
-    name: 204 → TCP → 网站 → 快速下载（分片 ${{ matrix.shard }}）
+    name: 204 → TCP → 网站 → 1MB → 50MB（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
     timeout-minutes: 90
