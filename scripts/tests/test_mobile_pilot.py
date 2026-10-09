@@ -1,6 +1,7 @@
 import copy
 from pathlib import Path
 import sys
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -16,6 +17,39 @@ def probe(received=3, asn=9808, country='CN'):
 
 
 class MobilePilotTests(unittest.TestCase):
+    def test_websites_overlap_and_use_independent_sessions(self):
+        barrier, lock = threading.Barrier(3), threading.Lock()
+        state = {'active': 0, 'peak': 0, 'sessions': 0}
+        class Response:
+            status_code = 200
+            headers = {'Content-Type': 'text/html'}
+            def __init__(self, url): self.url = url
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def iter_content(self, size): return iter([b'<html>Google YouTube ChatGPT</html>'])
+        class Client:
+            def __init__(self):
+                with lock: state['sessions'] += 1
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def get(self, url, **kwargs):
+                with lock:
+                    state['active'] += 1
+                    state['peak'] = max(state['peak'], state['active'])
+                try:
+                    barrier.wait(timeout=1)
+                except threading.BrokenBarrierError:
+                    pass
+                finally:
+                    with lock: state['active'] -= 1
+                return Response(url)
+        with patch.object(pilot.s, 'session', side_effect=Client):
+            results = pilot.check_sites(1234)
+        self.assertEqual(state['peak'], 3, '网站串行等待，不能重叠处理超时')
+        self.assertEqual(state['sessions'], 3, '线程不能共享 requests Session')
+        self.assertEqual(set(results), set(pilot.SITES))
+        self.assertTrue(all(r['status'] == 'passed' for r in results.values()))
+
     def test_two_mobile_probes_required_and_wrong_network_is_unknown(self):
         for results, expected in [([probe(), probe()], 'passed'),
                                   ([probe(0), probe(0)], 'failed'),

@@ -1,6 +1,7 @@
 import copy
 from pathlib import Path
 import sys
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -9,6 +10,52 @@ import availability as a
 
 
 class AvailabilityTests(unittest.TestCase):
+    def test_shards_cover_all_nodes_and_keep_shared_endpoints_together(self):
+        nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': f'8.8.8.{i // 2}', 'port': 443} for i in range(20)]
+        parts = [a.shard_nodes(nodes, i, 4) for i in range(4)]
+        self.assertEqual(sorted(n['name'] for p in parts for n in p), sorted(n['name'] for n in nodes))
+        locations = {n['name']: i for i, p in enumerate(parts) for n in p}
+        for i in range(0, 20, 2):
+            self.assertEqual(locations[f'n-{i}'], locations[f'n-{i + 1}'])
+
+    def test_merge_rejects_missing_duplicate_wrong_batch_and_incomplete_rounds(self):
+        nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': f'8.8.8.{i}', 'port': 443} for i in range(20)]
+        bundle = {'id': 'batch', 'nodes': nodes}
+        parts = [{'bundle_id': 'batch', 'index': i, 'count': 4, 'endpoint_count': len(a.shard_nodes(nodes, i, 4)),
+                  'records': [{'id': n['name'], 'entry': {'status': 'failed'}, 'websites': None}
+                              for n in a.shard_nodes(nodes, i, 4)]} for i in range(4)]
+        records, endpoints = a.merge_shards(bundle, parts, 4)
+        self.assertEqual([r['id'] for r in records], [n['name'] for n in nodes])
+        self.assertEqual(endpoints, 20)
+        broken = [parts[:-1]]
+        wrong = copy.deepcopy(parts); wrong[0]['bundle_id'] = 'old'; broken.append(wrong)
+        wrong = copy.deepcopy(parts); wrong[0]['records'].append(wrong[0]['records'][0]); broken.append(wrong)
+        wrong = copy.deepcopy(parts); wrong[0]['records'][0]['entry']['status'] = 'passed'; broken.append(wrong)
+        for case in broken:
+            with self.assertRaises(ValueError): a.merge_shards(bundle, case, 4)
+
+    def test_websites_start_before_last_tcp_probe_finishes(self):
+        started = threading.Event()
+        overlap = []
+        nodes = [{'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443},
+                 {'name': 'n-b', 'type': 'ss', 'server': '1.1.1.1', 'port': 443}]
+        def probe(key, pace):
+            if key[0] == '1.1.1.1':
+                overlap.append(started.wait(timeout=1))
+                return {'status': 'failed'}
+            return {'status': 'passed'}
+        def websites(port):
+            started.set()
+            return {label: {'status': 'passed', 'elapsed_ms': 1} for label in a.SITES}
+        with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1, 'n-b': 2})), \
+             patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}), \
+             patch.object(a.time, 'sleep'):
+            records, endpoints = a.probe_pipeline(nodes, 'unused', Path('.'), probe=probe, site_check=websites)
+        self.assertEqual(overlap, [True], '网站等待了所有 TCP 探测结束')
+        self.assertEqual(endpoints, 2)
+        self.assertEqual(records[0]['websites']['Google']['passed_count'], 3)
+        self.assertIsNone(records[1]['websites'])
+
     def test_tcp_connection_failure_is_distinct_from_api_errors(self):
         self.assertEqual(a.parse_xxapi({'code': -2, 'msg': '连接失败'}, 'example.com', 443)['status'], 'failed')
         for data in [None, [], {'code': 500, 'msg': 'error'}, {'code': -2, 'msg': 'quota'},

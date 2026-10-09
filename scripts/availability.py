@@ -3,6 +3,7 @@
 import argparse
 import concurrent.futures as futures
 import copy
+import hashlib
 import ipaddress
 import json
 import math
@@ -118,24 +119,90 @@ def service_status():
     return services
 
 
-def classify_all(nodes, workers=10, probe=probe_xxapi, pace=None):
+def classify_all(nodes, workers=10, probe=probe_xxapi, pace=None, on_record=None):
     pace = pace or Pace()
     endpoints = sorted({endpoint_key(n) for n in nodes if tcp_supported(n)})
     measured = {}
+    records, by_endpoint = [], {}
+    for node in nodes:
+        record = {'id': node['name'], 'server': node['server'], 'port': node['port'],
+                  'protocol': node['type'], 'entry': {'status': 'unknown',
+                  'reason': 'UDP 协议不适用 TCP 入口判定', 'attempts': 0}, 'websites': None, 'exit': None}
+        records.append(record)
+        if tcp_supported(node):
+            by_endpoint.setdefault(endpoint_key(node), []).append(record)
     with futures.ThreadPoolExecutor(max_workers=workers) as pool:
         jobs = {pool.submit(probe, key, pace): key for key in endpoints}
         for job in futures.as_completed(jobs):
-            measured[jobs[job]] = job.result()
+            key = jobs[job]
+            measured[key] = job.result()
+            for record in by_endpoint[key]:
+                record['entry'] = copy.deepcopy(measured[key])
+                if on_record:
+                    on_record(record)
             if len(measured) % 100 == 0 or len(measured) == len(endpoints):
                 counts = {v: sum(r['status'] == v for r in measured.values()) for v in ('passed', 'failed', 'unknown')}
                 print(f'TCP 入口 {len(measured)}/{len(endpoints)}：{counts}', flush=True)
-    records = []
-    for node in nodes:
-        entry = copy.deepcopy(measured[endpoint_key(node)]) if tcp_supported(node) else {
-            'status': 'unknown', 'reason': 'UDP 协议不适用 TCP 入口判定', 'attempts': 0}
-        records.append({'id': node['name'], 'server': node['server'], 'port': node['port'],
-                        'protocol': node['type'], 'entry': entry, 'websites': None, 'exit': None})
     return records, len(endpoints)
+
+
+def shard_nodes(nodes, index, count):
+    if count < 1 or not 0 <= index < count:
+        raise ValueError('分片编号或数量无效')
+    # All credentials sharing a host/port stay together: only one TCP request.
+    return [node for node in nodes if int(hashlib.sha256(
+        json.dumps(endpoint_key(node), ensure_ascii=False).encode()).hexdigest(), 16) % count == index]
+
+
+def probe_pipeline(nodes, binary, root, probe=probe_xxapi, site_check=check_sites, interval=.2, workers=16):
+    if not nodes:
+        return [], 0
+    listeners, ports = s.make_listeners({'id': n['name']} for n in nodes)
+    checked, jobs, lock = {}, [], threading.Lock()
+    def completed(job):
+        if job.exception() is not None:
+            return
+        record = job.result()
+        with lock:
+            checked[record['id']] = record
+            if len(checked) % 20 == 0:
+                print(f'流水线网页完成 {len(checked)}，已提交 {len(jobs)}；TCP 探测同时运行，每站 3 轮', flush=True)
+    with s.Core(binary, root, nodes, listeners), futures.ThreadPoolExecutor(max_workers=workers) as pool:
+        def submit(record):
+            if record['entry']['status'] == 'passed':
+                job = pool.submit(check_repeated, ports[record['id']], record, site_check=site_check)
+                jobs.append(job)
+                job.add_done_callback(completed)
+        records, endpoints = classify_all(nodes, probe=probe, pace=Pace(interval), on_record=submit)
+        for job in futures.as_completed(jobs):
+            job.result()  # Propagate errors; never silently publish an incomplete shard.
+    print(f'流水线完成：TCP 入口 {endpoints}，网页节点 {len(checked)}', flush=True)
+    return [checked.get(r['id'], r) for r in records], endpoints
+
+
+def merge_shards(bundle, parts, count):
+    if len(parts) != count or {p['index'] for p in parts} != set(range(count)):
+        raise ValueError('缺少分片，拒绝发布')
+    combined = {}
+    for part in parts:
+        if part.get('bundle_id') != bundle['id']:
+            raise ValueError('分片来源批次不一致，拒绝发布')
+        if part['count'] != count:
+            raise ValueError('分片数量不一致')
+        subset = shard_nodes(bundle['nodes'], part['index'], count)
+        expected = {n['name'] for n in subset}
+        if part['endpoint_count'] != len({endpoint_key(n) for n in subset if tcp_supported(n)}):
+            raise ValueError('TCP 入口统计不完整')
+        rows = part['records']
+        if len(rows) != len(expected) or {r['id'] for r in rows} != expected:
+            raise ValueError('分片存在漏测、重复或串片节点')
+        for record in rows:
+            if record['entry']['status'] == 'passed' and (not record.get('websites') or any(
+                    record['websites'].get(site, {}).get('round_count') != 3 or
+                    len(record['websites'].get(site, {}).get('attempts', [])) != 3 for site in SITES)):
+                raise ValueError('通过节点缺少完整网页复测')
+            combined[record['id']] = record
+    return [combined[n['name']] for n in bundle['nodes']], sum(p['endpoint_count'] for p in parts)
 
 
 def summarize_rounds(rounds):
@@ -220,40 +287,57 @@ def render_comparison(base, records, mapping):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
-    parser.add_argument('--sample', help='Optional fixture for smoke runs; default pulls ALL configured subscriptions')
+    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish'), default='all')
+    parser.add_argument('--sample', help='Optional fixture; default pulls ALL subscriptions')
     parser.add_argument('--work-dir', default='.node-work/availability')
+    parser.add_argument('--shard-index', type=int, default=0)
+    parser.add_argument('--shard-count', type=int, default=4)
+    parser.add_argument('--results-dir', default='.node-work/shards')
     args = parser.parse_args()
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     binary = str(Path(args.mihomo).resolve())
-    base = yaml.safe_load(Path('聚合配置.yaml').read_text())
-    if args.sample:
-        samples = yaml.safe_load(Path(args.sample).read_text())['samples']
-        nodes = [{**r['node'], 'name': r['id']} for r in samples]
-        metadata, sources = {}, []
+    bundle_path = root / 'bundle.json'
+    if args.phase in ('all', 'prepare'):
+        base = yaml.safe_load(Path('聚合配置.yaml').read_text())
+        if args.sample:
+            samples = yaml.safe_load(Path(args.sample).read_text())['samples']
+            nodes = [{**r['node'], 'name': r['id']} for r in samples]
+            metadata, sources = {}, []
+        else:
+            nodes, metadata, sources = s.collect(base, root, extra_sources=s.load_sources(Path('节点来源.yaml')))
+        input_count = len(nodes)
+        if not nodes:
+            raise RuntimeError('没有来源节点；保留已发布订阅')
+        nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
+        bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
+                  'input_count': input_count, 'rejected': rejected, 'services': service_status(),
+                  'scope': 'fixture' if args.sample else 'all_subscriptions',
+                  'prepared_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
+        bundle['id'] = hashlib.sha256(json.dumps(bundle, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        bundle_path.write_text(json.dumps(bundle, ensure_ascii=False))
+        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备流水线输入，不运行下载测速', flush=True)
+        if args.phase == 'prepare':
+            return
     else:
-        nodes, metadata, sources = s.collect(base, root, extra_sources=s.load_sources(Path('节点来源.yaml')))
-    input_count = len(nodes)
-    if not nodes:
-        raise RuntimeError('没有来源节点；保留已发布订阅')
-    validator = s.Core(binary, root, nodes)
-    nodes, rejected = validator.validate_nodes()
+        bundle = json.loads(bundle_path.read_text())
+    nodes = bundle['nodes']
+    base, metadata, sources = bundle['base'], bundle['metadata'], bundle['sources']
+    input_count, rejected, services = bundle['input_count'], bundle['rejected'], bundle['services']
     mapping = {n['name']: n for n in nodes}
-    services = service_status()
-    print(f'全量节点 {input_count}，内核可解析 {len(nodes)}，开始 TCP 分类；不运行下载测速', flush=True)
-    records, endpoint_count = classify_all(nodes)
-    (root / 'entry-results.json').write_text(json.dumps(records, ensure_ascii=False, indent=2))
+    if args.phase == 'probe':
+        subset = shard_nodes(nodes, args.shard_index, args.shard_count)
+        print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)} 节点，TCP 与网站同时检测', flush=True)
+        records, endpoint_count = probe_pipeline(subset, binary, root, interval=.2 * args.shard_count)
+        result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
+                  'records': records, 'endpoint_count': endpoint_count}
+        (root / f'shard-{args.shard_index}.json').write_text(json.dumps(result, ensure_ascii=False))
+        return
+    if args.phase == 'publish':
+        parts = [json.loads(p.read_text()) for p in Path(args.results_dir).glob('shard-*.json')]
+        records, endpoint_count = merge_shards(bundle, parts, args.shard_count)
+    else:
+        records, endpoint_count = probe_pipeline(nodes, binary, root)
     reachable = [r for r in records if r['entry']['status'] == 'passed']
-    if reachable:
-        listeners, ports = s.make_listeners(reachable)
-        with s.Core(binary, root, [mapping[r['id']] for r in reachable], listeners):
-            with futures.ThreadPoolExecutor(max_workers=16) as pool:
-                jobs = {pool.submit(check_repeated, ports[r['id']], r): r['id'] for r in reachable}
-                checked = {}
-                for job in futures.as_completed(jobs):
-                    record = job.result(); checked[record['id']] = record
-                    if len(checked) % 20 == 0 or len(checked) == len(reachable):
-                        print(f'入口通过节点网页复测 {len(checked)}/{len(reachable)}，每站 3 轮', flush=True)
-        records = [checked.get(r['id'], r) for r in records]
     ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
     for record in records:
         record['sources'] = metadata.get(record['id'], {}).get('sources', [])
@@ -265,7 +349,9 @@ def main():
         raise RuntimeError('最终订阅校验失败，不发布')
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
-    report = {'updated_at': now, 'scope': 'fixture' if args.sample else 'all_subscriptions',
+    report = {'updated_at': now, 'scope': bundle['scope'],
+              'pipeline': True, 'parallel_shards': args.shard_count if args.phase == 'publish' else 1,
+              'website_workers_per_shard': 16, 'parallel_sites_per_node': 3,
               'download_test': False, 'website_rounds': 3, 'input_unique_count': input_count,
               'parseable_count': len(nodes), 'invalid_node_ids': rejected, 'unique_tcp_endpoints': endpoint_count,
               'entry_counts': counts, 'website_tested_count': len(reachable),
@@ -278,6 +364,7 @@ def main():
             f'TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；网站复测 {len(reachable)} 个节点，三站全部稳定 {report["three_sites_stable"]} 个。', '',
             '不进行下载测速。全部可解析节点保留在订阅，方便手机对照“TCP通”“TCP不通”“TCP未验证”；地区和非机房分组最多各 30 个。', '',
             'TCP 结果是小小 API 探测点单次真实端口连接结果；探测点运营商未公开，不代表移动或本地必然可用。共享主机和端口共用入口结果，不同密码与协议节点分别复测网站。UDP、接口超时、限流、错误和目标不匹配归入未验证。', '',
+            f'TCP 与网站采用流水线并行：入口一通过即提交网页任务，不等待全部 TCP 完成。本轮 {report["parallel_shards"]} 个 Actions 分片，每个分片最多同时复测 16 个节点，三个网站同时请求，同一网站的三轮依次执行。', '',
             '仅 TCP 通的节点检查 Google、YouTube、ChatGPT，每站独立 3 轮，全部成功才加入该站分组。只读取网页前 16 KB，网页通过不代表视频播放或 ChatGPT 对话已验证；403/验证码/风控记为需人工复核。地区来自实际 Cloudflare 出口，无法取得则名称显示地区未确认。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
     for name, service in services.items():

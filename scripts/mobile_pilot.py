@@ -103,22 +103,26 @@ def classify_page(label, status, final_url, content_type, body):
             'reason': '网页入口正常；实际功能仍需本地测试' if passed else '未返回预期网页'}
 
 
-def check_sites(port):
-    results = {}
+def check_site(port, label, url):
     with s.session() as client:
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
-        for label, url in SITES.items():
-            try:
-                started = time.perf_counter()
-                with client.get(url, stream=True, timeout=(5, 8)) as response:
-                    # Bound response data and time; never download an entire webpage/video.
-                    body = next(response.iter_content(16384), b'')
-                    results[label] = classify_page(label, response.status_code, response.url,
-                                                   response.headers.get('Content-Type', ''), body)
-                    results[label]['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
-            except s.requests.RequestException:
-                results[label] = {'status': 'failed', 'reason': '连接、TLS 或读取失败'}
-    return results
+        try:
+            started = time.perf_counter()
+            with client.get(url, stream=True, timeout=(5, 8)) as response:
+                body = next(response.iter_content(16384), b'')
+                result = classify_page(label, response.status_code, response.url,
+                                       response.headers.get('Content-Type', ''), body)
+                result['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
+                return result
+        except s.requests.RequestException:
+            return {'status': 'failed', 'reason': '连接、TLS 或读取失败'}
+
+
+def check_sites(port):
+    # Each site has its own Session: slow sites do not delay the other two.
+    with futures.ThreadPoolExecutor(max_workers=len(SITES)) as pool:
+        jobs = {label: pool.submit(check_site, port, label, url) for label, url in SITES.items()}
+        return {label: job.result() for label, job in jobs.items()}
 
 
 def mobile_label(record):
