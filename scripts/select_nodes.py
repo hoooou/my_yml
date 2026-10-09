@@ -23,7 +23,10 @@ import yaml
 COUNTRIES = {'HK': '香港', 'TW': '台湾', 'JP': '日本', 'SG': '新加坡', 'US': '美国',
              'KR': '韩国', 'DE': '德国', 'GB': '英国', 'FR': '法国', 'CA': '加拿大',
              'AU': '澳大利亚', 'NL': '荷兰', 'IN': '印度', 'RU': '俄罗斯',
-             'FI': '芬兰', 'SE': '瑞典', 'CH': '瑞士', 'CN': '中国', 'VN': '越南'}
+             'FI': '芬兰', 'SE': '瑞典', 'CH': '瑞士', 'CN': '中国', 'VN': '越南',
+             'AT': '奥地利', 'EE': '爱沙尼亚', 'ES': '西班牙', 'ID': '印度尼西亚',
+             'IE': '爱尔兰', 'IL': '以色列', 'IT': '意大利', 'LT': '立陶宛',
+             'LV': '拉脱维亚', 'PL': '波兰', 'RO': '罗马尼亚', 'TH': '泰国', 'ZA': '南非'}
 CHECK_URL = 'https://www.gstatic.com/generate_204'
 DOWNLOAD_URL = 'http://lax.download.datapacket.com/10mb.bin'
 FILE_BYTES = 10000000
