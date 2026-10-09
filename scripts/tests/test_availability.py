@@ -1,4 +1,5 @@
 import copy
+import io
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,34 @@ import availability as a
 
 
 class AvailabilityTests(unittest.TestCase):
+    def test_quick_download_requires_full_uncompressed_file_and_deadline(self):
+        class Response:
+            status_code = 200
+            url = a.DOWNLOAD_URL
+            def __init__(self, body, length=None, encoding='identity'):
+                self.raw = io.BytesIO(body)
+                self.headers = {'Content-Length': str(a.DOWNLOAD_BYTES if length is None else length),
+                                'Content-Type': 'application/octet-stream', 'Content-Encoding': encoding}
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+        complete = b'x' * a.DOWNLOAD_BYTES
+        for body, length, encoding, expected in [(complete, None, 'identity', 'passed'),
+                (complete[:-1], None, 'identity', 'failed'), (complete, 10, 'identity', 'failed'),
+                (complete, None, 'gzip', 'failed')]:
+            with patch.object(a.s, 'session') as session, patch.object(a.time, 'perf_counter', side_effect=[0] + [1]*1000):
+                session.return_value.__enter__.return_value.get.return_value = Response(body, length, encoding)
+                result = a.quick_download(1234)
+            self.assertEqual(result['status'], expected)
+            if expected == 'passed':
+                self.assertEqual(result['received_bytes'], a.DOWNLOAD_BYTES)
+                self.assertAlmostEqual(result['speed_mib_s'], a.DOWNLOAD_BYTES / 1048576, places=3)
+            else: self.assertIsNone(result['speed_mib_s'])
+        with patch.object(a.s, 'session') as session, patch.object(a.time, 'perf_counter', side_effect=[0, 7, 7]):
+            session.return_value.__enter__.return_value.get.return_value = Response(complete)
+            result = a.quick_download(1234)
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(result['received_bytes'], 0)
+
     def test_repair_preserves_measurements_and_never_retests_network(self):
         good = {'name': 'good', 'type': 'trojan', 'server': 'example.com', 'port': 443, 'password': 'same'}
         bad = {**good, 'name': 'bad', 'sni': 'bad\x9f'}
@@ -75,12 +104,13 @@ class AvailabilityTests(unittest.TestCase):
         for i in range(0, 20, 2):
             self.assertEqual(locations[f'n-{i}'], locations[f'n-{i + 1}'])
 
-    def test_merge_rejects_missing_duplicate_wrong_batch_and_incomplete_rounds(self):
+    def test_merge_rejects_missing_duplicate_wrong_batch_and_incomplete_stages(self):
         nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': f'8.8.8.{i}', 'port': 443} for i in range(20)]
         bundle = {'id': 'batch', 'nodes': nodes}
+        pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 20}}] * 3, ('Google204',))['Google204']
         parts = [{'bundle_id': 'batch', 'index': i, 'count': 4, 'endpoint_count': len(a.shard_nodes(nodes, i, 4)),
-                  'records': [{'id': n['name'], 'entry': {'status': 'failed'}, 'websites': None}
-                              for n in a.shard_nodes(nodes, i, 4)]} for i in range(4)]
+                  'records': [{'id': n['name'], 'precheck': copy.deepcopy(pre), 'entry': {'status': 'failed'}, 'websites': None,
+                               'download': {'status': 'skipped'}} for n in a.shard_nodes(nodes, i, 4)]} for i in range(4)]
         records, endpoints = a.merge_shards(bundle, parts, 4)
         self.assertEqual([r['id'] for r in records], [n['name'] for n in nodes])
         self.assertEqual(endpoints, 20)
@@ -88,30 +118,46 @@ class AvailabilityTests(unittest.TestCase):
         wrong = copy.deepcopy(parts); wrong[0]['bundle_id'] = 'old'; broken.append(wrong)
         wrong = copy.deepcopy(parts); wrong[0]['records'].append(wrong[0]['records'][0]); broken.append(wrong)
         wrong = copy.deepcopy(parts); wrong[0]['records'][0]['entry']['status'] = 'passed'; broken.append(wrong)
+        wrong = copy.deepcopy(parts); wrong[0]['records'][0]['precheck']['attempts'].pop(); broken.append(wrong)
+        wrong = copy.deepcopy(parts); wrong[0]['records'][0]['download'] = {'status': 'passed', 'received_bytes': 10}; broken.append(wrong)
         for case in broken:
             with self.assertRaises(ValueError): a.merge_shards(bundle, case, 4)
 
-    def test_websites_start_before_last_tcp_probe_finishes(self):
-        started = threading.Event()
-        overlap = []
-        nodes = [{'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443},
-                 {'name': 'n-b', 'type': 'ss', 'server': '1.1.1.1', 'port': 443}]
-        def probe(key, pace):
-            if key[0] == '1.1.1.1':
-                overlap.append(started.wait(timeout=1))
-                return {'status': 'failed'}
+    def test_node_stages_overlap_but_each_node_preserves_order_and_shared_tcp_dedup(self):
+        website_started = threading.Event(); events = []; tested = []
+        nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': '8.8.8.8', 'port': 443} for i in range(3)]
+        def precheck(port):
+            if port == 3:
+                self.assertTrue(website_started.wait(1), '其他节点的后续检测等待了全量204完成')
+            events.append(('204', port))
+            return {'status': 'failed' if port == 3 else 'passed', 'round_count': 3, 'attempts': [{}]*3}
+        def tcp(key, pace):
+            self.assertIn(('204', 1), events)
+            tested.append(key)
             return {'status': 'passed'}
         def websites(port):
-            started.set()
-            return {label: {'status': 'passed', 'elapsed_ms': 1} for label in a.SITES}
-        with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1, 'n-b': 2})), \
-             patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}), \
-             patch.object(a.time, 'sleep'):
-            records, endpoints = a.probe_pipeline(nodes, 'unused', Path('.'), probe=probe, site_check=websites)
-        self.assertEqual(overlap, [True], '网站等待了所有 TCP 探测结束')
-        self.assertEqual(endpoints, 2)
-        self.assertEqual(records[0]['websites']['Google']['passed_count'], 3)
-        self.assertIsNone(records[1]['websites'])
+            website_started.set(); events.append(('websites', port))
+            return {label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES}
+        def download(port):
+            self.assertIn(('websites', port), events)
+            events.append(('download', port)); return {'status': 'passed', 'speed_mib_s': 1}
+        with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-0': 1, 'n-1': 2, 'n-2': 3})), \
+             patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}):
+            records, endpoints = a.probe_pipeline(nodes, 'unused', Path('.'), probe=tcp, precheck=precheck, site_check=websites, download=download)
+        self.assertEqual(tested, [('8.8.8.8', 443)])
+        self.assertEqual(endpoints, 1)
+        self.assertEqual(records[0]['websites']['Google']['round_count'], 1)
+        self.assertIsNone(records[2]['websites'])
+        self.assertEqual(records[2]['entry']['status'], 'unknown')
+        self.assertEqual(records[2]['entry']['attempts'], 0)
+        self.assertNotIn(('download', 3), events)
+
+    def test_three_204_rounds_are_independent_and_all_required(self):
+        with patch.object(a, 'check_site', side_effect=[{'status': 'passed', 'elapsed_ms': 5}, {'status': 'failed'}, {'status': 'passed', 'elapsed_ms': 10}]) as check:
+            result = a.precheck_204(1234)
+        self.assertEqual(check.call_count, 3)
+        self.assertEqual(result['status'], 'unstable')
+        self.assertEqual(result['passed_count'], 2)
 
     def test_tcp_connection_failure_is_distinct_from_api_errors(self):
         self.assertEqual(a.parse_xxapi({'code': -2, 'msg': '连接失败'}, 'example.com', 443)['status'], 'failed')
@@ -139,21 +185,16 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(len(records), 4)
         self.assertEqual([r['entry']['status'] for r in records], ['passed', 'passed', 'failed', 'unknown'])
 
-    def test_failed_and_unknown_nodes_never_reach_websites_or_downloads(self):
-        with patch.object(a.s, 'download_file', side_effect=AssertionError('download forbidden')), \
-             patch.object(a.s, 'measure_file', side_effect=AssertionError('download forbidden')), \
-             patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}), \
-             patch.object(a.time, 'sleep'):
-            calls = []
-            def websites(port):
-                calls.append(port)
-                return {label: {'status': 'passed', 'elapsed_ms': 20} for label in a.SITES}
-            for status in ('failed', 'unknown'):
-                r = a.check_repeated(1234, {'entry': {'status': status}}, site_check=websites)
-                self.assertNotIn('websites', r)
-            r = a.check_repeated(1234, {'id': 'n-a', 'entry': {'status': 'passed'}}, site_check=websites)
-            self.assertEqual(calls, [1234]*3)
-            self.assertTrue(all(v['round_count'] == v['passed_count'] == 3 for v in r['websites'].values()))
+    def test_failed_tcp_and_udp_never_reach_website_or_download_stages(self):
+        nodes = [{'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443},
+                 {'name': 'n-b', 'type': 'hysteria2', 'server': '8.8.8.8', 'port': 443}]
+        def forbidden(port): raise AssertionError('late stage should not run')
+        with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1, 'n-b': 2})):
+            rows, count = a.probe_pipeline(nodes, 'unused', Path('.'),
+                precheck=lambda port: {'status': 'passed'}, probe=lambda key, pace: {'status': 'failed'},
+                site_check=forbidden, download=forbidden)
+        self.assertEqual(count, 1)
+        self.assertEqual([r['entry']['status'] for r in rows], ['failed', 'unknown'])
 
     def test_intermittent_page_and_challenge_never_mark_stable(self):
         rounds = [{label: {'status': 'passed', 'elapsed_ms': 20} for label in a.SITES} for _ in range(3)]
@@ -164,6 +205,27 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(result['Google']['passed_count'], 2)
         self.assertEqual(result['ChatGPT']['status'], 'needs_review')
         self.assertEqual(result['YouTube']['status'], 'passed')
+
+    def test_light_probes_keep_three_rounds_and_rank_by_successful_latency(self):
+        rounds = [{label: {'status': 'passed', 'elapsed_ms': delay} for label in a.SITES} for delay in (30, 10, 20)]
+        rounds[1]['ClaudeTrace'] = {'status': 'failed', 'elapsed_ms': 8000}
+        result = a.summarize_rounds(rounds)
+        self.assertEqual(result['Google204']['median_elapsed_ms'], 20)
+        self.assertEqual(result['Google204']['max_elapsed_ms'], 30)
+        self.assertEqual(result['ClaudeTrace']['status'], 'unstable')
+        self.assertEqual(result['ClaudeTrace']['median_elapsed_ms'], 25)
+        self.assertEqual(result['ClaudeTrace']['max_elapsed_ms'], 30)
+        self.assertEqual(result['ClaudeTrace']['passed_count'], 2)
+        record = {'id': 'n-a', 'entry': {'status': 'passed', 'latency_ms': 10}, 'websites': result}
+        self.assertEqual(a.website_count(record), 3)
+        self.assertEqual(a.connectivity_count(record), 2)
+        faster = copy.deepcopy(record); faster['id'] = 'n-b'; faster['entry']['latency_ms'] = 100
+        record['precheck'] = {'median_elapsed_ms': 20}
+        faster['precheck'] = {'median_elapsed_ms': 1}
+        self.assertLess(a.rank_key(faster), a.rank_key(record))
+        # A trace success cannot turn a challenged ChatGPT page into a working page.
+        faster['websites']['ChatGPT']['status'] = 'needs_review'
+        self.assertEqual(a.website_count(faster), 2)
 
     def test_all_categories_remain_importable_for_local_comparison(self):
         records = [{'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
@@ -181,7 +243,7 @@ class AvailabilityTests(unittest.TestCase):
             self.assertEqual(len(groups[group]), 1)
             self.assertNotEqual(groups[group], ['REJECT'])
         self.assertEqual(groups['🏠 非机房 IP'], ['REJECT'])
-        self.assertEqual(groups['✅ 三站稳定'], [records[0]['name']])
+        self.assertEqual(groups['✅ 三站通过'], [records[0]['name']])
         self.assertEqual(base, original)
         valid = {p['name'] for p in config['proxies']} | set(groups) | {'DIRECT', 'REJECT'}
         self.assertTrue(all(name in valid for proxies in groups.values() for name in proxies))
