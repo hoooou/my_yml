@@ -130,6 +130,21 @@ class SelectionTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, message):
                     selection.download_file(client, expected)
 
+    def test_default_file_range_download_and_wrong_range_rejection(self):
+        body = b'x' * 1024
+        with patch.object(selection, 'FILE_BYTES', len(body)):
+            client = Client([Response(chunks=[body], status_code=206,
+                                      headers={'Content-Range': 'bytes 0-1023/5000'})])
+            with patch.object(client, 'get', wraps=client.get) as get:
+                _, digest = selection.download_file(client)
+            self.assertEqual(digest, hashlib.sha256(body).hexdigest())
+            self.assertEqual(get.call_args.kwargs['headers']['Range'], 'bytes=0-1023')
+            for header in ['bytes 1024-2047/5000', 'bytes 0-1022/5000', 'bytes 0-1023/1000', '']:
+                client = Client([Response(chunks=[body], status_code=206,
+                                          headers={'Content-Range': header})])
+                with self.assertRaisesRegex(ValueError, '范围与请求不一致'):
+                    selection.download_file(client)
+
     def test_region_or_ip_change_after_classification_is_rejected(self):
         record = {'exit_ip': '8.8.8.8', 'country_code': 'JP', 'file_speed_mib_s': 2.5}
         for trace in ['ip=8.8.8.8\nloc=US\n', 'ip=1.1.1.1\nloc=JP\n']:

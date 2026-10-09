@@ -28,7 +28,7 @@ COUNTRIES = {'HK': '香港', 'TW': '台湾', 'JP': '日本', 'SG': '新加坡', 
              'IE': '爱尔兰', 'IL': '以色列', 'IT': '意大利', 'LT': '立陶宛',
              'LV': '拉脱维亚', 'PL': '波兰', 'RO': '罗马尼亚', 'TH': '泰国', 'ZA': '南非'}
 CHECK_URL = 'https://www.gstatic.com/generate_204'
-DOWNLOAD_URL = 'http://lax.download.datapacket.com/10mb.bin'
+DOWNLOAD_URL = 'https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg'
 FILE_BYTES = 10000000
 IP_API_URL = 'http://ip-api.com/batch'
 IP_FIELDS = 'status,message,query,countryCode,isp,org,as,mobile,proxy,hosting'
@@ -287,9 +287,17 @@ def query_exit(port, record):
 
 def download_file(client, expected_sha256=None):
     started, total, digest = time.perf_counter(), 0, hashlib.sha256()
-    with client.get(DOWNLOAD_URL, headers={'Cache-Control': 'no-cache', 'Accept-Encoding': 'identity'},
+    with client.get(DOWNLOAD_URL, headers={'Cache-Control': 'no-cache', 'Accept-Encoding': 'identity',
+                                         'Range': f'bytes=0-{FILE_BYTES - 1}'},
                     stream=True, timeout=(8, 8)) as response:
         response.raise_for_status()
+        if response.status_code == 206:
+            content_range = re.fullmatch(r'bytes 0-(\d+)/(\d+|\*)', response.headers.get('Content-Range', ''))
+            if (not content_range or int(content_range[1]) != FILE_BYTES - 1
+                    or (content_range[2] != '*' and int(content_range[2]) < FILE_BYTES)):
+                raise ValueError('测速服务器返回的数据范围与请求不一致')
+        elif response.status_code != 200:
+            raise ValueError('测速服务器未返回下载数据')
         for chunk in response.iter_content(65536):
             total += len(chunk)
             digest.update(chunk)
@@ -563,9 +571,9 @@ def publish(args, root, state):
     rows = ['# 节点测速报告', '', f'更新时间：{timestamp}', '',
             f'测速地点：{state["test_origin"]}。输入 {report["input_count"]} 个，去重后 {report["unique_count"]} 个；'
             f'延迟合格 {report["latency_passed"]} 个，出口地区确认成功 {report["region_classified"]} 个，全部进行文件测速；'
-            f'完整文件复测合格 {report["qualified_count"]} 个，最终合并入选 {len(selected)} 个。', '',
-            f'测速文件：[{DOWNLOAD_URL}]({DOWNLOAD_URL})；每次完整下载 {FILE_BYTES:,} 字节（10 MB）。'
-            '下载速度取工具测速和完整文件复测中的较低值，按速度降序、延迟升序排名。', '',
+            f'完整采样复测合格 {report["qualified_count"]} 个，最终合并入选 {len(selected)} 个。', '',
+            f'测速文件：[{DOWNLOAD_URL}]({DOWNLOAD_URL})（测速工具默认地址）；每次下载文件开头 {FILE_BYTES:,} 字节（10 MB）。'
+            '下载速度取工具测速和完整采样复测中的较低值，按速度降序、延迟升序排名。', '',
             '地区和 IP 通过节点访问 Cloudflare trace 确认；分类后出口 IP 或地区变化的节点剔除。'
             '初筛延迟为 Google 204 请求耗时，文件延迟为测速工具 6 次 HEAD 请求平均值。MiB/s 是下载速度，HEAD 失败率不是 ICMP 丢包率。', '',
             '[IP 类型依据 ip-api.com 的 hosting 字段](https://ip-api.com/docs/api:json)。只有明确返回成功且 hosting=false 的地址进入非机房候选；'

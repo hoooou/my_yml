@@ -22,8 +22,8 @@ GitHub Actions 的“每日节点优选”每天北京时间 **08:00 开始**，
 2. 仅提取各配置的 `proxies`。忽略节点名称，统一服务器地址大小写、端口数字和 UUID 大小写，再按完整连接配置去重并通过 Mihomo 解析校验；不同密码、UUID、TLS 或传输参数仍保留。
 3. 对全部节点访问 Google 204 地址，剔除失败或延迟超过 1000 ms 的节点。
 4. 延迟合格后，通过每个节点访问 Cloudflare trace 获取实际出口 IP 和国家/地区，先分类再测速。地区未知的节点跳过。对独立出口 IP 使用 [ip-api.com](https://ip-api.com/docs/api:json) 批量查询 IP 类型，记录 `hosting`、ISP、ASN、移动网络和代理标签。免费批量接口最多 100 IP/请求、15 请求/分钟；程序按窗口限流，失败或缺少类型字段的 IP 记为未知。
-5. 对每个地区的**全部分类成功节点**，用 [faceair/clash-speedtest v1.8.8](https://github.com/faceair/clash-speedtest/tree/v1.8.8) 下载 `http://lax.download.datapacket.com/10mb.bin`，实际大小 10,000,000 字节（10 MB），要求速度至少 0.5 MiB/s、6 次 HTTP HEAD 请求失败率不超过 20%、文件请求平均延迟不超过 1000 ms。没有全局或各地区 150 个候选上限。
-6. 工具测速通过后，再完整下载**同一个 10 MB 文件**；检查字节数和 SHA-256 与本轮直连对照一致，剔除未完整下载、内容被替换或低于最低速度的节点。分类后出口 IP 或地区改变的节点也剔除。两次下载速度取较低值排名，延迟作为次排序。
+5. 对每个地区的**全部分类成功节点**，用 [faceair/clash-speedtest v1.8.8](https://github.com/faceair/clash-speedtest/tree/v1.8.8) 的默认下载地址 `https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg` 测速。每次以 HTTP Range 下载文件开头 10,000,000 字节（10 MB），要求速度至少 0.5 MiB/s、6 次 HTTP HEAD 请求失败率不超过 20%、文件请求平均延迟不超过 1000 ms。没有全局或各地区 150 个候选上限。
+6. 工具测速通过后，再下载**同一文件的前 10 MB 片段**；确认 HTTP Range 返回的范围、下载字节数和 SHA-256 与本轮直连对照一致，剔除未完整下载采样、内容被替换或低于最低速度的节点。分类后出口 IP 或地区改变的节点也剔除。两次下载速度取较低值排名，延迟作为次排序。
 7. 每个国家/地区独立保留最多 30 个节点。另外从全量测速合格节点中选择 `hosting=false` 的非机房节点，按出口 IP 去重，再取速度最高、延迟次优的最多 30 个。两个榜单取并集，配置中的共同节点只保存一份。地区分组只列本地区榜单，非机房分组只列非机房榜单。
 8. 生成完整配置，保留原始分流规则，使用 Mihomo 校验后提交 `优选配置.yaml`、`测速报告.json` 和 `测速报告.md`。
 
