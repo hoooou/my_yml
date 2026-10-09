@@ -18,15 +18,23 @@ def probe(received=3, asn=9808, country='CN'):
 
 class MobilePilotTests(unittest.TestCase):
     def test_websites_overlap_and_use_independent_sessions(self):
-        barrier, lock = threading.Barrier(3), threading.Lock()
+        barrier, lock = threading.Barrier(len(pilot.SITES)), threading.Lock()
         state = {'active': 0, 'peak': 0, 'sessions': 0}
         class Response:
             status_code = 200
             headers = {'Content-Type': 'text/html'}
-            def __init__(self, url): self.url = url
+            def __init__(self, url):
+                self.url = url
+                if url.endswith('generate_204'): self.status_code = 204
+                if url.endswith('/trace'): self.headers = {'Content-Type': 'text/plain'}
             def __enter__(self): return self
             def __exit__(self, *args): pass
-            def iter_content(self, size): return iter([b'<html>Google YouTube ChatGPT</html>'])
+            def iter_content(self, size):
+                if self.url.endswith('generate_204'): return iter([])
+                if self.url.endswith('/trace'):
+                    host = pilot.urlparse(self.url).hostname
+                    return iter([f'h={host}\nip=8.8.8.8\nloc=US\nvisit_scheme=https\ncolo=LAX\n'.encode()])
+                return iter([b'<html>Google YouTube ChatGPT</html>'])
         class Client:
             def __init__(self):
                 with lock: state['sessions'] += 1
@@ -45,10 +53,32 @@ class MobilePilotTests(unittest.TestCase):
                 return Response(url)
         with patch.object(pilot.s, 'session', side_effect=Client):
             results = pilot.check_sites(1234)
-        self.assertEqual(state['peak'], 3, '网站串行等待，不能重叠处理超时')
-        self.assertEqual(state['sessions'], 3, '线程不能共享 requests Session')
+        self.assertEqual(state['peak'], len(pilot.SITES), '网站串行等待，不能重叠处理超时')
+        self.assertEqual(state['sessions'], len(pilot.SITES), '线程不能共享 requests Session')
         self.assertEqual(set(results), set(pilot.SITES))
         self.assertTrue(all(r['status'] == 'passed' for r in results.values()))
+
+    def test_https_204_requires_exact_empty_response_and_no_redirect(self):
+        url = pilot.SITES['Google204']
+        classify = lambda status, body, final=url: pilot.classify_page('Google204', status, final, 'text/html', body)['status']
+        self.assertEqual(classify(204, b''), 'passed')
+        self.assertEqual(classify(200, b''), 'failed')
+        self.assertEqual(classify(204, b'portal'), 'failed')
+        self.assertEqual(classify(204, b'', 'https://connectivitycheck.gstatic.com/other'), 'needs_review')
+
+    def test_trace_requires_expected_fields_and_does_not_accept_html_or_private_ip(self):
+        for label in ('ChatGPTTrace', 'ClaudeTrace'):
+            url = pilot.SITES[label]; host = pilot.urlparse(url).hostname
+            body = f'h={host}\nip=8.8.8.8\nloc=US\nvisit_scheme=https\ncolo=LAX\n'.encode()
+            result = pilot.classify_page(label, 200, url, 'text/plain', body)
+            self.assertEqual(result['status'], 'passed')
+            self.assertEqual(result['exit_ip'], '8.8.8.8')
+            for invalid in (b'<html>ChatGPT</html>', body.replace(b'8.8.8.8', b'127.0.0.1'),
+                            body.replace(host.encode(), b'wrong.example'), body.replace(b'US', b'A1'),
+                            body.replace(b'https', b'http')):
+                self.assertEqual(pilot.classify_page(label, 200, url, 'text/plain', invalid)['status'], 'failed')
+            self.assertEqual(pilot.classify_page(label, 403, url, 'text/plain', body)['status'], 'needs_review')
+            self.assertEqual(pilot.classify_page(label, 200, url, 'text/html', body)['status'], 'failed')
 
     def test_two_mobile_probes_required_and_wrong_network_is_unknown(self):
         for results, expected in [([probe(), probe()], 'passed'),

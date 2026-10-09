@@ -20,6 +20,14 @@ MOBILE_ASN = 9808
 UDP_TYPES = {'hysteria', 'hysteria2', 'tuic', 'wireguard'}
 SITES = {'Google': 'https://www.google.com/', 'YouTube': 'https://www.youtube.com/',
          'ChatGPT': 'https://chatgpt.com/'}
+PAGE_SITES = tuple(SITES)
+CONNECTIVITY_SITES = {
+    'Google204': 'https://connectivitycheck.gstatic.com/generate_204',
+    'ChatGPTTrace': 'https://chatgpt.com/cdn-cgi/trace',
+    'ClaudeTrace': 'https://claude.ai/cdn-cgi/trace',
+}
+SITES.update(CONNECTIVITY_SITES)
+POST_SITES = {label: url for label, url in SITES.items() if label != 'Google204'}
 
 
 def parse_mobile_result(data, measurement_id):
@@ -97,18 +105,37 @@ def classify_page(label, status, final_url, content_type, body):
         return {**result, 'status': 'needs_review', 'reason': '登录、风控、验证码或地区限制，无法自动确认服务可用'}
     if status in (401, 403, 429) or host != expected_host:
         return {**result, 'status': 'needs_review', 'reason': '需人工确认登录、访问限制或跳转'}
+    if label in CONNECTIVITY_SITES:
+        if final_url != SITES[label]:
+            return {**result, 'status': 'needs_review', 'reason': '检测地址发生跳转'}
+        if label == 'Google204':
+            passed = status == 204 and not body
+            return {**result, 'status': 'passed' if passed else 'failed',
+                    'reason': 'HTTPS 204 连通正常' if passed else '未返回无正文的 204'}
+        fields = dict(line.split('=', 1) for line in body.decode('utf-8', errors='replace').splitlines() if '=' in line)
+        try:
+            valid_ip = ipaddress.ip_address(fields.get('ip', '')).is_global
+        except ValueError:
+            valid_ip = False
+        passed = (status == 200 and 'text/plain' in content_type.lower() and valid_ip
+                  and fields.get('h') == expected_host and fields.get('visit_scheme') == 'https'
+                  and len(fields.get('loc', '')) == 2 and fields['loc'].isascii()
+                  and fields['loc'].isalpha() and fields['loc'].isupper())
+        return {**result, 'status': 'passed' if passed else 'failed',
+                'reason': '域名 HTTPS 连通正常；未验证登录或对话' if passed else '未返回预期 Cloudflare trace',
+                **({'exit_ip': fields['ip'], 'country_code': fields['loc'], 'colo': fields.get('colo')} if passed else {})}
     markers = {'Google': ('google',), 'YouTube': ('youtube',), 'ChatGPT': ('chatgpt', 'openai')}
     passed = status == 200 and 'html' in content_type.lower() and any(word in text for word in markers[label])
     return {**result, 'status': 'passed' if passed else 'failed',
             'reason': '网页入口正常；实际功能仍需本地测试' if passed else '未返回预期网页'}
 
 
-def check_site(port, label, url):
+def check_site(port, label, url, timeout=(5, 8)):
     with s.session() as client:
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
             started = time.perf_counter()
-            with client.get(url, stream=True, timeout=(5, 8)) as response:
+            with client.get(url, stream=True, timeout=timeout, allow_redirects=False) as response:
                 body = next(response.iter_content(16384), b'')
                 result = classify_page(label, response.status_code, response.url,
                                        response.headers.get('Content-Type', ''), body)
@@ -118,10 +145,11 @@ def check_site(port, label, url):
             return {'status': 'failed', 'reason': '连接、TLS 或读取失败'}
 
 
-def check_sites(port):
-    # Each site has its own Session: slow sites do not delay the other two.
-    with futures.ThreadPoolExecutor(max_workers=len(SITES)) as pool:
-        jobs = {label: pool.submit(check_site, port, label, url) for label, url in SITES.items()}
+def check_sites(port, targets=None):
+    # Each target has its own Session; page checks and light probes overlap.
+    targets = SITES if targets is None else targets
+    with futures.ThreadPoolExecutor(max_workers=len(targets)) as pool:
+        jobs = {label: pool.submit(check_site, port, label, url) for label, url in targets.items()}
         return {label: job.result() for label, job in jobs.items()}
 
 
