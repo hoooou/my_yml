@@ -1,4 +1,5 @@
 import copy
+import hashlib
 from pathlib import Path
 import subprocess
 import sys
@@ -13,9 +14,13 @@ import select_nodes as selection
 
 
 class Response:
-    def __init__(self, text='', chunks=None):
+    def __init__(self, text='', chunks=None, data=None, headers=None, status_code=200):
         self.text = text
         self.chunks = chunks or []
+        self.data, self.headers, self.status_code = data, headers or {}, status_code
+
+    def json(self):
+        return self.data
 
     def raise_for_status(self):
         pass
@@ -35,6 +40,9 @@ class Client:
         self.responses = iter(responses)
 
     def get(self, *_args, **_kwargs):
+        return next(self.responses)
+
+    def post(self, *_args, **_kwargs):
         return next(self.responses)
 
     def __enter__(self):
@@ -105,19 +113,83 @@ class SelectionTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, '重复'):
                 selection.load_sources(path)
 
-    def test_region_comes_from_exit_trace_and_speed_is_conservative(self):
-        client = Client([Response('ip=203.0.113.5\nloc=JP\n'), Response(chunks=[b'x' * (4 * 1024 * 1024)])])
+    def test_region_comes_from_trace_and_file_speed_is_conservative(self):
+        body = b'x' * selection.FILE_BYTES
+        client = Client([Response('ip=8.8.8.8\nloc=JP\n'), Response(chunks=[body])])
         with patch.object(selection, 'session', return_value=client), patch.object(selection.time, 'perf_counter', side_effect=[0, .5, 1]):
-            result = selection.verify_exit(12345, {'file_speed_mib_s': 2.5})
+            result = selection.verify_exit(12345, {'exit_ip': '8.8.8.8', 'country_code': 'JP', 'file_speed_mib_s': 2.5}, hashlib.sha256(body).hexdigest())
         self.assertEqual(result['country_code'], 'JP')
-        self.assertEqual(result['exit_ip'], '203.0.113.5')
+        self.assertEqual(result['exit_ip'], '8.8.8.8')
         self.assertEqual(result['speed_mib_s'], 2.5)
 
-    def test_incomplete_file_is_rejected(self):
-        client = Client([Response('ip=203.0.113.5\nloc=US\n'), Response(chunks=[b'x' * 1024])])
-        with patch.object(selection, 'session', return_value=client), patch.object(selection.time, 'perf_counter', side_effect=[0, .5, 1]):
-            with self.assertRaisesRegex(ValueError, '未完整下载'):
-                selection.verify_exit(12345, {'file_speed_mib_s': 2.5})
+    def test_incomplete_file_and_replaced_content_are_rejected(self):
+        for body, expected, message in [(b'x' * 1024, None, '未完整下载'),
+                                        (b'x' * selection.FILE_BYTES, 'wrong', '内容与直连对照不一致')]:
+            client = Client([Response(chunks=[body])])
+            with patch.object(selection.time, 'perf_counter', side_effect=[0, .5, 1]):
+                with self.assertRaisesRegex(ValueError, message):
+                    selection.download_file(client, expected)
+
+    def test_region_or_ip_change_after_classification_is_rejected(self):
+        record = {'exit_ip': '8.8.8.8', 'country_code': 'JP', 'file_speed_mib_s': 2.5}
+        for trace in ['ip=8.8.8.8\nloc=US\n', 'ip=1.1.1.1\nloc=JP\n']:
+            with patch.object(selection, 'session', return_value=Client([Response(trace)])):
+                with self.assertRaisesRegex(ValueError, '发生变化'):
+                    selection.verify_exit(12345, record, 'unused')
+
+    def test_each_region_has_own_quota_and_non_datacenter_ips_are_unique(self):
+        def row(name, country, speed, ip, hosting=True):
+            return {'id': name, 'country_code': country, 'speed_mib_s': speed, 'latency_ms': 100,
+                    'exit_ip': ip, 'ip_type': {'status': 'success', 'hosting': hosting}}
+        records = [row('n-us1', 'US', 100, '8.8.8.1'), row('n-us2', 'US', 90, '8.8.8.2'),
+                   row('n-us3', 'US', 80, '8.8.8.3', False), row('n-us4', 'US', 70, '8.8.8.3', False),
+                   row('n-us5', 'US', 60, '8.8.8.5', False), row('n-jp1', 'JP', 5, '1.1.1.1'),
+                   row('n-jp2', 'JP', 4, '1.1.1.2'), row('n-jp3', 'JP', 3, '1.1.1.3')]
+        selected, regional, non_dc = selection.select_rankings(records, 2, 2)
+        self.assertEqual(regional, {'US': ['n-us1', 'n-us2'], 'JP': ['n-jp1', 'n-jp2']})
+        self.assertEqual(non_dc, ['n-us3', 'n-us5'])
+        self.assertEqual(len(selected), 6)
+        base = {'dns': {'default-nameserver': ['223.5.5.5']}, 'rules': ['MATCH,🚀 全局选择'], 'rule-providers': {}}
+        config = selection.render_config(base, selected, {r['id']: {'name': r['id']} for r in records}, regional, non_dc)
+        groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
+        self.assertEqual(len(groups['美国']), 2)
+        self.assertEqual(len(groups['日本']), 2)
+        self.assertEqual(len(groups['🏠 非机房 IP']), 2)
+        self.assertEqual(len(config['proxies']), 6)
+
+    def test_unknown_ip_type_never_enters_non_datacenter_group(self):
+        records = [{'id': 'n-a', 'country_code': 'JP', 'speed_mib_s': 3, 'latency_ms': 100,
+                    'exit_ip': '8.8.8.8', 'ip_type': {'status': 'success'}},
+                   {'id': 'n-b', 'country_code': 'JP', 'speed_mib_s': 2, 'latency_ms': 100,
+                    'exit_ip': '1.1.1.1', 'ip_type': {'status': 'unknown', 'hosting': False}}]
+        _, _, non_dc = selection.select_rankings(records, 30, 30)
+        self.assertEqual(non_dc, [])
+
+    def test_ip_lookup_uses_explicit_boolean_and_stops_on_rate_limit(self):
+        response = Response(data=[{'query': '8.8.8.8', 'status': 'success', 'hosting': False},
+                                  {'query': '1.1.1.1', 'status': 'success'}])
+        with patch.object(selection, 'session', return_value=Client([response])):
+            result = selection.lookup_ip_types(['8.8.8.8', '1.1.1.1', '8.8.8.8'])
+        self.assertIs(result['8.8.8.8']['hosting'], False)
+        self.assertEqual(result['1.1.1.1']['status'], 'unknown')
+        client = Client([Response(status_code=429)])
+        with patch.object(selection, 'session', return_value=client):
+            result = selection.lookup_ip_types(['8.8.8.8'])
+        self.assertEqual(result['8.8.8.8']['status'], 'unknown')
+
+    def test_all_classified_nodes_are_tested_even_if_region_quota_is_small(self):
+        records = [{'id': f'n-{i}', 'country_code': 'JP', 'latency_ms': 100} for i in range(7)]
+        class FakeCore:
+            def __init__(self, *_): pass
+            def __enter__(self): return self
+            def __exit__(self, *_): pass
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(selection, 'Core', FakeCore), patch.object(selection, 'measure_file', side_effect=lambda _b, _r, n, _m: {'id': n['id']}), patch.object(selection, 'verify_exit', side_effect=lambda _p, r, _h: {**r, 'speed_mib_s': 5}):
+                verified, summaries = selection.measure_regions('/core', '/tool', Path(directory), records,
+                    {r['id']: r for r in records}, {r['id']: {'sources': ['test']} for r in records},
+                    {'max_latency_ms': 1000, 'file_sha256': 'hash', 'per_region_limit': 2})
+        self.assertEqual(len(verified), 7)
+        self.assertEqual(summaries[0]['file_tested'], 7)
 
     def test_generated_groups_and_rules_reference_existing_targets(self):
         base = {'mixed-port': 7890, 'dns': {'default-nameserver': ['223.5.5.5', '192.168.70.49']},
