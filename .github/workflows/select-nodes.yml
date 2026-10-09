@@ -16,7 +16,7 @@ concurrency:
 jobs:
   select:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 180
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -39,15 +39,26 @@ jobs:
       - name: 检查筛选逻辑
         run: python -m unittest discover -s scripts/tests -v
 
-      - name: 测速并生成配置
+      - name: 延迟测速、地区分类与 IP 类型检测
         run: |
           python scripts/select_nodes.py \
+            --stage prepare \
             --mihomo .node-work/bin/mihomo \
             --speedtest .node-work/bin/clash-speedtest \
-            --limit 30 \
-            --candidate-limit 150 \
+            --per-region-limit 30 \
+            --non-datacenter-limit 30 \
             --max-latency-ms 1000 \
             --test-origin 'GitHub Actions（ubuntu-24.04 云端网络）'
+
+      - name: 各地区全部候选文件测速
+        run: |
+          python scripts/select_nodes.py --stage measure \
+            --mihomo .node-work/bin/mihomo --speedtest .node-work/bin/clash-speedtest
+
+      - name: 每地区前30和非机房IP前30、生成并校验配置
+        run: |
+          python scripts/select_nodes.py --stage publish \
+            --mihomo .node-work/bin/mihomo --speedtest .node-work/bin/clash-speedtest
 
       - name: 更新配置和报告
         run: |
