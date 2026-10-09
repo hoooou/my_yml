@@ -11,7 +11,7 @@ from pathlib import Path
 import statistics
 import subprocess
 import time
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 import yaml
 import select_nodes as s
@@ -26,6 +26,7 @@ SITES = {'Google': 'https://www.google.com/', 'YouTube': 'https://www.youtube.co
          'X': 'https://x.com/', 'Instagram': 'https://www.instagram.com/'}
 PAGE_SITES = tuple(SITES)
 SITE_WORKERS = 5
+WEB_USER_AGENT = 'my-yml-availability-bot/4.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
 PAGE_MARKERS = {
     'Google': ('google',), 'YouTube': ('youtube',), 'ChatGPT': ('chatgpt', 'openai'),
     'Claude': ('claude', 'anthropic'), 'Gemini': ('gemini',), 'GitHub': ('github',),
@@ -150,12 +151,23 @@ def check_site(port, label, url, timeout=(5, 8)):
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
             started = time.perf_counter()
-            with client.get(url, stream=True, timeout=timeout, allow_redirects=False) as response:
-                body = next(response.iter_content(16384), b'')
-                result = classify_page(label, response.status_code, response.url,
-                                       response.headers.get('Content-Type', ''), body)
-                result['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
-                return result
+            current_url = url
+            for hop in range(3):
+                with client.get(current_url, stream=True, timeout=timeout, allow_redirects=False,
+                                headers={'User-Agent': WEB_USER_AGENT}) as response:
+                    location = response.headers.get('Location')
+                    if label in PAGE_SITES and 300 <= response.status_code < 400 and location:
+                        target = urljoin(current_url, location)
+                        # Follow up to two HTTPS redirects on the same website only.
+                        if hop < 2 and urlparse(target).scheme == 'https' and urlparse(target).hostname == urlparse(url).hostname:
+                            current_url = target
+                            continue
+                    body = next(response.iter_content(16384), b'')
+                    result = classify_page(label, response.status_code, response.url,
+                                           response.headers.get('Content-Type', ''), body)
+                    result['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
+                    result['redirect_hops'] = hop
+                    return result
         except s.requests.RequestException:
             return {'status': 'failed', 'reason': '连接、TLS 或读取失败'}
 
