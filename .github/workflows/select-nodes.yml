@@ -54,7 +54,7 @@ jobs:
           overwrite: true
 
   probe:
-    name: TCP 与网站流水线（分片 ${{ matrix.shard }}）
+    name: 204 → TCP → 网站 → 快速下载（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
     timeout-minutes: 90
@@ -81,7 +81,7 @@ jobs:
         with:
           name: availability-input
           path: .node-work/availability
-      - name: 同时探测入口与复测网站
+      - name: 按阶段并行检测节点
         env:
           SHARD_INDEX: ${{ matrix.shard }}
         run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase probe --shard-index "$SHARD_INDEX" --shard-count 4

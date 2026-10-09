@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Classify every subscription endpoint and repeat webpages only for reachable nodes."""
+"""Stage HTTPS 204, domestic TCP, overseas pages/trace and a quick download."""
 import argparse
 import concurrent.futures as futures
 import copy
@@ -16,7 +16,7 @@ import time
 
 import yaml
 import select_nodes as s
-from mobile_pilot import check_sites, SITES, UDP_TYPES
+from mobile_pilot import check_site, check_sites, SITES, PAGE_SITES, CONNECTIVITY_SITES, POST_SITES, UDP_TYPES
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
@@ -183,30 +183,106 @@ def shard_nodes(nodes, index, count):
         json.dumps(endpoint_key(node), ensure_ascii=False).encode()).hexdigest(), 16) % count == index]
 
 
-def probe_pipeline(nodes, binary, root, probe=probe_xxapi, site_check=check_sites, interval=.2, workers=16):
+DOWNLOAD_URL = 'https://speed.cloudflare.com/__down?bytes=1000000'
+DOWNLOAD_BYTES = 1_000_000
+DOWNLOAD_BUDGET = 6
+
+
+def precheck_204(port):
+    outcomes = [{'Google204': check_site(port, 'Google204', SITES['Google204'], timeout=(2, 3))}
+                for _ in range(3)]
+    return summarize_rounds(outcomes, labels=('Google204',))['Google204']
+
+
+def quick_download(port):
+    """One bounded 1 MB sample; conservative speed includes TLS and first byte."""
+    started = time.perf_counter()
+    received = 0
+    result = {'status': 'failed', 'url': DOWNLOAD_URL, 'requested_bytes': DOWNLOAD_BYTES,
+              'budget_seconds': DOWNLOAD_BUDGET, 'speed_mib_s': None}
+    with s.session() as client:
+        client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
+        try:
+            with client.get(DOWNLOAD_URL, stream=True, timeout=(2, 1), allow_redirects=False,
+                            headers={'Accept-Encoding': 'identity', 'Cache-Control': 'no-cache'}) as response:
+                if (response.status_code != 200 or response.url != DOWNLOAD_URL
+                        or response.headers.get('Content-Length') != str(DOWNLOAD_BYTES)
+                        or response.headers.get('Content-Type', '').split(';')[0] != 'application/octet-stream'
+                        or response.headers.get('Content-Encoding', 'identity') != 'identity'):
+                    return {**result, 'reason': '下载状态、文件长度或类型不匹配'}
+                # read1 returns available data without waiting to fill a large chunk.
+                while received <= DOWNLOAD_BYTES and time.perf_counter() - started < DOWNLOAD_BUDGET:
+                    chunk = response.raw.read1(16384)
+                    if not chunk:
+                        break
+                    received += len(chunk)
+                elapsed = time.perf_counter() - started
+                if received != DOWNLOAD_BYTES or elapsed > DOWNLOAD_BUDGET:
+                    return {**result, 'reason': '未在时间预算内完整下载 1 MB', 'received_bytes': received,
+                            'elapsed_ms': round(elapsed * 1000, 1)}
+                return {**result, 'status': 'passed', 'reason': '1 MB 快速采样完整下载；包含建连耗时，不代表峰值带宽',
+                        'received_bytes': received, 'elapsed_ms': round(elapsed * 1000, 1),
+                        'speed_mib_s': round(received / elapsed / 1048576, 3)}
+        except (s.requests.RequestException, OSError, s.requests.packages.urllib3.exceptions.HTTPError):
+            return {**result, 'reason': '快速下载连接、TLS 或读取失败', 'received_bytes': received}
+
+
+def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
+                   site_check=None, download=quick_download, interval=.25, workers=16):
+    """Per-node stages are ordered, while different nodes overlap across stages."""
     if not nodes:
         return [], 0
+    site_check = site_check or (lambda port: check_sites(port, POST_SITES))
     listeners, ports = s.make_listeners({'id': n['name']} for n in nodes)
-    checked, jobs, lock = {}, [], threading.Lock()
-    def completed(job):
-        if job.exception() is not None:
-            return
-        record = job.result()
-        with lock:
-            checked[record['id']] = record
-            if len(checked) % 20 == 0:
-                print(f'流水线网页完成 {len(checked)}，已提交 {len(jobs)}；TCP 探测同时运行，每站 3 轮', flush=True)
-    with s.Core(binary, root, nodes, listeners), futures.ThreadPoolExecutor(max_workers=workers) as pool:
-        def submit(record):
-            if record['entry']['status'] == 'passed':
-                job = pool.submit(check_repeated, ports[record['id']], record, site_check=site_check)
-                jobs.append(job)
-                job.add_done_callback(completed)
-        records, endpoints = classify_all(nodes, probe=probe, pace=Pace(interval), on_record=submit)
-        for job in futures.as_completed(jobs):
-            job.result()  # Propagate errors; never silently publish an incomplete shard.
-    print(f'流水线完成：TCP 入口 {endpoints}，网页节点 {len(checked)}', flush=True)
-    return [checked.get(r['id'], r) for r in records], endpoints
+    pace, lock, tcp_jobs = Pace(interval), threading.Lock(), {}
+    progress = {'done': 0, 'precheck': 0, 'tcp': 0, 'websites': 0, 'download': 0}
+    with s.Core(binary, root, nodes, listeners), futures.ThreadPoolExecutor(max_workers=10) as tcp_pool:
+        def measure(node):
+            port = ports[node['name']]
+            record = {'id': node['name'], 'server': node['server'], 'port': node['port'], 'protocol': node['type'],
+                      'entry': {'status': 'unknown', 'attempts': 0, 'reason': '204 未通过，未提交国内 TCP 检测'},
+                      'websites': None, 'exit': None, 'download': {'status': 'skipped', 'reason': '未进入下载阶段'}}
+            record['precheck'] = precheck(port)
+            if record['precheck']['status'] == 'passed':
+                if not tcp_supported(node):
+                    record['entry']['reason'] = 'UDP 协议不适用 TCP 检测，后续阶段未测'
+                else:
+                    key = endpoint_key(node)
+                    with lock:
+                        if key not in tcp_jobs:
+                            tcp_jobs[key] = tcp_pool.submit(probe, key, pace)
+                        job = tcp_jobs[key]
+                    record['entry'] = copy.deepcopy(job.result())
+                if record['entry']['status'] == 'passed':
+                    record['websites'] = summarize_rounds([site_check(port)], labels=POST_SITES)
+                    traces = [record['websites'][label]['attempts'][0] for label in ('ChatGPTTrace', 'ClaudeTrace')
+                              if record['websites'][label]['status'] == 'passed'
+                              and record['websites'][label]['attempts'][0].get('exit_ip')]
+                    if traces:
+                        record['exit'] = {'id': record['id'], 'exit_ip': traces[0]['exit_ip'],
+                                          'country_code': traces[0]['country_code'], 'source': 'verified_trace'}
+                        record['exit_consistent'] = len({(r['exit_ip'], r['country_code']) for r in traces}) == 1
+                    else:
+                        try:
+                            record['exit'] = s.query_exit(port, {'id': record['id']})
+                        except (s.requests.RequestException, ValueError, KeyError):
+                            record['exit_reason'] = '出口 IP/地区未确认'
+                    if any(v['status'] == 'passed' for v in record['websites'].values()):
+                        record['download'] = download(port)
+                    else:
+                        record['download']['reason'] = '海外网页与 trace 均未通过，跳过下载'
+            with lock:
+                progress['done'] += 1
+                progress['precheck'] += record['precheck']['status'] == 'passed'
+                progress['tcp'] += record['entry']['status'] == 'passed'
+                progress['websites'] += record['websites'] is not None
+                progress['download'] += record['download']['status'] == 'passed'
+                if progress['done'] % 100 == 0 or progress['done'] == len(nodes):
+                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，网站完成 {progress["websites"]}，快速下载通过 {progress["download"]}', flush=True)
+            return record
+        with futures.ThreadPoolExecutor(max_workers=workers) as pool:
+            records = list(pool.map(measure, nodes))
+    return records, len(tcp_jobs)
 
 
 def merge_shards(bundle, parts, count):
@@ -220,23 +296,48 @@ def merge_shards(bundle, parts, count):
             raise ValueError('分片数量不一致')
         subset = shard_nodes(bundle['nodes'], part['index'], count)
         expected = {n['name'] for n in subset}
-        if part['endpoint_count'] != len({endpoint_key(n) for n in subset if tcp_supported(n)}):
-            raise ValueError('TCP 入口统计不完整')
         rows = part['records']
         if len(rows) != len(expected) or {r['id'] for r in rows} != expected:
             raise ValueError('分片存在漏测、重复或串片节点')
+        by_id = {r['id']: r for r in rows}
+        eligible = {endpoint_key(n) for n in subset if tcp_supported(n) and
+                    by_id[n['name']].get('precheck', {}).get('status') == 'passed'}
+        if part['endpoint_count'] != len(eligible):
+            raise ValueError('TCP 入口统计不完整')
         for record in rows:
+            pre = record.get('precheck', {})
+            if pre.get('round_count') != 3 or len(pre.get('attempts', [])) != 3:
+                raise ValueError('节点缺少三轮 204 检测')
+            passed = sum(a.get('status') == 'passed' for a in pre['attempts'])
+            if pre.get('passed_count') != passed or (pre.get('status') == 'passed') != (passed == 3):
+                raise ValueError('204 汇总与三轮结果不一致')
+            if record['entry']['status'] != 'unknown' and pre['status'] != 'passed':
+                raise ValueError('204 未通过却进入 TCP 阶段')
+            if pre['status'] != 'passed' and (record['entry'].get('attempts') != 0 or record.get('websites')):
+                raise ValueError('204 未通过却执行后续阶段')
             if record['entry']['status'] == 'passed' and (not record.get('websites') or any(
-                    record['websites'].get(site, {}).get('round_count') != 3 or
-                    len(record['websites'].get(site, {}).get('attempts', [])) != 3 for site in SITES)):
-                raise ValueError('通过节点缺少完整网页复测')
+                    record['websites'].get(site, {}).get('round_count') != 1 or
+                    len(record['websites'].get(site, {}).get('attempts', [])) != 1 for site in POST_SITES)):
+                raise ValueError('通过节点缺少完整网站单轮检测')
+            if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
+                raise ValueError('节点未按阶段筛选')
+            should_download = record['entry']['status'] == 'passed' and any(
+                v['status'] == 'passed' for v in (record.get('websites') or {}).values())
+            if record.get('download', {}).get('status') not in (('passed', 'failed') if should_download else ('skipped',)):
+                raise ValueError('下载阶段漏测或顺序异常')
+            if record.get('download', {}).get('status') == 'passed' and (
+                    record['entry']['status'] != 'passed' or
+                    not any(v['status'] == 'passed' for v in (record.get('websites') or {}).values()) or
+                    record['download'].get('received_bytes') != DOWNLOAD_BYTES or
+                    not 0 < record['download'].get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
+                raise ValueError('下载结果不完整或节点未通过前置阶段')
             combined[record['id']] = record
     return [combined[n['name']] for n in bundle['nodes']], sum(p['endpoint_count'] for p in parts)
 
 
-def summarize_rounds(rounds):
+def summarize_rounds(rounds, labels=SITES):
     summarized = {}
-    for label in SITES:
+    for label in labels:
         attempts = [row[label] for row in rounds]
         passed = sum(a['status'] == 'passed' for a in attempts)
         status = ('passed' if passed == len(rounds) else 'needs_review' if any(a['status'] == 'needs_review' for a in attempts)
@@ -244,29 +345,29 @@ def summarize_rounds(rounds):
         delays = [a['elapsed_ms'] for a in attempts if a.get('elapsed_ms') is not None and a['status'] == 'passed']
         summarized[label] = {'status': status, 'passed_count': passed, 'round_count': len(rounds),
                               'median_elapsed_ms': round(statistics.median(delays), 1) if delays else None,
+                              'max_elapsed_ms': max(delays) if delays else None,
                               'attempts': attempts}
     return summarized
 
 
-def check_repeated(port, record, rounds=3, site_check=check_sites):
-    if record['entry']['status'] != 'passed':
-        return record
-    record = copy.deepcopy(record)
-    outcomes = []
-    for index in range(rounds):
-        outcomes.append(site_check(port))
-        if index + 1 < rounds:
-            time.sleep(1)
-    record['websites'] = summarize_rounds(outcomes)
-    try:
-        record['exit'] = s.query_exit(port, {'id': record['id']})
-    except (s.requests.RequestException, ValueError, KeyError):
-        record['exit_reason'] = '出口 IP/地区未确认'
-    return record
-
 
 def website_count(record):
-    return sum(v['status'] == 'passed' for v in (record.get('websites') or {}).values())
+    results = record.get('websites') or {}
+    return sum(results.get(label, {}).get('status') == 'passed' for label in PAGE_SITES)
+
+
+def connectivity_count(record):
+    results = record.get('websites') or {}
+    return int((record.get('precheck') or results.get('Google204', {})).get('status') == 'passed') + sum(
+        results.get(label, {}).get('status') == 'passed' for label in ('ChatGPTTrace', 'ClaudeTrace'))
+
+
+def rank_key(record):
+    pre = record.get('precheck') or {}
+    downloaded = record.get('download') or {}
+    return (downloaded.get('status') != 'passed', -website_count(record), -connectivity_count(record),
+            pre.get('median_elapsed_ms') if pre.get('median_elapsed_ms') is not None else math.inf,
+            -(downloaded.get('speed_mib_s') or 0), record['entry'].get('latency_ms', math.inf), record['id'])
 
 
 def render_comparison(base, records, mapping):
@@ -277,38 +378,50 @@ def render_comparison(base, records, mapping):
     references = {rule.split(',')[1] for rule in config.get('rules', []) if rule.startswith('RULE-SET,')}
     config['rule-providers'] = {k: v for k, v in config.get('rule-providers', {}).items() if k in references}
     proxies, classified, regions = [], {v: [] for v in ('passed', 'failed', 'unknown')}, {}
-    ranked = sorted(records, key=lambda r: (-website_count(r), r['entry'].get('latency_ms', math.inf), r['id']))
+    ranked = sorted(records, key=rank_key)
     non_dc, seen_ips = [], set()
     for record in ranked:
         region_code = (record.get('exit') or {}).get('country_code')
         region = s.COUNTRIES.get(region_code, region_code) if region_code else '地区未确认'
         status = record['entry']['status']
         webpages = f'网页{website_count(record)}/3项通过' if record.get('websites') else '未测网站'
+        if record.get('precheck'):
+            webpages += f' | 连通{connectivity_count(record)}/3'
+        speed = (record.get('download') or {}).get('speed_mib_s')
+        if (record.get('download') or {}).get('status') == 'passed':
+            webpages += f' | {speed:.2f}MiB/s'
         name = f"{record['id'][2:]} | {region} | TCP{LABELS[status]} | {webpages}"
         record['name'] = name
         node = copy.deepcopy(mapping[record['id']]); node['name'] = name; proxies.append(node)
         classified[status].append(name)
-        if region_code and status == 'passed' and website_count(record):
+        eligible = status == 'passed' and (record.get('download') or {}).get('status') == 'passed'
+        if region_code and eligible:
             regions.setdefault(region, []).append(name)
         ip = (record.get('exit') or {}).get('exit_ip')
-        if (status == 'passed' and website_count(record) and record.get('ip_type', {}).get('hosting') is False
+        if (eligible and record.get('exit_consistent') is not False and record.get('ip_type', {}).get('hosting') is False
                 and record['ip_type'].get('status') == 'success' and ip and ip not in seen_ips and len(non_dc) < 30):
             non_dc.append(name); seen_ips.add(ip)
     stable = [r['name'] for r in ranked if r['entry']['status'] == 'passed' and website_count(r) == 3]
-    fallback = '✅ 三站稳定' if stable else '📶 TCP通' if classified['passed'] else '🔎 TCP未验证' if classified['unknown'] else '⛔ TCP不通'
+    connected = [r['name'] for r in ranked if r['entry']['status'] == 'passed' and connectivity_count(r) == 3]
+    fast = [r['name'] for r in ranked if (r.get('download') or {}).get('status') == 'passed']
+    pre_failed = [r['name'] for r in ranked if r.get('precheck') and r['precheck']['status'] != 'passed']
+    fallback = '⚡ 快速下载通过' if fast else '✅ 三站通过' if stable else '📶 TCP通' if classified['passed'] else '🔎 TCP未验证' if classified['unknown'] else '⛔ TCP不通'
     def group(name, names):
         return {'name': name, 'type': 'select', 'proxies': names or ['REJECT']}
     region_names = list(regions)
     config['proxies'] = proxies
     config['proxy-groups'] = [
-        group('🚀 全局选择', list(dict.fromkeys([fallback, '✅ 三站稳定', '📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证',
+        group('🚀 全局选择', list(dict.fromkeys([fallback, '✅ 三站通过', '📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证',
+                                              '⚡ 快速下载通过', '🔎 204未通过', '✅ 三项连通', '⚡ HTTPS 204', '🧭 ChatGPT 域名连通', '🧭 Claude 域名连通',
                                               '🌐 Google', '📺 YouTube', '💬 ChatGPT', '🏠 非机房 IP', '🎯 手动选择', 'DIRECT'] + region_names))),
-        group('✅ 三站稳定', stable), group('📶 TCP通', classified['passed']), group('⛔ TCP不通', classified['failed']),
+        group('✅ 三站通过', stable), group('📶 TCP通', classified['passed']), group('⛔ TCP不通', classified['failed']),
+        group('✅ 三项连通', connected), group('⚡ 快速下载通过', fast), group('🔎 204未通过', pre_failed),
         group('🔎 TCP未验证', classified['unknown']), group('🎯 手动选择', [n['name'] for n in proxies]),
         group('🏠 非机房 IP', non_dc),
     ]
-    for label, name in [('Google', '🌐 Google'), ('YouTube', '📺 YouTube'), ('ChatGPT', '💬 ChatGPT')]:
-        config['proxy-groups'].append(group(name, [r['name'] for r in ranked if r.get('websites') and r['websites'][label]['status'] == 'passed']))
+    for label, name in [('Google', '🌐 Google'), ('YouTube', '📺 YouTube'), ('ChatGPT', '💬 ChatGPT'),
+                        ('Google204', '⚡ HTTPS 204'), ('ChatGPTTrace', '🧭 ChatGPT 域名连通'), ('ClaudeTrace', '🧭 Claude 域名连通')]:
+        config['proxy-groups'].append(group(name, [r['name'] for r in ranked if ((r.get('precheck') or {}) if label == 'Google204' else (r.get('websites') or {}).get(label, {})).get('status') == 'passed']))
     config['proxy-groups'] += [group(name, names[:30]) for name, names in regions.items()]
     if mobile_control_paths(config):
         raise ValueError('配置包含解码后的控制字符，拒绝发布到手机')
@@ -346,7 +459,7 @@ def main():
                   'services': previous['services'], 'scope': previous['scope'],
                   'parallel_shards': previous.get('parallel_shards', 1),
                   'measurements_updated_at': previous.get('measurements_updated_at', previous['updated_at'])}
-        endpoint_count = len({endpoint_key(n) for n in nodes if tcp_supported(n)})
+        endpoint_count = previous.get('unique_tcp_endpoints', len({endpoint_key(n) for n in nodes if tcp_supported(n)}))
         print(f'仅修复手机兼容性：剔除 {len(mobile_rejections)} 个损坏节点，保留 {len(nodes)} 个；不重新探测', flush=True)
     elif args.phase in ('all', 'prepare'):
         base = yaml.safe_load(Path('聚合配置.yaml').read_text())
@@ -371,7 +484,7 @@ def main():
                   'prepared_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
         bundle['id'] = hashlib.sha256(json.dumps(bundle, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
         bundle_path.write_text(json.dumps(bundle, ensure_ascii=False))
-        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备流水线输入，不运行下载测速', flush=True)
+        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备分阶段流水线输入，最后进行 1 MB 快速下载', flush=True)
         if args.phase == 'prepare':
             return
     else:
@@ -383,7 +496,7 @@ def main():
     if args.phase == 'probe':
         subset = shard_nodes(nodes, args.shard_index, args.shard_count)
         print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)} 节点，TCP 与网站同时检测', flush=True)
-        records, endpoint_count = probe_pipeline(subset, binary, root, interval=.2 * args.shard_count)
+        records, endpoint_count = probe_pipeline(subset, binary, root, interval=.25 * args.shard_count)
         result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
                   'records': records, 'endpoint_count': endpoint_count}
         (root / f'shard-{args.shard_index}.json').write_text(json.dumps(result, ensure_ascii=False))
@@ -406,40 +519,66 @@ def main():
         raise RuntimeError('最终订阅校验失败，不发布')
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
-    report = {'updated_at': now, 'scope': bundle['scope'],
+    repairing = args.phase == 'repair'
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 2,
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
-              'publication_mode': 'compatibility_repair' if args.phase == 'repair' else 'full',
+              'publication_mode': 'compatibility_repair' if repairing else 'full',
               'mobile_rejections': bundle.get('mobile_rejections', {}),
               'pipeline': True, 'parallel_shards': bundle.get('parallel_shards', args.shard_count if args.phase == 'publish' else 1),
-              'website_workers_per_shard': 16, 'parallel_sites_per_node': 3,
-              'download_test': False, 'website_rounds': 3, 'input_unique_count': input_count,
-              'parseable_count': len(nodes), 'invalid_node_ids': rejected, 'unique_tcp_endpoints': endpoint_count,
+              'website_workers_per_shard': 16,
+              'parallel_sites_per_node': previous.get('parallel_sites_per_node', 3) if repairing else len(POST_SITES),
+              'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(SITES),
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'quick_download'],
+              'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
+              'website_rounds': previous.get('website_rounds', 3) if repairing else 1,
+              'download_test': previous.get('download_test', False) if repairing else True,
+              'download_settings': previous.get('download_settings') if repairing else {'url': DOWNLOAD_URL, 'bytes': DOWNLOAD_BYTES, 'budget_seconds': DOWNLOAD_BUDGET, 'rounds': 1, 'read_timeout_seconds': 1, 'includes_handshake': True},
+              'input_unique_count': input_count, 'parseable_count': len(nodes), 'invalid_node_ids': rejected,
+              'unique_tcp_endpoints': endpoint_count,
+              'total_unique_tcp_endpoints': len({endpoint_key(n) for n in nodes if tcp_supported(n)}),
+              'precheck_counts': {v: sum((r.get('precheck') or {}).get('status') == v for r in records)
+                                  for v in ('passed', 'failed', 'unstable', 'needs_review')},
               'entry_counts': counts, 'website_tested_count': len(reachable),
-              'three_sites_stable': sum(website_count(r) == 3 for r in records),
+              'three_sites_passed': sum(website_count(r) == 3 for r in records),
+              'three_connectivity_passed': sum(connectivity_count(r) == 3 for r in records),
+              'download_counts': {v: sum((r.get('download') or {}).get('status') == v for r in records)
+                                  for v in ('passed', 'failed', 'skipped')},
               'services': services, 'sources': sources, 'nodes': records}
-    Path('优选配置.yaml').write_text(f'# 全量 TCP 分类与网页 3 轮复测；{now}；未测下载速度\n' + candidate.read_text())
+    Path('优选配置.yaml').write_text(f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text())
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    rows = ['# 节点 TCP 连通性与网页复测', '', f'发布时间：{now}；检测数据时间：{report["measurements_updated_at"]}', '',
-            f'去重节点 {input_count}；内核可解析 {len(nodes)}；不同 TCP 入口 {endpoint_count}。', '',
-            f'TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；网站复测 {len(reachable)} 个节点，三站全部稳定 {report["three_sites_stable"]} 个。', '',
-            '不进行下载测速。全部可解析节点保留在订阅，方便手机对照“TCP通”“TCP不通”“TCP未验证”；地区和非机房分组最多各 30 个。', '',
-            'TCP 结果是小小 API 探测点单次真实端口连接结果；探测点运营商未公开，不代表移动或本地必然可用。共享主机和端口共用入口结果，不同密码与协议节点分别复测网站。UDP、接口超时、限流、错误和目标不匹配归入未验证。', '',
-            f'TCP 与网站采用流水线并行：入口一通过即提交网页任务，不等待全部 TCP 完成。本轮 {report["parallel_shards"]} 个 Actions 分片，每个分片最多同时复测 16 个节点，三个网站同时请求，同一网站的三轮依次执行。', '',
-            '仅 TCP 通的节点检查 Google、YouTube、ChatGPT，每站独立 3 轮，全部成功才加入该站分组。只读取网页前 16 KB，网页通过不代表视频播放或 ChatGPT 对话已验证；403/验证码/风控记为需人工复核。地区来自实际 Cloudflare 出口，无法取得则名称显示地区未确认。', '',
+    rows = ['# 节点分阶段连通性与快速下载', '', f'发布时间：{now}；检测数据时间：{report["measurements_updated_at"]}', '',
+            f'去重节点 {input_count}；内核可解析 {len(nodes)}；TCP 入口总数 {report["total_unique_tcp_endpoints"]}，本轮实际提交 {endpoint_count}。', '',
+            f'204 全通过 {report["precheck_counts"]["passed"]}；TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；海外访问检测 {len(reachable)}；快速下载通过 {report["download_counts"]["passed"]}。', '',
+            f'检测顺序：{" → ".join(report["stages"])}。204 {report["precheck_rounds"]} 轮；网站与 trace 各 {report["website_rounds"]} 轮；下载检测 {"开启" if report["download_test"] else "关闭"}。兼容性修复保留原检测数据，未测项目保持未测。', '',
+            '204 三轮均返回 HTTPS 204 且无正文才进入 TCP；204 未通过的节点仍保留在“204未通过”与“TCP未验证”组，不伪造国内入口不通。UDP 的 TCP 阶段不适用，保持未验证。', '',
+            'TCP 来自小小 API 的国内探测点，运营商未公开，不代表移动或手机本地必然可用。共享主机和端口只提交一次，不同凭据分别检查 204 和海外访问。接口限流、超时、异常和目标不匹配均记为未验证。', '',
+            f'本轮 {report["parallel_shards"]} 个并行 Actions 分片，每片最多同时检测 16 个节点。同一节点按顺序过关，不同节点可同时处于不同阶段；海外的 Google、YouTube、ChatGPT 网页及两个 trace 共五个地址同时请求一次。', '',
+            '网页只读取前 16 KB；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
+            'TCP 通且至少一个海外网页或 trace 通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
+            '优先完整下载通过的节点，再比较网页通过项数、连通通过项数、204 中位延迟、下载速度及 TCP 延迟。地区和非机房组仅从快速下载通过的节点选择，各地区最多 30 个；非机房最多 30 个独立出口，且必须明确 hosting=false。', '',
+            '全部可解析节点保留，手机刷新原订阅即可查看新分组；所有延迟及速度来自 GitHub 云端，仍需手机对照。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
     for name, service in services.items():
         rows.append(f'| [{name}]({service["url"]}) | {service["mode"]} | {service.get("reason", "公开 TCPing API，最多 5 次请求/秒")} |')
-    rows += ['', '## 手机对照', '', '刷新原订阅，进入“🚀 全局选择”，选择对应分类，再在分类组内选单个节点。反馈编号、云端分类、本地能否连接，以及 Google、YouTube 播放和 ChatGPT 实际对话是否可用。', '',
-             '| 编号 | 入口 | TCP 分类 | 地区 | Google | YouTube | ChatGPT |', '|---|---|---|---|---|---|---|']
+    rows += ['', '## 手机对照', '', '刷新原订阅，进入“🚀 全局选择”，优先选择“⚡ 快速下载通过”；也可对照“204未通过”及三个 TCP 分类。反馈节点编号和手机实际体验。', '',
+             '| 编号 | 入口 | TCP 分类 | 地区 | HTTPS204（三轮） | ' + ' | '.join(POST_SITES) + ' | 快速下载 |',
+             '|' + '---|' * (6 + len(POST_SITES))]
     for record in records:
         results = record.get('websites') or {}
-        scores = [f'{results[label]["passed_count"]}/3 {LABELS[results[label]["status"]]}' if label in results else '未测' for label in SITES]
+        scores = []
+        for item in [record.get('precheck')] + [results.get(label) for label in POST_SITES]:
+            score = f'{item["passed_count"]}/{item["round_count"]} {LABELS[item["status"]]}' if item else '未测'
+            if item and item.get('median_elapsed_ms') is not None:
+                score += f'，中位 {item["median_elapsed_ms"]}ms / 最大 {item.get("max_elapsed_ms", "未记录")}ms'
+            scores.append(score)
+        downloaded = record.get('download') or {}
+        scores.append(f'{downloaded["speed_mib_s"]:.3f} MiB/s' if downloaded.get('status') == 'passed' else LABELS.get(downloaded.get('status'), '未测'))
         country = (record.get('exit') or {}).get('country_code')
         rows.append(f'| {record["id"][2:]} | {record["server"]}:{record["port"]} | {LABELS[record["entry"]["status"]]} | {s.COUNTRIES.get(country, country) or "未确认"} | ' + ' | '.join(scores) + ' |')
     if rejected:
         rows += ['', '内核或手机兼容性校验未通过的节点未写入订阅，编号：' + '、'.join(rejected)]
     Path('连通性报告.md').write_text('\n'.join(rows) + '\n')
-    print(f'全量分类完成，配置校验通过；{counts}；不含下载测速', flush=True)
+    print(f'分阶段分类完成，配置校验通过；204 {report["precheck_counts"]}；TCP {counts}；下载 {report["download_counts"]}', flush=True)
 
 
 if __name__ == '__main__':
