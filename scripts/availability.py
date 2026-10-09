@@ -49,6 +49,35 @@ def tcp_supported(node):
     return node['type'] not in UDP_TYPES and node.get('network') != 'quic'
 
 
+def mobile_control_paths(value, path=()):
+    """Reject decoded controls: mobile YAML writers may emit them literally."""
+    if isinstance(value, str):
+        if any((ord(c) < 32 and c not in '\t\n\r') or 127 <= ord(c) <= 159
+               or 0xd800 <= ord(c) <= 0xdfff or ord(c) in (0xfffe, 0xffff) for c in value):
+            return ['.'.join(path) or '<root>']
+        return []
+    if isinstance(value, dict):
+        result = []
+        for key, item in value.items():
+            result.extend(mobile_control_paths(key, path + ('<key>',)))
+            result.extend(mobile_control_paths(item, path + (str(key),)))
+        return result
+    if isinstance(value, list):
+        return [p for i, item in enumerate(value) for p in mobile_control_paths(item, path + (str(i),))]
+    return []
+
+
+def filter_mobile_nodes(nodes):
+    safe, rejected = [], {}
+    for node in nodes:
+        paths = mobile_control_paths(node)
+        if paths:
+            rejected[node['name']] = paths
+        else:
+            safe.append(node)
+    return safe, rejected
+
+
 def parse_xxapi(data, host, port):
     if not isinstance(data, dict):
         return {'status': 'unknown', 'reason': '接口返回格式异常'}
@@ -281,13 +310,15 @@ def render_comparison(base, records, mapping):
     for label, name in [('Google', '🌐 Google'), ('YouTube', '📺 YouTube'), ('ChatGPT', '💬 ChatGPT')]:
         config['proxy-groups'].append(group(name, [r['name'] for r in ranked if r.get('websites') and r['websites'][label]['status'] == 'passed']))
     config['proxy-groups'] += [group(name, names[:30]) for name, names in regions.items()]
+    if mobile_control_paths(config):
+        raise ValueError('配置包含解码后的控制字符，拒绝发布到手机')
     return config
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
-    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish'), default='all')
+    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair'), default='all')
     parser.add_argument('--sample', help='Optional fixture; default pulls ALL subscriptions')
     parser.add_argument('--work-dir', default='.node-work/availability')
     parser.add_argument('--shard-index', type=int, default=0)
@@ -297,7 +328,27 @@ def main():
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     binary = str(Path(args.mihomo).resolve())
     bundle_path = root / 'bundle.json'
-    if args.phase in ('all', 'prepare'):
+    if args.phase == 'repair':
+        previous = json.loads(Path('连通性报告.json').read_text())
+        published = yaml.safe_load(Path('优选配置.yaml').read_text())
+        by_name = {n['name']: n for n in published['proxies']}
+        nodes = [{**by_name[r['name']], 'name': r['id']} for r in previous['nodes']]
+        nodes, mobile_rejections = filter_mobile_nodes(nodes)
+        retained = {n['name'] for n in nodes}
+        records = [r for r in previous['nodes'] if r['id'] in retained]
+        if not nodes:
+            raise RuntimeError('没有手机可安全读取的节点；保留旧订阅')
+        bundle = {'base': yaml.safe_load(Path('聚合配置.yaml').read_text()), 'nodes': nodes,
+                  'metadata': {r['id']: {'sources': r.get('sources', [])} for r in records},
+                  'sources': previous['sources'], 'input_count': previous['input_unique_count'],
+                  'rejected': sorted(set(previous['invalid_node_ids']) | set(mobile_rejections)),
+                  'mobile_rejections': {**previous.get('mobile_rejections', {}), **mobile_rejections},
+                  'services': previous['services'], 'scope': previous['scope'],
+                  'parallel_shards': previous.get('parallel_shards', 1),
+                  'measurements_updated_at': previous.get('measurements_updated_at', previous['updated_at'])}
+        endpoint_count = len({endpoint_key(n) for n in nodes if tcp_supported(n)})
+        print(f'仅修复手机兼容性：剔除 {len(mobile_rejections)} 个损坏节点，保留 {len(nodes)} 个；不重新探测', flush=True)
+    elif args.phase in ('all', 'prepare'):
         base = yaml.safe_load(Path('聚合配置.yaml').read_text())
         if args.sample:
             samples = yaml.safe_load(Path(args.sample).read_text())['samples']
@@ -308,9 +359,14 @@ def main():
         input_count = len(nodes)
         if not nodes:
             raise RuntimeError('没有来源节点；保留已发布订阅')
+        nodes, mobile_rejections = filter_mobile_nodes(nodes)
+        if not nodes:
+            raise RuntimeError('全部节点未通过手机兼容性检查；保留旧订阅')
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
+        rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
                   'input_count': input_count, 'rejected': rejected, 'services': service_status(),
+                  'mobile_rejections': mobile_rejections,
                   'scope': 'fixture' if args.sample else 'all_subscriptions',
                   'prepared_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
         bundle['id'] = hashlib.sha256(json.dumps(bundle, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
@@ -335,13 +391,14 @@ def main():
     if args.phase == 'publish':
         parts = [json.loads(p.read_text()) for p in Path(args.results_dir).glob('shard-*.json')]
         records, endpoint_count = merge_shards(bundle, parts, args.shard_count)
-    else:
+    elif args.phase != 'repair':
         records, endpoint_count = probe_pipeline(nodes, binary, root)
     reachable = [r for r in records if r['entry']['status'] == 'passed']
-    ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
-    for record in records:
-        record['sources'] = metadata.get(record['id'], {}).get('sources', [])
-        record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
+    if args.phase != 'repair':
+        ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
+        for record in records:
+            record['sources'] = metadata.get(record['id'], {}).get('sources', [])
+            record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
     config = render_comparison(base, records, mapping)
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
     checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(candidate)], capture_output=True, text=True, timeout=90)
@@ -350,7 +407,10 @@ def main():
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
     report = {'updated_at': now, 'scope': bundle['scope'],
-              'pipeline': True, 'parallel_shards': args.shard_count if args.phase == 'publish' else 1,
+              'measurements_updated_at': bundle.get('measurements_updated_at', now),
+              'publication_mode': 'compatibility_repair' if args.phase == 'repair' else 'full',
+              'mobile_rejections': bundle.get('mobile_rejections', {}),
+              'pipeline': True, 'parallel_shards': bundle.get('parallel_shards', args.shard_count if args.phase == 'publish' else 1),
               'website_workers_per_shard': 16, 'parallel_sites_per_node': 3,
               'download_test': False, 'website_rounds': 3, 'input_unique_count': input_count,
               'parseable_count': len(nodes), 'invalid_node_ids': rejected, 'unique_tcp_endpoints': endpoint_count,
@@ -359,7 +419,7 @@ def main():
               'services': services, 'sources': sources, 'nodes': records}
     Path('优选配置.yaml').write_text(f'# 全量 TCP 分类与网页 3 轮复测；{now}；未测下载速度\n' + candidate.read_text())
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    rows = ['# 节点 TCP 连通性与网页复测', '', f'更新时间：{now}', '',
+    rows = ['# 节点 TCP 连通性与网页复测', '', f'发布时间：{now}；检测数据时间：{report["measurements_updated_at"]}', '',
             f'去重节点 {input_count}；内核可解析 {len(nodes)}；不同 TCP 入口 {endpoint_count}。', '',
             f'TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；网站复测 {len(reachable)} 个节点，三站全部稳定 {report["three_sites_stable"]} 个。', '',
             '不进行下载测速。全部可解析节点保留在订阅，方便手机对照“TCP通”“TCP不通”“TCP未验证”；地区和非机房分组最多各 30 个。', '',
@@ -377,7 +437,7 @@ def main():
         country = (record.get('exit') or {}).get('country_code')
         rows.append(f'| {record["id"][2:]} | {record["server"]}:{record["port"]} | {LABELS[record["entry"]["status"]]} | {s.COUNTRIES.get(country, country) or "未确认"} | ' + ' | '.join(scores) + ' |')
     if rejected:
-        rows += ['', '内核无法解析的节点未写入订阅，编号：' + '、'.join(rejected)]
+        rows += ['', '内核或手机兼容性校验未通过的节点未写入订阅，编号：' + '、'.join(rejected)]
     Path('连通性报告.md').write_text('\n'.join(rows) + '\n')
     print(f'全量分类完成，配置校验通过；{counts}；不含下载测速', flush=True)
 
