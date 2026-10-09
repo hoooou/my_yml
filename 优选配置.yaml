@@ -1,0 +1,463 @@
+# 自动生成；更新时间：2026-10-09T16:50:37+08:00
+# 测速地点：GitHub Actions（ubuntu-24.04 云端网络）；实际入选 30 个节点
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+dns:
+  enable: true
+  ipv6: true
+  default-nameserver:
+  - 8.8.8.8
+  - 114.114.114.114
+  - 218.30.118.6
+  - 223.6.6.6
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: false
+  nameserver:
+  - https://doh.pub/dns-query
+  - https://dns.alidns.com/dns-query
+  fallback:
+  - https://dns.cloudflare.com/dns-query
+  - https://doh.dns.sb/dns-query
+  - https://dns.twnic.tw/dns-query
+  - tls://8.8.4.4:853
+  fallback-filter:
+    geoip: true
+    ipcidr:
+    - 240.0.0.0/4
+    - 0.0.0.0/32
+rules:
+- DOMAIN-SUFFIX,zijieapi.com,DIRECT
+- DOMAIN-SUFFIX,office.com,DIRECT
+- DOMAIN-SUFFIX,outlook.com,DIRECT
+- DOMAIN-SUFFIX,cursor.sh,DIRECT
+- DOMAIN-SUFFIX,jiuse3.cloud,DIRECT
+- DOMAIN-SUFFIX,onenote.com,DIRECT
+- DOMAIN-SUFFIX,clarivate.cn,DIRECT
+- DOMAIN-SUFFIX,onedrive.com,DIRECT
+- DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+- DOMAIN-SUFFIX,sharepoint.com,DIRECT
+- DOMAIN-SUFFIX,azure.com,DIRECT
+- DOMAIN-KEYWORD,tencent,DIRECT
+- DOMAIN-KEYWORD,yuanbao,DIRECT
+- DOMAIN-SUFFIX,qq.com,DIRECT
+- DOMAIN-SUFFIX,immersivetranslate.com,🚀 全局选择
+- DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
+- DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
+- DOMAIN-SUFFIX,yiche.com,DIRECT
+- DOMAIN-SUFFIX,bitautotech.com,DIRECT
+- DOMAIN-SUFFIX,live.com,🚀 全局选择
+- DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
+- DOMAIN-SUFFIX,microsoft.com,DIRECT
+- DOMAIN,clash.razord.top,DIRECT
+- DOMAIN,yacd.haishan.me,DIRECT
+- DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
+- DOMAIN-SUFFIX,gitee.com,DIRECT
+- DOMAIN,free886.herokuapp.com,DIRECT
+- RULE-SET,applications,DIRECT
+- RULE-SET,private,DIRECT
+- RULE-SET,reject,REJECT
+- RULE-SET,icloud,DIRECT
+- RULE-SET,apple,DIRECT
+- RULE-SET,google,🚀 全局选择
+- RULE-SET,proxy,🚀 全局选择
+- RULE-SET,direct,DIRECT
+- RULE-SET,lancidr,DIRECT
+- RULE-SET,cncidr,DIRECT
+- RULE-SET,telegramcidr,🚀 全局选择
+- GEOIP,CN,DIRECT
+- GEOIP,LAN,DIRECT
+- MATCH,🚀 全局选择
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
+    path: ./ruleset/reject_rule.yaml
+    interval: 86400
+  icloud:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+  apple:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
+    path: ./ruleset/apple.yaml
+    interval: 86400
+  google:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
+    path: ./ruleset/google.yaml
+    interval: 86400
+  proxy:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+  direct:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
+    path: ./ruleset/direct.yaml
+    interval: 86400
+  private:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
+    path: ./ruleset/private.yaml
+    interval: 86400
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+  applications:
+    type: http
+    behavior: classical
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
+    path: ./ruleset/applications.yaml
+    interval: 86400
+proxies:
+- port: 443
+  server: 172.64.69.89
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | 2df495 | 44.99MiB/s | 53ms
+- port: 443
+  server: 172.64.68.89
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | fb78c1 | 18.40MiB/s | 40ms
+- cipher: aes-256-cfb
+  password: amazonskr05
+  port: 443
+  server: 3.80.84.187
+  type: ss
+  udp: true
+  delay: 506
+  name: 美国 US | 3df073 | 13.34MiB/s | 68ms
+- port: 443
+  server: 192.227.176.234
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | b2eeed | 11.37MiB/s | 232ms
+- password: 'null'
+  port: 443
+  server: 52.55.81.168
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 美国 US | 491533 | 11.31MiB/s | 101ms
+- port: 8443
+  server: 129.212.181.253
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | a3a9fd | 9.63MiB/s | 206ms
+- server: 3.80.84.187
+  port: 443
+  type: ss
+  cipher: aes-256-cfb
+  password: amazonskr05
+  udp: true
+  name: 美国 US | 80c048 | 8.19MiB/s | 68ms
+- port: 443
+  server: 38.247.141.135
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | 3a8f47 | 7.57MiB/s | 145ms
+- password: 099830134df5ac3a04a4b21d39b8c395
+  port: 50160
+  server: 163.192.14.135
+  skip-cert-verify: true
+  sni: vk.com
+  tls: false
+  type: hysteria2
+  name: 美国 US | 2c9b49 | 6.41MiB/s | 224ms
+- port: 443
+  server: voteshirleysew.club
+  tls: true
+  type: http
+  udp: true
+  name: 美国 US | 4cc004 | 6.37MiB/s | 400ms
+- port: 9002
+  server: 138.199.35.217
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | 3dc176 | 6.25MiB/s | 264ms
+- port: 443
+  server: 129.153.93.183
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | f7e906 | 6.12MiB/s | 266ms
+- port: 9002
+  server: 138.199.35.196
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | 66d363 | 5.99MiB/s | 260ms
+- password: None
+  port: 9002
+  server: 138.199.35.195
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | b49bb5 | 5.94MiB/s | 263ms
+- password: 'null'
+  port: 9002
+  server: 138.199.35.198
+  skip-cert-verify: true
+  sni: 138.199.35.198
+  tls: true
+  type: http
+  username: 'null'
+  name: 美国 US | db306c | 5.94MiB/s | 261ms
+- server: 154.40.55.185
+  port: 443
+  type: vless
+  uuid: 52919204-4ed9-42c8-97a0-0f01d007f898
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: XY0OTrgnRWxHbqBC8u4qFWvZakjNZY83AAnL_lwHu1M
+    short-id: 7f
+  servername: www.oracle.com
+  client-fingerprint: chrome
+  network: tcp
+  udp: true
+  name: 美国 US | 92f967 | 5.92MiB/s | 236ms
+- password: ''
+  port: 9002
+  server: 138.199.35.207
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  username: ''
+  name: 美国 US | fec11f | 5.91MiB/s | 262ms
+- password: 'null'
+  port: 9002
+  server: 138.199.35.205
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 美国 US | cd6d3b | 5.90MiB/s | 261ms
+- port: 9002
+  server: 138.199.35.204
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | 73df08 | 5.90MiB/s | 262ms
+- password: null
+  port: 9002
+  server: 138.199.35.217
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: null
+  name: 美国 US | eb90f7 | 5.89MiB/s | 262ms
+- port: 9002
+  server: 138.199.35.212
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 美国 US | 314576 | 5.89MiB/s | 261ms
+- password: ''
+  port: 9002
+  server: 138.199.35.201
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  username: ''
+  name: 美国 US | cdfed7 | 5.89MiB/s | 261ms
+- password: None
+  port: 9002
+  server: 138.199.35.197
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: null
+  name: 美国 US | f11a2f | 5.86MiB/s | 261ms
+- password: None
+  port: 9002
+  server: 138.199.35.213
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | a134d3 | 5.83MiB/s | 261ms
+- password: 'null'
+  port: 9002
+  server: 138.199.35.211
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 美国 US | 83b335 | 5.83MiB/s | 262ms
+- password: 'null'
+  port: 9002
+  server: 138.199.35.219
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 美国 US | 34f888 | 5.81MiB/s | 261ms
+- password: 'null'
+  port: 9002
+  server: 138.199.35.197
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 美国 US | a271ed | 5.80MiB/s | 261ms
+- password: None
+  port: 9002
+  server: 138.199.35.218
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: null
+  name: 美国 US | 8d46b7 | 5.79MiB/s | 261ms
+- password: None
+  port: 9002
+  server: 138.199.35.202
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国 US | f105ad | 5.73MiB/s | 266ms
+- type: vless
+  server: 154.40.55.185
+  port: 443
+  uuid: 52919204-4ed9-42c8-97a0-0f01d007f898
+  servername: www.oracle.com
+  tls: true
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: XY0OTrgnRWxHbqBC8u4qFWvZakjNZY83AAnL_lwHu1M
+    short-id: e726fb
+  skip-cert-verify: true
+  udp: true
+  name: 美国 US | eb8532 | 5.69MiB/s | 229ms
+proxy-groups:
+- name: 🚀 全局选择
+  type: select
+  proxies:
+  - ⚡ 速度优先
+  - ♻️ 低延迟
+  - 🎯 手动选择
+  - DIRECT
+  - 美国
+- name: ⚡ 速度优先
+  type: fallback
+  url: https://www.gstatic.com/generate_204
+  expected-status: 204
+  interval: 300
+  timeout: 5000
+  lazy: true
+  proxies: &id001
+  - 美国 US | 2df495 | 44.99MiB/s | 53ms
+  - 美国 US | fb78c1 | 18.40MiB/s | 40ms
+  - 美国 US | 3df073 | 13.34MiB/s | 68ms
+  - 美国 US | b2eeed | 11.37MiB/s | 232ms
+  - 美国 US | 491533 | 11.31MiB/s | 101ms
+  - 美国 US | a3a9fd | 9.63MiB/s | 206ms
+  - 美国 US | 80c048 | 8.19MiB/s | 68ms
+  - 美国 US | 3a8f47 | 7.57MiB/s | 145ms
+  - 美国 US | 2c9b49 | 6.41MiB/s | 224ms
+  - 美国 US | 4cc004 | 6.37MiB/s | 400ms
+  - 美国 US | 3dc176 | 6.25MiB/s | 264ms
+  - 美国 US | f7e906 | 6.12MiB/s | 266ms
+  - 美国 US | 66d363 | 5.99MiB/s | 260ms
+  - 美国 US | b49bb5 | 5.94MiB/s | 263ms
+  - 美国 US | db306c | 5.94MiB/s | 261ms
+  - 美国 US | 92f967 | 5.92MiB/s | 236ms
+  - 美国 US | fec11f | 5.91MiB/s | 262ms
+  - 美国 US | cd6d3b | 5.90MiB/s | 261ms
+  - 美国 US | 73df08 | 5.90MiB/s | 262ms
+  - 美国 US | eb90f7 | 5.89MiB/s | 262ms
+  - 美国 US | 314576 | 5.89MiB/s | 261ms
+  - 美国 US | cdfed7 | 5.89MiB/s | 261ms
+  - 美国 US | f11a2f | 5.86MiB/s | 261ms
+  - 美国 US | a134d3 | 5.83MiB/s | 261ms
+  - 美国 US | 83b335 | 5.83MiB/s | 262ms
+  - 美国 US | 34f888 | 5.81MiB/s | 261ms
+  - 美国 US | a271ed | 5.80MiB/s | 261ms
+  - 美国 US | 8d46b7 | 5.79MiB/s | 261ms
+  - 美国 US | f105ad | 5.73MiB/s | 266ms
+  - 美国 US | eb8532 | 5.69MiB/s | 229ms
+- name: ♻️ 低延迟
+  type: url-test
+  url: https://www.gstatic.com/generate_204
+  expected-status: 204
+  interval: 300
+  timeout: 5000
+  lazy: true
+  tolerance: 50
+  proxies: *id001
+- name: 🎯 手动选择
+  type: select
+  proxies: *id001
+- name: 美国
+  type: select
+  proxies:
+  - 美国 US | 2df495 | 44.99MiB/s | 53ms
+  - 美国 US | fb78c1 | 18.40MiB/s | 40ms
+  - 美国 US | 3df073 | 13.34MiB/s | 68ms
+  - 美国 US | b2eeed | 11.37MiB/s | 232ms
+  - 美国 US | 491533 | 11.31MiB/s | 101ms
+  - 美国 US | a3a9fd | 9.63MiB/s | 206ms
+  - 美国 US | 80c048 | 8.19MiB/s | 68ms
+  - 美国 US | 3a8f47 | 7.57MiB/s | 145ms
+  - 美国 US | 2c9b49 | 6.41MiB/s | 224ms
+  - 美国 US | 4cc004 | 6.37MiB/s | 400ms
+  - 美国 US | 3dc176 | 6.25MiB/s | 264ms
+  - 美国 US | f7e906 | 6.12MiB/s | 266ms
+  - 美国 US | 66d363 | 5.99MiB/s | 260ms
+  - 美国 US | b49bb5 | 5.94MiB/s | 263ms
+  - 美国 US | db306c | 5.94MiB/s | 261ms
+  - 美国 US | 92f967 | 5.92MiB/s | 236ms
+  - 美国 US | fec11f | 5.91MiB/s | 262ms
+  - 美国 US | cd6d3b | 5.90MiB/s | 261ms
+  - 美国 US | 73df08 | 5.90MiB/s | 262ms
+  - 美国 US | eb90f7 | 5.89MiB/s | 262ms
+  - 美国 US | 314576 | 5.89MiB/s | 261ms
+  - 美国 US | cdfed7 | 5.89MiB/s | 261ms
+  - 美国 US | f11a2f | 5.86MiB/s | 261ms
+  - 美国 US | a134d3 | 5.83MiB/s | 261ms
+  - 美国 US | 83b335 | 5.83MiB/s | 262ms
+  - 美国 US | 34f888 | 5.81MiB/s | 261ms
+  - 美国 US | a271ed | 5.80MiB/s | 261ms
+  - 美国 US | 8d46b7 | 5.79MiB/s | 261ms
+  - 美国 US | f105ad | 5.73MiB/s | 266ms
+  - 美国 US | eb8532 | 5.69MiB/s | 229ms
