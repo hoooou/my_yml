@@ -1,6 +1,19 @@
 {
-  "updated_at": "2026-10-09T22:01:27+08:00",
+  "updated_at": "2026-10-09T22:42:41+08:00",
   "scope": "all_subscriptions",
+  "measurements_updated_at": "2026-10-09T22:01:27+08:00",
+  "publication_mode": "compatibility_repair",
+  "mobile_rejections": {
+    "n-455317290bcf": [
+      "sni"
+    ],
+    "n-46db08a8b926": [
+      "sni"
+    ],
+    "n-73dadf3c428c": [
+      "sni"
+    ]
+  },
   "pipeline": true,
   "parallel_shards": 4,
   "website_workers_per_shard": 16,
@@ -8,13 +21,17 @@
   "download_test": false,
   "website_rounds": 3,
   "input_unique_count": 4476,
-  "parseable_count": 4476,
-  "invalid_node_ids": [],
+  "parseable_count": 4473,
+  "invalid_node_ids": [
+    "n-455317290bcf",
+    "n-46db08a8b926",
+    "n-73dadf3c428c"
+  ],
   "unique_tcp_endpoints": 3213,
   "entry_counts": {
     "passed": 993,
     "failed": 2882,
-    "unknown": 601
+    "unknown": 598
   },
   "website_tested_count": 993,
   "three_sites_stable": 107,
@@ -119756,27 +119773,6 @@
       "name": "9fba39694ed5 | 地区未确认 | TCP未验证 | 未测网站"
     },
     {
-      "id": "n-455317290bcf",
-      "server": "202.146.222.29",
-      "port": 443,
-      "protocol": "hysteria2",
-      "entry": {
-        "status": "unknown",
-        "reason": "UDP 协议不适用 TCP 入口判定",
-        "attempts": 0
-      },
-      "websites": null,
-      "exit": null,
-      "sources": [
-        "au1rxx"
-      ],
-      "ip_type": {
-        "status": "unknown",
-        "hosting": null
-      },
-      "name": "455317290bcf | 地区未确认 | TCP未验证 | 未测网站"
-    },
-    {
       "id": "n-94e4e857d70e",
       "server": "202.146.222.89",
       "port": 443,
@@ -129374,27 +129370,6 @@
         "hosting": null
       },
       "name": "e51dd8b0af0a | 地区未确认 | TCP未验证 | 未测网站"
-    },
-    {
-      "id": "n-46db08a8b926",
-      "server": "202.146.222.29",
-      "port": 443,
-      "protocol": "hysteria2",
-      "entry": {
-        "status": "unknown",
-        "reason": "UDP 协议不适用 TCP 入口判定",
-        "attempts": 0
-      },
-      "websites": null,
-      "exit": null,
-      "sources": [
-        "au1rxx"
-      ],
-      "ip_type": {
-        "status": "unknown",
-        "hosting": null
-      },
-      "name": "46db08a8b926 | 地区未确认 | TCP未验证 | 未测网站"
     },
     {
       "id": "n-62bf8df4a692",
@@ -144833,27 +144808,6 @@
         "hosting": null
       },
       "name": "5bc5d67b2203 | 地区未确认 | TCP未验证 | 未测网站"
-    },
-    {
-      "id": "n-73dadf3c428c",
-      "server": "202.146.222.29",
-      "port": 443,
-      "protocol": "hysteria2",
-      "entry": {
-        "status": "unknown",
-        "reason": "UDP 协议不适用 TCP 入口判定",
-        "attempts": 0
-      },
-      "websites": null,
-      "exit": null,
-      "sources": [
-        "au1rxx"
-      ],
-      "ip_type": {
-        "status": "unknown",
-        "hosting": null
-      },
-      "name": "73dadf3c428c | 地区未确认 | TCP未验证 | 未测网站"
     },
     {
       "id": "n-4d47c321c4fa",
