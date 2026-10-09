@@ -58,6 +58,53 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(sorted(len(m['sources']) for m in metadata.values()), [1, 2])
         self.assertTrue(all(n['name'].startswith('n-') for n in nodes))
 
+    def test_new_sources_merge_and_normalize_without_importing_source_rules(self):
+        node = {'name': 'old', 'type': 'vmess', 'server': 'EXAMPLE.COM.', 'port': '443',
+                'uuid': 'AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE'}
+        normalized = {**node, 'server': 'example.com', 'port': 443,
+                      'uuid': node['uuid'].lower()}
+        normalized.pop('name')
+        different = {**normalized, 'uuid': 'ffffffff-bbbb-cccc-dddd-eeeeeeeeeeee'}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            selection.dump(root / 'original.txt', {'proxies': [node]})
+            selection.dump(root / 'extra.txt', {'proxies': [normalized, different],
+                                                'rules': ['MATCH,DIRECT'], 'mixed-port': 9999})
+            base = {'proxy-providers': {'original': {}}}
+            nodes, metadata, sources = selection.collect(base, root, root, {'extra': {}})
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(sources[1]['duplicates'], 1)
+        self.assertEqual(sources[1]['unique_added'], 1)
+        self.assertEqual(sum(s['downloaded'] for s in sources), 3)
+        self.assertEqual(sorted(len(m['sources']) for m in metadata.values()), [1, 2])
+        self.assertEqual({n['server'] for n in nodes}, {'example.com'})
+        self.assertTrue(all(n['port'] == 443 for n in nodes))
+        self.assertTrue(all('rules' not in n and 'mixed-port' not in n for n in nodes))
+        self.assertNotIn('extra', base['proxy-providers'])
+
+    def test_bad_source_and_unusable_nodes_do_not_discard_good_source(self):
+        node = {'type': 'ss', 'server': 'example.com', 'port': 443, 'password': 'one'}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'bad.txt').write_text('proxies: [unterminated')
+            selection.dump(root / 'good.txt', {'proxies': [node, {**node, 'dialer-proxy': 'external'},
+                                                        {**node, 'port': 0}, 'not a node']})
+            nodes, _, sources = selection.collect({'proxy-providers': {'bad': {}, 'good': {}}}, root, root)
+        self.assertEqual(len(nodes), 1)
+        self.assertNotEqual(sources[0]['status'], 'ok')
+        self.assertEqual(sources[1]['skipped'], 3)
+        self.assertEqual(sources[1]['status'], 'ok')
+
+    def test_source_manifest_rejects_duplicate_ids_and_honors_disabled_entries(self):
+        entry = {'id': 'extra', 'url': 'https://example.com/nodes.yaml'}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'sources.yaml'
+            selection.dump(path, {'sources': [entry, {**entry, 'enabled': False}]})
+            self.assertEqual(list(selection.load_sources(path)), ['extra'])
+            selection.dump(path, {'sources': [entry, entry]})
+            with self.assertRaisesRegex(ValueError, '重复'):
+                selection.load_sources(path)
+
     def test_region_comes_from_exit_trace_and_speed_is_conservative(self):
         client = Client([Response('ip=203.0.113.5\nloc=JP\n'), Response(chunks=[b'x' * (4 * 1024 * 1024)])])
         with patch.object(selection, 'session', return_value=client), patch.object(selection.time, 'perf_counter', side_effect=[0, .5, 1]):
