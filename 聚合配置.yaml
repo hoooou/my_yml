@@ -210,10 +210,10 @@ proxy-groups:
 
   - name: ♻️ 自动选择
     type: url-test
-    url: http://captive.apple.com
-    expected-status: 200
-    interval: 120
-    tolerance: 600
+    url: https://www.gstatic.com/generate_204
+    expected-status: 204
+    interval: 300
+    tolerance: 100
     <<: *usex
 
   - name: 🤖 ChatGPT自动选择可用节点
@@ -253,12 +253,11 @@ p: &p
     interval: 86400
     health-check:
         enable: true
-        url: https://api.openai.com/compliance/cookie_requirements
-        interval: 30
-        timeout: 2000
-        disable-udp: true
+        url: https://www.gstatic.com/generate_204
+        expected-status: 204
+        interval: 300
+        timeout: 5000
         lazy: false
-        expected-status: 200
 
 proxy-providers:
     a1:
@@ -271,13 +270,13 @@ proxy-providers:
       <<: *p
       override:
         additional-prefix: "a2:"
-      url: "https://v1.mk/9tJCOtC"
+      url: "https://raw.githubusercontent.com/free18/v2ray/main/c.yaml"
       path: proxy-providers/a2.yaml
     a3:
       <<: *p
       override:
         additional-prefix: "a3:"
-      url: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
+      url: "https://raw.githubusercontent.com/jifeng250/free-nodes/main/clash.yaml"
       path: proxy-providers/a3.yaml
     a4:
       <<: *p
@@ -313,7 +312,7 @@ proxy-providers:
       <<: *p
       override:
         additional-prefix: "a15:"
-      url: "https://ghproxy.cn/https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml"
+      url: "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml"
       path: proxy-providers/a15.yaml
     a10:
       <<: *p
