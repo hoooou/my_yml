@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Install pinned upstream Linux releases into the workflow scratch directory."""
 import gzip
+import argparse
 import hashlib
 import io
 from pathlib import Path
@@ -16,9 +17,14 @@ TOOLS = [
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mihomo-only', action='store_true')
+    args = parser.parse_args()
     root = Path('.node-work/bin')
     root.mkdir(parents=True, exist_ok=True)
     for name, url, checksum, kind in TOOLS:
+        if args.mihomo_only and name != 'mihomo':
+            continue
         response = requests.get(url, timeout=(10, 90))
         response.raise_for_status()
         if hashlib.sha256(response.content).hexdigest() != checksum:

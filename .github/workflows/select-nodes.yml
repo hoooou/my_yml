@@ -1,4 +1,4 @@
-name: 每日节点优选
+name: 每日节点连通性分类
 
 on:
   schedule:
@@ -31,46 +31,28 @@ jobs:
           cache: pip
           cache-dependency-path: scripts/requirements.txt
 
-      - name: 安装依赖和测速工具
+      - name: 安装依赖与内核
         run: |
           python -m pip install -r scripts/requirements.txt
-          python scripts/install_tools.py
+          python scripts/install_tools.py --mihomo-only
 
       - name: 检查筛选逻辑
         run: python -m unittest discover -s scripts/tests -v
 
-      - name: 延迟测速、地区分类与 IP 类型检测
-        run: |
-          python scripts/select_nodes.py \
-            --stage prepare \
-            --mihomo .node-work/bin/mihomo \
-            --speedtest .node-work/bin/clash-speedtest \
-            --per-region-limit 30 \
-            --non-datacenter-limit 30 \
-            --max-latency-ms 1000 \
-            --test-origin 'GitHub Actions（ubuntu-24.04 云端网络）'
-
-      - name: 各地区全部候选文件测速
-        run: |
-          python scripts/select_nodes.py --stage measure \
-            --mihomo .node-work/bin/mihomo --speedtest .node-work/bin/clash-speedtest
-
-      - name: 每地区前30和非机房IP前30、生成并校验配置
-        run: |
-          python scripts/select_nodes.py --stage publish \
-            --mihomo .node-work/bin/mihomo --speedtest .node-work/bin/clash-speedtest
+      - name: 全量 TCP 分类、通过节点网页三轮复测
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo
 
       - name: 更新配置和报告
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- 优选配置.yaml 测速报告.json 测速报告.md
+          git add -- 优选配置.yaml 连通性报告.json 连通性报告.md
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m "Update selected nodes $(date -u +%Y-%m-%d)"
+          git commit -m "Update TCP classification $(date -u +%Y-%m-%d)"
           git pull --rebase origin main
           git push origin HEAD:main
 
       - name: 发布本次摘要
-        run: cat 测速报告.md >> "$GITHUB_STEP_SUMMARY"
+        run: cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
