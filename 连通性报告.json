@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-10-10T13:32:38+08:00",
+  "updated_at": "2026-10-10T14:26:56+08:00",
   "scope": "all_subscriptions",
-  "schema_version": 5,
+  "schema_version": 6,
   "measurements_updated_at": "2026-10-10T11:20:18+08:00",
   "publication_mode": "compatibility_repair",
   "mobile_rejections": {
@@ -119,8 +119,8 @@
     "domestic": "DIRECT",
     "overseas": "🚀 全局选择",
     "unmatched": "🚀 全局选择",
-    "group_count": 9,
-    "version": 1
+    "group_count": 4,
+    "version": 2
   },
   "stages": [
     "HTTPS204",
@@ -148,9 +148,14 @@
     "budget_seconds": 30,
     "rounds": 1,
     "workers_per_shard": 2,
-    "selection_limit": 30,
+    "selection_limit": null,
     "read_timeout_seconds": 1,
     "includes_handshake": true
+  },
+  "high_speed_selection_policy": {
+    "max_elapsed_seconds": 20,
+    "selection_limit": null,
+    "selected_count": 144
   },
   "high_speed_download_counts": {
     "passed": 146,
