@@ -492,7 +492,10 @@ def high_speed_eligible(record):
 
 def recheck_websites(records, mapping, binary, root):
     """Recheck the small download-passed pool without rerunning TCP or downloads."""
-    candidates = [r for r in records if (r.get('download') or {}).get('status') == 'passed']
+    candidates = [r for r in records if r['id'] in mapping
+                  and (r.get('download') or {}).get('status') == 'passed']
+    if not candidates:
+        raise RuntimeError('没有可复测的已发布节点；保留旧订阅')
     listeners, ports = s.make_listeners(candidates)
     done, lock = 0, threading.Lock()
     with s.Core(binary, root, [mapping[r['id']] for r in candidates], listeners):
@@ -533,8 +536,12 @@ def render_comparison(base, records, mapping):
     config = {key: copy.deepcopy(base[key]) for key in (
         'mixed-port', 'allow-lan', 'mode', 'log-level', 'external-controller', 'dns', 'rules', 'rule-providers') if key in base}
     optimize_routing(config)
-    proxies, classified = [], {v: [] for v in ('passed', 'failed', 'unknown')}
-    ranked = sorted(records, key=rank_key)
+    proxies = []
+    # Historical failures stay in reports, never in the subscription or another group.
+    ranked = limit_hong_kong(sorted((r for r in records if r['id'] in mapping
+        and r['entry']['status'] == 'passed'
+        and (r.get('download') or {}).get('status') == 'passed'
+        and web_quality_eligible(r)), key=rank_key))
     short_ids = {}
     for record in ranked:
         short_ids.setdefault(record['id'][2:8], []).append(record['id'])
@@ -542,7 +549,6 @@ def render_comparison(base, records, mapping):
     for record in ranked:
         region_code = (record.get('exit') or {}).get('country_code')
         region = s.COUNTRIES.get(region_code, region_code) if region_code else '地区未确认'
-        status = record['entry']['status']
         pre = record.get('precheck') or {}
         core_latencies = [(record.get('websites') or {}).get(label, {}).get('median_elapsed_ms') for label in CORE_SITES]
         latency = max(core_latencies) if all(isinstance(v, (float, int)) and math.isfinite(v) for v in core_latencies) else None
@@ -560,20 +566,13 @@ def render_comparison(base, records, mapping):
                            ip_reputation.residence_label(record), ip_reputation.purity_label(record)])
         record['name'] = name
         node = copy.deepcopy(mapping[record['id']]); node['name'] = name; proxies.append(node)
-        classified[status].append(name)
-        eligible = status == 'passed' and (record.get('download') or {}).get('status') == 'passed'
         ip = (record.get('exit') or {}).get('exit_ip')
-        if (eligible and record.get('exit_consistent') is not False and record.get('ip_type', {}).get('hosting') is False
+        if (record.get('exit_consistent') is not False and record.get('ip_type', {}).get('hosting') is False
                 and record['ip_type'].get('status') == 'success' and ip and ip not in seen_ips):
             non_dc.append(record); seen_ips.add(ip)
-    non_dc = [r['name'] for r in limit_hong_kong(non_dc)]
-    fast = [r['name'] for r in limit_hong_kong(
-        r for r in ranked if (r.get('download') or {}).get('status') == 'passed' and web_quality_eligible(r))]
-    high = [r['name'] for r in limit_hong_kong(
-        r for r in sorted(records, key=high_speed_rank_key) if high_speed_eligible(r))]
-    recommended = fast
-    recommended_names = set(recommended)
-    recommended = [r['name'] for r in limit_hong_kong(r for r in ranked if r['name'] in recommended_names)]
+    non_dc = [r['name'] for r in non_dc]
+    high = [r['name'] for r in sorted(ranked, key=high_speed_rank_key) if high_speed_eligible(r)]
+    recommended = [r['name'] for r in ranked]
     def group(name, names):
         return {'name': name, 'type': 'select', 'proxies': names or ['REJECT']}
     config['proxies'] = proxies
@@ -604,10 +603,11 @@ def main():
         previous = json.loads(Path('连通性报告.json').read_text())
         published = yaml.safe_load(Path('优选配置.yaml').read_text())
         by_name = {n['name']: n for n in published['proxies']}
-        nodes = [{**by_name[r['name']], 'name': r['id']} for r in previous['nodes']]
+        # Published YAML deliberately excludes rejected nodes; reports still audit them.
+        nodes = [{**by_name[r['name']], 'name': r['id']} for r in previous['nodes']
+                 if r.get('name') in by_name]
         nodes, mobile_rejections = filter_mobile_nodes(nodes)
-        retained = {n['name'] for n in nodes}
-        records = [r for r in previous['nodes'] if r['id'] in retained]
+        records = [r for r in previous['nodes'] if r['id'] not in mobile_rejections]
         if not nodes:
             raise RuntimeError('没有手机可安全读取的节点；保留旧订阅')
         bundle = {'base': yaml.safe_load(Path('聚合配置.yaml').read_text()), 'nodes': nodes,
@@ -617,7 +617,10 @@ def main():
                   'mobile_rejections': {**previous.get('mobile_rejections', {}), **mobile_rejections},
                   'services': previous['services'], 'scope': previous['scope'],
                   'parallel_shards': previous.get('parallel_shards', 1),
-                  'measurements_updated_at': previous.get('measurements_updated_at', previous['updated_at'])}
+                  'measurements_updated_at': previous.get('measurements_updated_at', previous['updated_at']),
+                  'parseable_count': previous.get('parseable_count', len(previous['nodes'])) - len(mobile_rejections),
+                  'total_unique_tcp_endpoints': previous.get('total_unique_tcp_endpoints',
+                      len({endpoint_key(n) for n in nodes if tcp_supported(n)}))}
         endpoint_count = previous.get('unique_tcp_endpoints', len({endpoint_key(n) for n in nodes if tcp_supported(n)}))
         print(f'按当前规则重建已有结果：剔除 {len(mobile_rejections)} 个损坏节点，保留 {len(nodes)} 个；本模式 {args.phase}', flush=True)
     elif args.phase in ('all', 'prepare'):
@@ -682,7 +685,7 @@ def main():
             record['ip_reputation'] = reputations.get((record.get('exit') or {}).get('exit_ip'),
                 {'status': 'unknown', 'provider': 'ipapi.is', 'reason': 'not_eligible'})
     config = render_comparison(base, records, mapping)
-    if args.phase in ('all', 'publish', 'web-recheck') and config['proxy-groups'][1]['proxies'] == ['REJECT']:
+    if config['proxy-groups'][1]['proxies'] == ['REJECT']:
         raise RuntimeError('没有满足网站稳定与响应速度门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
     checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(candidate)], capture_output=True, text=True, timeout=90)
@@ -691,11 +694,13 @@ def main():
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
     repairing = args.phase in ('repair', 'web-recheck')
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 8,
+    published_names = {n['name'] for n in config['proxies']}
+    published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 9,
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
-                  'scope': 'previous_quick_download_passed', 'overseas_rounds': WEBSITE_ROUNDS,
+                  'scope': 'available_published_quick_download_passed', 'overseas_rounds': WEBSITE_ROUNDS,
                   'workers': 8, 'jobs': 1,
                   'preserved_measurements': ['HTTPS204', 'domestic_TCP', 'domestic_pages', 'trace', '1MB_download', '50MB_download']}
                   if args.phase == 'web-recheck' else previous.get('website_recheck') if repairing else None),
@@ -724,17 +729,20 @@ def main():
               'high_speed_download_settings': ({**previous['high_speed_download_settings'], 'selection_limit': None}
                   if previous.get('high_speed_download_settings') else None) if repairing else {'url': HIGH_DOWNLOAD_URL, 'bytes': HIGH_DOWNLOAD_BYTES, 'budget_seconds': HIGH_DOWNLOAD_BUDGET, 'rounds': 1, 'workers_per_shard': HIGH_DOWNLOAD_WORKERS, 'selection_limit': None, 'read_timeout_seconds': 1, 'includes_handshake': True},
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
-                                        'non_datacenter_total_limit': None},
+                  'non_datacenter_total_limit': None, 'qualified_pool_only': True,
+                  'requires_domestic_tcp_pass': True, 'rejected_proxy_definitions': 'omitted'},
+              'published_node_count': len(config['proxies']), 'published_node_ids': published_ids,
               'ip_reputation_policy': {'provider': 'ipapi.is', 'scope': 'quick_download_passed_unique_exits',
                   'configured': bool(os.environ.get('IPAPI_IS_KEY')), 'lookup_budget_per_run': ip_reputation.DAILY_LOOKUP_BUDGET,
                   'purity_formula': '100 * (1 - company.abuser_score_numeric_ratio)', 'score_scope': 'company_network_not_individual_ip',
                   'confirmed_nodes': sum((r.get('ip_reputation') or {}).get('status') == 'success' for r in records)},
               'high_speed_selection_policy': {'max_elapsed_seconds': HIGH_DOWNLOAD_BUDGET, 'selection_limit': None,
-                                              'selected_count': len(limit_hong_kong(r for r in records if high_speed_eligible(r)))},
+                                              'selected_count': len([n for n in config['proxy-groups'][2]['proxies'] if n != 'REJECT'])},
               'high_speed_download_counts': {v: sum((r.get('high_speed_download') or {}).get('status') == v for r in records) for v in ('passed', 'failed', 'skipped')},
-              'input_unique_count': input_count, 'parseable_count': len(nodes), 'invalid_node_ids': rejected,
+              'input_unique_count': input_count, 'parseable_count': bundle.get('parseable_count', len(nodes)), 'invalid_node_ids': rejected,
               'unique_tcp_endpoints': endpoint_count,
-              'total_unique_tcp_endpoints': len({endpoint_key(n) for n in nodes if tcp_supported(n)}),
+              'total_unique_tcp_endpoints': bundle.get('total_unique_tcp_endpoints',
+                  len({endpoint_key(n) for n in nodes if tcp_supported(n)})),
               'precheck_counts': {v: sum((r.get('precheck') or {}).get('status') == v for r in records)
                                   for v in ('passed', 'failed', 'unstable', 'needs_review')},
               'entry_counts': counts, 'website_tested_count': len(reachable),
@@ -749,7 +757,7 @@ def main():
     Path('优选配置.yaml').write_text(f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text())
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     rows = ['# 节点分阶段连通性与快速下载', '', f'发布时间：{now}；检测数据时间：{report["measurements_updated_at"]}', '',
-            f'去重节点 {input_count}；内核可解析 {len(nodes)}；TCP 入口总数 {report["total_unique_tcp_endpoints"]}，本轮实际提交 {endpoint_count}。', '',
+            f'去重节点 {input_count}；内核可解析 {report["parseable_count"]}；实际发布 {report["published_node_count"]}；TCP 入口总数 {report["total_unique_tcp_endpoints"]}，原检测提交 {endpoint_count}。', '',
             f'204 全通过 {report["precheck_counts"]["passed"]}；TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；海外访问检测 {len(reachable)}；1MB 快测通过 {report["download_counts"]["passed"]}；50MB 完整下载通过 {report["high_speed_download_counts"]["passed"]}。', '',
             f'检测顺序：{" → ".join(report["stages"])}。204 {report["precheck_rounds"]} 轮；海外网站 {report["website_rounds"]} 轮；国内及 trace 各 {report["trace_rounds"]} 轮；下载检测 {"开启" if report["download_test"] else "关闭"}。兼容性修复保留原检测数据，未测项目保持未测。', '',
             '204 三轮均返回 HTTPS 204 且无正文才进入 TCP；204 未通过的节点延迟显示未知，分类及跳过原因保留在 JSON 报告，不伪造国内入口不通。UDP 的 TCP 阶段不适用，保持未验证。', '',
@@ -761,7 +769,7 @@ def main():
             'TCP 通且至少一个海外网页或 trace 通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
             f'仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，新检测采样预算 {HIGH_DOWNLOAD_BUDGET} 秒，读取超时 1 秒，每分片最多同时测试 2 个。本批数据的实际检测预算为 {(report["high_speed_download_settings"] or {}).get("budget_seconds", "未记录")} 秒；重建配置不改写历史检测时限。高速下载组仅接纳完整下载且耗时不超过 {HIGH_DOWNLOAD_BUDGET} 秒的节点，按实测速度从高到低保留；仅香港最多 30 个，其他地区不限制数量；本次入选 {report["high_speed_selection_policy"]["selected_count"]} 个。未通过 1 MB 的节点不消耗 50 MB 流量。', '',
             '综合优选要求 1 MB 通过，Google/YouTube 各三轮均通过、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms，海外至少13站稳定通过；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
-            '手机仅显示四个分组：全局选择、综合优选、高速下载、非机房 IP。各网站、204、trace 和 TCP 的细分结果放在报告；全部可解析节点定义保留，刷新原订阅即可；所有延迟及速度来自 GitHub 云端，仍需手机对照。', '',
+            '手机仅显示四个分组：全局选择、综合优选、高速下载、非机房 IP。所有分组共用国内 TCP 通过、1 MB 通过且网站响应合格的节点池；被淘汰节点的定义和凭据不写入订阅，检测记录仅保留在报告。每天重新获取全部来源，可让恢复可用的节点重新入选。刷新原订阅即可；网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照，仍可持续校准。', '',
             '节点名称：地区·唯一短标识｜网页响应中位耗时（无数据时明确标204）｜下载换算 Mbps｜住宅类型｜网段纯净度。住宅候选表示 ISP 网络且非机房；非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']

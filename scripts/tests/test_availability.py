@@ -15,6 +15,12 @@ import availability as a
 
 
 class AvailabilityTests(unittest.TestCase):
+    @staticmethod
+    def stable_sites():
+        return {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
+            'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10}
+            for label in a.OVERSEAS_SITES}
+
     def test_hong_kong_only_quota_preserves_other_regions_and_unique_residential_exits(self):
         records = []
         for country_index, country in enumerate(('HK', 'US', 'JP')):
@@ -33,23 +39,24 @@ class AvailabilityTests(unittest.TestCase):
         records.append(duplicate)
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
-        by_name = {r['name']: r for r in records}
+        by_name = {r['name']: r for r in records if 'name' in r}
         for group in config['proxy-groups'][1:]:
             countries = [by_name[n]['exit']['country_code'] for n in group['proxies']]
             self.assertEqual(countries.count('HK'), 30)
             self.assertEqual(countries.count('US'), 35)
             self.assertEqual(countries.count('JP'), 35 if group['name'] == '🏠 非机房 IP' else 36)
-        self.assertEqual(len(config['proxies']), 106)
+        self.assertEqual(len(config['proxies']), 101)
 
     def test_compact_name_contains_five_fields_and_correct_bandwidth_without_fake_housing(self):
         record = {'id': 'n-unique', 'entry': {'status': 'passed'},
+            'websites': self.stable_sites(),
             'exit': {'country_code': 'US', 'exit_ip': '8.8.8.8'},
             'precheck': {'status': 'passed', 'median_elapsed_ms': 82.5},
             'download': {'status': 'passed', 'speed_mib_s': 10},
             'ip_type': {'status': 'success', 'hosting': False}}
         a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, [record],
             {'n-unique': {'name': 'n-unique', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
-        self.assertEqual(record['name'], '美国·unique | 20482.5ms | 83.9Mbps | 非机房 | 纯净未知')
+        self.assertEqual(record['name'], '美国·unique | 网页100ms | 83.9Mbps | 非机房 | 纯净未知')
 
     def test_50mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
@@ -77,7 +84,7 @@ class AvailabilityTests(unittest.TestCase):
             late = a.high_speed_download(1234)
         self.assertEqual(late['received_bytes'], 50_000_000)
         self.assertEqual(late['status'], 'failed')
-        records = [{'id': f'n-{i}', 'entry': {'status': 'passed'}, 'websites': None,
+        records = [{'id': f'n-{i}', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
                     'exit': None, 'download': {'status': 'passed', 'speed_mib_s': 1},
                     'high_speed_download': {**result, 'speed_mib_s': i+1}} for i in range(40)]
         # A bogus high result without the 1 MB prerequisite must not enter the group.
@@ -164,7 +171,8 @@ class AvailabilityTests(unittest.TestCase):
         good = {'name': 'good', 'type': 'trojan', 'server': 'example.com', 'port': 443, 'password': 'same'}
         bad = {**good, 'name': 'bad', 'sni': 'bad\x9f'}
         records = [{'id': ident, 'name': name, 'server': 'example.com', 'port': 443,
-                    'protocol': 'trojan', 'entry': {'status': 'unknown'}, 'websites': None,
+                    'protocol': 'trojan', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
+                    'download': {'status': 'passed', 'speed_mib_s': 5},
                     'exit': None, 'ip_type': {'status': 'unknown'}} for ident, name in [('n-a', 'good'), ('n-b', 'bad')]]
         report = {'updated_at': '2026-10-09T22:01:27+08:00', 'scope': 'all_subscriptions',
                   'nodes': records, 'sources': [], 'services': {}, 'input_unique_count': 2,
@@ -200,7 +208,8 @@ class AvailabilityTests(unittest.TestCase):
                 os.chdir(old_cwd)
 
     def test_publication_rejects_controls_even_when_source_yaml_escaped_them(self):
-        record = {'id': 'n-a', 'entry': {'status': 'unknown'}, 'websites': None, 'exit': None}
+        record = {'id': 'n-a', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
+                  'download': {'status': 'passed', 'speed_mib_s': 5}, 'exit': None}
         original = {'name': 'n-a', 'type': 'trojan', 'server': 'example.com', 'port': 443,
                     'password': 'unchanged', 'sni': 'https://t.me/wangcai2\xf0\x9f\x87'}
         decoded = yaml.safe_load(yaml.safe_dump(original))
@@ -377,21 +386,22 @@ class AvailabilityTests(unittest.TestCase):
     def test_only_four_groups_remain_and_all_references_are_valid(self):
         records = [{'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
                    for i, status in [(1, 'passed'), (2, 'failed'), (3, 'unknown')]]
-        records[0]['websites'] = {k: {'status': 'passed', 'passed_count': 3} for k in a.SITES}
+        records[0]['websites'] = self.stable_sites()
+        records[0]['download'] = {'status': 'passed', 'speed_mib_s': 5}
         records[0]['exit'] = {'country_code': 'HK', 'exit_ip': '8.8.8.8'}
         records[0]['ip_type'] = {'status': 'unknown', 'hosting': None}
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         base = {'dns': {}, 'rules': ['MATCH,🚀 全局选择'], 'rule-providers': {}}
         original = copy.deepcopy(base)
         config = a.render_comparison(base, records, mapping)
-        self.assertEqual(len(config['proxies']), 3)
+        self.assertEqual(len(config['proxies']), 1)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
         self.assertEqual(set(groups), {'🚀 全局选择', '⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP'})
         for group in ('🌍 按地区选择', '📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证', '🎯 全部节点'):
             self.assertNotIn(group, groups)
             self.assertNotIn(group, groups['🚀 全局选择'])
         self.assertEqual(groups['🏠 非机房 IP'], ['REJECT'])
-        self.assertEqual(groups['⭐ 综合优选'], ['REJECT'])
+        self.assertEqual(groups['⭐ 综合优选'], [config['proxies'][0]['name']])
         self.assertEqual(len(groups), 4)
         self.assertEqual(base, original)
         valid = {p['name'] for p in config['proxies']} | set(groups) | {'DIRECT', 'REJECT'}
@@ -419,6 +429,64 @@ class AvailabilityTests(unittest.TestCase):
         self.assertNotIn('美国', groups)
         self.assertEqual(len(config['proxies']), 70)
         self.assertNotIn('🌍 按地区选择', groups)
+
+    def test_rejected_nodes_cannot_leak_through_high_speed_or_residential_group(self):
+        good = {'id': 'n-good', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
+            'download': {'status': 'passed', 'speed_mib_s': 5},
+            'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
+                'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,
+                'elapsed_ms': 10000, 'speed_mib_s': 5},
+            'exit': {'exit_ip': '8.8.8.8', 'country_code': 'US'},
+            'ip_type': {'status': 'success', 'hosting': False}}
+        records = [good]
+        for reason in ('slow_web', 'tcp_unknown', 'tcp_failed', 'quick_failed', 'missing_credentials'):
+            bad = copy.deepcopy(good); bad['id'] = 'n-' + reason
+            if reason == 'slow_web': bad['websites']['YouTube']['p95_elapsed_ms'] = 5000
+            if reason.startswith('tcp_'): bad['entry']['status'] = reason[4:]
+            if reason == 'quick_failed': bad['download']['status'] = 'failed'
+            records.append(bad)
+        mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80}
+                   for r in records if r['id'] != 'n-missing_credentials'}
+        config = a.render_comparison({}, records, mapping)
+        self.assertEqual(len(config['proxies']), 1)
+        for group in config['proxy-groups'][1:]:
+            self.assertEqual(group['proxies'], [good['name']])
+
+    def test_repeated_repair_preserves_audit_for_nodes_absent_from_subscription(self):
+        good = {'name': 'good', 'type': 'trojan', 'server': 'example.com', 'port': 443, 'password': 'same'}
+        records = [{'id': 'n-good', 'name': 'good', 'server': 'example.com', 'port': 443,
+            'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
+            'download': {'status': 'passed', 'speed_mib_s': 5}, 'exit': None},
+            {'id': 'n-failed', 'name': 'old-rejected-name', 'server': 'example.org', 'port': 443,
+             'entry': {'status': 'failed'}, 'websites': None, 'exit': None}]
+        report = {'updated_at': '2026-10-10T11:20:18+08:00', 'scope': 'all_subscriptions',
+            'nodes': records, 'sources': [], 'services': {}, 'input_unique_count': 2,
+            'parseable_count': 2, 'total_unique_tcp_endpoints': 2, 'unique_tcp_endpoints': 2,
+            'invalid_node_ids': []}
+        with tempfile.TemporaryDirectory() as directory:
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(directory)
+                a.s.dump(Path('聚合配置.yaml'), {'rules': ['MATCH,🚀 全局选择']})
+                a.s.dump(Path('优选配置.yaml'), {'proxies': [good]})
+                Path('连通性报告.json').write_text(json.dumps(report))
+                with patch.object(sys, 'argv', ['availability', '--phase', 'repair', '--mihomo', 'unused']), \
+                     patch.object(a, 'probe_pipeline', side_effect=AssertionError('no network retest')), \
+                     patch.object(a.subprocess, 'run') as run:
+                    run.return_value.returncode = 0
+                    for _ in range(2):
+                        a.main()
+                        result = json.loads(Path('连通性报告.json').read_text())
+                        config = yaml.safe_load(Path('优选配置.yaml').read_text())
+                        self.assertEqual(result['parseable_count'], 2)
+                        self.assertEqual(result['total_unique_tcp_endpoints'], 2)
+                        self.assertEqual(result['published_node_count'], 1)
+                        self.assertEqual(result['published_node_ids'], ['n-good'])
+                        self.assertEqual(result['nodes'][1], records[1])
+                        self.assertEqual(result['measurements_updated_at'], report['updated_at'])
+                        self.assertEqual(config['proxies'][0]['password'], 'same')
+            finally:
+                os.chdir(old_cwd)
 
 
 if __name__ == '__main__':
