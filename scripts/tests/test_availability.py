@@ -15,7 +15,7 @@ import availability as a
 
 
 class AvailabilityTests(unittest.TestCase):
-    def test_50mb_sample_reads_entire_file_and_selects_fastest_30(self):
+    def test_50mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
             def __init__(self): self.remaining = a.HIGH_DOWNLOAD_BYTES
             def read1(self, size):
@@ -33,17 +33,29 @@ class AvailabilityTests(unittest.TestCase):
             result = a.high_speed_download(1234)
         self.assertEqual(result['status'], 'passed')
         self.assertEqual(result['received_bytes'], 50_000_000)
-        self.assertEqual(result['budget_seconds'], 30)
+        self.assertEqual(result['budget_seconds'], 20)
+        # Completing the entire body just after the new deadline still fails.
+        with patch.object(a.s, 'session') as session, patch.object(a.time, 'perf_counter',
+                side_effect=[0] + [19]*3052 + [20.001]*10):
+            session.return_value.__enter__.return_value.get.return_value = Response()
+            late = a.high_speed_download(1234)
+        self.assertEqual(late['received_bytes'], 50_000_000)
+        self.assertEqual(late['status'], 'failed')
         records = [{'id': f'n-{i}', 'entry': {'status': 'passed'}, 'websites': None,
                     'exit': None, 'download': {'status': 'passed', 'speed_mib_s': 1},
                     'high_speed_download': {**result, 'speed_mib_s': i+1}} for i in range(40)]
         # A bogus high result without the 1 MB prerequisite must not enter the group.
         records[39]['download']['status'] = 'failed'
         records[38]['high_speed_download']['status'] = 'failed'
+        # Old 30-second measurements are reselected, without changing the data.
+        records[37]['high_speed_download']['elapsed_ms'] = 20001
+        records[36]['high_speed_download']['received_bytes'] = 49_999_999
+        records[35]['high_speed_download']['elapsed_ms'] = 20000
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
-        self.assertEqual(groups['⚡ 高速下载'], [r['name'] for r in reversed(records[8:38])])
+        self.assertEqual(groups['⚡ 高速下载'], [r['name'] for r in reversed(records[:36])])
+        self.assertEqual(records[37]['high_speed_download']['status'], 'passed')
 
     def test_large_tests_require_quick_pass_and_never_exceed_two_concurrent_downloads(self):
         nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': '8.8.8.8', 'port': 443} for i in range(6)]
@@ -75,11 +87,11 @@ class AvailabilityTests(unittest.TestCase):
             'websites': a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES}], a.POST_SITES),
             'download': {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 1000},
             'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
-                'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'elapsed_ms': 25000, 'speed_mib_s': 2, 'url': a.HIGH_DOWNLOAD_URL}}
+                'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'elapsed_ms': 20000, 'speed_mib_s': 2, 'url': a.HIGH_DOWNLOAD_URL}}
         part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': 1, 'records': [record]}
         bundle = {'id': 'batch', 'nodes': [node]}
         a.merge_shards(bundle, [part], 1)
-        for key, value in [('status','skipped'), ('received_bytes',49_999_999), ('elapsed_ms',30001), ('speed_mib_s',float('inf'))]:
+        for key, value in [('status','skipped'), ('received_bytes',49_999_999), ('elapsed_ms',20001), ('speed_mib_s',float('inf'))]:
             invalid = copy.deepcopy(part); invalid['records'][0]['high_speed_download'][key] = value
             with self.assertRaises(ValueError): a.merge_shards(bundle, [invalid], 1)
 
@@ -119,7 +131,8 @@ class AvailabilityTests(unittest.TestCase):
                     'exit': None, 'ip_type': {'status': 'unknown'}} for ident, name in [('n-a', 'good'), ('n-b', 'bad')]]
         report = {'updated_at': '2026-10-09T22:01:27+08:00', 'scope': 'all_subscriptions',
                   'nodes': records, 'sources': [], 'services': {}, 'input_unique_count': 2,
-                  'invalid_node_ids': [], 'parallel_shards': 4}
+                  'invalid_node_ids': [], 'parallel_shards': 4,
+                  'high_speed_download_settings': {'budget_seconds': 30, 'selection_limit': 30}}
         with tempfile.TemporaryDirectory() as directory:
             old_cwd = os.getcwd()
             try:
@@ -141,6 +154,11 @@ class AvailabilityTests(unittest.TestCase):
                 self.assertEqual(result['parseable_count'], 1)
                 self.assertEqual(config['proxies'][0]['password'], 'same')
                 self.assertEqual(result['parallel_shards'], 4)
+                self.assertEqual(result['high_speed_download_settings']['budget_seconds'], 30)
+                self.assertIsNone(result['high_speed_download_settings']['selection_limit'])
+                self.assertEqual(result['high_speed_selection_policy'],
+                                 {'max_elapsed_seconds': 20, 'selection_limit': None, 'selected_count': 0})
+                self.assertEqual(result['routing_policy']['group_count'], len(config['proxy-groups']))
             finally:
                 os.chdir(old_cwd)
 
@@ -318,7 +336,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(rows[0]['download']['status'],'skipped')
         self.assertEqual(rows[0]['high_speed_download']['status'],'skipped')
 
-    def test_all_categories_remain_importable_for_local_comparison(self):
+    def test_only_four_groups_remain_and_all_references_are_valid(self):
         records = [{'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
                    for i, status in [(1, 'passed'), (2, 'failed'), (3, 'unknown')]]
         records[0]['websites'] = {k: {'status': 'passed', 'passed_count': 3} for k in a.SITES}
@@ -330,19 +348,19 @@ class AvailabilityTests(unittest.TestCase):
         config = a.render_comparison(base, records, mapping)
         self.assertEqual(len(config['proxies']), 3)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
-        for group in ('📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证'):
-            self.assertEqual(len(groups[group]), 1)
-            self.assertNotEqual(groups[group], ['REJECT'])
+        self.assertEqual(set(groups), {'🚀 全局选择', '⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP'})
+        for group in ('🌍 按地区选择', '📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证', '🎯 全部节点'):
+            self.assertNotIn(group, groups)
+            self.assertNotIn(group, groups['🚀 全局选择'])
         self.assertEqual(groups['🏠 非机房 IP'], ['REJECT'])
         self.assertEqual(groups['⭐ 综合优选'], [records[0]['name']])
-        self.assertEqual(len(groups), 9)
-        self.assertEqual(groups['🎯 全部节点'], [n['name'] for n in config['proxies']])
+        self.assertEqual(len(groups), 4)
         self.assertEqual(base, original)
         valid = {p['name'] for p in config['proxies']} | set(groups) | {'DIRECT', 'REJECT'}
         self.assertTrue(all(name in valid for proxies in groups.values() for name in proxies))
         self.assertTrue(all('MiB' not in n['name'] for n in config['proxies']))
 
-    def test_regional_picker_keeps_per_country_quota_without_extra_groups(self):
+    def test_country_labels_remain_without_regional_group_or_country_quota(self):
         records = []
         for country in ('JP', 'US'):
             for index in range(35):
@@ -354,16 +372,14 @@ class AvailabilityTests(unittest.TestCase):
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
-        regional = groups['🌍 按地区选择']
-        self.assertEqual(len(groups), 9)
-        self.assertEqual(sum(name.startswith('日本 |') for name in regional), 30)
-        self.assertEqual(sum(name.startswith('美国 |') for name in regional), 30)
+        recommended = groups['⭐ 综合优选']
+        self.assertEqual(len(groups), 4)
+        self.assertEqual(sum(name.startswith('日本 |') for name in recommended), 35)
+        self.assertEqual(sum(name.startswith('美国 |') for name in recommended), 35)
         self.assertNotIn('日本', groups)
         self.assertNotIn('美国', groups)
-        self.assertEqual(len(groups['🎯 全部节点']), 70)
-        for country in ('日本', '美国'):
-            included = [name for name in regional if name.startswith(country + ' |')]
-            self.assertTrue(all('204 35ms' not in name for name in included))
+        self.assertEqual(len(config['proxies']), 70)
+        self.assertNotIn('🌍 按地区选择', groups)
 
 
 if __name__ == '__main__':

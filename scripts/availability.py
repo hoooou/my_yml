@@ -188,7 +188,7 @@ DOWNLOAD_URL = 'https://speed.cloudflare.com/__down?bytes=1000000'
 DOWNLOAD_BYTES = 1_000_000
 DOWNLOAD_BUDGET = 6
 HIGH_DOWNLOAD_BYTES = 50_000_000
-HIGH_DOWNLOAD_BUDGET = 30
+HIGH_DOWNLOAD_BUDGET = 20
 HIGH_DOWNLOAD_WORKERS = 2
 HIGH_DOWNLOAD_URL = 'https://speed.cloudflare.com/__down?bytes=50000000'
 
@@ -417,12 +417,23 @@ def high_speed_rank_key(record):
             -website_count(record), record['id'])
 
 
+def high_speed_eligible(record):
+    """Apply the current deadline even when rebuilding historical measurements."""
+    high = record.get('high_speed_download') or {}
+    return ((record.get('download') or {}).get('status') == 'passed'
+            and high.get('status') == 'passed'
+            and high.get('received_bytes') == high.get('requested_bytes') == HIGH_DOWNLOAD_BYTES
+            and high.get('url') == HIGH_DOWNLOAD_URL
+            and 0 < high.get('elapsed_ms', math.inf) <= HIGH_DOWNLOAD_BUDGET * 1000
+            and (high.get('speed_mib_s') or 0) > 0 and math.isfinite(high['speed_mib_s']))
+
+
 def render_comparison(base, records, mapping):
-    """Keep all parseable samples for the user's local positive/negative comparison."""
+    """Publish four stable groups; keep detailed classifications in the report."""
     config = {key: copy.deepcopy(base[key]) for key in (
         'mixed-port', 'allow-lan', 'mode', 'log-level', 'external-controller', 'dns', 'rules', 'rule-providers') if key in base}
     optimize_routing(config)
-    proxies, classified, regions = [], {v: [] for v in ('passed', 'failed', 'unknown')}, {}
+    proxies, classified = [], {v: [] for v in ('passed', 'failed', 'unknown')}
     ranked = sorted(records, key=rank_key)
     non_dc, seen_ips = [], set()
     for record in ranked:
@@ -452,29 +463,19 @@ def render_comparison(base, records, mapping):
         node = copy.deepcopy(mapping[record['id']]); node['name'] = name; proxies.append(node)
         classified[status].append(name)
         eligible = status == 'passed' and (record.get('download') or {}).get('status') == 'passed'
-        if region_code and eligible:
-            regions.setdefault(region, []).append(name)
         ip = (record.get('exit') or {}).get('exit_ip')
         if (eligible and record.get('exit_consistent') is not False and record.get('ip_type', {}).get('hosting') is False
                 and record['ip_type'].get('status') == 'success' and ip and ip not in seen_ips and len(non_dc) < 30):
             non_dc.append(name); seen_ips.add(ip)
     fast = [r['name'] for r in ranked if (r.get('download') or {}).get('status') == 'passed']
-    high = [r['name'] for r in sorted(records, key=high_speed_rank_key)
-            if (r.get('download') or {}).get('status') == 'passed' and
-            (r.get('high_speed_download') or {}).get('status') == 'passed'][:30]
+    high = [r['name'] for r in sorted(records, key=high_speed_rank_key) if high_speed_eligible(r)]
     recommended = fast or classified['passed'] or classified['unknown'] or classified['failed']
     def group(name, names):
         return {'name': name, 'type': 'select', 'proxies': names or ['REJECT']}
-    # One regional picker keeps each region's 30-node quota without 20+ tabs.
-    regional = [node for region in sorted(regions) for node in regions[region][:30]]
     config['proxies'] = proxies
     config['proxy-groups'] = [
-        group('🚀 全局选择', ['⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', '🌍 按地区选择',
-                            '📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证', '🎯 全部节点', 'DIRECT']),
+        group('🚀 全局选择', ['⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', 'DIRECT']),
         group('⭐ 综合优选', recommended), group('⚡ 高速下载', high), group('🏠 非机房 IP', non_dc),
-        group('🌍 按地区选择', regional),
-        group('📶 TCP通', classified['passed']), group('⛔ TCP不通', classified['failed']),
-        group('🔎 TCP未验证', classified['unknown']), group('🎯 全部节点', [n['name'] for n in proxies]),
     ]
     if mobile_control_paths(config):
         raise ValueError('配置包含解码后的控制字符，拒绝发布到手机')
@@ -513,7 +514,7 @@ def main():
                   'parallel_shards': previous.get('parallel_shards', 1),
                   'measurements_updated_at': previous.get('measurements_updated_at', previous['updated_at'])}
         endpoint_count = previous.get('unique_tcp_endpoints', len({endpoint_key(n) for n in nodes if tcp_supported(n)}))
-        print(f'仅修复手机兼容性：剔除 {len(mobile_rejections)} 个损坏节点，保留 {len(nodes)} 个；不重新探测', flush=True)
+        print(f'按当前规则重建已有结果：剔除 {len(mobile_rejections)} 个损坏节点，保留 {len(nodes)} 个；不重新探测', flush=True)
     elif args.phase in ('all', 'prepare'):
         base = yaml.safe_load(Path('聚合配置.yaml').read_text())
         if args.sample:
@@ -573,7 +574,7 @@ def main():
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
     repairing = args.phase == 'repair'
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 5,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 6,
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': 'compatibility_repair' if repairing else 'full',
               'mobile_rejections': bundle.get('mobile_rejections', {}),
@@ -582,7 +583,7 @@ def main():
               'parallel_sites_per_node': previous.get('parallel_sites_per_node', 3) if repairing else SITE_WORKERS,
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': list(DOMESTIC_SITES), 'connectivity': list(CONNECTIVITY_SITES)},
-              'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': 9, 'version': 1},
+              'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
               'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'quick_download', '50MB_download'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': previous.get('website_rounds', 3) if repairing else 1,
@@ -590,7 +591,10 @@ def main():
               'download_settings': previous.get('download_settings') if repairing else {'url': DOWNLOAD_URL, 'bytes': DOWNLOAD_BYTES, 'budget_seconds': DOWNLOAD_BUDGET, 'rounds': 1, 'read_timeout_seconds': 1, 'includes_handshake': True},
               'web_user_agent': previous.get('web_user_agent') if repairing else WEB_USER_AGENT,
               'high_speed_download_test': previous.get('high_speed_download_test', False) if repairing else True,
-              'high_speed_download_settings': previous.get('high_speed_download_settings') if repairing else {'url': HIGH_DOWNLOAD_URL, 'bytes': HIGH_DOWNLOAD_BYTES, 'budget_seconds': HIGH_DOWNLOAD_BUDGET, 'rounds': 1, 'workers_per_shard': HIGH_DOWNLOAD_WORKERS, 'selection_limit': 30, 'read_timeout_seconds': 1, 'includes_handshake': True},
+              'high_speed_download_settings': ({**previous['high_speed_download_settings'], 'selection_limit': None}
+                  if previous.get('high_speed_download_settings') else None) if repairing else {'url': HIGH_DOWNLOAD_URL, 'bytes': HIGH_DOWNLOAD_BYTES, 'budget_seconds': HIGH_DOWNLOAD_BUDGET, 'rounds': 1, 'workers_per_shard': HIGH_DOWNLOAD_WORKERS, 'selection_limit': None, 'read_timeout_seconds': 1, 'includes_handshake': True},
+              'high_speed_selection_policy': {'max_elapsed_seconds': HIGH_DOWNLOAD_BUDGET, 'selection_limit': None,
+                                              'selected_count': sum(high_speed_eligible(r) for r in records)},
               'high_speed_download_counts': {v: sum((r.get('high_speed_download') or {}).get('status') == v for r in records) for v in ('passed', 'failed', 'skipped')},
               'input_unique_count': input_count, 'parseable_count': len(nodes), 'invalid_node_ids': rejected,
               'unique_tcp_endpoints': endpoint_count,
@@ -612,16 +616,16 @@ def main():
             f'去重节点 {input_count}；内核可解析 {len(nodes)}；TCP 入口总数 {report["total_unique_tcp_endpoints"]}，本轮实际提交 {endpoint_count}。', '',
             f'204 全通过 {report["precheck_counts"]["passed"]}；TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；海外访问检测 {len(reachable)}；1MB 快测通过 {report["download_counts"]["passed"]}；50MB 完整下载通过 {report["high_speed_download_counts"]["passed"]}。', '',
             f'检测顺序：{" → ".join(report["stages"])}。204 {report["precheck_rounds"]} 轮；网站与 trace 各 {report["website_rounds"]} 轮；下载检测 {"开启" if report["download_test"] else "关闭"}。兼容性修复保留原检测数据，未测项目保持未测。', '',
-            '204 三轮均返回 HTTPS 204 且无正文才进入 TCP；204 未通过的节点仍保留在“TCP未验证”与“全部节点”组，名称注明“204未通过”，不伪造国内入口不通。UDP 的 TCP 阶段不适用，保持未验证。', '',
+            '204 三轮均返回 HTTPS 204 且无正文才进入 TCP；204 未通过的节点名称注明“204未通过”，分类及跳过原因保留在 JSON 报告，不伪造国内入口不通。UDP 的 TCP 阶段不适用，保持未验证。', '',
             'TCP 来自小小 API 的国内探测点，运营商未公开，不代表移动或手机本地必然可用。共享主机和端口只提交一次，不同凭据分别检查 204 和海外访问。接口限流、超时、异常和目标不匹配均记为未验证。', '',
             f'本轮 {report["parallel_shards"]} 个并行 Actions 分片，每片最多同时检测 16 个节点。同一节点按顺序过关，不同节点可同时处于不同阶段；海外地址各请求一次，每节点最多五个请求并发；新增网站不会增加并发连接上限。', '',
             '海外网页目标：' + '、'.join(OVERSEAS_SITES) + '；另测 ChatGPT、Claude 两个 trace。', '',
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
             '网页只读取前 16 KB；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
             'TCP 通且至少一个海外网页或 trace 通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
-            '仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，采样预算 30 秒，读取超时 1 秒，每分片最多同时测试 2 个。50 MB 必须完整下载才能进入高速下载组，按该次实测速度从高到低取前 30 个；不足 30 个不补失败节点，未通过 1 MB 的节点不消耗 50 MB 流量。', '',
-            '优先完整下载通过的节点，再比较网页通过项数、连通通过项数、204 中位延迟、下载速度及 TCP 延迟。地区和非机房组仅从快速下载通过的节点选择，各地区最多 30 个；非机房最多 30 个独立出口，且必须明确 hosting=false。', '',
-            '手机仅显示九个分组：全局选择、综合优选、高速下载、非机房 IP、按地区选择、TCP通、TCP不通、TCP未验证、全部节点。每地区前 30 个按国家排列在同一个地区组。各网站、204 和 trace 的细分结果放在报告；全部可解析节点保留，刷新原订阅即可；所有延迟及速度来自 GitHub 云端，仍需手机对照。', '',
+            f'仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，新检测采样预算 {HIGH_DOWNLOAD_BUDGET} 秒，读取超时 1 秒，每分片最多同时测试 2 个。本批数据的实际检测预算为 {(report["high_speed_download_settings"] or {}).get("budget_seconds", "未记录")} 秒；重建配置不改写历史检测时限。高速下载组仅接纳完整下载且耗时不超过 {HIGH_DOWNLOAD_BUDGET} 秒的节点，按实测速度从高到低全部保留，不限制数量；本次入选 {report["high_speed_selection_policy"]["selected_count"]} 个。未通过 1 MB 的节点不消耗 50 MB 流量。', '',
+            '优先完整下载通过的节点，再比较网页通过项数、连通通过项数、204 中位延迟、下载速度及 TCP 延迟。非机房组仅从快速下载通过的节点选择，最多 30 个独立出口，且必须明确 hosting=false。', '',
+            '手机仅显示四个分组：全局选择、综合优选、高速下载、非机房 IP。各网站、204、trace 和 TCP 的细分结果放在报告；全部可解析节点定义保留，刷新原订阅即可；所有延迟及速度来自 GitHub 云端，仍需手机对照。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
     for name, service in services.items():
