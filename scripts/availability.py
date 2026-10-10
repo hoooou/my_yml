@@ -738,6 +738,9 @@ def main():
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'))
     if not config['proxies']:
+        if args.phase in ('all', 'publish'):
+            print('全量检测完成：无符合13站门槛的节点，报告已保存；原订阅未更新', flush=True)
+            return
         raise RuntimeError('没有满足综合或台湾／新加坡门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
     checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(candidate)], capture_output=True, text=True, timeout=90)

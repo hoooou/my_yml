@@ -171,7 +171,10 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
       - name: 发布本次摘要
-        run: cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          if [ -f .node-work/availability/selected.yaml ]; then
+            cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   repair:
     name: 修复手机兼容性并更新原订阅

@@ -1,5 +1,6 @@
 import copy
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -69,3 +70,29 @@ class RequiredSiteTests(unittest.TestCase):
             self.assertEqual(report['selection_outcome'], 'no_eligible_nodes_previous_subscription_retained')
             self.assertEqual(report['website_counts']['Claude']['attempt_http_status_counts'], {'403': 3})
             self.assertIn('不代表通过这次13站', (root / 'full-test-report.md').read_text())
+
+    def test_full_publication_with_no_candidates_leaves_old_subscription_and_report_intact(self):
+        record = self.record(); record['websites']['Claude'].update(status='needs_review', passed_count=0)
+        record['download'] = {'status': 'skipped'}
+        node = {'name': record['id'], 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
+        bundle = {'nodes': [node], 'base': {}, 'metadata': {}, 'sources': [], 'input_count': 1,
+            'rejected': [], 'services': {}, 'scope': 'all_subscriptions', 'id': 'batch'}
+        with tempfile.TemporaryDirectory() as directory:
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(directory)
+                root = Path('.node-work/availability'); root.mkdir(parents=True)
+                (root / 'bundle.json').write_text(json.dumps(bundle))
+                originals = {filename: b'previous published result\n'
+                    for filename in ('优选配置.yaml', '连通性报告.json', '连通性报告.md')}
+                for filename, contents in originals.items(): Path(filename).write_bytes(contents)
+                with patch.object(sys, 'argv', ['availability', '--phase', 'publish', '--mihomo', 'unused']), \
+                     patch.object(a, 'merge_shards', return_value=([record], 1)), \
+                     patch.object(a.s, 'lookup_ip_types', return_value={}), \
+                     patch.object(a.ip_reputation, 'lookup', return_value={}), \
+                     patch.object(a.subprocess, 'run', side_effect=AssertionError('no empty subscription publication')):
+                    a.main()
+                self.assertEqual({f: Path(f).read_bytes() for f in originals}, originals)
+                self.assertTrue((root / 'full-test-report.json').exists())
+            finally:
+                os.chdir(old_cwd)
