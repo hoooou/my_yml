@@ -26,6 +26,9 @@ OVERSEAS_SITES = tuple(OVERSEAS)
 DOMESTIC_SITES = tuple(DOMESTIC)
 SITE_WORKERS = 5
 WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
+MAX_TTFB_MS = 3000
+MAX_SAMPLE_MS = 5000
+PAGE_SAMPLE_BYTES = 16384
 PAGE_MARKERS = {label: item['markers'] for label, item in PAGES.items()}
 # Permit only the entry hostname and its explicit www/non-www counterpart.
 PAGE_HOSTS = {}
@@ -146,7 +149,7 @@ def classify_page(label, status, final_url, content_type, body):
             'reason': '网页入口正常；实际功能仍需本地测试' if passed else '未返回预期网页'}
 
 
-def check_site(port, label, url, timeout=(5, 8)):
+def check_site(port, label, url, timeout=(3, 2)):
     with s.session() as client:
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
@@ -162,14 +165,27 @@ def check_site(port, label, url, timeout=(5, 8)):
                         if hop < 2 and urlparse(target).scheme == 'https' and urlparse(target).hostname in PAGE_HOSTS[label]:
                             current_url = target
                             continue
-                    body = next(response.iter_content(16384), b'')
+                    # Headers include DNS, handshake, redirects and server wait.
+                    headers_ms = round((time.perf_counter() - started) * 1000, 1)
+                    body = bytearray()
+                    for chunk in response.iter_content(1024):
+                        body.extend(chunk[:PAGE_SAMPLE_BYTES - len(body)])
+                        if len(body) >= PAGE_SAMPLE_BYTES or (time.perf_counter() - started) * 1000 >= MAX_SAMPLE_MS:
+                            break
                     result = classify_page(label, response.status_code, response.url,
-                                           response.headers.get('Content-Type', ''), body)
+                                           response.headers.get('Content-Type', ''), bytes(body))
                     result['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
+                    result['ttfb_ms'] = headers_ms
+                    result['sample_bytes'] = len(body)
+                    result['sample_limit_bytes'] = PAGE_SAMPLE_BYTES
+                    if label in PAGE_SITES and result['status'] == 'passed' and (
+                            headers_ms > MAX_TTFB_MS or result['elapsed_ms'] > MAX_SAMPLE_MS):
+                        result.update(status='slow', reason='HTTP 和网页特征正常，但请求响应超过速度预算')
                     result['redirect_hops'] = hop
                     return result
         except s.requests.RequestException:
-            return {'status': 'failed', 'reason': '连接、TLS 或读取失败'}
+            return {'status': 'failed', 'reason': '连接、TLS 或读取失败',
+                    'elapsed_ms': round((time.perf_counter() - started) * 1000, 1)}
 
 
 def check_sites(port, targets=None):
