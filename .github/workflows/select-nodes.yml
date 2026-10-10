@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 全量检测或仅修复已有订阅的手机兼容性
+        description: 全量检测或重建已有结果（可刷新 IP 信誉）
         type: choice
         required: true
         default: full
@@ -129,6 +129,8 @@ jobs:
           merge-multiple: true
           path: .node-work/shards
       - name: 检查全量结果并生成订阅
+        env:
+          IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
         run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 4
       - name: 更新配置和报告
         run: |
@@ -169,7 +171,9 @@ jobs:
       - name: 检查手机兼容性逻辑
         run: python -m unittest discover -s scripts/tests -v
       - name: 修复已有结果并验证订阅
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase repair
+        env:
+          IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase repair --refresh-ip-reputation
       - name: 更新原订阅与报告
         run: |
           git config user.name 'github-actions[bot]'
