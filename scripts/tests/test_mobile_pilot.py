@@ -110,7 +110,9 @@ class MobilePilotTests(unittest.TestCase):
 
     def test_catalog_categories_and_known_www_redirects(self):
         self.assertEqual(len(pilot.OVERSEAS_SITES), 26)
-        self.assertEqual(len(pilot.DOMESTIC_SITES), 14)
+        self.assertEqual(len(pilot.DOMESTIC_SITES), 13)
+        self.assertNotIn('抖音', pilot.SITES)
+        self.assertIn('抖音', pilot.DOMESTIC)
         self.assertFalse(set(pilot.OVERSEAS_SITES) & set(pilot.DOMESTIC_SITES))
         self.assertEqual(set(pilot.PAGE_SITES), set(pilot.OVERSEAS_SITES) | set(pilot.DOMESTIC_SITES))
         self.assertEqual(pilot.classify_page('Cursor',200,'https://cursor.com/','text/html',b'Cursor')['status'],'passed')

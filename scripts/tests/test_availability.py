@@ -371,7 +371,7 @@ class AvailabilityTests(unittest.TestCase):
                  for label in a.POST_SITES}
         record = {'websites': {label: {'status': item['status']} for label, item in pages.items()}}
         self.assertEqual(a.website_count(record),0)
-        self.assertEqual(a.domestic_count(record),14)
+        self.assertEqual(a.domestic_count(record),13)
         self.assertFalse(a.overseas_reachable(record))
         with patch.object(a.s,'Core'), patch.object(a.s,'query_exit',return_value=None), \
              patch.object(a.s,'make_listeners',return_value=([],{'n-a':1234})):
@@ -458,7 +458,7 @@ class AvailabilityTests(unittest.TestCase):
             'precheck': {'status': 'passed', 'round_count': 3, 'passed_count': 3},
             'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
                 'median_elapsed_ms': 2200, 'p95_elapsed_ms': 3200, 'jitter_ms': 1200}
-                for label in a.CORE_SITES},
+                for label in a.REQUIRED_SITES},
             'download': {'status': 'passed', 'speed_mib_s': 5},
             'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
                 'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,

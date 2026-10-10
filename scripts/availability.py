@@ -20,6 +20,7 @@ import select_nodes as s
 from mobile_pilot import check_site, check_sites, SITES, PAGE_SITES, OVERSEAS_SITES, DOMESTIC_SITES, CONNECTIVITY_SITES, POST_SITES, SITE_WORKERS, WEB_USER_AGENT, UDP_TYPES
 from routing import optimize_routing
 import ip_reputation
+from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
@@ -27,6 +28,8 @@ LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
           'unstable': '波动', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
 WEBSITE_ROUNDS = 3
 CORE_SITES = ('Google', 'YouTube')
+REQUIRED_SITES = ('Google', 'YouTube', 'ChatGPT', 'Claude', 'Gemini', 'GitHub',
+                  'Wikipedia', 'Reddit', 'X', 'Instagram', 'Telegram', 'Discord', 'Facebook')
 CORE_MEDIAN_MS = 1500
 CORE_TAIL_MS = 3000
 CORE_JITTER_MS = 1500
@@ -306,13 +309,13 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['exit'] = s.query_exit(port, {'id': record['id']})
                         except (s.requests.RequestException, ValueError, KeyError):
                             record['exit_reason'] = '出口 IP/地区未确认'
-                    if overseas_reachable(record):
+                    if required_websites_passed(record):
                         record['download'] = download(port)
                         if record['download']['status'] == 'passed':
                             with large_slots:
                                 record['high_speed_download'] = large_download(port)
                     else:
-                        record['download']['reason'] = '海外网页与 trace 均未通过，跳过下载；国内网页不触发下载'
+                        record['download']['reason'] = '必过13站未全部三轮通过，跳过下载；trace和国内网页不能替代'
             with lock:
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
@@ -371,12 +374,12 @@ def merge_shards(bundle, parts, count):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
             if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
                 raise ValueError('节点未按阶段筛选')
-            should_download = record['entry']['status'] == 'passed' and overseas_reachable(record)
+            should_download = record['entry']['status'] == 'passed' and required_websites_passed(record)
             if record.get('download', {}).get('status') not in (('passed', 'failed') if should_download else ('skipped',)):
                 raise ValueError('下载阶段漏测或顺序异常')
             if record.get('download', {}).get('status') == 'passed' and (
                     record['entry']['status'] != 'passed' or
-                    not overseas_reachable(record) or
+                    not required_websites_passed(record) or
                     record['download'].get('received_bytes') != DOWNLOAD_BYTES or
                     not 0 < record['download'].get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
                 raise ValueError('下载结果不完整或节点未通过前置阶段')
@@ -439,7 +442,16 @@ def connectivity_count(record):
         results.get(label, {}).get('status') == 'passed' for label in ('ChatGPTTrace', 'ClaudeTrace'))
 
 
+def required_websites_passed(record):
+    return all((record.get('websites') or {}).get(label, {}).get('status') == 'passed'
+        and (record['websites'][label].get('round_count') == WEBSITE_ROUNDS)
+        and (record['websites'][label].get('passed_count') == WEBSITE_ROUNDS)
+        for label in REQUIRED_SITES)
+
+
 def web_quality_eligible(record):
+    if not required_websites_passed(record):
+        return False
     sites = record.get('websites') or {}
     for label in CORE_SITES:
         item = sites.get(label) or {}
@@ -470,7 +482,8 @@ def web_rank_metrics(record):
 
 def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
-    if ((record.get('exit') or {}).get('country_code') not in REGIONAL_COUNTRIES
+    if (not required_websites_passed(record)
+            or (record.get('exit') or {}).get('country_code') not in REGIONAL_COUNTRIES
             or record.get('exit_consistent') is False
             or record['entry']['status'] != 'passed'
             or (record.get('download') or {}).get('status') != 'passed'):
@@ -721,6 +734,9 @@ def main():
             record['ip_reputation'] = reputations.get((record.get('exit') or {}).get('exit_ip'),
                 {'status': 'unknown', 'provider': 'ipapi.is', 'reason': 'not_eligible'})
     config = render_comparison(base, records, mapping)
+    if args.phase in ('all', 'publish'):
+        write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
+                      s.datetime.now(s.TZ).isoformat(timespec='seconds'))
     if not config['proxies']:
         raise RuntimeError('没有满足综合或台湾／新加坡门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
@@ -740,10 +756,12 @@ def main():
                   'workers': 8, 'jobs': 1,
                   'preserved_measurements': ['HTTPS204', 'domestic_TCP', 'domestic_pages', 'trace', '1MB_download', '50MB_download']}
                   if args.phase == 'web-recheck' else previous.get('website_recheck') if repairing else None),
-              'website_measurement_policy': {'version': 2, 'overseas_rounds': WEBSITE_ROUNDS,
+              'website_measurement_policy': {'version': 3, 'overseas_rounds': WEBSITE_ROUNDS,
                   'domestic_and_trace_rounds': 1, 'sample_bytes': 16384,
                   'max_ttfb_ms': MAX_TTFB_MS, 'max_sample_ms': MAX_SAMPLE_MS,
-                  'required_core_sites': list(CORE_SITES), 'core_median_limit_ms': CORE_MEDIAN_MS,
+                  'required_core_sites': list(CORE_SITES), 'required_websites': list(REQUIRED_SITES),
+                  'required_websites_rounds': WEBSITE_ROUNDS, 'trace_can_replace_required_page': False,
+                  'core_median_limit_ms': CORE_MEDIAN_MS,
                   'core_p95_limit_ms': CORE_TAIL_MS, 'core_jitter_limit_ms': CORE_JITTER_MS,
                   'min_stable_overseas_sites': math.ceil(len(OVERSEAS_SITES) / 2),
                   'eligible_count': sum(web_quality_eligible(r) and (r.get('download') or {}).get('status') == 'passed' for r in records)},
@@ -772,7 +790,7 @@ def main():
                       'jitter_limit_ms': REGIONAL_JITTER_MS, 'required_core_rounds': WEBSITE_ROUNDS,
                       'requires_204_rounds': 3, 'requires_quick_download': True,
                       'requires_overseas_coverage': False, 'exit_conflict_allowed': False,
-                      'other_groups_use_strict_pool': True}},
+                      'other_groups_use_strict_pool': True, 'required_websites': list(REQUIRED_SITES)}},
               'regional_selection': {'group': REGIONAL_GROUP,
                   'selected_count': sum(regional_eligible(r) and r['id'] in published_ids for r in records),
                   'country_counts': {cc: sum(r['id'] in published_ids and regional_eligible(r)
@@ -813,11 +831,11 @@ def main():
             '海外网页目标：' + '、'.join(OVERSEAS_SITES) + '；另测 ChatGPT、Claude 两个 trace。', '',
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
             '网页最多读取 16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
-            'TCP 通且至少一个海外网页或 trace 通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
+            'TCP通且指定13个海外网站各三轮均通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
             f'仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，新检测采样预算 {HIGH_DOWNLOAD_BUDGET} 秒，读取超时 1 秒，每分片最多同时测试 2 个。本批数据的实际检测预算为 {(report["high_speed_download_settings"] or {}).get("budget_seconds", "未记录")} 秒；重建配置不改写历史检测时限。高速下载组仅接纳完整下载且耗时不超过 {HIGH_DOWNLOAD_BUDGET} 秒的节点，按实测速度从高到低保留；仅香港最多 30 个，其他地区不限制数量；本次入选 {report["high_speed_selection_policy"]["selected_count"]} 个。未通过 1 MB 的节点不消耗 50 MB 流量。', '',
-            '综合优选要求 1 MB 通过，Google/YouTube 各三轮均通过、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms，海外至少13站稳定通过；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
+            '综合优选要求1 MB通过、指定13个海外网站各三轮均通过；Google/YouTube、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
             '手机显示五个分组：全局选择、综合优选、高速下载、非机房 IP、台湾／新加坡。前三类节点组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
-            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、Google/YouTube各三轮访问均须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。不要求其他海外站至少13个通过，不放行验证码、错误页面或未测项目。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
+            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定13站各三轮访问均须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。13个指定网站必过，不允许其他网站或trace替代，不放行验证码、错误页面或未测项目。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
             '节点名称：地区·唯一短标识｜网页响应中位耗时（无数据时明确标204）｜下载换算 Mbps｜住宅类型｜网段纯净度。住宅候选表示 ISP 网络且非机房；非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
