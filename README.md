@@ -134,3 +134,5 @@ ISP 网络且 `is_datacenter=false` 标为“住宅候选”；移动网单独�
 必过网站：Google、YouTube、ChatGPT、Claude、Gemini、GitHub、Wikipedia、Reddit、X、Instagram、Telegram、Discord、Facebook。每站三轮全部通过才进入下载和候选选择；403、验证码、失败、慢响应、未测和仅trace通过均不符合要求。台湾／新加坡组也须满足13站，只放宽Google/YouTube的响应耗时。Amazon继续检测但不在必过清单；抖音停止检测，直连分流保留。
 
 每次完整全量测量保存 Actions 的 **full-test-report** 存档7天，包含来源、节点结果、每站状态、HTTP响应和失败原因统计。没有合格节点时检测报告仍保存，但发布步骤拒绝覆盖旧订阅；旧订阅不代表已经通过新13站门槛。手动全量运行另保存 **amazon-page-diagnostics**，从三个已发布节点检查Amazon不同样本长度的识别结果，不能以诊断代替入选检测。
+
+Amazon诊断发现：部分云端响应为HTTP200且包含正常首页标题，但没有Content-Type头。现允许仅Amazon在类型头缺失时，凭DOCTYPE、HTML/head结构和Amazon标题确认HTML；明确非HTML类型、验证码、错误页面及超时仍不通过，不通过HTTP200本身放行。识别依据写入每次请求结果，未扩大网页采样长度。

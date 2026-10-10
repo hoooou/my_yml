@@ -30,6 +30,8 @@ def inspect(port, node_id):
                     'content_type': response.headers.get('Content-Type', ''), 'sample_bytes': len(raw),
                     'first_brand_byte': raw.lower().find(b'amazon'),
                     'title': title[1].decode('utf-8', errors='replace')[:150] if title else None,
+                    'document_structure': {'doctype_html': b'<!doctype html' in raw.lower(),
+                        'html': b'<html' in raw.lower(), 'head': b'<head' in raw.lower()},
                     'prefix_classification': {str(size): p.classify_page('Amazon', response.status_code,
                         response.url, response.headers.get('Content-Type', ''), raw[:size])
                         for size in (16384, 65536, 131072, 262144)}}
