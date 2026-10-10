@@ -19,7 +19,7 @@ def probe(received=3, asn=9808, country='CN'):
 class MobilePilotTests(unittest.TestCase):
     def test_cloudflare_challenge_header_is_explicit_and_never_a_pass(self):
         class Response:
-            url = pilot.SITES['Claude']
+            url = pilot.CLAUDE_PAGE_URL
             headers = {'Content-Type': 'text/html', 'cf-mitigated': 'challenge'}
             def __enter__(self): return self
             def __exit__(self, *args): pass
@@ -28,14 +28,14 @@ class MobilePilotTests(unittest.TestCase):
             with self.subTest(status=status), patch.object(pilot.s, 'session') as session:
                 response = Response(); response.status_code = status
                 session.return_value.__enter__.return_value.get.return_value = response
-                result = pilot.check_site(1234, 'Claude', pilot.SITES['Claude'])
+                result = pilot.check_site(1234, 'Claude', pilot.CLAUDE_PAGE_URL)
                 self.assertEqual(result['status'], 'needs_review')
                 self.assertEqual(result.get('restriction'), 'cloudflare_challenge')
 
     def test_claude_region_redirect_is_explicit_without_following_or_exposing_query(self):
         class Response:
             status_code = 302
-            url = pilot.SITES['Claude']
+            url = pilot.CLAUDE_PAGE_URL
             headers = {'Content-Type': 'text/html',
                        'Location': 'https://claude.com/app-unavailable-in-region?token=private'}
             def __enter__(self): return self
@@ -43,7 +43,7 @@ class MobilePilotTests(unittest.TestCase):
             def iter_content(self, size): return iter([b'<title>302 Found</title>'])
         with patch.object(pilot.s, 'session') as session:
             session.return_value.__enter__.return_value.get.return_value = Response()
-            result = pilot.check_site(1234, 'Claude', pilot.SITES['Claude'])
+            result = pilot.check_site(1234, 'Claude', pilot.CLAUDE_PAGE_URL)
             self.assertEqual(result['status'], 'needs_review')
             self.assertEqual(result.get('restriction'), 'region_unavailable')
             self.assertEqual(result.get('redirect_target'), 'https://claude.com/app-unavailable-in-region')
@@ -143,7 +143,7 @@ class MobilePilotTests(unittest.TestCase):
         with patch.object(pilot.s, 'session') as session:
             client = session.return_value.__enter__.return_value
             client.get.side_effect = [Response('https://claude.ai/',302,'/login'), Response('https://claude.ai/login')]
-            result = pilot.check_site(1234,'Claude',pilot.SITES['Claude'])
+            result = pilot.check_site(1234,'Claude',pilot.CLAUDE_PAGE_URL)
             self.assertEqual(result['status'],'passed')
             self.assertEqual(result['redirect_hops'],1)
             self.assertIn('github.com/hoooou/my_yml',client.get.call_args.kwargs['headers']['User-Agent'])
@@ -152,13 +152,14 @@ class MobilePilotTests(unittest.TestCase):
                                 ('ClaudeTrace','/login'),('Google204','/other')]:
             with patch.object(pilot.s,'session') as session:
                 client = session.return_value.__enter__.return_value
-                client.get.return_value = Response(pilot.SITES[label],302,location)
-                self.assertEqual(pilot.check_site(1234,label,pilot.SITES[label])['status'],'needs_review')
+                url = pilot.CLAUDE_PAGE_URL if label == 'Claude' else pilot.SITES[label]
+                client.get.return_value = Response(url,302,location)
+                self.assertEqual(pilot.check_site(1234,label,url)['status'],'needs_review')
                 self.assertEqual(client.get.call_count,1)
         with patch.object(pilot.s,'session') as session:
             client = session.return_value.__enter__.return_value
             client.get.side_effect = [Response('https://claude.ai/'+str(i),302,'/'+str(i+1)) for i in range(3)]
-            self.assertEqual(pilot.check_site(1234,'Claude',pilot.SITES['Claude'])['status'],'needs_review')
+            self.assertEqual(pilot.check_site(1234,'Claude',pilot.CLAUDE_PAGE_URL)['status'],'needs_review')
             self.assertEqual(client.get.call_count,3)
 
     def test_https_204_requires_exact_empty_response_and_no_redirect(self):
@@ -170,9 +171,11 @@ class MobilePilotTests(unittest.TestCase):
         self.assertEqual(classify(204, b'', 'https://connectivitycheck.gstatic.com/other'), 'needs_review')
 
     def test_catalog_categories_and_known_www_redirects(self):
-        self.assertEqual(len(pilot.OVERSEAS_SITES), 26)
+        self.assertEqual(len(pilot.OVERSEAS_SITES), 25)
         self.assertEqual(len(pilot.DOMESTIC_SITES), 13)
         self.assertNotIn('抖音', pilot.SITES)
+        self.assertNotIn('Claude', pilot.SITES)
+        self.assertIn('Claude', pilot.OVERSEAS)
         self.assertIn('抖音', pilot.DOMESTIC)
         self.assertFalse(set(pilot.OVERSEAS_SITES) & set(pilot.DOMESTIC_SITES))
         self.assertEqual(set(pilot.PAGE_SITES), set(pilot.OVERSEAS_SITES) | set(pilot.DOMESTIC_SITES))
