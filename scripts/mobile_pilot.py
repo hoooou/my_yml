@@ -159,6 +159,23 @@ def classify_page(label, status, final_url, content_type, body):
             'reason': '网页入口正常；实际功能仍需本地测试' if passed else '未返回预期网页'}
 
 
+def classify_response(label, status, final_url, headers, body):
+    """Distinguish captured access restrictions without treating them as success."""
+    headers = {k.lower(): v for k, v in headers.items()}
+    result = classify_page(label, status, final_url, headers.get('content-type', ''), body)
+    if headers.get('cf-mitigated', '').strip().lower() == 'challenge':
+        result.update(status='needs_review', restriction='cloudflare_challenge',
+                      reason='Cloudflare 人机验证页，无法自动确认网页可用')
+    if label == 'Claude':
+        target = urlparse(urljoin(final_url, headers.get('location', '')))
+        if (target.scheme == 'https' and target.hostname in ('claude.com', 'www.claude.com')
+                and target.path.rstrip('/') == '/app-unavailable-in-region'):
+            result.update(status='needs_review', restriction='region_unavailable',
+                reason='Claude 返回该出口地区不可用页面',
+                redirect_target=f'https://{target.hostname}{target.path}')
+    return result
+
+
 def check_site(port, label, url, timeout=(3, 2)):
     sample_limit = PAGE_SAMPLE_LIMITS.get(label, PAGE_SAMPLE_BYTES)
     with s.session() as client:
@@ -183,8 +200,8 @@ def check_site(port, label, url, timeout=(3, 2)):
                         body.extend(chunk[:sample_limit - len(body)])
                         if len(body) >= sample_limit or (time.perf_counter() - started) * 1000 >= MAX_SAMPLE_MS:
                             break
-                    result = classify_page(label, response.status_code, response.url,
-                                           response.headers.get('Content-Type', ''), bytes(body))
+                    result = classify_response(label, response.status_code, response.url,
+                                               response.headers, bytes(body))
                     result['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
                     result['ttfb_ms'] = headers_ms
                     result['sample_bytes'] = len(body)
