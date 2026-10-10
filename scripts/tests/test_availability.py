@@ -291,7 +291,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(result['ClaudeTrace']['max_elapsed_ms'], 30)
         self.assertEqual(result['ClaudeTrace']['passed_count'], 2)
         record = {'id': 'n-a', 'entry': {'status': 'passed', 'latency_ms': 10}, 'websites': result}
-        self.assertEqual(a.website_count(record), len(a.PAGE_SITES))
+        self.assertEqual(a.website_count(record), len(a.OVERSEAS_SITES))
         self.assertEqual(a.connectivity_count(record), 2)
         faster = copy.deepcopy(record); faster['id'] = 'n-b'; faster['entry']['latency_ms'] = 100
         record['precheck'] = {'median_elapsed_ms': 20}
@@ -299,7 +299,24 @@ class AvailabilityTests(unittest.TestCase):
         self.assertLess(a.rank_key(faster), a.rank_key(record))
         # A trace success cannot turn a challenged ChatGPT page into a working page.
         faster['websites']['ChatGPT']['status'] = 'needs_review'
-        self.assertEqual(a.website_count(faster), len(a.PAGE_SITES) - 1)
+        self.assertEqual(a.website_count(faster), len(a.OVERSEAS_SITES) - 1)
+
+    def test_domestic_successes_do_not_inflate_rank_or_trigger_download(self):
+        pages = {label: {'status': 'passed' if label in a.DOMESTIC_SITES else 'failed', 'elapsed_ms': 1}
+                 for label in a.POST_SITES}
+        record = {'websites': {label: {'status': item['status']} for label, item in pages.items()}}
+        self.assertEqual(a.website_count(record),0)
+        self.assertEqual(a.domestic_count(record),14)
+        self.assertFalse(a.overseas_reachable(record))
+        with patch.object(a.s,'Core'), patch.object(a.s,'query_exit',return_value=None), \
+             patch.object(a.s,'make_listeners',return_value=([],{'n-a':1234})):
+            rows,_ = a.probe_pipeline([{'name':'n-a','type':'ss','server':'8.8.8.8','port':443}],
+                'unused',Path('.'),precheck=lambda port:{'status':'passed'},
+                probe=lambda key,pace:{'status':'passed'},site_check=lambda port:pages,
+                download=lambda port:self.fail('domestic-only nodes must skip downloads'),
+                large_download=lambda port:self.fail('must skip large downloads'))
+        self.assertEqual(rows[0]['download']['status'],'skipped')
+        self.assertEqual(rows[0]['high_speed_download']['status'],'skipped')
 
     def test_all_categories_remain_importable_for_local_comparison(self):
         records = [{'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
