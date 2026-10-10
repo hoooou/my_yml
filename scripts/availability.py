@@ -21,7 +21,7 @@ from mobile_pilot import check_site, check_sites, SITES, PAGE_SITES, OVERSEAS_SI
 from routing import optimize_routing
 import ip_reputation
 from attempt_report import write_attempt
-from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS
+from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
@@ -761,6 +761,7 @@ def main():
                   if args.phase == 'web-recheck' else previous.get('website_recheck') if repairing else None),
               'website_measurement_policy': {'version': 3, 'overseas_rounds': WEBSITE_ROUNDS,
                   'domestic_and_trace_rounds': 1, 'sample_bytes': 16384,
+                  'sample_bytes_overrides': PAGE_SAMPLE_LIMITS,
                   'max_ttfb_ms': MAX_TTFB_MS, 'max_sample_ms': MAX_SAMPLE_MS,
                   'required_core_sites': list(CORE_SITES), 'required_websites': list(REQUIRED_SITES),
                   'required_websites_rounds': WEBSITE_ROUNDS, 'trace_can_replace_required_page': False,
@@ -833,7 +834,7 @@ def main():
             f'本轮 {report["parallel_shards"]} 个并行 Actions 分片，每片最多同时检测 16 个节点。同一节点按顺序过关，不同节点可同时处于不同阶段；海外网页各请求三轮，国内及 trace 各一次，每节点最多五个请求并发；新增网站不会增加并发连接上限。', '',
             '海外网页目标：' + '、'.join(OVERSEAS_SITES) + '；另测 ChatGPT、Claude 两个 trace。', '',
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
-            '网页最多读取 16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
+            '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
             'TCP通且指定13个海外网站各三轮均通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
             f'仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，新检测采样预算 {HIGH_DOWNLOAD_BUDGET} 秒，读取超时 1 秒，每分片最多同时测试 2 个。本批数据的实际检测预算为 {(report["high_speed_download_settings"] or {}).get("budget_seconds", "未记录")} 秒；重建配置不改写历史检测时限。高速下载组仅接纳完整下载且耗时不超过 {HIGH_DOWNLOAD_BUDGET} 秒的节点，按实测速度从高到低保留；仅香港最多 30 个，其他地区不限制数量；本次入选 {report["high_speed_selection_policy"]["selected_count"]} 个。未通过 1 MB 的节点不消耗 50 MB 流量。', '',
             '综合优选要求1 MB通过、指定13个海外网站各三轮均通过；Google/YouTube、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
