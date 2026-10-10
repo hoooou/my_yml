@@ -59,7 +59,26 @@ Cloudflare 官方测速引擎使用 `https://speed.cloudflare.com/__down`，`byt
 
 ## 手机分流与 DNS
 
-匹配顺序：公司域名直连 → 局域网和私有域名直连 → 保留广告拦截 → 明确的海外服务走“🚀 全局选择” → 国内服务直连 → 个人域名例外 → 应用、Apple/iCloud、代理/GFW/国内维护规则集 → 中国 IP 直连 → 未匹配流量走全局选择。海外 AI、影音、社交和开发服务包含常用 API、登录、静态资源及 CDN 域名，检测和分流共用清单。保留 Office、OneDrive、SharePoint 等个人域名直连选择；Cursor 改为代理，服务规则优先于应用进程直连，移除 Tencent/元宝模糊关键词直连，启用原来未引用的 GFW 列表。没有增加应用策略组。
+匹配顺序：公司域名直连 → 局域网和私有域名直连 → 保留广告拦截 → 个人进程例外 → 指定应用进程直连/代理 → 应用域名兜底 → 明确的海外服务走“🚀 全局选择” → 国内服务直连 → 个人域名例外 → 其他应用、Apple/iCloud、代理/GFW/国内维护规则集 → 中国 IP 直连 → 未匹配流量走全局选择。海外 AI、影音、社交和开发服务包含常用 API、登录、静态资源及 CDN 域名，检测和分流共用清单。保留 Office、OneDrive、SharePoint 等个人域名直连选择；Cursor 进程及服务域名代理，移除 Tencent/元宝模糊关键词直连，启用原来未引用的 GFW 列表。没有增加应用策略组。
+
+### 指定应用分流
+
+应用清单位于 `scripts/app_catalog.py`，同时生成 Android 包名、macOS/Windows 可执行文件名以及域名兜底。每日全量发布和手动 `repair` 均编译同一清单，手机继续更新原订阅即可。
+
+| 选择 | 应用 |
+|---|---|
+| 指定直连 | 微信、微博、美团/大众点评、拼多多、京东、高德地图、企业微信、向日葵、腾讯会议 |
+| 补充直连 | QQ/TIM、支付宝、淘宝、哔哩哔哩、抖音、网易云音乐、小红书 |
+| 指定代理 | X/Twitter、Google Play、YouTube、Threads |
+| 补充代理 | Telegram、Discord、Instagram、ChatGPT、Claude、Gemini、Cursor |
+
+进程规则在常规服务域名规则前：例如微信内打开的海外链接仍按微信直连选择；公司域名和局域网始终优先直连。Google Play 同时包含 `com.android.vending` 与 `com.google.android.gms`，后者负责部分商店登录、下载及其他 Google 服务，其流量也走代理。浏览器没有整进程固定直连或代理，继续按访问域名分流。未识别进程时回退到域名规则；此时无法保证该应用使用的每个第三方域名都遵循进程选择。
+
+设置 `find-process-mode: strict`，按规则需要查进程。Android 使用完整包名；macOS 使用实际可执行文件名，不使用 bundle ID。本机核对了 WeChat、QQ、TencentMeeting、Telegram、Claude、Cursor 及 Claude/Cursor 的专属 Helper 名称；没有匹配通用 `Helper`、浏览器、Python、Node 或 Git。个人直接写入的 `PROCESS-NAME`/`PROCESS-PATH` 及正则/通配符例外会保留，并优先于内置应用清单。
+
+参考 [Clash-FX/cn-apps-direct](https://github.com/Clash-FX/cn-apps-direct) 的 macOS 进程名称清单、[Android 包名参考](https://gist.github.com/Zestinc/fa5a35a444a076214cefbe4965677d8b)及官方应用商店信息，服务域名参考 [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)。这是 2026-10-10 审核适配后的内置快照，不自动导入外部清单的全部路由选择；第三方原文中的策略字段也不会写入 classical provider 的 matcher。原有 Loyalsoldier 域名/IP 规则集仍自动更新。
+
+FlClash 需使用规则模式，并让这些应用的流量进入其 VPN；在“分应用代理”中排除的应用不会经过订阅规则。Android 进程识别依赖系统支持，旧系统可能只能域名兜底。电脑进程流量需进入 Mihomo（通常使用 TUN），客户端覆写也可能改变最终规则。本次校验配置和桌面进程匹配，不宣称已经验证你手机上全部应用的实际识别。依据 [Mihomo PROCESS-NAME 文档](https://wiki.metacubex.one/config/rules/#process-name)和 [FlClash VPN 实现](https://github.com/chen08209/FlClash/blob/main/android/service/src/main/java/com/follow/clash/service/VpnService.kt)。
 
 国内 DNS 和节点域名使用阿里/腾讯 DoH，引导 DNS 为 `223.5.5.5` 与 `119.29.29.29`，公司 DNS 不作为公共域名的引导解析器。海外 DNS 查询通过全局选择的节点访问加密 DNS；独立节点域名解析器避免代理与 DNS 互相依赖。保留原 IPv6 选择，加入局域网及 Windows 网络检查域名的 fake-IP 排除。依据 [Mihomo DNS 文档](https://wiki.metacubex.one/config/dns/)和[规则集合文档](https://wiki.metacubex.one/config/rule-providers/)；服务域名内置，维护规则集继续每天更新。
 
