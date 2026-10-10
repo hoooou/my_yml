@@ -75,7 +75,7 @@ def requests_probe(port, ua):
         with s.session() as client:
             if port:
                 client.proxies = {k: f'http://127.0.0.1:{port}' for k in ('http', 'https')}
-            current = p.SITES['Claude']
+            current = p.CLAUDE_PAGE_URL
             for hop in range(3):
                 with client.get(current, headers={'User-Agent': ua}, allow_redirects=False,
                                 stream=True, timeout=(3, 2)) as response:
@@ -107,7 +107,7 @@ def curl_probe(port, version):
         command = ['curl', '--silent', '--show-error', '--compressed', '--' + version,
             '--connect-timeout', '3', '--max-time', '8', '--max-filesize', str(BODY_LIMIT),
             '--user-agent', BROWSER_UA, '--dump-header', str(root / 'headers'),
-            '--output', str(root / 'body'), '--write-out', '%{json}', p.SITES['Claude']]
+            '--output', str(root / 'body'), '--write-out', '%{json}', p.CLAUDE_PAGE_URL]
         if port:
             command[1:1] = ['--proxy', f'http://127.0.0.1:{port}']
         else:
@@ -122,7 +122,7 @@ def curl_probe(port, version):
         headers = dict(line.split(':', 1) for line in header_block.splitlines() if ':' in line)
         headers = {k.strip(): v.strip() for k, v in headers.items()}
         body = (root / 'body').read_bytes()[:BODY_LIMIT] if (root / 'body').exists() else b''
-        return {**evidence(stats.get('http_code', 0), stats.get('url_effective', p.SITES['Claude']), headers, body),
+        return {**evidence(stats.get('http_code', 0), stats.get('url_effective', p.CLAUDE_PAGE_URL), headers, body),
             'curl_exit_code': result.returncode, 'http_version': stats.get('http_version'),
             'ttfb_ms': round(stats.get('time_starttransfer', 0) * 1000, 1),
             'elapsed_ms': round(stats.get('time_total', 0) * 1000, 1)}
@@ -145,7 +145,7 @@ def browser_probe(port):
                     'headers': {k: v[:200] for k, v in response.headers.items()
                                 if k in ('cf-mitigated', 'server', 'content-type')}})
                     if response.request.is_navigation_request() and response.frame == page.main_frame else None)
-                response = page.goto(p.SITES['Claude'], wait_until='domcontentloaded', timeout=15000)
+                response = page.goto(p.CLAUDE_PAGE_URL, wait_until='domcontentloaded', timeout=15000)
                 page.wait_for_timeout(2000)
                 body = page.content().encode()[:BODY_LIMIT]
                 status = chain[-1]['http_status'] if chain else (response.status if response else 0)
@@ -204,7 +204,7 @@ def inspect(port, row):
 
 
 def markdown(results):
-    lines = ['# Claude 首页诊断', '', '仅用于对照诊断，不修改订阅或13站必过规则；403和验证页不计通过。', '',
+    lines = ['# Claude 首页诊断', '', '仅用于对照诊断，不修改订阅或当前入选规则；403和验证页不计通过。', '',
         '|样本|上轮→本次出口|204/trace控制前→后|现有检测|Requests原UA|Requests浏览器UA|curl H1/H2|普通Chrome|',
         '|---|---|---|---|---|---|---|---|']
     def label(item):

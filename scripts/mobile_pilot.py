@@ -20,10 +20,11 @@ from site_catalog import PAGES, OVERSEAS, DOMESTIC
 GLOBALPING = 'https://api.globalping.io/v1'
 MOBILE_ASN = 9808
 UDP_TYPES = {'hysteria', 'hysteria2', 'tuic', 'wireguard'}
-# Keep Douyin's domain routing in the catalog, but do not probe it.
-SITES = {label: item['url'] for label, item in PAGES.items() if label != '抖音'}
+# Keep domain routing and the explicit diagnostic URL; neither page is probed daily.
+CLAUDE_PAGE_URL = PAGES['Claude']['url']
+SITES = {label: item['url'] for label, item in PAGES.items() if label not in ('抖音', 'Claude')}
 PAGE_SITES = tuple(SITES)
-OVERSEAS_SITES = tuple(OVERSEAS)
+OVERSEAS_SITES = tuple(label for label in OVERSEAS if label in SITES)
 DOMESTIC_SITES = tuple(label for label in DOMESTIC if label in SITES)
 SITE_WORKERS = 5
 WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
@@ -34,8 +35,8 @@ PAGE_SAMPLE_LIMITS = {'Amazon': 65536}
 PAGE_MARKERS = {label: item['markers'] for label, item in PAGES.items()}
 # Permit only the entry hostname and its explicit www/non-www counterpart.
 PAGE_HOSTS = {}
-for label in PAGE_SITES:
-    host = urlparse(SITES[label]).hostname
+for label in (*PAGE_SITES, 'Claude'):
+    host = urlparse(PAGES[label]['url']).hostname
     PAGE_HOSTS[label] = {host, host[4:] if host.startswith('www.') else 'www.' + host}
 CONNECTIVITY_SITES = {
     'Google204': 'https://connectivitycheck.gstatic.com/generate_204',
@@ -115,7 +116,7 @@ def classify_page(label, status, final_url, content_type, body):
     result = {'http_status': status, 'final_url': final_url}
     text = body.decode('utf-8', errors='replace').lower()
     host = urlparse(final_url).hostname or ''
-    expected_host = urlparse(SITES[label]).hostname
+    expected_host = urlparse(PAGES[label]['url'] if label in PAGES else SITES[label]).hostname
     # Normal pages can mention captcha in feature flags or scripts (e.g. GitHub).
     visible = re.sub(r'<(?:script|style)\b[^>]*>.*?(?:</(?:script|style)>|$)', '', text, flags=re.S)
     title = re.search(r'<title\b[^>]*>(.*?)</title>', visible, flags=re.S)
@@ -187,7 +188,7 @@ def check_site(port, label, url, timeout=(3, 2)):
                 with client.get(current_url, stream=True, timeout=timeout, allow_redirects=False,
                                 headers={'User-Agent': WEB_USER_AGENT}) as response:
                     location = response.headers.get('Location')
-                    if label in PAGE_SITES and 300 <= response.status_code < 400 and location:
+                    if label in PAGE_HOSTS and 300 <= response.status_code < 400 and location:
                         target = urljoin(current_url, location)
                         # Follow up to two HTTPS redirects on the same website only.
                         if hop < 2 and urlparse(target).scheme == 'https' and urlparse(target).hostname in PAGE_HOSTS[label]:
@@ -206,7 +207,7 @@ def check_site(port, label, url, timeout=(3, 2)):
                     result['ttfb_ms'] = headers_ms
                     result['sample_bytes'] = len(body)
                     result['sample_limit_bytes'] = sample_limit
-                    if label in PAGE_SITES and result['status'] == 'passed' and (
+                    if label in PAGE_HOSTS and result['status'] == 'passed' and (
                             headers_ms > MAX_TTFB_MS or result['elapsed_ms'] > MAX_SAMPLE_MS):
                         result.update(status='slow', reason='HTTP 和网页特征正常，但请求响应超过速度预算')
                     result['redirect_hops'] = hop
