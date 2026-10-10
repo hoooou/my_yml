@@ -17,6 +17,39 @@ def probe(received=3, asn=9808, country='CN'):
 
 
 class MobilePilotTests(unittest.TestCase):
+    def test_cloudflare_challenge_header_is_explicit_and_never_a_pass(self):
+        class Response:
+            url = pilot.SITES['Claude']
+            headers = {'Content-Type': 'text/html', 'cf-mitigated': 'challenge'}
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def iter_content(self, size): return iter([b'<html>Claude</html>'])
+        for status in (403, 200):
+            with self.subTest(status=status), patch.object(pilot.s, 'session') as session:
+                response = Response(); response.status_code = status
+                session.return_value.__enter__.return_value.get.return_value = response
+                result = pilot.check_site(1234, 'Claude', pilot.SITES['Claude'])
+                self.assertEqual(result['status'], 'needs_review')
+                self.assertEqual(result.get('restriction'), 'cloudflare_challenge')
+
+    def test_claude_region_redirect_is_explicit_without_following_or_exposing_query(self):
+        class Response:
+            status_code = 302
+            url = pilot.SITES['Claude']
+            headers = {'Content-Type': 'text/html',
+                       'Location': 'https://claude.com/app-unavailable-in-region?token=private'}
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def iter_content(self, size): return iter([b'<title>302 Found</title>'])
+        with patch.object(pilot.s, 'session') as session:
+            session.return_value.__enter__.return_value.get.return_value = Response()
+            result = pilot.check_site(1234, 'Claude', pilot.SITES['Claude'])
+            self.assertEqual(result['status'], 'needs_review')
+            self.assertEqual(result.get('restriction'), 'region_unavailable')
+            self.assertEqual(result.get('redirect_target'), 'https://claude.com/app-unavailable-in-region')
+            self.assertNotIn('private', str(result))
+            self.assertEqual(session.return_value.__enter__.return_value.get.call_count, 1)
+
     def test_websites_overlap_and_use_independent_sessions(self):
         barrier, lock = threading.Barrier(pilot.SITE_WORKERS), threading.Lock()
         state = {'active': 0, 'peak': 0, 'sessions': 0}

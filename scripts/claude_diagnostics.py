@@ -60,9 +60,12 @@ def evidence(status, url, headers, body):
         'challenge_signals': {'cf_mitigated': headers.get('cf-mitigated') == 'challenge',
             'cf_chl': 'cf-chl-' in lower, 'just_a_moment': 'just a moment' in lower,
             'verify_human': 'verify you are human' in lower,
-            'unsupported_country': 'unsupported_country' in lower or 'unsupported country' in lower},
-        'classification': p.classify_page('Claude', status, url, headers.get('content-type', ''), body[:p.PAGE_SAMPLE_BYTES]),
-        'larger_sample_classification': p.classify_page('Claude', status, url, headers.get('content-type', ''), body)}
+            'unsupported_country': ('unsupported_country' in lower or 'unsupported country' in lower
+                or 'app unavailable in region' in lower
+                or '/app-unavailable-in-region' in selected_headers.get('location', '')
+                or urlparse(url).path.rstrip('/') == '/app-unavailable-in-region')},
+        'classification': p.classify_response('Claude', status, url, headers, body[:p.PAGE_SAMPLE_BYTES]),
+        'larger_sample_classification': p.classify_response('Claude', status, url, headers, body)}
 
 
 def requests_probe(port, ua):
@@ -160,6 +163,10 @@ def browser_probe(port):
 def control_probe(port, label):
     if port:
         return p.check_site(port, label, p.SITES[label])
+    if label == 'Claude':
+        result = requests_probe(None, p.WEB_USER_AGENT)
+        return {**result.get('classification', {'status': 'failed'}),
+                'elapsed_ms': result.get('elapsed_ms'), 'redirect_hops': len(result.get('redirect_chain', [])) - 1}
     started = time.monotonic()
     try:
         with s.session() as client:
@@ -170,8 +177,8 @@ def control_probe(port, label):
                     body.extend(chunk[:p.PAGE_SAMPLE_BYTES - len(body)])
                     if len(body) >= p.PAGE_SAMPLE_BYTES or time.monotonic() - started > 5:
                         break
-                return {**p.classify_page(label, response.status_code, response.url,
-                        response.headers.get('Content-Type', ''), bytes(body)),
+                return {**p.classify_response(label, response.status_code, response.url,
+                        response.headers, bytes(body)),
                         'elapsed_ms': round((time.monotonic() - started) * 1000, 1)}
     except s.requests.RequestException as error:
         return {'status': 'failed', 'error_type': type(error).__name__}
@@ -198,16 +205,21 @@ def inspect(port, row):
 
 def markdown(results):
     lines = ['# Claude 首页诊断', '', '仅用于对照诊断，不修改订阅或13站必过规则；403和验证页不计通过。', '',
-        '|样本|原出口|204/trace控制前→后|现有检测|Requests原UA|Requests浏览器UA|curl H1/H2|普通Chrome|',
+        '|样本|上轮→本次出口|204/trace控制前→后|现有检测|Requests原UA|Requests浏览器UA|curl H1/H2|普通Chrome|',
         '|---|---|---|---|---|---|---|---|']
     def label(item):
         signals = item.get('challenge_signals', {})
-        extra = ' 验证页' if any(signals.get(k) for k in ('cf_mitigated', 'cf_chl', 'just_a_moment', 'verify_human')) else ''
-        if signals.get('unsupported_country'): extra += ' 地区限制'
+        extra = ' 验证页' if (item.get('restriction') == 'cloudflare_challenge' or any(
+            signals.get(k) for k in ('cf_mitigated', 'cf_chl', 'just_a_moment', 'verify_human'))) else ''
+        if signals.get('unsupported_country') or item.get('restriction') == 'region_unavailable':
+            extra += ' 地区限制'
         return str(item.get('http_status', item.get('error_type', item.get('status', '?')))) + extra
     for r in results:
         controls = '/'.join(r['before'][k]['status'] for k in ('Google204', 'ClaudeTrace')) + ' → ' + '/'.join(r['after'][k]['status'] for k in ('Google204', 'ClaudeTrace'))
-        cells = [r['id'], (r.get('previous_exit') or {}).get('country_code', '云端直连'), controls,
+        previous = (r.get('previous_exit') or {}).get('country_code', '云端直连')
+        current = r['before']['ClaudeTrace'].get('country_code', '未知')
+        country = previous + ' → ' + current if previous != current else current
+        cells = [r['id'], country, controls,
             label(r['production_probe']), ', '.join(map(label, r['requests_bot'])),
             ', '.join(map(label, r['requests_browser_ua'])), label(r['curl_http1']) + '/' + label(r['curl_http2']), label(r['browser'])]
         lines.append('|' + '|'.join(cells) + '|')
