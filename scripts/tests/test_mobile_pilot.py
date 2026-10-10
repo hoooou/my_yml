@@ -34,7 +34,7 @@ class MobilePilotTests(unittest.TestCase):
                 if self.url.endswith('/trace'):
                     host = pilot.urlparse(self.url).hostname
                     return iter([f'h={host}\nip=8.8.8.8\nloc=US\nvisit_scheme=https\ncolo=LAX\n'.encode()])
-                return iter([('<html>' + ' '.join(pilot.PAGE_SITES) + ' twitter x.com</html>').encode()])
+                return iter([('<html>' + ' '.join(marker for markers in pilot.PAGE_MARKERS.values() for marker in markers) + '</html>').encode()])
         class Client:
             def __init__(self):
                 with lock: state['sessions'] += 1
@@ -107,6 +107,16 @@ class MobilePilotTests(unittest.TestCase):
         self.assertEqual(classify(200, b''), 'failed')
         self.assertEqual(classify(204, b'portal'), 'failed')
         self.assertEqual(classify(204, b'', 'https://connectivitycheck.gstatic.com/other'), 'needs_review')
+
+    def test_catalog_categories_and_known_www_redirects(self):
+        self.assertEqual(len(pilot.OVERSEAS_SITES), 26)
+        self.assertEqual(len(pilot.DOMESTIC_SITES), 14)
+        self.assertFalse(set(pilot.OVERSEAS_SITES) & set(pilot.DOMESTIC_SITES))
+        self.assertEqual(set(pilot.PAGE_SITES), set(pilot.OVERSEAS_SITES) | set(pilot.DOMESTIC_SITES))
+        self.assertEqual(pilot.classify_page('Cursor',200,'https://cursor.com/','text/html',b'Cursor')['status'],'passed')
+        self.assertEqual(pilot.classify_page('Cursor',200,'https://unrelated.cursor.com/','text/html',b'Cursor')['status'],'needs_review')
+        for status in (412,444,451):
+            self.assertEqual(pilot.classify_page('哔哩哔哩',status,pilot.SITES['哔哩哔哩'],'text/html',b'bilibili')['status'],'needs_review')
 
     def test_trace_requires_expected_fields_and_does_not_accept_html_or_private_ip(self):
         for label in ('ChatGPTTrace', 'ClaudeTrace'):

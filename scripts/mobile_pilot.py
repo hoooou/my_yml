@@ -15,24 +15,23 @@ from urllib.parse import urlparse, urljoin
 
 import yaml
 import select_nodes as s
+from site_catalog import PAGES, OVERSEAS, DOMESTIC
 
 GLOBALPING = 'https://api.globalping.io/v1'
 MOBILE_ASN = 9808
 UDP_TYPES = {'hysteria', 'hysteria2', 'tuic', 'wireguard'}
-SITES = {'Google': 'https://www.google.com/', 'YouTube': 'https://www.youtube.com/',
-         'ChatGPT': 'https://chatgpt.com/', 'Claude': 'https://claude.ai/',
-         'Gemini': 'https://gemini.google.com/', 'GitHub': 'https://github.com/',
-         'Wikipedia': 'https://www.wikipedia.org/', 'Reddit': 'https://www.reddit.com/',
-         'X': 'https://x.com/', 'Instagram': 'https://www.instagram.com/'}
+SITES = {label: item['url'] for label, item in PAGES.items()}
 PAGE_SITES = tuple(SITES)
+OVERSEAS_SITES = tuple(OVERSEAS)
+DOMESTIC_SITES = tuple(DOMESTIC)
 SITE_WORKERS = 5
-WEB_USER_AGENT = 'my-yml-availability-bot/4.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
-PAGE_MARKERS = {
-    'Google': ('google',), 'YouTube': ('youtube',), 'ChatGPT': ('chatgpt', 'openai'),
-    'Claude': ('claude', 'anthropic'), 'Gemini': ('gemini',), 'GitHub': ('github',),
-    'Wikipedia': ('wikipedia',), 'Reddit': ('reddit',),
-    'X': ('twitter', 'x.com', '<title>x</title>'), 'Instagram': ('instagram',),
-}
+WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
+PAGE_MARKERS = {label: item['markers'] for label, item in PAGES.items()}
+# Permit only the entry hostname and its explicit www/non-www counterpart.
+PAGE_HOSTS = {}
+for label in PAGE_SITES:
+    host = urlparse(SITES[label]).hostname
+    PAGE_HOSTS[label] = {host, host[4:] if host.startswith('www.') else 'www.' + host}
 CONNECTIVITY_SITES = {
     'Google204': 'https://connectivitycheck.gstatic.com/generate_204',
     'ChatGPTTrace': 'https://chatgpt.com/cdn-cgi/trace',
@@ -120,7 +119,8 @@ def classify_page(label, status, final_url, content_type, body):
     if captcha_wall or any(word in text for word in ('cf-chl-', 'just a moment', 'verify you are human',
                                                      'unsupported_country', 'unsupported country')):
         return {**result, 'status': 'needs_review', 'reason': '登录、风控、验证码或地区限制，无法自动确认服务可用'}
-    if status in (401, 403, 429) or 300 <= status < 400 or host != expected_host:
+    allowed_hosts = PAGE_HOSTS.get(label, {expected_host})
+    if status in (401, 403, 412, 418, 429, 444, 451) or 300 <= status < 400 or host not in allowed_hosts or urlparse(final_url).scheme != 'https':
         return {**result, 'status': 'needs_review', 'reason': '需人工确认登录、访问限制或跳转'}
     if label in CONNECTIVITY_SITES:
         if final_url != SITES[label]:
@@ -159,7 +159,7 @@ def check_site(port, label, url, timeout=(5, 8)):
                     if label in PAGE_SITES and 300 <= response.status_code < 400 and location:
                         target = urljoin(current_url, location)
                         # Follow up to two HTTPS redirects on the same website only.
-                        if hop < 2 and urlparse(target).scheme == 'https' and urlparse(target).hostname == urlparse(url).hostname:
+                        if hop < 2 and urlparse(target).scheme == 'https' and urlparse(target).hostname in PAGE_HOSTS[label]:
                             current_url = target
                             continue
                     body = next(response.iter_content(16384), b'')
