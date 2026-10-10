@@ -40,7 +40,7 @@ class AvailabilityTests(unittest.TestCase):
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
         by_name = {r['name']: r for r in records if 'name' in r}
-        for group in config['proxy-groups'][1:]:
+        for group in config['proxy-groups'][1:4]:
             countries = [by_name[n]['exit']['country_code'] for n in group['proxies']]
             self.assertEqual(countries.count('HK'), 30)
             self.assertEqual(countries.count('US'), 35)
@@ -383,7 +383,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(rows[0]['download']['status'],'skipped')
         self.assertEqual(rows[0]['high_speed_download']['status'],'skipped')
 
-    def test_only_four_groups_remain_and_all_references_are_valid(self):
+    def test_five_groups_have_valid_references_without_diagnostic_groups(self):
         records = [{'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
                    for i, status in [(1, 'passed'), (2, 'failed'), (3, 'unknown')]]
         records[0]['websites'] = self.stable_sites()
@@ -396,13 +396,14 @@ class AvailabilityTests(unittest.TestCase):
         config = a.render_comparison(base, records, mapping)
         self.assertEqual(len(config['proxies']), 1)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
-        self.assertEqual(set(groups), {'🚀 全局选择', '⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP'})
+        self.assertEqual(set(groups), {'🚀 全局选择', '⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', a.REGIONAL_GROUP})
         for group in ('🌍 按地区选择', '📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证', '🎯 全部节点'):
             self.assertNotIn(group, groups)
             self.assertNotIn(group, groups['🚀 全局选择'])
         self.assertEqual(groups['🏠 非机房 IP'], ['REJECT'])
         self.assertEqual(groups['⭐ 综合优选'], [config['proxies'][0]['name']])
-        self.assertEqual(len(groups), 4)
+        self.assertEqual(groups[a.REGIONAL_GROUP], ['REJECT'])
+        self.assertEqual(len(groups), 5)
         self.assertEqual(base, original)
         valid = {p['name'] for p in config['proxies']} | set(groups) | {'DIRECT', 'REJECT'}
         self.assertTrue(all(name in valid for proxies in groups.values() for name in proxies))
@@ -422,7 +423,7 @@ class AvailabilityTests(unittest.TestCase):
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
         recommended = groups['⭐ 综合优选']
-        self.assertEqual(len(groups), 4)
+        self.assertEqual(len(groups), 5)
         self.assertEqual(sum(name.startswith('日本·') for name in recommended), 35)
         self.assertEqual(sum(name.startswith('美国·') for name in recommended), 35)
         self.assertNotIn('日本', groups)
@@ -449,8 +450,45 @@ class AvailabilityTests(unittest.TestCase):
                    for r in records if r['id'] != 'n-missing_credentials'}
         config = a.render_comparison({}, records, mapping)
         self.assertEqual(len(config['proxies']), 1)
-        for group in config['proxy-groups'][1:]:
+        for group in config['proxy-groups'][1:4]:
             self.assertEqual(group['proxies'], [good['name']])
+
+    def test_regional_exception_is_isolated_and_can_publish_without_strict_nodes(self):
+        record = {'id': 'n-slow-tw', 'entry': {'status': 'passed'},
+            'precheck': {'status': 'passed', 'round_count': 3, 'passed_count': 3},
+            'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
+                'median_elapsed_ms': 2200, 'p95_elapsed_ms': 3200, 'jitter_ms': 1200}
+                for label in a.CORE_SITES},
+            'download': {'status': 'passed', 'speed_mib_s': 5},
+            'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
+                'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,
+                'elapsed_ms': 10000, 'speed_mib_s': 5},
+            'exit': {'country_code': 'TW', 'exit_ip': '8.8.8.8'},
+            'ip_type': {'status': 'success', 'hosting': False}}
+        self.assertFalse(a.web_quality_eligible(record))
+        self.assertTrue(a.regional_eligible(record))
+        config = a.render_comparison({}, [record], {'n-slow-tw': {'name': 'n-slow-tw',
+            'type': 'http', 'server': '8.8.8.8', 'port': 80}})
+        self.assertEqual(len(config['proxies']), 1)
+        for group in config['proxy-groups'][1:4]:
+            self.assertEqual(group['proxies'], ['REJECT'])
+        self.assertEqual(config['proxy-groups'][4]['proxies'], [record['name']])
+        self.assertEqual(config['proxy-groups'][0]['proxies'][0], a.REGIONAL_GROUP)
+        for country in ('TW', 'SG'):
+            record['exit']['country_code'] = country
+            self.assertTrue(a.regional_eligible(record))
+            for reason in ('bad204', 'tcp_unknown', 'quick_failed', 'captcha', 'single_round',
+                           'too_slow', 'exit_conflict', 'wrong_country'):
+                bad = copy.deepcopy(record)
+                if reason == 'bad204': bad['precheck']['passed_count'] = 2
+                if reason == 'tcp_unknown': bad['entry']['status'] = 'unknown'
+                if reason == 'quick_failed': bad['download']['status'] = 'failed'
+                if reason == 'captcha': bad['websites']['Google']['status'] = 'needs_review'
+                if reason == 'single_round': bad['websites']['YouTube']['round_count'] = 1
+                if reason == 'too_slow': bad['websites']['Google']['p95_elapsed_ms'] = 5001
+                if reason == 'exit_conflict': bad['exit_consistent'] = False
+                if reason == 'wrong_country': bad['exit']['country_code'] = 'JP'
+                self.assertFalse(a.regional_eligible(bad), reason)
 
     def test_repeated_repair_preserves_audit_for_nodes_absent_from_subscription(self):
         good = {'name': 'good', 'type': 'trojan', 'server': 'example.com', 'port': 443, 'password': 'same'}
