@@ -80,6 +80,24 @@ class MobilePilotTests(unittest.TestCase):
         challenge = html.replace(b'Amazon.com.', b'CAPTCHA Amazon.com.')
         self.assertEqual(pilot.classify_page('Amazon', 200, pilot.SITES['Amazon'], '', challenge)['status'], 'needs_review')
 
+    def test_amazon_reads_bounded_larger_prefix_when_document_title_follows_large_style(self):
+        html = (b'<!doctype html><html><head><style>' + b' ' * 20000
+            + b'</style><title>Amazon.com. Spend less. Smile more.</title></head><body></body></html>')
+        class Response:
+            status_code = 200
+            url = pilot.SITES['Amazon']
+            headers = {}
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def iter_content(self, size):
+                return iter(html[i:i+size] for i in range(0, len(html), size))
+        with patch.object(pilot.s, 'session') as session, patch.object(pilot.time, 'perf_counter', side_effect=[0] + [0.1]*100):
+            session.return_value.__enter__.return_value.get.return_value = Response()
+            result = pilot.check_site(1234, 'Amazon', pilot.SITES['Amazon'])
+        self.assertEqual(result['status'], 'passed')
+        self.assertGreater(result['sample_bytes'], 16384)
+        self.assertEqual(result['sample_limit_bytes'], 65536)
+
     def test_page_redirects_are_bounded_and_trace_never_follows_them(self):
         class Response:
             headers = {'Content-Type': 'text/html'}

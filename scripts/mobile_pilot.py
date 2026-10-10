@@ -30,6 +30,7 @@ WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml)
 MAX_TTFB_MS = 3000
 MAX_SAMPLE_MS = 5000
 PAGE_SAMPLE_BYTES = 16384
+PAGE_SAMPLE_LIMITS = {'Amazon': 65536}
 PAGE_MARKERS = {label: item['markers'] for label, item in PAGES.items()}
 # Permit only the entry hostname and its explicit www/non-www counterpart.
 PAGE_HOSTS = {}
@@ -159,6 +160,7 @@ def classify_page(label, status, final_url, content_type, body):
 
 
 def check_site(port, label, url, timeout=(3, 2)):
+    sample_limit = PAGE_SAMPLE_LIMITS.get(label, PAGE_SAMPLE_BYTES)
     with s.session() as client:
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
@@ -178,15 +180,15 @@ def check_site(port, label, url, timeout=(3, 2)):
                     headers_ms = round((time.perf_counter() - started) * 1000, 1)
                     body = bytearray()
                     for chunk in response.iter_content(1024):
-                        body.extend(chunk[:PAGE_SAMPLE_BYTES - len(body)])
-                        if len(body) >= PAGE_SAMPLE_BYTES or (time.perf_counter() - started) * 1000 >= MAX_SAMPLE_MS:
+                        body.extend(chunk[:sample_limit - len(body)])
+                        if len(body) >= sample_limit or (time.perf_counter() - started) * 1000 >= MAX_SAMPLE_MS:
                             break
                     result = classify_page(label, response.status_code, response.url,
                                            response.headers.get('Content-Type', ''), bytes(body))
                     result['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
                     result['ttfb_ms'] = headers_ms
                     result['sample_bytes'] = len(body)
-                    result['sample_limit_bytes'] = PAGE_SAMPLE_BYTES
+                    result['sample_limit_bytes'] = sample_limit
                     if label in PAGE_SITES and result['status'] == 'passed' and (
                             headers_ms > MAX_TTFB_MS or result['elapsed_ms'] > MAX_SAMPLE_MS):
                         result.update(status='slow', reason='HTTP 和网页特征正常，但请求响应超过速度预算')
