@@ -45,3 +45,29 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(dns['nameserver-policy']['rule-set:overseas-services'],r.PROXY_DNS)
         self.assertTrue(all('#🚀 全局选择' in url for url in dns['fallback']))
         self.assertTrue(dns['ipv6'])
+
+    def test_company_policy_overrides_public_resolvers_and_survives_daily_compilation(self):
+        config = {'dns': {'nameserver-policy': {'+.bitauto.com': r.CHINA_DNS,
+                                               '+.office.com': ['system']}},
+                  'rules': ['DOMAIN-SUFFIX,bitauto.com,REJECT'],
+                  'proxy-groups': [{'name': 'existing', 'type': 'select', 'proxies': ['DIRECT']}]}
+        groups = copy.deepcopy(config['proxy-groups'])
+        r.optimize_routing(config)
+        self.assertEqual(config['rules'][0], 'RULE-SET,company-internal,DIRECT')
+        dns = config['dns']
+        for domain in r.COMPANY_DOMAINS:
+            self.assertEqual(dns['nameserver-policy']['+.' + domain], r.COMPANY_DNS)
+            self.assertIn('+.' + domain, dns['fake-ip-filter'])
+        self.assertEqual(dns['nameserver-policy']['rule-set:company-internal'], r.COMPANY_DNS)
+        self.assertEqual(list(dns['nameserver-policy'])[:5],
+                         ['+.' + domain for domain in r.COMPANY_DOMAINS] + ['rule-set:company-internal'])
+        self.assertTrue(dns['direct-nameserver-follow-policy'])
+        self.assertEqual(dns['nameserver-policy']['+.office.com'], ['system'])
+        self.assertEqual(dns['nameserver'], r.CHINA_DNS)
+        self.assertEqual(config['proxy-groups'], groups)
+        self.assertEqual(config['rule-providers']['company-internal']['behavior'], 'domain')
+        self.assertFalse(any(rule.startswith('DOMAIN-KEYWORD,')
+                             for rule in config['rule-providers']['company-internal']['payload']))
+        compiled = copy.deepcopy(config)
+        r.optimize_routing(config)
+        self.assertEqual(config, compiled)

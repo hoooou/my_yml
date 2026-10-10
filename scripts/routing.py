@@ -4,6 +4,8 @@ from site_catalog import OVERSEAS, DOMESTIC
 GLOBAL = '🚀 全局选择'
 CHINA_DNS = ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
 PROXY_DNS = [f'https://1.1.1.1/dns-query#{GLOBAL}', f'https://8.8.8.8/dns-query#{GLOBAL}']
+COMPANY_DOMAINS = ('tech.bitauto.com', 'yiche.com', 'bitauto.com', 'bitautotech.com')
+COMPANY_DNS = ['192.168.70.49', '192.168.70.1']
 
 
 def domains(catalog):
@@ -13,6 +15,10 @@ def domains(catalog):
 def optimize_routing(config):
     """Retain explicit personal exceptions after reviewed service routing."""
     providers = config.setdefault('rule-providers', {})
+    # Exact domain families also work in DNS policy and fake-IP filtering.
+    # Avoid keyword matching unrelated domains containing a company name.
+    providers['company-internal'] = {'type': 'inline', 'behavior': 'domain', 'format': 'yaml',
+                                     'payload': ['+.' + domain for domain in COMPANY_DOMAINS]}
     for name, catalog in [('overseas-services', OVERSEAS), ('domestic-services', DOMESTIC)]:
         providers[name] = {'type': 'inline', 'behavior': 'domain', 'format': 'yaml',
                            'payload': ['+.' + domain for domain in domains(catalog)]}
@@ -32,7 +38,8 @@ def optimize_routing(config):
         if rule in ('DOMAIN-SUFFIX,cursor.sh,DIRECT', 'DOMAIN-SUFFIX,cursor.com,DIRECT'):
             continue
         custom.append(rule)
-    rules = (rule_set('private', 'DIRECT') + rule_set('lancidr', 'DIRECT', True)
+    rules = (rule_set('company-internal', 'DIRECT')
+             + rule_set('private', 'DIRECT') + rule_set('lancidr', 'DIRECT', True)
              + ['GEOIP,LAN,DIRECT,no-resolve'] + rule_set('reject', 'REJECT')
              + rule_set('overseas-services', GLOBAL) + rule_set('domestic-services', 'DIRECT')
              + custom + rule_set('applications', 'DIRECT') + rule_set('icloud', 'DIRECT')
@@ -46,15 +53,22 @@ def optimize_routing(config):
     dns = config.setdefault('dns', {})
     dns.update({'enable': True, 'default-nameserver': ['223.5.5.5', '119.29.29.29'],
                 'proxy-server-nameserver': list(CHINA_DNS), 'direct-nameserver': list(CHINA_DNS),
+                'direct-nameserver-follow-policy': True,
                 'nameserver': list(CHINA_DNS), 'fallback': list(PROXY_DNS),
                 'fallback-filter': {'geoip': True, 'geoip-code': 'CN',
                                     'ipcidr': ['240.0.0.0/4', '0.0.0.0/32']}})
-    policy = {f'rule-set:{name}': list(PROXY_DNS) for name in ('overseas-services', 'proxy', 'gfw') if name in referenced}
+    # Policy matching follows YAML order: company choices must precede broad lists.
+    policy = {'+.' + domain: list(COMPANY_DNS) for domain in COMPANY_DOMAINS}
+    policy['rule-set:company-internal'] = list(COMPANY_DNS)
+    policy.update({f'rule-set:{name}': list(PROXY_DNS) for name in ('overseas-services', 'proxy', 'gfw') if name in referenced})
     policy.update({f'rule-set:{name}': list(CHINA_DNS) for name in ('domestic-services', 'direct', 'private') if name in referenced})
     # Retain explicitly configured per-domain resolver choices if any.
-    policy.update({key: value for key, value in dns.get('nameserver-policy', {}).items() if not key.startswith('rule-set:')})
+    policy.update({key: value for key, value in dns.get('nameserver-policy', {}).items()
+                   if not key.startswith('rule-set:') and key not in policy})
     dns['nameserver-policy'] = policy
     dns.setdefault('enhanced-mode', 'fake-ip')
     dns.setdefault('fake-ip-range', '198.18.0.1/16')
     filters = dns.get('fake-ip-filter', [])
-    dns['fake-ip-filter'] = list(dict.fromkeys(filters + ['*.lan', '*.local', '+.msftconnecttest.com', '+.msftncsi.com']))
+    dns['fake-ip-filter'] = list(dict.fromkeys(filters + ['*.lan', '*.local', '+.msftconnecttest.com', '+.msftncsi.com']
+                                             + ['+.' + domain for domain in COMPANY_DOMAINS]
+                                             + ['rule-set:company-internal']))

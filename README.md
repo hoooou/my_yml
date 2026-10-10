@@ -59,9 +59,11 @@ Cloudflare 官方测速引擎使用 `https://speed.cloudflare.com/__down`，`byt
 
 ## 手机分流与 DNS
 
-匹配顺序：局域网和私有域名直连 → 保留广告拦截 → 明确的海外服务走“🚀 全局选择” → 国内服务直连 → 个人域名例外 → 应用、Apple/iCloud、代理/GFW/国内维护规则集 → 中国 IP 直连 → 未匹配流量走全局选择。海外 AI、影音、社交和开发服务包含常用 API、登录、静态资源及 CDN 域名，检测和分流共用清单。保留 Office、OneDrive、SharePoint 等个人域名直连选择；Cursor 改为代理，服务规则优先于应用进程直连，移除 Tencent/元宝模糊关键词直连，启用原来未引用的 GFW 列表。没有增加应用策略组。
+匹配顺序：公司域名直连 → 局域网和私有域名直连 → 保留广告拦截 → 明确的海外服务走“🚀 全局选择” → 国内服务直连 → 个人域名例外 → 应用、Apple/iCloud、代理/GFW/国内维护规则集 → 中国 IP 直连 → 未匹配流量走全局选择。海外 AI、影音、社交和开发服务包含常用 API、登录、静态资源及 CDN 域名，检测和分流共用清单。保留 Office、OneDrive、SharePoint 等个人域名直连选择；Cursor 改为代理，服务规则优先于应用进程直连，移除 Tencent/元宝模糊关键词直连，启用原来未引用的 GFW 列表。没有增加应用策略组。
 
-国内 DNS 和节点域名使用阿里/腾讯 DoH，引导 DNS 为 `223.5.5.5` 与 `119.29.29.29`，移除旧的 `192.168.70.49`。海外 DNS 查询通过全局选择的节点访问加密 DNS；独立节点域名解析器避免代理与 DNS 互相依赖。保留原 IPv6 选择，加入局域网及 Windows 网络检查域名的 fake-IP 排除。依据 [Mihomo DNS 文档](https://wiki.metacubex.one/config/dns/)和[规则集合文档](https://wiki.metacubex.one/config/rule-providers/)；服务域名内置，维护规则集继续每天更新。
+国内 DNS 和节点域名使用阿里/腾讯 DoH，引导 DNS 为 `223.5.5.5` 与 `119.29.29.29`，公司 DNS 不作为公共域名的引导解析器。海外 DNS 查询通过全局选择的节点访问加密 DNS；独立节点域名解析器避免代理与 DNS 互相依赖。保留原 IPv6 选择，加入局域网及 Windows 网络检查域名的 fake-IP 排除。依据 [Mihomo DNS 文档](https://wiki.metacubex.one/config/dns/)和[规则集合文档](https://wiki.metacubex.one/config/rule-providers/)；服务域名内置，维护规则集继续每天更新。
+
+公司域名 `tech.bitauto.com`、`yiche.com`、`bitauto.com`、`bitautotech.com` 及其子域名优先直连，单独使用 `192.168.70.49` 和 `192.168.70.1`，并排除 fake-IP。DNS 策略与规则随每日订阅一起生成，不依赖 Clash Verge 的本地覆写；设置 `direct-nameserver-follow-policy: true`，防止直连解析改用公共 DNS。使用精确域名后缀，避免公司关键词误匹配无关网站。这两个私有 DNS 地址需要公司网络或能够访问公司内网的 VPN；在外网无法凭此访问内网服务。
 
 ## 新增公开来源
 
