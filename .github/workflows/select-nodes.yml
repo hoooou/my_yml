@@ -41,6 +41,18 @@ jobs:
           python scripts/install_tools.py --mihomo-only
       - name: 检查并行与分类逻辑
         run: python -m unittest discover -s scripts/tests -v
+      - name: 诊断 Amazon 网页样本
+        if: github.event_name == 'workflow_dispatch'
+        run: python scripts/probe_page_diagnostics.py --mihomo .node-work/bin/mihomo
+      - name: 保存 Amazon 诊断结果
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: amazon-page-diagnostics
+          path: .node-work/page-diagnostics/summary.json
+          include-hidden-files: true
+          retention-days: 1
+          if-no-files-found: warn
       - name: 获取节点并检查配置
         run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase prepare
       - name: 保存本轮共同输入
@@ -132,6 +144,21 @@ jobs:
         env:
           IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
         run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 4
+      - name: 保存本次全量检测报告
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: full-test-report
+          path: .node-work/availability/full-test-report.*
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: warn
+      - name: 展示本次全量检测结果
+        if: always()
+        run: |
+          if [ -f .node-work/availability/full-test-report.md ]; then
+            cat .node-work/availability/full-test-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: 更新配置和报告
         run: |
           git config user.name 'github-actions[bot]'

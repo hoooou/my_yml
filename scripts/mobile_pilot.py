@@ -20,10 +20,11 @@ from site_catalog import PAGES, OVERSEAS, DOMESTIC
 GLOBALPING = 'https://api.globalping.io/v1'
 MOBILE_ASN = 9808
 UDP_TYPES = {'hysteria', 'hysteria2', 'tuic', 'wireguard'}
-SITES = {label: item['url'] for label, item in PAGES.items()}
+# Keep Douyin's domain routing in the catalog, but do not probe it.
+SITES = {label: item['url'] for label, item in PAGES.items() if label != '抖音'}
 PAGE_SITES = tuple(SITES)
 OVERSEAS_SITES = tuple(OVERSEAS)
-DOMESTIC_SITES = tuple(DOMESTIC)
+DOMESTIC_SITES = tuple(label for label in DOMESTIC if label in SITES)
 SITE_WORKERS = 5
 WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
 MAX_TTFB_MS = 3000
