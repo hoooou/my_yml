@@ -21,13 +21,16 @@ class RoutingTests(unittest.TestCase):
                         'com.xunmeng.pinduoduo', 'com.jingdong.app.mall', 'com.autonavi.minimap',
                         'com.tencent.wework', 'com.oray.sunlogin', 'com.tencent.wemeet.app'):
             self.assertIn('PROCESS-NAME,' + package, direct)
-        for package in ('com.twitter.android', 'com.android.vending', 'com.google.android.gms',
+        for package in ('com.twitter.android', 'com.android.vending', 'com.google.android.gms', 'com.google.android.gsf',
                         'com.google.android.youtube', 'com.instagram.barcelona'):
             self.assertIn('PROCESS-NAME,' + package, proxy)
-        for name in ('WeChat', 'TencentMeeting', 'wemeetapp.exe', 'SunloginClient', 'WXWork.exe'):
+        for name in ('WeChat', 'WeChatAppEx.exe', 'TencentMeeting', 'wemeetapp.exe', 'SunloginClient',
+                     'SunloginClient_Desktop', 'SunloginClient_Helper', 'SunloginClient_Desktop.exe',
+                     'SunloginClient_Service.exe', 'WXWork.exe'):
             self.assertIn('PROCESS-NAME,' + name, direct)
         self.assertIn('PROCESS-NAME,Cursor Helper (Renderer)', proxy)
         self.assertFalse(set(direct) & set(proxy))
+        self.assertNotIn('PROCESS-NAME,com.tencent.wemeet', direct)
         for payload in (direct, proxy):
             self.assertTrue(all(len(rule.split(',')) == 2 for rule in payload))
             for name in ('chrome.exe', 'Safari', 'python', 'node', 'git', 'Helper'):
