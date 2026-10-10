@@ -402,16 +402,18 @@ def rank(records):
 
 def select_rankings(records, per_region_limit, non_datacenter_limit):
     regional_ids, residential_ids = {}, []
-    seen_ips = set()
+    seen_ips, residential_hk_count = set(), 0
     for record in rank(records):
         group = regional_ids.setdefault(record['country_code'], [])
-        if len(group) < per_region_limit:
+        if record['country_code'] != 'HK' or len(group) < per_region_limit:
             group.append(record['id'])
         info = record.get('ip_type', {})
         if (info.get('status') == 'success' and info.get('hosting') is False
-                and record['exit_ip'] not in seen_ips and len(residential_ids) < non_datacenter_limit):
+                and record['exit_ip'] not in seen_ips
+                and (record['country_code'] != 'HK' or residential_hk_count < non_datacenter_limit)):
             residential_ids.append(record['id'])
             seen_ips.add(record['exit_ip'])
+            residential_hk_count += record['country_code'] == 'HK'
     wanted = set(residential_ids) | {name for names in regional_ids.values() for name in names}
     return [r for r in rank(records) if r['id'] in wanted], regional_ids, residential_ids
 
@@ -566,7 +568,7 @@ def publish(args, root, state):
               'non_datacenter': {'qualified_nodes': len(qualified_non_dc),
                                 'qualified_unique_ips': len({r['exit_ip'] for r in qualified_non_dc}),
                                 'selected_count': len(non_dc_ids), 'selected_ids': non_dc_ids}, 'nodes': selected}
-    header = f'# 自动生成；更新时间：{timestamp}\n# 每地区最多 {state["settings"]["per_region_limit"]} 个；非机房 IP 最多 {state["settings"]["non_datacenter_limit"]} 个；合计去重 {len(selected)} 个\n'
+    header = f'# 自动生成；更新时间：{timestamp}\n# 香港最多 {state["settings"]["per_region_limit"]} 个；非机房香港最多 {state["settings"]["non_datacenter_limit"]} 个；其他地区不限；合计去重 {len(selected)} 个\n'
     Path('优选配置.yaml').write_text(header + candidate_path.read_text(), encoding='utf-8')
     Path('测速报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     rows = ['# 节点测速报告', '', f'更新时间：{timestamp}', '',
@@ -586,7 +588,7 @@ def publish(args, root, state):
                     f"{region['file_passed']} | {region['qualified']} | {region['selected_count']} |")
     rows += ['', f"非机房 IP：文件复测合格 {len(qualified_non_dc)} 个节点、{report['non_datacenter']['qualified_unique_ips']} 个独立出口，"
              f"入选 {len(non_dc_ids)} 个；IP 类型检测未知 {report['ip_checks']['unknown']} 个独立出口。",
-             '地区与非机房分组可共享节点，最终配置取两个榜单的并集；各地区分组仍只含该地区最多 30 个。', '',
+             '地区与非机房分组可共享节点，最终配置取两个榜单的并集；仅香港保留配置上限，其他地区不限数量。', '',
              '## 入选节点', '', '| 地区 | 节点 | 出口 IP | 初筛延迟 ms | 文件延迟 ms | 下载 MiB/s | HEAD 失败率 | IP 类型 | 来源 |',
              '|---|---|---|---:|---:|---:|---:|---|---|']
     for record in selected:
@@ -617,8 +619,8 @@ def main():
     parser.add_argument('--work-dir', default='.node-work')
     parser.add_argument('--source-cache', type=Path)
     parser.add_argument('--stage', choices=['all', 'prepare', 'measure', 'publish'], default='all')
-    parser.add_argument('--per-region-limit', '--limit', dest='per_region_limit', type=int, default=30)
-    parser.add_argument('--non-datacenter-limit', type=int, default=30)
+    parser.add_argument('--per-region-limit', '--limit', dest='per_region_limit', type=int, default=30, help='Hong Kong quota only')
+    parser.add_argument('--non-datacenter-limit', type=int, default=30, help='Non-datacenter Hong Kong quota only')
     parser.add_argument('--max-latency-ms', type=int, default=1000)
     parser.add_argument('--test-origin', default='local')
     args = parser.parse_args()
