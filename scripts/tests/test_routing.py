@@ -5,11 +5,66 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import routing as r
+from app_catalog import DIRECT_APPS, PROXY_APPS
 from site_catalog import OVERSEAS, DOMESTIC
 from urllib.parse import urlparse
 
 
 class RoutingTests(unittest.TestCase):
+    def test_requested_android_apps_and_desktop_aliases_are_fixed_before_service_rules(self):
+        config = {'rules': [], 'rule-providers': {'reject': {}, 'private': {}, 'applications': {}}}
+        r.optimize_routing(config)
+        providers, rules = config['rule-providers'], config['rules']
+        direct = providers['app-direct']['payload']
+        proxy = providers['app-proxy']['payload']
+        for package in ('com.tencent.mm', 'com.sina.weibo', 'com.sankuai.meituan',
+                        'com.xunmeng.pinduoduo', 'com.jingdong.app.mall', 'com.autonavi.minimap',
+                        'com.tencent.wework', 'com.oray.sunlogin', 'com.tencent.wemeet.app'):
+            self.assertIn('PROCESS-NAME,' + package, direct)
+        for package in ('com.twitter.android', 'com.android.vending', 'com.google.android.gms',
+                        'com.google.android.youtube', 'com.instagram.barcelona'):
+            self.assertIn('PROCESS-NAME,' + package, proxy)
+        for name in ('WeChat', 'TencentMeeting', 'wemeetapp.exe', 'SunloginClient', 'WXWork.exe'):
+            self.assertIn('PROCESS-NAME,' + name, direct)
+        self.assertIn('PROCESS-NAME,Cursor Helper (Renderer)', proxy)
+        self.assertFalse(set(direct) & set(proxy))
+        for payload in (direct, proxy):
+            self.assertTrue(all(len(rule.split(',')) == 2 for rule in payload))
+            for name in ('chrome.exe', 'Safari', 'python', 'node', 'git', 'Helper'):
+                self.assertNotIn('PROCESS-NAME,' + name, payload)
+        for app_rule in ('RULE-SET,app-direct,DIRECT', 'RULE-SET,app-proxy,' + r.GLOBAL):
+            self.assertLess(rules.index('RULE-SET,company-internal,DIRECT'), rules.index(app_rule))
+            self.assertLess(rules.index('RULE-SET,reject,REJECT'), rules.index(app_rule))
+            self.assertLess(rules.index(app_rule), rules.index('RULE-SET,overseas-services,' + r.GLOBAL))
+            self.assertLess(rules.index(app_rule), rules.index('RULE-SET,domestic-services,DIRECT'))
+        self.assertEqual(config['find-process-mode'], 'strict')
+
+    def test_app_domain_fallback_and_dns_cover_every_catalog_entry(self):
+        config = {}
+        r.optimize_routing(config)
+        for catalog, name, dns in ((DIRECT_APPS, 'app-direct', r.CHINA_DNS),
+                                    (PROXY_APPS, 'app-proxy', r.PROXY_DNS)):
+            payload = config['rule-providers'][name + '-domains']['payload']
+            for item in catalog.values():
+                self.assertTrue(all('+.' + domain in payload for domain in item['domains']))
+            self.assertEqual(config['dns']['nameserver-policy']['rule-set:' + name + '-domains'], dns)
+        self.assertIn('+.oray.com', config['rule-providers']['app-direct-domains']['payload'])
+        self.assertIn('+.gvt1.com', config['rule-providers']['app-proxy-domains']['payload'])
+        self.assertIn('+.threads.com', config['rule-providers']['app-proxy-domains']['payload'])
+
+    def test_personal_process_exceptions_survive_daily_compile_and_take_precedence(self):
+        exceptions = ['PROCESS-NAME,WeChat,REJECT', 'PROCESS-PATH,/opt/custom/app,DIRECT',
+                      'PROCESS-NAME-REGEX,^MyApp.*,DIRECT', 'PROCESS-PATH-WILDCARD,/opt/custom/*,DIRECT']
+        config = {'rules': exceptions + ['DOMAIN-SUFFIX,office.com,DIRECT']}
+        r.optimize_routing(config)
+        rules = config['rules']
+        for rule in exceptions:
+            self.assertLess(rules.index(rule), rules.index('RULE-SET,app-direct,DIRECT'))
+            self.assertGreater(rules.index(rule), rules.index('RULE-SET,company-internal,DIRECT'))
+        first = copy.deepcopy(config)
+        r.optimize_routing(config)
+        self.assertEqual(config, first)
+
     def test_reviewed_services_override_old_direct_rules_without_extra_groups(self):
         config = {'rules': ['DOMAIN-SUFFIX,cursor.sh,DIRECT', 'DOMAIN-KEYWORD,tencent,DIRECT',
                            'DOMAIN-SUFFIX,office.com,DIRECT', 'DOMAIN-SUFFIX,googleapis.cn,DIRECT', 'MATCH,DIRECT'],

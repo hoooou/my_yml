@@ -1,10 +1,11 @@
-# 手机分流：公司域名使用公司 DNS；国内直连，海外服务优先代理
+# 应用进程与域名分流；公司域名优先使用公司 DNS
 mixed-port: 7890
 allow-lan: false
 bind-address: '*'
 mode: rule
 log-level: info
 external-controller: 127.0.0.1:9090
+find-process-mode: strict
 dns:
   enable: true
   ipv6: true
@@ -48,6 +49,12 @@ dns:
     rule-set:company-internal:
     - 192.168.70.49
     - 192.168.70.1
+    rule-set:app-proxy-domains:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:app-direct-domains:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
     rule-set:overseas-services:
     - https://1.1.1.1/dns-query#🚀 全局选择
     - https://8.8.8.8/dns-query#🚀 全局选择
@@ -295,12 +302,182 @@ rule-providers:
     - +.yiche.com
     - +.bitauto.com
     - +.bitautotech.com
+  app-direct:
+    type: inline
+    behavior: classical
+    format: yaml
+    payload:
+    - PROCESS-NAME,Bilibili
+    - PROCESS-NAME,Meituan
+    - PROCESS-NAME,NeteaseMusic
+    - PROCESS-NAME,QQ
+    - PROCESS-NAME,QQ.exe
+    - PROCESS-NAME,SunloginClient
+    - PROCESS-NAME,SunloginClient.exe
+    - PROCESS-NAME,TIM
+    - PROCESS-NAME,TIM.exe
+    - PROCESS-NAME,TencentMeeting
+    - PROCESS-NAME,WXWork.exe
+    - PROCESS-NAME,WeChat
+    - PROCESS-NAME,WeChat.exe
+    - PROCESS-NAME,WeChatAppEx
+    - PROCESS-NAME,WeCom
+    - PROCESS-NAME,Weixin
+    - PROCESS-NAME,Weixin.exe
+    - PROCESS-NAME,cloudmusic.exe
+    - PROCESS-NAME,com.autonavi.minimap
+    - PROCESS-NAME,com.dianping.v1
+    - PROCESS-NAME,com.eg.android.AlipayGphone
+    - PROCESS-NAME,com.jingdong.app.mall
+    - PROCESS-NAME,com.netease.cloudmusic
+    - PROCESS-NAME,com.oray.sunlogin
+    - PROCESS-NAME,com.sankuai.meituan
+    - PROCESS-NAME,com.sina.weibo
+    - PROCESS-NAME,com.ss.android.ugc.aweme
+    - PROCESS-NAME,com.taobao.taobao
+    - PROCESS-NAME,com.tencent.mm
+    - PROCESS-NAME,com.tencent.mobileqq
+    - PROCESS-NAME,com.tencent.wemeet.app
+    - PROCESS-NAME,com.tencent.wework
+    - PROCESS-NAME,com.xingin.xhs
+    - PROCESS-NAME,com.xunmeng.pinduoduo
+    - PROCESS-NAME,sunloginclient
+    - PROCESS-NAME,tv.danmaku.bili
+    - PROCESS-NAME,wemeetapp
+    - PROCESS-NAME,wemeetapp.exe
+    - PROCESS-NAME,企业微信
+    - PROCESS-NAME,哔哩哔哩
+  app-direct-domains:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.360buyimg.com
+    - +.alicdn.com
+    - +.alipay.com
+    - +.alipayobjects.com
+    - +.amap.com
+    - +.autonavi.com
+    - +.bilibili.com
+    - +.bilivideo.com
+    - +.dianping.com
+    - +.douyin.com
+    - +.douyinvod.com
+    - +.hdslb.com
+    - +.jd.com
+    - +.meeting.tencent.com
+    - +.meituan.com
+    - +.meituan.net
+    - +.music.126.net
+    - +.music.163.com
+    - +.oray.com
+    - +.oray.net
+    - +.pddpic.com
+    - +.pinduoduo.com
+    - +.qlogo.cn
+    - +.qpic.cn
+    - +.qq.com
+    - +.sankuai.com
+    - +.servicewechat.com
+    - +.sinaimg.cn
+    - +.taobao.com
+    - +.tbcdn.cn
+    - +.tenpay.com
+    - +.wechat.com
+    - +.weibo.cn
+    - +.weibo.com
+    - +.weibocdn.com
+    - +.weixin.com
+    - +.weixin.qq.com
+    - +.weixinbridge.com
+    - +.wemeet.qq.com
+    - +.work.weixin.qq.com
+    - +.xhscdn.com
+    - +.xiaohongshu.com
+    - +.yangkeduo.com
+  app-proxy:
+    type: inline
+    behavior: classical
+    format: yaml
+    payload:
+    - PROCESS-NAME,ChatGPT
+    - PROCESS-NAME,ChatGPT.exe
+    - PROCESS-NAME,Claude
+    - PROCESS-NAME,Claude Helper
+    - PROCESS-NAME,Claude Helper (GPU)
+    - PROCESS-NAME,Claude Helper (Plugin)
+    - PROCESS-NAME,Claude Helper (Renderer)
+    - PROCESS-NAME,Claude.exe
+    - PROCESS-NAME,Cursor
+    - PROCESS-NAME,Cursor Helper
+    - PROCESS-NAME,Cursor Helper (GPU)
+    - PROCESS-NAME,Cursor Helper (Plugin)
+    - PROCESS-NAME,Cursor Helper (Renderer)
+    - PROCESS-NAME,Cursor.exe
+    - PROCESS-NAME,Discord
+    - PROCESS-NAME,Discord.exe
+    - PROCESS-NAME,Telegram
+    - PROCESS-NAME,Telegram.exe
+    - PROCESS-NAME,com.android.vending
+    - PROCESS-NAME,com.anthropic.claude
+    - PROCESS-NAME,com.discord
+    - PROCESS-NAME,com.google.android.apps.bard
+    - PROCESS-NAME,com.google.android.gms
+    - PROCESS-NAME,com.google.android.youtube
+    - PROCESS-NAME,com.instagram.android
+    - PROCESS-NAME,com.instagram.barcelona
+    - PROCESS-NAME,com.openai.chatgpt
+    - PROCESS-NAME,com.twitter.android
+    - PROCESS-NAME,org.telegram.messenger
+  app-proxy-domains:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.anthropic.com
+    - +.cdninstagram.com
+    - +.chatgpt.com
+    - +.claude.ai
+    - +.cursor.com
+    - +.cursor.sh
+    - +.discord.com
+    - +.discord.gg
+    - +.discordapp.com
+    - +.discordapp.net
+    - +.gemini.google.com
+    - +.generativelanguage.googleapis.com
+    - +.ggpht.com
+    - +.googleplay.com
+    - +.googlevideo.com
+    - +.gvt1.com
+    - +.gvt2.com
+    - +.instagram.com
+    - +.oaistatic.com
+    - +.oaiusercontent.com
+    - +.openai.com
+    - +.play.google.com
+    - +.t.co
+    - +.t.me
+    - +.telegram.me
+    - +.telegram.org
+    - +.threads.com
+    - +.threads.net
+    - +.twimg.com
+    - +.twitter.com
+    - +.x.com
+    - +.youtu.be
+    - +.youtube.com
+    - +.ytimg.com
 rules:
 - RULE-SET,company-internal,DIRECT
 - RULE-SET,private,DIRECT
 - RULE-SET,lancidr,DIRECT,no-resolve
 - GEOIP,LAN,DIRECT,no-resolve
 - RULE-SET,reject,REJECT
+- RULE-SET,app-proxy,🚀 全局选择
+- RULE-SET,app-direct,DIRECT
+- RULE-SET,app-proxy-domains,🚀 全局选择
+- RULE-SET,app-direct-domains,DIRECT
 - RULE-SET,overseas-services,🚀 全局选择
 - RULE-SET,domestic-services,DIRECT
 - DOMAIN-SUFFIX,zijieapi.com,DIRECT

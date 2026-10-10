@@ -1,5 +1,6 @@
 """Compile mobile routing without adding strategy groups or geosite dependencies."""
 from site_catalog import OVERSEAS, DOMESTIC
+from app_catalog import DIRECT_APPS, PROXY_APPS, process_payload, domain_payload
 
 GLOBAL = '🚀 全局选择'
 CHINA_DNS = ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
@@ -13,8 +14,14 @@ def domains(catalog):
 
 
 def optimize_routing(config):
-    """Retain explicit personal exceptions after reviewed service routing."""
+    """Company/LAN first, then fixed app choices, then service-domain fallback."""
     providers = config.setdefault('rule-providers', {})
+    config['find-process-mode'] = 'strict'
+    for name, catalog in [('app-direct', DIRECT_APPS), ('app-proxy', PROXY_APPS)]:
+        providers[name] = {'type': 'inline', 'behavior': 'classical', 'format': 'yaml',
+                           'payload': process_payload(catalog)}
+        providers[name + '-domains'] = {'type': 'inline', 'behavior': 'domain', 'format': 'yaml',
+                                      'payload': domain_payload(catalog)}
     # Exact domain families also work in DNS policy and fake-IP filtering.
     # Avoid keyword matching unrelated domains containing a company name.
     providers['company-internal'] = {'type': 'inline', 'behavior': 'domain', 'format': 'yaml',
@@ -28,8 +35,12 @@ def optimize_routing(config):
         'path': './ruleset/gfw.yaml', 'interval': 86400})
     def rule_set(name, target, no_resolve=False):
         return [f'RULE-SET,{name},{target}' + (',no-resolve' if no_resolve else '')] if name in providers else []
-    custom = []
+    custom, process_custom = [], []
     for rule in config.get('rules', []):
+        if rule.startswith(('PROCESS-NAME,', 'PROCESS-PATH,', 'PROCESS-NAME-REGEX,',
+                            'PROCESS-PATH-REGEX,', 'PROCESS-NAME-WILDCARD,', 'PROCESS-PATH-WILDCARD,')):
+            process_custom.append(rule)
+            continue
         if not rule.startswith(('DOMAIN,', 'DOMAIN-SUFFIX,', 'DOMAIN-KEYWORD,')):
             continue
         # Broad substrings cause collateral direct routing; service families cover Tencent.
@@ -41,6 +52,8 @@ def optimize_routing(config):
     rules = (rule_set('company-internal', 'DIRECT')
              + rule_set('private', 'DIRECT') + rule_set('lancidr', 'DIRECT', True)
              + ['GEOIP,LAN,DIRECT,no-resolve'] + rule_set('reject', 'REJECT')
+             + process_custom + rule_set('app-proxy', GLOBAL) + rule_set('app-direct', 'DIRECT')
+             + rule_set('app-proxy-domains', GLOBAL) + rule_set('app-direct-domains', 'DIRECT')
              + rule_set('overseas-services', GLOBAL) + rule_set('domestic-services', 'DIRECT')
              + custom + rule_set('applications', 'DIRECT') + rule_set('icloud', 'DIRECT')
              + rule_set('apple', 'DIRECT') + rule_set('google', GLOBAL)
@@ -60,6 +73,8 @@ def optimize_routing(config):
     # Policy matching follows YAML order: company choices must precede broad lists.
     policy = {'+.' + domain: list(COMPANY_DNS) for domain in COMPANY_DOMAINS}
     policy['rule-set:company-internal'] = list(COMPANY_DNS)
+    policy['rule-set:app-proxy-domains'] = list(PROXY_DNS)
+    policy['rule-set:app-direct-domains'] = list(CHINA_DNS)
     policy.update({f'rule-set:{name}': list(PROXY_DNS) for name in ('overseas-services', 'proxy', 'gfw') if name in referenced})
     policy.update({f'rule-set:{name}': list(CHINA_DNS) for name in ('domestic-services', 'direct', 'private') if name in referenced})
     # Retain explicitly configured per-domain resolver choices if any.
