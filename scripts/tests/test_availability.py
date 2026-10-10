@@ -15,6 +15,40 @@ import availability as a
 
 
 class AvailabilityTests(unittest.TestCase):
+    def test_hong_kong_only_quota_preserves_other_regions_and_unique_residential_exits(self):
+        records = []
+        for country_index, country in enumerate(('HK', 'US', 'JP')):
+            for index in range(35):
+                records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
+                    'precheck': {'status': 'passed', 'median_elapsed_ms': country_index * 100 + index + 1},
+                    'exit': {'country_code': country, 'exit_ip': f'8.8.{country_index}.{index + 1}'},
+                    'ip_type': {'status': 'success', 'hosting': False},
+                    'download': {'status': 'passed', 'speed_mib_s': 1},
+                    'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
+                        'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,
+                        'elapsed_ms': 10000, 'speed_mib_s': 5}})
+        duplicate = copy.deepcopy(records[-1]); duplicate['id'] = 'n-duplicate'
+        records.append(duplicate)
+        mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
+        config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
+        by_name = {r['name']: r for r in records}
+        for group in config['proxy-groups'][1:]:
+            countries = [by_name[n]['exit']['country_code'] for n in group['proxies']]
+            self.assertEqual(countries.count('HK'), 30)
+            self.assertEqual(countries.count('US'), 35)
+            self.assertEqual(countries.count('JP'), 35 if group['name'] == '🏠 非机房 IP' else 36)
+        self.assertEqual(len(config['proxies']), 106)
+
+    def test_compact_name_contains_five_fields_and_correct_bandwidth_without_fake_housing(self):
+        record = {'id': 'n-unique', 'entry': {'status': 'passed'},
+            'exit': {'country_code': 'US', 'exit_ip': '8.8.8.8'},
+            'precheck': {'status': 'passed', 'median_elapsed_ms': 82.5},
+            'download': {'status': 'passed', 'speed_mib_s': 10},
+            'ip_type': {'status': 'success', 'hosting': False}}
+        a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, [record],
+            {'n-unique': {'name': 'n-unique', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
+        self.assertEqual(record['name'], '美国·unique | 82.5ms | 83.9Mbps | 非机房 | 纯净未知')
+
     def test_50mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
             def __init__(self): self.remaining = a.HIGH_DOWNLOAD_BYTES
@@ -374,8 +408,8 @@ class AvailabilityTests(unittest.TestCase):
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
         recommended = groups['⭐ 综合优选']
         self.assertEqual(len(groups), 4)
-        self.assertEqual(sum(name.startswith('日本 |') for name in recommended), 35)
-        self.assertEqual(sum(name.startswith('美国 |') for name in recommended), 35)
+        self.assertEqual(sum(name.startswith('日本·') for name in recommended), 35)
+        self.assertEqual(sum(name.startswith('美国·') for name in recommended), 35)
         self.assertNotIn('日本', groups)
         self.assertNotIn('美国', groups)
         self.assertEqual(len(config['proxies']), 70)

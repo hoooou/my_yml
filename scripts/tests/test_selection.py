@@ -152,7 +152,7 @@ class SelectionTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, '发生变化'):
                     selection.verify_exit(12345, record, 'unused')
 
-    def test_each_region_has_own_quota_and_non_datacenter_ips_are_unique(self):
+    def test_non_hong_kong_regions_are_unlimited_and_non_datacenter_ips_are_unique(self):
         def row(name, country, speed, ip, hosting=True):
             return {'id': name, 'country_code': country, 'speed_mib_s': speed, 'latency_ms': 100,
                     'exit_ip': ip, 'ip_type': {'status': 'success', 'hosting': hosting}}
@@ -161,16 +161,16 @@ class SelectionTests(unittest.TestCase):
                    row('n-us5', 'US', 60, '8.8.8.5', False), row('n-jp1', 'JP', 5, '1.1.1.1'),
                    row('n-jp2', 'JP', 4, '1.1.1.2'), row('n-jp3', 'JP', 3, '1.1.1.3')]
         selected, regional, non_dc = selection.select_rankings(records, 2, 2)
-        self.assertEqual(regional, {'US': ['n-us1', 'n-us2'], 'JP': ['n-jp1', 'n-jp2']})
+        self.assertEqual(regional, {'US': ['n-us1', 'n-us2', 'n-us3', 'n-us4', 'n-us5'], 'JP': ['n-jp1', 'n-jp2', 'n-jp3']})
         self.assertEqual(non_dc, ['n-us3', 'n-us5'])
-        self.assertEqual(len(selected), 6)
+        self.assertEqual(len(selected), 8)
         base = {'dns': {'default-nameserver': ['223.5.5.5']}, 'rules': ['MATCH,🚀 全局选择'], 'rule-providers': {}}
         config = selection.render_config(base, selected, {r['id']: {'name': r['id']} for r in records}, regional, non_dc)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
-        self.assertEqual(len(groups['美国']), 2)
-        self.assertEqual(len(groups['日本']), 2)
+        self.assertEqual(len(groups['美国']), 5)
+        self.assertEqual(len(groups['日本']), 3)
         self.assertEqual(len(groups['🏠 非机房 IP']), 2)
-        self.assertEqual(len(config['proxies']), 6)
+        self.assertEqual(len(config['proxies']), 8)
 
     def test_unknown_ip_type_never_enters_non_datacenter_group(self):
         records = [{'id': 'n-a', 'country_code': 'JP', 'speed_mib_s': 3, 'latency_ms': 100,
