@@ -5,6 +5,7 @@ Android reference: https://gist.github.com/Zestinc/fa5a35a444a076214cefbe4965677
 Packages are also identified by official Play/store listings; local Info.plist
 confirms WeChat, QQ, TencentMeeting, Telegram, Claude and Cursor on this Mac.
 Domain reference: https://github.com/blackmatrix7/ios_rule_script
+Content-search audit and pinned evidence: docs/process-rule-sources.md
 These are reviewed snapshots, not unfiltered third-party process subscriptions.
 Only bare executable names belong here, never macOS bundle identifiers.
 """
@@ -15,7 +16,7 @@ def app(packages, desktop=(), domains=()):
 
 
 DIRECT_APPS = {
-    '微信': app(['com.tencent.mm'], ['WeChat', 'Weixin', 'WeChatAppEx', 'WeChat.exe', 'Weixin.exe'],
+    '微信': app(['com.tencent.mm'], ['WeChat', 'Weixin', 'WeChatAppEx', 'WeChat.exe', 'Weixin.exe', 'WeChatAppEx.exe'],
               ['wechat.com', 'weixin.com', 'weixin.qq.com', 'servicewechat.com', 'weixinbridge.com', 'tenpay.com']),
     '微博': app(['com.sina.weibo'], domains=['weibo.com', 'weibo.cn', 'sinaimg.cn', 'weibocdn.com']),
     '美团': app(['com.sankuai.meituan', 'com.dianping.v1'], ['Meituan'],
@@ -24,7 +25,8 @@ DIRECT_APPS = {
     '京东': app(['com.jingdong.app.mall'], domains=['jd.com', '360buyimg.com']),
     '高德地图': app(['com.autonavi.minimap'], domains=['amap.com', 'autonavi.com']),
     '企业微信': app(['com.tencent.wework'], ['WeCom', '企业微信', 'WXWork.exe'], ['work.weixin.qq.com']),
-    '向日葵': app(['com.oray.sunlogin'], ['SunloginClient', 'SunloginClient.exe', 'sunloginclient'],
+    '向日葵': app(['com.oray.sunlogin'], ['SunloginClient', 'SunloginClient.exe', 'sunloginclient',
+              'SunloginClient_Desktop', 'SunloginClient_Helper', 'SunloginClient_Desktop.exe', 'SunloginClient_Service.exe'],
               ['oray.com', 'oray.net']),
     '腾讯会议': app(['com.tencent.wemeet.app'], ['TencentMeeting', 'wemeetapp', 'wemeetapp.exe'],
                 ['meeting.tencent.com', 'wemeet.qq.com']),
@@ -40,7 +42,7 @@ DIRECT_APPS = {
 PROXY_APPS = {
     'X / Twitter': app(['com.twitter.android'], domains=['x.com', 'twitter.com', 't.co', 'twimg.com']),
     # Play downloads/login often originate in Google Play services instead of the store.
-    'Google Play': app(['com.android.vending', 'com.google.android.gms'],
+    'Google Play': app(['com.android.vending', 'com.google.android.gms', 'com.google.android.gsf'],
                        domains=['googleplay.com', 'play.google.com', 'gvt1.com', 'gvt2.com', 'ggpht.com']),
     'YouTube': app(['com.google.android.youtube'], domains=['youtube.com', 'youtu.be', 'googlevideo.com', 'ytimg.com']),
     'Threads': app(['com.instagram.barcelona'], domains=['threads.net', 'threads.com']),

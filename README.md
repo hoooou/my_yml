@@ -72,11 +72,13 @@ Cloudflare 官方测速引擎使用 `https://speed.cloudflare.com/__down`，`byt
 | 指定代理 | X/Twitter、Google Play、YouTube、Threads |
 | 补充代理 | Telegram、Discord、Instagram、ChatGPT、Claude、Gemini、Cursor |
 
-进程规则在常规服务域名规则前：例如微信内打开的海外链接仍按微信直连选择；公司域名和局域网始终优先直连。Google Play 同时包含 `com.android.vending` 与 `com.google.android.gms`，后者负责部分商店登录、下载及其他 Google 服务，其流量也走代理。浏览器没有整进程固定直连或代理，继续按访问域名分流。未识别进程时回退到域名规则；此时无法保证该应用使用的每个第三方域名都遵循进程选择。
+进程规则在常规服务域名规则前：例如微信内打开的海外链接仍按微信直连选择；公司域名和局域网始终优先直连。Google Play 包含商店 `com.android.vending`、服务 `com.google.android.gms` 和框架 `com.google.android.gsf`，相关 Google 后台服务也走代理。浏览器没有整进程固定直连或代理，继续按访问域名分流。未识别进程时回退到域名规则；此时无法保证该应用使用的每个第三方域名都遵循进程选择。
 
 设置 `find-process-mode: strict`，按规则需要查进程。Android 使用完整包名；macOS 使用实际可执行文件名，不使用 bundle ID。本机核对了 WeChat、QQ、TencentMeeting、Telegram、Claude、Cursor 及 Claude/Cursor 的专属 Helper 名称；没有匹配通用 `Helper`、浏览器、Python、Node 或 Git。个人直接写入的 `PROCESS-NAME`/`PROCESS-PATH` 及正则/通配符例外会保留，并优先于内置应用清单。
 
 参考 [Clash-FX/cn-apps-direct](https://github.com/Clash-FX/cn-apps-direct) 的 macOS 进程名称清单、[Android 包名参考](https://gist.github.com/Zestinc/fa5a35a444a076214cefbe4965677d8b)及官方应用商店信息，服务域名参考 [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)。这是 2026-10-10 审核适配后的内置快照，不自动导入外部清单的全部路由选择；第三方原文中的策略字段也不会写入 classical provider 的 matcher。原有 Loyalsoldier 域名/IP 规则集仍自动更新。
+
+随后按实际代码内容搜索 `PROCESS-NAME`、Android 包名和可执行文件名，补充核对隐藏在个人配置、生成规则和辅助脚本中的清单。来源固定提交、文件更新时间及不采用的写法见 [进程规则代码搜索核对记录](docs/process-rule-sources.md)。本轮补充向日葵 Desktop/Helper/Service 别名、Windows 微信 `WeChatAppEx.exe` 以及 Google 服务框架；这是兼容名称补充，手机实际识别仍需本地连接日志确认。
 
 FlClash 需使用规则模式，并让这些应用的流量进入其 VPN；在“分应用代理”中排除的应用不会经过订阅规则。Android 进程识别依赖系统支持，旧系统可能只能域名兜底。电脑进程流量需进入 Mihomo（通常使用 TUN），客户端覆写也可能改变最终规则。本次校验配置和桌面进程匹配，不宣称已经验证你手机上全部应用的实际识别。依据 [Mihomo PROCESS-NAME 文档](https://wiki.metacubex.one/config/rules/#process-name)和 [FlClash VPN 实现](https://github.com/chen08209/FlClash/blob/main/android/service/src/main/java/com/follow/clash/service/VpnService.kt)。
 
