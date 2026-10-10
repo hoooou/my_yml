@@ -145,8 +145,16 @@ def classify_page(label, status, final_url, content_type, body):
         return {**result, 'status': 'passed' if passed else 'failed',
                 'reason': '域名 HTTPS 连通正常；未验证登录或对话' if passed else '未返回预期 Cloudflare trace',
                 **({'exit_ip': fields['ip'], 'country_code': fields['loc'], 'colo': fields.get('colo')} if passed else {})}
-    passed = status == 200 and 'html' in content_type.lower() and any(word in text for word in PAGE_MARKERS[label])
+    # Cloud samples include a genuine Amazon homepage without Content-Type.
+    # Require document structure and a matching title; do not override explicit types.
+    inferred_amazon_html = (label == 'Amazon' and not content_type.strip()
+        and '<!doctype html' in text and '<html' in text and '<head' in text
+        and title is not None and 'amazon' in title[1])
+    passed = (status == 200 and ('html' in content_type.lower() or inferred_amazon_html)
+              and any(word in text for word in PAGE_MARKERS[label]))
     return {**result, 'status': 'passed' if passed else 'failed',
+            'content_type': content_type,
+            'html_identification': 'inferred_amazon_document' if inferred_amazon_html else 'content_type',
             'reason': '网页入口正常；实际功能仍需本地测试' if passed else '未返回预期网页'}
 
 

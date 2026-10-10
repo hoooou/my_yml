@@ -748,7 +748,7 @@ def main():
     repairing = args.phase in ('repair', 'web-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 10,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 11,
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
