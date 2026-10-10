@@ -1,4 +1,4 @@
-# 手机分流：国内直连，海外服务优先代理；完整检测目标见 scripts/site_catalog.py
+# 手机分流：公司域名使用公司 DNS；国内直连，海外服务优先代理
 mixed-port: 7890
 allow-lan: false
 bind-address: '*'
@@ -33,6 +33,21 @@ dns:
   - https://dns.alidns.com/dns-query
   - https://doh.pub/dns-query
   nameserver-policy:
+    +.tech.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.yiche.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitautotech.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    rule-set:company-internal:
+    - 192.168.70.49
+    - 192.168.70.1
     rule-set:overseas-services:
     - https://1.1.1.1/dns-query#🚀 全局选择
     - https://8.8.8.8/dns-query#🚀 全局选择
@@ -56,6 +71,12 @@ dns:
   - '*.local'
   - +.msftconnecttest.com
   - +.msftncsi.com
+  - +.tech.bitauto.com
+  - +.yiche.com
+  - +.bitauto.com
+  - +.bitautotech.com
+  - rule-set:company-internal
+  direct-nameserver-follow-policy: true
 rule-providers:
   reject:
     type: http
@@ -265,7 +286,17 @@ rule-providers:
     - +.zhihu.com
     - +.zhimg.com
     - +.zijieapi.com
+  company-internal:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.tech.bitauto.com
+    - +.yiche.com
+    - +.bitauto.com
+    - +.bitautotech.com
 rules:
+- RULE-SET,company-internal,DIRECT
 - RULE-SET,private,DIRECT
 - RULE-SET,lancidr,DIRECT,no-resolve
 - GEOIP,LAN,DIRECT,no-resolve
