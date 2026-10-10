@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-10T11:20:18+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-10T11:53:08+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -32,6 +32,21 @@ dns:
   - https://dns.alidns.com/dns-query
   - https://doh.pub/dns-query
   nameserver-policy:
+    +.tech.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.yiche.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitautotech.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    rule-set:company-internal:
+    - 192.168.70.49
+    - 192.168.70.1
     rule-set:overseas-services:
     - https://1.1.1.1/dns-query#🚀 全局选择
     - https://8.8.8.8/dns-query#🚀 全局选择
@@ -55,7 +70,14 @@ dns:
   - '*.local'
   - +.msftconnecttest.com
   - +.msftncsi.com
+  - +.tech.bitauto.com
+  - +.yiche.com
+  - +.bitauto.com
+  - +.bitautotech.com
+  - rule-set:company-internal
+  direct-nameserver-follow-policy: true
 rules:
+- RULE-SET,company-internal,DIRECT
 - RULE-SET,private,DIRECT
 - RULE-SET,lancidr,DIRECT,no-resolve
 - GEOIP,LAN,DIRECT,no-resolve
@@ -306,6 +328,15 @@ rule-providers:
     - +.zhihu.com
     - +.zhimg.com
     - +.zijieapi.com
+  company-internal:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.tech.bitauto.com
+    - +.yiche.com
+    - +.bitauto.com
+    - +.bitautotech.com
 proxies:
 - port: 443
   server: 12.221.146.147
