@@ -30,6 +30,11 @@ CORE_SITES = ('Google', 'YouTube')
 CORE_MEDIAN_MS = 1500
 CORE_TAIL_MS = 3000
 CORE_JITTER_MS = 1500
+REGIONAL_GROUP = '🌏 台湾／新加坡'
+REGIONAL_COUNTRIES = ('TW', 'SG')
+REGIONAL_MEDIAN_MS = 3000
+REGIONAL_TAIL_MS = 5000
+REGIONAL_JITTER_MS = 3000
 
 
 class Pace:
@@ -463,6 +468,29 @@ def web_rank_metrics(record):
     return core_metrics + overall_metrics
 
 
+def regional_eligible(record):
+    """A regional exception permits slower pages, never failed access or downloads."""
+    if ((record.get('exit') or {}).get('country_code') not in REGIONAL_COUNTRIES
+            or record.get('exit_consistent') is False
+            or record['entry']['status'] != 'passed'
+            or (record.get('download') or {}).get('status') != 'passed'):
+        return False
+    pre = record.get('precheck') or {}
+    if pre.get('status') != 'passed' or pre.get('round_count') != 3 or pre.get('passed_count') != 3:
+        return False
+    for label in CORE_SITES:
+        item = (record.get('websites') or {}).get(label) or {}
+        if (item.get('status') != 'passed' or item.get('round_count') != WEBSITE_ROUNDS
+                or item.get('passed_count') != WEBSITE_ROUNDS):
+            return False
+        for field, limit in (('median_elapsed_ms', REGIONAL_MEDIAN_MS),
+                ('p95_elapsed_ms', REGIONAL_TAIL_MS), ('jitter_ms', REGIONAL_JITTER_MS)):
+            value = item.get(field)
+            if not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= limit:
+                return False
+    return True
+
+
 def rank_key(record):
     pre = record.get('precheck') or {}
     downloaded = record.get('download') or {}
@@ -532,16 +560,18 @@ def limit_hong_kong(records):
 
 
 def render_comparison(base, records, mapping):
-    """Publish four stable groups; keep detailed classifications in the report."""
+    """Publish the strict pool and an explicitly authorized regional exception."""
     config = {key: copy.deepcopy(base[key]) for key in (
         'mixed-port', 'allow-lan', 'mode', 'log-level', 'external-controller', 'dns', 'rules', 'rule-providers') if key in base}
     optimize_routing(config)
     proxies = []
-    # Historical failures stay in reports, never in the subscription or another group.
+    # The slower regional pool is selectable only in its own group.
     ranked = limit_hong_kong(sorted((r for r in records if r['id'] in mapping
         and r['entry']['status'] == 'passed'
         and (r.get('download') or {}).get('status') == 'passed'
-        and web_quality_eligible(r)), key=rank_key))
+        and (web_quality_eligible(r) or regional_eligible(r))), key=rank_key))
+    strict = [r for r in ranked if web_quality_eligible(r)]
+    strict_ids = {r['id'] for r in strict}
     short_ids = {}
     for record in ranked:
         short_ids.setdefault(record['id'][2:8], []).append(record['id'])
@@ -567,18 +597,24 @@ def render_comparison(base, records, mapping):
         record['name'] = name
         node = copy.deepcopy(mapping[record['id']]); node['name'] = name; proxies.append(node)
         ip = (record.get('exit') or {}).get('exit_ip')
-        if (record.get('exit_consistent') is not False and record.get('ip_type', {}).get('hosting') is False
+        if (record['id'] in strict_ids and record.get('exit_consistent') is not False
+                and record.get('ip_type', {}).get('hosting') is False
                 and record['ip_type'].get('status') == 'success' and ip and ip not in seen_ips):
             non_dc.append(record); seen_ips.add(ip)
     non_dc = [r['name'] for r in non_dc]
-    high = [r['name'] for r in sorted(ranked, key=high_speed_rank_key) if high_speed_eligible(r)]
-    recommended = [r['name'] for r in ranked]
+    high = [r['name'] for r in sorted(strict, key=high_speed_rank_key) if high_speed_eligible(r)]
+    recommended = [r['name'] for r in strict]
+    regional = [r['name'] for r in ranked if regional_eligible(r)]
     def group(name, names):
         return {'name': name, 'type': 'select', 'proxies': names or ['REJECT']}
     config['proxies'] = proxies
+    choices = ['⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
+    if not recommended and regional:
+        choices.remove(REGIONAL_GROUP); choices.insert(0, REGIONAL_GROUP)
     config['proxy-groups'] = [
-        group('🚀 全局选择', ['⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', 'DIRECT']),
+        group('🚀 全局选择', choices),
         group('⭐ 综合优选', recommended), group('⚡ 高速下载', high), group('🏠 非机房 IP', non_dc),
+        group(REGIONAL_GROUP, regional),
     ]
     if mobile_control_paths(config):
         raise ValueError('配置包含解码后的控制字符，拒绝发布到手机')
@@ -685,8 +721,8 @@ def main():
             record['ip_reputation'] = reputations.get((record.get('exit') or {}).get('exit_ip'),
                 {'status': 'unknown', 'provider': 'ipapi.is', 'reason': 'not_eligible'})
     config = render_comparison(base, records, mapping)
-    if config['proxy-groups'][1]['proxies'] == ['REJECT']:
-        raise RuntimeError('没有满足网站稳定与响应速度门槛的节点；保留旧订阅')
+    if not config['proxies']:
+        raise RuntimeError('没有满足综合或台湾／新加坡门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
     checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(candidate)], capture_output=True, text=True, timeout=90)
     if checked.returncode:
@@ -696,7 +732,7 @@ def main():
     repairing = args.phase in ('repair', 'web-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 9,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 10,
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
@@ -730,7 +766,18 @@ def main():
                   if previous.get('high_speed_download_settings') else None) if repairing else {'url': HIGH_DOWNLOAD_URL, 'bytes': HIGH_DOWNLOAD_BYTES, 'budget_seconds': HIGH_DOWNLOAD_BUDGET, 'rounds': 1, 'workers_per_shard': HIGH_DOWNLOAD_WORKERS, 'selection_limit': None, 'read_timeout_seconds': 1, 'includes_handshake': True},
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
-                  'requires_domestic_tcp_pass': True, 'rejected_proxy_definitions': 'omitted'},
+                  'requires_domestic_tcp_pass': True, 'rejected_proxy_definitions': 'omitted',
+                  'regional_exception': {'group': REGIONAL_GROUP, 'country_codes': list(REGIONAL_COUNTRIES),
+                      'median_limit_ms': REGIONAL_MEDIAN_MS, 'tail_limit_ms': REGIONAL_TAIL_MS,
+                      'jitter_limit_ms': REGIONAL_JITTER_MS, 'required_core_rounds': WEBSITE_ROUNDS,
+                      'requires_204_rounds': 3, 'requires_quick_download': True,
+                      'requires_overseas_coverage': False, 'exit_conflict_allowed': False,
+                      'other_groups_use_strict_pool': True}},
+              'regional_selection': {'group': REGIONAL_GROUP,
+                  'selected_count': sum(regional_eligible(r) and r['id'] in published_ids for r in records),
+                  'country_counts': {cc: sum(r['id'] in published_ids and regional_eligible(r)
+                      and (r.get('exit') or {}).get('country_code') == cc for r in records)
+                      for cc in REGIONAL_COUNTRIES}},
               'published_node_count': len(config['proxies']), 'published_node_ids': published_ids,
               'ip_reputation_policy': {'provider': 'ipapi.is', 'scope': 'quick_download_passed_unique_exits',
                   'configured': bool(os.environ.get('IPAPI_IS_KEY')), 'lookup_budget_per_run': ip_reputation.DAILY_LOOKUP_BUDGET,
@@ -769,7 +816,8 @@ def main():
             'TCP 通且至少一个海外网页或 trace 通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
             f'仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，新检测采样预算 {HIGH_DOWNLOAD_BUDGET} 秒，读取超时 1 秒，每分片最多同时测试 2 个。本批数据的实际检测预算为 {(report["high_speed_download_settings"] or {}).get("budget_seconds", "未记录")} 秒；重建配置不改写历史检测时限。高速下载组仅接纳完整下载且耗时不超过 {HIGH_DOWNLOAD_BUDGET} 秒的节点，按实测速度从高到低保留；仅香港最多 30 个，其他地区不限制数量；本次入选 {report["high_speed_selection_policy"]["selected_count"]} 个。未通过 1 MB 的节点不消耗 50 MB 流量。', '',
             '综合优选要求 1 MB 通过，Google/YouTube 各三轮均通过、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms，海外至少13站稳定通过；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
-            '手机仅显示四个分组：全局选择、综合优选、高速下载、非机房 IP。所有分组共用国内 TCP 通过、1 MB 通过且网站响应合格的节点池；被淘汰节点的定义和凭据不写入订阅，检测记录仅保留在报告。每天重新获取全部来源，可让恢复可用的节点重新入选。刷新原订阅即可；网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照，仍可持续校准。', '',
+            '手机显示五个分组：全局选择、综合优选、高速下载、非机房 IP、台湾／新加坡。前三类节点组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
+            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、Google/YouTube各三轮访问均须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。不要求其他海外站至少13个通过，不放行验证码、错误页面或未测项目。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
             '节点名称：地区·唯一短标识｜网页响应中位耗时（无数据时明确标204）｜下载换算 Mbps｜住宅类型｜网段纯净度。住宅候选表示 ISP 网络且非机房；非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
