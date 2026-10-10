@@ -1,172 +1,313 @@
+# 手机分流：国内直连，海外服务优先代理；完整检测目标见 scripts/site_catalog.py
 mixed-port: 7890
 allow-lan: false
 bind-address: '*'
 mode: rule
 log-level: info
-external-controller: '127.0.0.1:9090'
+external-controller: 127.0.0.1:9090
 dns:
-    enable: true
-    ipv6: true
-    default-nameserver: [8.8.8.8,114.114.114.114,218.30.118.6, 223.6.6.6,192.168.70.49]
-    enhanced-mode: fake-ip
-    fake-ip-range: 198.18.0.1/16
-    use-hosts: false
-    nameserver: ['https://doh.pub/dns-query', 'https://dns.alidns.com/dns-query']
-    fallback: ['https://dns.cloudflare.com/dns-query', 'https://doh.dns.sb/dns-query', 'https://dns.twnic.tw/dns-query', 'tls://8.8.4.4:853']
-    fallback-filter: { geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32] }
+  enable: true
+  ipv6: true
+  default-nameserver:
+  - 223.5.5.5
+  - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: false
+  nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  fallback:
+  - https://1.1.1.1/dns-query#🚀 全局选择
+  - https://8.8.8.8/dns-query#🚀 全局选择
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+    - 240.0.0.0/4
+    - 0.0.0.0/32
+  proxy-server-nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  direct-nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  nameserver-policy:
+    rule-set:overseas-services:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:proxy:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:gfw:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:domestic-services:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:direct:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:private:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  fake-ip-filter:
+  - '*.lan'
+  - '*.local'
+  - +.msftconnecttest.com
+  - +.msftncsi.com
 rule-providers:
   reject:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
     path: ./ruleset/reject_rule.yaml
     interval: 86400
-
   icloud:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
     path: ./ruleset/icloud.yaml
     interval: 86400
-
   apple:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
     path: ./ruleset/apple.yaml
     interval: 86400
-
   google:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
     path: ./ruleset/google.yaml
     interval: 86400
-
   proxy:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
     path: ./ruleset/proxy.yaml
     interval: 86400
-
   direct:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
     path: ./ruleset/direct.yaml
     interval: 86400
-
   private:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
     path: ./ruleset/private.yaml
     interval: 86400
-
   gfw:
     type: http
     behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
     path: ./ruleset/gfw.yaml
     interval: 86400
-
-  tld-not-cn:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
-    path: ./ruleset/tld-not-cn.yaml
-    interval: 86400
-
   telegramcidr:
     type: http
     behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
     path: ./ruleset/telegramcidr.yaml
     interval: 86400
-
   cncidr:
     type: http
     behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
     path: ./ruleset/cncidr.yaml
     interval: 86400
-
   lancidr:
     type: http
     behavior: ipcidr
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
     path: ./ruleset/lancidr.yaml
     interval: 86400
-
   applications:
     type: http
     behavior: classical
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
     path: ./ruleset/applications.yaml
     interval: 86400
-#白名单模式
+  overseas-services:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.aiv-cdn.net
+    - +.amazon.com
+    - +.amazonvideo.com
+    - +.anthropic.com
+    - +.bamgrid.com
+    - +.bing.com
+    - +.cdninstagram.com
+    - +.chatgpt.com
+    - +.claude.ai
+    - +.copilot.microsoft.com
+    - +.cursor.com
+    - +.cursor.sh
+    - +.cursorapi.com
+    - +.discord.com
+    - +.discord.gg
+    - +.discordapp.com
+    - +.discordapp.net
+    - +.disneyplus.com
+    - +.dssott.com
+    - +.facebook.com
+    - +.fb.com
+    - +.fbcdn.net
+    - +.gemini.google.com
+    - +.github.com
+    - +.github.io
+    - +.githubassets.com
+    - +.githubusercontent.com
+    - +.google.com
+    - +.googleapis.cn
+    - +.googleapis.com
+    - +.googleusercontent.com
+    - +.googlevideo.com
+    - +.gstatic.com
+    - +.hf.co
+    - +.huggingface.co
+    - +.instagram.com
+    - +.jtvnw.net
+    - +.messenger.com
+    - +.netflix.com
+    - +.nflxext.com
+    - +.nflximg.com
+    - +.nflximg.net
+    - +.nflxso.net
+    - +.nflxvideo.net
+    - +.oaistatic.com
+    - +.oaiusercontent.com
+    - +.openai.com
+    - +.perplexity.ai
+    - +.primevideo.com
+    - +.redd.it
+    - +.reddit.com
+    - +.redditmedia.com
+    - +.redditstatic.com
+    - +.scdn.co
+    - +.spotify.com
+    - +.spotifycdn.com
+    - +.sstatic.net
+    - +.stackexchange.com
+    - +.stackoverflow.com
+    - +.steamcommunity.com
+    - +.steampowered.com
+    - +.steamstatic.com
+    - +.t.co
+    - +.t.me
+    - +.telegra.ph
+    - +.telegram.me
+    - +.telegram.org
+    - +.tiktok.com
+    - +.tiktokcdn.com
+    - +.tiktokv.com
+    - +.ttvnw.net
+    - +.twimg.com
+    - +.twitch.tv
+    - +.twitter.com
+    - +.wa.me
+    - +.whatsapp.com
+    - +.whatsapp.net
+    - +.wikimedia.org
+    - +.wikipedia.org
+    - +.x.com
+    - +.youtu.be
+    - +.youtube-nocookie.com
+    - +.youtube.com
+    - +.ytimg.com
+  domestic-services:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.126.net
+    - +.163.com
+    - +.360buyimg.com
+    - +.alicdn.com
+    - +.alipay.com
+    - +.baidu.com
+    - +.bdimg.com
+    - +.bdstatic.com
+    - +.bilibili.cn
+    - +.bilibili.com
+    - +.bilivideo.com
+    - +.deepseek.com
+    - +.douyin.com
+    - +.douyincdn.com
+    - +.douyinpic.com
+    - +.douyinvod.com
+    - +.gitee.cn
+    - +.gitee.com
+    - +.hdslb.com
+    - +.iqiyi.com
+    - +.iqiyipic.com
+    - +.jd.com
+    - +.jdcloud.com
+    - +.music.126.net
+    - +.qiyipic.com
+    - +.qlogo.cn
+    - +.qpic.cn
+    - +.qq.com
+    - +.sinaimg.cn
+    - +.taobao.com
+    - +.tencent.com
+    - +.tmall.com
+    - +.ugurl.cn
+    - +.video.qq.com
+    - +.wechat.com
+    - +.weibo.cn
+    - +.weibo.com
+    - +.xhscdn.com
+    - +.xiaohongshu.com
+    - +.zhihu.com
+    - +.zhimg.com
+    - +.zijieapi.com
 rules:
-  # 新增微软服务直连规则（优先级最高）🌟
-  - DOMAIN-SUFFIX,zijieapi.com,DIRECT
-  - DOMAIN-SUFFIX,office.com,DIRECT
-  - DOMAIN-SUFFIX,outlook.com,DIRECT
-  - DOMAIN-SUFFIX,cursor.sh,DIRECT
-  - DOMAIN-SUFFIX,jiuse3.cloud,DIRECT
-  - DOMAIN-SUFFIX,onenote.com,DIRECT
-  - DOMAIN-SUFFIX,clarivate.cn,DIRECT
-  - DOMAIN-SUFFIX,onedrive.com,DIRECT
-  - DOMAIN-SUFFIX,microsoftonline.com,DIRECT
-  - DOMAIN-SUFFIX,sharepoint.com,DIRECT
-  - DOMAIN-SUFFIX,azure.com,DIRECT
-  - DOMAIN-KEYWORD,tencent,DIRECT
-  - DOMAIN-KEYWORD,yuanbao,DIRECT
-  - DOMAIN-SUFFIX,qq.com,DIRECT
-  # 现有显式规则（保持优先级）
-  - DOMAIN-SUFFIX,immersivetranslate.com,🚀 全局选择
-  - DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
-  - DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
-  - DOMAIN-SUFFIX,yiche.com,DIRECT
-  - DOMAIN-SUFFIX,bitautotech.com,DIRECT
-  - DOMAIN-SUFFIX,live.com,🚀 全局选择
-  - DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
-  - DOMAIN-SUFFIX,microsoft.com,DIRECT
-  - DOMAIN,clash.razord.top,DIRECT
-  - DOMAIN,yacd.haishan.me,DIRECT
-  - DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
-  - DOMAIN-SUFFIX,gitee.com,DIRECT
-  - DOMAIN,free886.herokuapp.com,DIRECT
- # - DOMAIN-SUFFIX,video.twimg.com,DIRECT
-#  - DOMAIN-SUFFIX,video-t-2.twimg.com,DIRECT
-  # 规则集引用（保持原有顺序）
-  - RULE-SET,applications,DIRECT
-  - RULE-SET,private,DIRECT
-  - RULE-SET,reject,REJECT
-  - RULE-SET,icloud,DIRECT
-  - RULE-SET,apple,DIRECT
-  - RULE-SET,google,🚀 全局选择
-  - RULE-SET,proxy,🚀 全局选择
-  - RULE-SET,direct,DIRECT
-  - RULE-SET,lancidr,DIRECT
-  - RULE-SET,cncidr,DIRECT
-  - RULE-SET,telegramcidr,🚀 全局选择
+- RULE-SET,private,DIRECT
+- RULE-SET,lancidr,DIRECT,no-resolve
+- GEOIP,LAN,DIRECT,no-resolve
+- RULE-SET,reject,REJECT
+- RULE-SET,overseas-services,🚀 全局选择
+- RULE-SET,domestic-services,DIRECT
+- DOMAIN-SUFFIX,zijieapi.com,DIRECT
+- DOMAIN-SUFFIX,office.com,DIRECT
+- DOMAIN-SUFFIX,outlook.com,DIRECT
+- DOMAIN-SUFFIX,jiuse3.cloud,DIRECT
+- DOMAIN-SUFFIX,onenote.com,DIRECT
+- DOMAIN-SUFFIX,clarivate.cn,DIRECT
+- DOMAIN-SUFFIX,onedrive.com,DIRECT
+- DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+- DOMAIN-SUFFIX,sharepoint.com,DIRECT
+- DOMAIN-SUFFIX,azure.com,DIRECT
+- DOMAIN-SUFFIX,qq.com,DIRECT
+- DOMAIN-SUFFIX,immersivetranslate.com,🚀 全局选择
+- DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
+- DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
+- DOMAIN-SUFFIX,yiche.com,DIRECT
+- DOMAIN-SUFFIX,bitautotech.com,DIRECT
+- DOMAIN-SUFFIX,live.com,🚀 全局选择
+- DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
+- DOMAIN-SUFFIX,microsoft.com,DIRECT
+- DOMAIN,clash.razord.top,DIRECT
+- DOMAIN,yacd.haishan.me,DIRECT
+- DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
+- DOMAIN-SUFFIX,gitee.com,DIRECT
+- DOMAIN,free886.herokuapp.com,DIRECT
+- RULE-SET,applications,DIRECT
+- RULE-SET,icloud,DIRECT
+- RULE-SET,apple,DIRECT
+- RULE-SET,google,🚀 全局选择
+- RULE-SET,proxy,🚀 全局选择
+- RULE-SET,gfw,🚀 全局选择
+- RULE-SET,direct,DIRECT
+- RULE-SET,telegramcidr,🚀 全局选择,no-resolve
+- RULE-SET,cncidr,DIRECT
+- GEOIP,CN,DIRECT
+- MATCH,🚀 全局选择
 
-  # 地理定位规则
-  - GEOIP,CN,DIRECT
-  - GEOIP,LAN,DIRECT
-  - MATCH,🚀 全局选择
-#黑名单模式
-#rules:
-#  - RULE-SET,applications,DIRECT
-#  - DOMAIN,clash.razord.top,DIRECT
-#  - DOMAIN,yacd.haishan.me,DIRECT
-#  - RULE-SET,private,DIRECT
-#  - RULE-SET,reject,REJECT
-#  - RULE-SET,tld-not-cn,PROXY
-#  - RULE-SET,gfw,PROXY
-#  - RULE-SET,greatfire,PROXY
-#  - RULE-SET,telegramcidr,PROXY
-#  - MATCH,DIRECT
 usex: &usex
     use:
       - a5
