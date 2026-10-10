@@ -1,0 +1,63 @@
+name: Hysteria2国内UDP诊断
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 已完成全量测试的运行编号
+        type: string
+        required: true
+        default: '38042555519'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: hysteria2-diagnostics-main
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    name: 国内UDP与云端认证实连（不发布订阅）
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+      - name: 准备检测环境
+        run: |
+          python -m pip install -r scripts/requirements.txt
+          python scripts/install_tools.py --mihomo-only
+          python -m unittest discover -s scripts/tests -v
+      - name: 读取全量来源与测量结果
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          if ! [[ "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            exit 1
+          fi
+          gh run download "$SOURCE_RUN_ID" -n availability-input -D .node-work/hy2-input
+          gh run download "$SOURCE_RUN_ID" -n full-test-report -D .node-work/hy2-report
+      - name: 原生QUIC与混淆小样本诊断
+        run: |
+          python scripts/hysteria2_diagnostics.py --mihomo .node-work/bin/mihomo \
+            --bundle .node-work/hy2-input/bundle.json \
+            --report .node-work/hy2-report/full-test-report.json
+      - name: 保存结果
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: hysteria2-diagnostics
+          path: .node-work/hysteria2-diagnostics/summary.*
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: warn
+      - name: 展示结果
+        if: always()
+        run: |
+          if [ -f .node-work/hysteria2-diagnostics/summary.md ]; then
+            cat .node-work/hysteria2-diagnostics/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
