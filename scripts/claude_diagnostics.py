@@ -45,7 +45,7 @@ def choose_samples(nodes, rows, limit):
     return selected
 
 
-def evidence(status, url, headers, body):
+def evidence(status, url, headers, body, label='Claude'):
     headers = {k.lower(): v for k, v in headers.items()}
     text = body.decode('utf-8', errors='replace')
     lower = text.lower()
@@ -64,18 +64,18 @@ def evidence(status, url, headers, body):
                 or 'app unavailable in region' in lower
                 or '/app-unavailable-in-region' in selected_headers.get('location', '')
                 or urlparse(url).path.rstrip('/') == '/app-unavailable-in-region')},
-        'classification': p.classify_response('Claude', status, url, headers, body[:p.PAGE_SAMPLE_BYTES]),
-        'larger_sample_classification': p.classify_response('Claude', status, url, headers, body)}
+        'classification': p.classify_response(label, status, url, headers, body[:p.PAGE_SAMPLE_LIMITS.get(label, p.PAGE_SAMPLE_BYTES)]),
+        'larger_sample_classification': p.classify_response(label, status, url, headers, body)}
 
 
-def requests_probe(port, ua):
+def requests_probe(port, ua, label='Claude'):
     started = time.monotonic()
     chain = []
     try:
         with s.session() as client:
             if port:
                 client.proxies = {k: f'http://127.0.0.1:{port}' for k in ('http', 'https')}
-            current = p.CLAUDE_PAGE_URL
+            current = p.CLAUDE_PAGE_URL if label == 'Claude' else p.SITES[label]
             for hop in range(3):
                 with client.get(current, headers={'User-Agent': ua}, allow_redirects=False,
                                 stream=True, timeout=(3, 2)) as response:
@@ -85,7 +85,7 @@ def requests_probe(port, ua):
                                   'location': safe_url(urljoin(current, location)) if location else None})
                     if 300 <= response.status_code < 400 and location and hop < 2:
                         target = urljoin(current, location)
-                        if urlparse(target).scheme == 'https' and urlparse(target).hostname in p.PAGE_HOSTS['Claude']:
+                        if urlparse(target).scheme == 'https' and urlparse(target).hostname in p.PAGE_HOSTS[label]:
                             current = target
                             continue
                     body = bytearray()
@@ -93,7 +93,7 @@ def requests_probe(port, ua):
                         body.extend(chunk[:BODY_LIMIT - len(body)])
                         if len(body) >= BODY_LIMIT or time.monotonic() - started > 5:
                             break
-                    return {**evidence(response.status_code, response.url, response.headers, bytes(body)),
+                    return {**evidence(response.status_code, response.url, response.headers, bytes(body), label),
                         'ttfb_ms': headers_ms, 'elapsed_ms': round((time.monotonic() - started) * 1000, 1),
                         'redirect_chain': chain}
     except s.requests.RequestException as error:
