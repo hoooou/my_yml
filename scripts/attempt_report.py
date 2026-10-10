@@ -3,7 +3,7 @@ from collections import Counter
 import json
 
 
-def write_attempt(root, records, config, required_sites, sources, input_count, now):
+def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=()):
     coverage = {}
     labels = {label for record in records for label in (record.get('websites') or {})}
     for label in sorted(labels):
@@ -19,6 +19,7 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'parseable_count': len(records), 'selected_node_count': selected,
         'selection_outcome': 'candidate_ready' if selected else 'no_eligible_nodes_previous_subscription_retained',
         'required_websites': list(required_sites), 'required_rounds': 3,
+        'required_traces': list(required_traces), 'required_trace_rounds': 1,
         'precheck_counts': dict(Counter((r.get('precheck') or {}).get('status', 'missing') for r in records)),
         'entry_counts': dict(Counter(r['entry']['status'] for r in records)),
         'download_counts': dict(Counter((r.get('download') or {}).get('status', 'missing') for r in records)),
@@ -26,9 +27,11 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'website_counts': coverage, 'sources': sources, 'nodes': records}
     rows = ['# 本次全量检测结果', '', f'检测结束：{now}；全部来源去重 {input_count}，可解析 {len(records)}，候选入选 {selected}。', '',
         '必过网站（三轮均通过）：' + '、'.join(required_sites) + '。', '',
+        '必过连通检测（单轮）：' + ('、'.join(required_traces) if required_traces else '无') + '。', '',
+        'Claude首页不检测，仅检查Claude trace；trace不证明登录或对话可用。', '',
         '抖音不检测；其国内直连规则保留。', '',
         '有合格候选，继续校验并发布；最终发布状态以 Actions 为准。' if selected else
-        '**本次无合格节点，未覆盖原订阅。原订阅仍是上次结果，不代表通过这次13站必过门槛。**', '',
+        '**本次无合格节点，未覆盖原订阅。原订阅仍是上次结果，不代表通过这次页面与trace必过门槛。**', '',
         '| 网站 | 通过 | 失败 | 需复核 | 响应慢 | 波动 | 未测 |', '|---|---:|---:|---:|---:|---:|---:|']
     for label, item in coverage.items():
         counts = item['node_status_counts']

@@ -62,6 +62,7 @@ class WebQualityTests(unittest.TestCase):
         sites = {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
             'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10}
             for label in a.OVERSEAS_SITES}
+        sites['ClaudeTrace'] = {'status': 'passed', 'round_count': 1, 'passed_count': 1}
         fast = {'id': 'n-fast', 'entry': {'status': 'passed'}, 'websites': sites,
             'precheck': {'status': 'passed', 'median_elapsed_ms': 300},
             'download': {'status': 'passed', 'speed_mib_s': 2}}
@@ -76,6 +77,7 @@ class WebQualityTests(unittest.TestCase):
         sites = {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
             'median_elapsed_ms': 100, 'p95_elapsed_ms': 120, 'jitter_ms': 20}
             for label in a.OVERSEAS_SITES}
+        sites['ClaudeTrace'] = {'status': 'passed', 'round_count': 1, 'passed_count': 1}
         record = {'id': 'n-a', 'entry': {'status': 'passed'}, 'websites': sites,
             'download': {'status': 'passed', 'speed_mib_s': 10}}
         self.assertTrue(a.web_quality_eligible(record))

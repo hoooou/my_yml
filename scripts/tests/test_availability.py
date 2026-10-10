@@ -19,7 +19,7 @@ class AvailabilityTests(unittest.TestCase):
     def stable_sites():
         return {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
             'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10}
-            for label in a.OVERSEAS_SITES}
+            for label in a.OVERSEAS_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}}
 
     def test_hong_kong_only_quota_preserves_other_regions_and_unique_residential_exits(self):
         records = []
@@ -27,7 +27,7 @@ class AvailabilityTests(unittest.TestCase):
             for index in range(35):
                 records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
                     'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
-                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.OVERSEAS_SITES},
+                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.OVERSEAS_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
                     'precheck': {'status': 'passed', 'median_elapsed_ms': country_index * 100 + index + 1},
                     'exit': {'country_code': country, 'exit_ip': f'8.8.{country_index}.{index + 1}'},
                     'ip_type': {'status': 'success', 'hosting': False},
@@ -415,7 +415,7 @@ class AvailabilityTests(unittest.TestCase):
             for index in range(35):
                 records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
                     'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
-                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.PAGE_SITES},
+                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.PAGE_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
                     'precheck': {'status': 'passed', 'median_elapsed_ms': index + 1},
                     'exit': {'country_code': country, 'exit_ip': f'8.8.{country == "JP"}.{index}'},
                     'download': {'status': 'passed', 'speed_mib_s': 1}})
@@ -458,7 +458,7 @@ class AvailabilityTests(unittest.TestCase):
             'precheck': {'status': 'passed', 'round_count': 3, 'passed_count': 3},
             'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
                 'median_elapsed_ms': 2200, 'p95_elapsed_ms': 3200, 'jitter_ms': 1200}
-                for label in a.REQUIRED_SITES},
+                for label in a.REQUIRED_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
             'download': {'status': 'passed', 'speed_mib_s': 5},
             'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
                 'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,

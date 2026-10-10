@@ -28,8 +28,9 @@ LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
           'unstable': '波动', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
 WEBSITE_ROUNDS = 3
 CORE_SITES = ('Google', 'YouTube')
-REQUIRED_SITES = ('Google', 'YouTube', 'ChatGPT', 'Claude', 'Gemini', 'GitHub',
+REQUIRED_SITES = ('Google', 'YouTube', 'ChatGPT', 'Gemini', 'GitHub',
                   'Wikipedia', 'Reddit', 'X', 'Instagram', 'Telegram', 'Discord', 'Facebook')
+REQUIRED_TRACES = ('ClaudeTrace',)
 CORE_MEDIAN_MS = 1500
 CORE_TAIL_MS = 3000
 CORE_JITTER_MS = 1500
@@ -315,7 +316,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             with large_slots:
                                 record['high_speed_download'] = large_download(port)
                     else:
-                        record['download']['reason'] = '必过13站未全部三轮通过，跳过下载；trace和国内网页不能替代'
+                        record['download']['reason'] = '12个必过页面未全部三轮通过或Claude trace未通过，跳过下载'
             with lock:
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
@@ -446,7 +447,11 @@ def required_websites_passed(record):
     return all((record.get('websites') or {}).get(label, {}).get('status') == 'passed'
         and (record['websites'][label].get('round_count') == WEBSITE_ROUNDS)
         and (record['websites'][label].get('passed_count') == WEBSITE_ROUNDS)
-        for label in REQUIRED_SITES)
+        for label in REQUIRED_SITES) and all(
+        (record.get('websites') or {}).get(label, {}).get('status') == 'passed'
+        and record['websites'][label].get('round_count') == 1
+        and record['websites'][label].get('passed_count') == 1
+        for label in REQUIRED_TRACES)
 
 
 def web_quality_eligible(record):
@@ -736,10 +741,10 @@ def main():
     config = render_comparison(base, records, mapping)
     if args.phase in ('all', 'publish'):
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
-                      s.datetime.now(s.TZ).isoformat(timespec='seconds'))
+                      s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES)
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
-            print('全量检测完成：无符合13站门槛的节点，报告已保存；原订阅未更新', flush=True)
+            print('全量检测完成：无符合12个页面加Claude trace门槛的节点，报告已保存；原订阅未更新', flush=True)
             return
         raise RuntimeError('没有满足综合或台湾／新加坡门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
@@ -751,7 +756,7 @@ def main():
     repairing = args.phase in ('repair', 'web-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 11,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 12,
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
@@ -759,12 +764,14 @@ def main():
                   'workers': 8, 'jobs': 1,
                   'preserved_measurements': ['HTTPS204', 'domestic_TCP', 'domestic_pages', 'trace', '1MB_download', '50MB_download']}
                   if args.phase == 'web-recheck' else previous.get('website_recheck') if repairing else None),
-              'website_measurement_policy': {'version': 3, 'overseas_rounds': WEBSITE_ROUNDS,
+              'website_measurement_policy': {'version': 4, 'overseas_rounds': WEBSITE_ROUNDS,
                   'domestic_and_trace_rounds': 1, 'sample_bytes': 16384,
                   'sample_bytes_overrides': PAGE_SAMPLE_LIMITS,
                   'max_ttfb_ms': MAX_TTFB_MS, 'max_sample_ms': MAX_SAMPLE_MS,
                   'required_core_sites': list(CORE_SITES), 'required_websites': list(REQUIRED_SITES),
                   'required_websites_rounds': WEBSITE_ROUNDS, 'trace_can_replace_required_page': False,
+                  'required_traces': list(REQUIRED_TRACES), 'required_trace_rounds': 1,
+                  'claude_validation': 'trace_only', 'claude_homepage_tested': False,
                   'core_median_limit_ms': CORE_MEDIAN_MS,
                   'core_p95_limit_ms': CORE_TAIL_MS, 'core_jitter_limit_ms': CORE_JITTER_MS,
                   'min_stable_overseas_sites': math.ceil(len(OVERSEAS_SITES) / 2),
@@ -794,7 +801,7 @@ def main():
                       'jitter_limit_ms': REGIONAL_JITTER_MS, 'required_core_rounds': WEBSITE_ROUNDS,
                       'requires_204_rounds': 3, 'requires_quick_download': True,
                       'requires_overseas_coverage': False, 'exit_conflict_allowed': False,
-                      'other_groups_use_strict_pool': True, 'required_websites': list(REQUIRED_SITES)}},
+                      'other_groups_use_strict_pool': True, 'required_websites': list(REQUIRED_SITES), 'required_traces': list(REQUIRED_TRACES)}},
               'regional_selection': {'group': REGIONAL_GROUP,
                   'selected_count': sum(regional_eligible(r) and r['id'] in published_ids for r in records),
                   'country_counts': {cc: sum(r['id'] in published_ids and regional_eligible(r)
@@ -835,11 +842,11 @@ def main():
             '海外网页目标：' + '、'.join(OVERSEAS_SITES) + '；另测 ChatGPT、Claude 两个 trace。', '',
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
             '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
-            'TCP通且指定13个海外网站各三轮均通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
+            'TCP通且指定12个海外网站各三轮均通过且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
             f'仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，新检测采样预算 {HIGH_DOWNLOAD_BUDGET} 秒，读取超时 1 秒，每分片最多同时测试 2 个。本批数据的实际检测预算为 {(report["high_speed_download_settings"] or {}).get("budget_seconds", "未记录")} 秒；重建配置不改写历史检测时限。高速下载组仅接纳完整下载且耗时不超过 {HIGH_DOWNLOAD_BUDGET} 秒的节点，按实测速度从高到低保留；仅香港最多 30 个，其他地区不限制数量；本次入选 {report["high_speed_selection_policy"]["selected_count"]} 个。未通过 1 MB 的节点不消耗 50 MB 流量。', '',
-            '综合优选要求1 MB通过、指定13个海外网站各三轮均通过；Google/YouTube、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
+            '综合优选要求1 MB通过、指定12个海外网站各三轮均通过且Claude trace单轮通过；Google/YouTube、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
             '手机显示五个分组：全局选择、综合优选、高速下载、非机房 IP、台湾／新加坡。前三类节点组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
-            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定13站各三轮访问均须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。13个指定网站必过，不允许其他网站或trace替代，不放行验证码、错误页面或未测项目。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
+            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮访问和Claude trace单轮均须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过，Claude仅检测trace；不允许其他页面或trace替代12站，不放行验证码、错误页面或未测项目。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
             '节点名称：地区·唯一短标识｜网页响应中位耗时（无数据时明确标204）｜下载换算 Mbps｜住宅类型｜网段纯净度。住宅候选表示 ISP 网络且非机房；非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
