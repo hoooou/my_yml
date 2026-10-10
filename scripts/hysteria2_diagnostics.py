@@ -18,6 +18,8 @@ import select_nodes as s
 ORIGIN = 'https://www.idcd.com'
 DNS_PAYLOAD = bytes.fromhex('123401000001000000000000076578616d706c6503636f6d0000010001')
 MAX_UNITS = 40
+# Previously observed domestic replies and its obfuscated comparison, only for diagnostic sampling.
+KNOWN_SAMPLES = ('n-2e60b13ec05a', 'n-1d4370f209d6')
 
 
 def choose_samples(nodes, records, limit=4):
@@ -25,7 +27,8 @@ def choose_samples(nodes, records, limit=4):
     candidates = sorted((n for n in nodes if n['type'] == 'hysteria2'
         and n['name'] in rows and rows[n['name']]['precheck']['status'] == 'passed'
         and n.get('obfs', '') in ('', 'salamander') and not n.get('ports')),
-        key=lambda n: (rows[n['name']]['precheck'].get('median_elapsed_ms') or float('inf'), n['name']))
+        key=lambda n: (n['name'] not in KNOWN_SAMPLES,
+                       rows[n['name']]['precheck'].get('median_elapsed_ms') or float('inf'), n['name']))
     # Include both wire formats, then fill with distinct endpoints. No credential-dependent ranking.
     result, seen = [], set()
     for group in (False, True, None):
@@ -65,23 +68,69 @@ def version_packet(node):
     return obfuscate(packet + secrets.token_bytes(1200 - len(packet)), node)
 
 
-def initial_packet_valid(packet, node):
+def clear_packet(packet, node):
     if node.get('obfs') == 'salamander':
         if len(packet) < 8:
-            return False
+            return b''
         mask = hashlib.blake2b(str(node['obfs-password']).encode() + packet[:8], digest_size=32).digest()
         packet = bytes(value ^ mask[i % 32] for i, value in enumerate(packet[8:]))
-    return (len(packet) >= 1200 and packet[0] & 0x80 != 0
-            and int.from_bytes(packet[1:5], 'big') in (1, 0x6b3343cf))
+    return packet
 
 
-def capture_initials(binary, root, nodes):
+def quic_header(packet):
+    if len(packet) < 7 or not packet[0] & 0x80:
+        return None
+    dest_len = packet[5]
+    if dest_len > 20 or len(packet) < 7 + dest_len:
+        return None
+    source_len = packet[6 + dest_len]
+    if source_len > 20 or len(packet) < 7 + dest_len + source_len:
+        return None
+    offset = 7 + dest_len + source_len
+    return {'version': int.from_bytes(packet[1:5], 'big'),
+            'dest': packet[6:6 + dest_len], 'source': packet[7 + dest_len:offset], 'offset': offset}
+
+
+def initial_packet_valid(packet, node):
+    packet = clear_packet(packet, node)
+    header = quic_header(packet)
+    return len(packet) >= 1200 and header is not None and header['version'] in (1, 0x6b3343cf)
+
+
+def cloud_udp(address, port, packet, node):
+    """Independent cloud wire-format control, with QUIC connection-ID matching; no auth claim."""
+    result = {'status': 'unknown', 'protocol_verified': False}
+    family = socket.AF_INET6 if ':' in address else socket.AF_INET
+    try:
+        with socket.socket(family, socket.SOCK_DGRAM) as sock:
+            sock.settimeout(3); sock.connect((address, port))
+            start = time.monotonic(); sock.send(packet); reply = sock.recv(65535)
+            result.update(rtt_ms=round((time.monotonic() - start) * 1000, 3), response_bytes=len(reply))
+        sent = quic_header(clear_packet(packet, node))
+        received_packet = clear_packet(reply, node); received = quic_header(received_packet)
+        valid = sent is not None and received is not None and received['dest'] == sent['source']
+        if valid and received['version'] == 0:
+            versions = received_packet[received['offset']:]
+            valid = (received['source'] == sent['dest'] and len(versions) >= 4
+                     and len(versions) % 4 == 0 and any(int.from_bytes(versions[i:i+4], 'big')
+                     in (1, 0x6b3343cf) for i in range(0, len(versions), 4)))
+        elif valid:
+            valid = received['version'] in (1, 0x6b3343cf)
+        result.update(status='quic_reply' if valid else 'unknown_reply', protocol_verified=bool(valid))
+    except socket.timeout:
+        result.update(status='no_reply', reason='云端UDP单包无回应')
+    except OSError:
+        result['reason'] = '云端UDP请求异常'
+    return result
+
+
+def capture_initials(binary, root, nodes, rounds=3):
     """Generate each fresh ClientHello against a silent loopback socket; never authenticate there."""
     root.mkdir(parents=True, exist_ok=True)
     sockets, proxies, rows, originals = {}, [], [], {}
     try:
         for node in nodes:
-            for round_index in range(3):
+            for round_index in range(rounds):
                 key = node['name'] + '-initial-' + str(round_index)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 sock.bind(('127.0.0.1', 0)); sock.settimeout(4)
@@ -222,7 +271,6 @@ def run_diagnostic(binary, root, bundle, report):
         for row, pre in zip(rows, prechecks):
             row['cloud_204'] = pre
     active = [n for n, row in zip(nodes, rows) if row['cloud_204']['status'] == 'passed']
-    packets = capture_initials(binary, root / 'capture', active)
     provider = Provider()
     result = {'scope': 'diagnostic_only_no_subscription_change',
         'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
@@ -234,20 +282,30 @@ def run_diagnostic(binary, root, bundle, report):
         result['control'] = provider.probe('223.5.5.5', 53, DNS_PAYLOAD, probes)
         working = {item['probe_id'] for item in result['control'] if item['status'] == 'reply'}
         probes = [n for n in probes if n['id'] in working]
+        # Source addresses differ between probes. Each needs a fresh QUIC connection ID.
+        # Use one extra fresh Initial for the independent GitHub UDP control.
+        packets = capture_initials(binary, root / 'capture', active, rounds=3 * len(probes) + 1) if probes else {}
         for node, row in zip(nodes, rows):
             if row['cloud_204']['status'] != 'passed':
                 row['reason'] = '当前云端204未三轮通过，跳过国内探测'; continue
             try:
                 address = public_address(node['server']); port = int(node['port'])
                 row['version_probe'] = provider.probe(address, port, version_packet(node), probes)
+                cloud_packet = packets.get(node['name'] + '-initial-' + str(3 * len(probes)))
+                if cloud_packet:
+                    row['cloud_udp_control'] = cloud_udp(address, port, cloud_packet, node)
                 for index in range(3):
-                    packet = packets.get(node['name'] + '-initial-' + str(index))
-                    if not packet:
-                        row['domestic_rounds'].append({'round': index + 1,
-                            'status': 'unknown', 'reason': '未生成可识别的原生QUIC初始包'}); continue
+                    measurements, sizes = [], []
+                    for probe_index, probe in enumerate(probes):
+                        packet = packets.get(node['name'] + '-initial-' + str(index * len(probes) + probe_index))
+                        if not packet:
+                            measurements.append({'status': 'unknown', 'probe_id': probe['id'],
+                                'reason': '未生成可识别的原生QUIC初始包'}); continue
+                        sizes.append(len(packet))
+                        measurements.extend(provider.probe(address, port, packet, [probe]))
                     row['domestic_rounds'].append({'round': index + 1,
-                        'payload_kind': 'mihomo_native_quic_initial', 'payload_bytes': len(packet),
-                        'probes': provider.probe(address, port, packet, probes)})
+                        'payload_kind': 'mihomo_native_quic_initial_unique_per_probe', 'payload_bytes': sizes,
+                        'probes': measurements})
                 row['domestic_udp_three_rounds_replied'] = bool(probes) and len(row['domestic_rounds']) == 3 and all(
                     len(x.get('probes', [])) == len(probes)
                     and all(y['status'] == 'reply' for y in x['probes']) for x in row['domestic_rounds'])
