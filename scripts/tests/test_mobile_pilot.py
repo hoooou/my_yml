@@ -70,6 +70,16 @@ class MobilePilotTests(unittest.TestCase):
         self.assertEqual(pilot.classify_page('GitHub', 200, pilot.SITES['GitHub'], 'text/html', wall)['status'], 'needs_review')
         self.assertEqual(pilot.classify_page('Gemini', 302, pilot.SITES['Gemini'], 'text/html', b'Gemini')['status'], 'needs_review')
 
+    def test_amazon_html_without_content_type_is_not_misclassified_as_connection_failure(self):
+        # Cloud capture: HTTP200, missing Content-Type, Amazon homepage title at byte531.
+        html = b'<!doctype html><html><head><title>Amazon.com. Spend less. Smile more.</title></head><body></body></html>'
+        self.assertEqual(pilot.classify_page('Amazon', 200, pilot.SITES['Amazon'], '', html)['status'], 'passed')
+        for content_type, body in [('text/plain', html), ('application/json', html),
+                ('', b'Amazon is a string'), ('', html.replace(b'Amazon.com.', b'Error.'))]:
+            self.assertNotEqual(pilot.classify_page('Amazon', 200, pilot.SITES['Amazon'], content_type, body)['status'], 'passed')
+        challenge = html.replace(b'Amazon.com.', b'CAPTCHA Amazon.com.')
+        self.assertEqual(pilot.classify_page('Amazon', 200, pilot.SITES['Amazon'], '', challenge)['status'], 'needs_review')
+
     def test_page_redirects_are_bounded_and_trace_never_follows_them(self):
         class Response:
             headers = {'Content-Type': 'text/html'}
