@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-10T16:29:19+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-10T17:57:28+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -521,527 +521,186 @@ rule-providers:
     - +.ytimg.com
 find-process-mode: strict
 proxies:
-- password: 'null'
-  port: 9002
-  server: 138.199.35.200
+- port: 9443
+  server: 198.44.135.19
   skip-cert-verify: true
   tls: true
   type: http
-  username: 'null'
-  name: 美国·f713be | 网页279ms | 242.7Mbps | 机房 | 网段纯净80.47/有滥用
-- type: vless
-  network: ws
-  server: 188.114.96.9
-  port: 443
-  uuid: 2e305ebe-f6e6-4689-b32f-cd04ab5ff541
-  servername: idb8onmvbntuyt5t7t6cejfw8vlrb.pages.dev
-  skip-cert-verify: false
+  name: 美国·42af5f | 网页243.6ms | 661.8Mbps | 机房 | 网段纯净62.50/有滥用
+- port: 443
+  server: 12.202.180.10
+  skip-cert-verify: true
   tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: chrome
-  ws-opts:
-    headers:
-      Host: idb8onmvbntuyt5t7t6cejfw8vlrb.pages.dev
-    path: /vl/9yvcoLdzdOXLUYfH7r5gwJhu1CHrj
-  name: 德国·74a6e3 | 网页258.5ms | 97.4Mbps | 机房 | 纯净未知
+  type: http
+  name: 美国·95a0dc | 网页244.8ms | 432.0Mbps | 住宅候选 | 网段纯净99.97
+- port: 443
+  server: 206.223.183.16
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 加拿大·89f027 | 网页311.4ms | 512.1Mbps | 非机房 | 网段纯净100.00
+- port: 443
+  server: 216.107.139.82
+  skip-cert-verify: true
+  sni: 991cc80f13caf81d3426ddebb2da7f49-92ff472ddc24e5b7.apache-iv.com
+  tls: true
+  type: http
+  name: 美国·d3db60 | 网页282ms | 74.7Mbps | 机房 | 网段纯净93.36
+- port: 443
+  server: 12.221.146.147
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国·dfa90b | 网页344.3ms | 175.6Mbps | 住宅候选 | 网段纯净100.00
 - port: 9443
   server: 38.95.111.226
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 美国·79ba21 | 网页294.2ms | 300.4Mbps | 机房 | 网段纯净99.88
-- type: vless
-  network: ws
-  server: 188.114.97.6
-  port: 443
-  uuid: 03790b11-e3d9-4966-859b-4e524bb04645
-  servername: vfuhf4iqn9b0-pyqr62d.qfem579emmb5z6ne0ejfcb.workers.dev
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  ws-opts:
-    headers:
-      Host: vfuhf4iqn9b0-pyqr62d.qfem579emmb5z6ne0ejfcb.workers.dev
-    path: /vl/DfvlLmSkjWX3nTYInEaKodZ33E4cvX?ed=2560
-  name: 美国·f1d0bc | 网页301.3ms | 159.7Mbps | 机房 | 网段纯净99.46
-- password: 'null'
-  port: 9002
-  server: 138.199.35.205
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 美国·cd6d3b | 网页302.7ms | 250.9Mbps | 机房 | 网段纯净80.47/有滥用
+  name: 美国·79ba21 | 网页364.8ms | 431.3Mbps | 机房 | 网段纯净99.88
 - port: 443
-  server: 44.239.226.15
+  server: 64.98.50.100
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国·cbe264 | 网页292.4ms | 160.1Mbps | 机房 | 纯净未知
-- password: ''
-  port: 9002
-  server: 138.199.35.201
+  name: 美国·bd504a | 网页368.2ms | 280.1Mbps | 机房 | 网段纯净99.98/有滥用
+- port: 9443
+  server: 149.88.21.140
   skip-cert-verify: true
   tls: true
   type: http
-  udp: true
-  username: ''
-  name: 美国·cdfed7 | 网页294ms | 969.3Mbps | 机房 | 网段纯净80.47/有滥用
-- port: 9002
-  server: 138.199.35.202
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 美国·5eba1a | 网页299.2ms | 325.8Mbps | 机房 | 网段纯净80.47/有滥用
-- password: 'null'
-  port: 9002
-  server: 138.199.35.219
-  skip-cert-verify: true
-  sni: 138.199.35.219
-  tls: true
-  type: http
-  username: 'null'
-  name: 美国·df9d14 | 网页280.8ms | 248.7Mbps | 机房 | 网段纯净80.47/有滥用
-- port: 9002
-  server: 138.199.35.201
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·56db9a | 网页293.3ms | 1008.9Mbps | 机房 | 网段纯净80.47/有滥用
-- port: 443
-  server: voteshirleysew.club
-  tls: true
-  type: http
-  udp: true
-  name: 美国·4cc004 | 网页316.7ms | 190.6Mbps | 机房 | 网段纯净99.59/有滥用
-- type: vless
-  network: ws
-  server: 172.67.173.89
-  port: 443
-  uuid: ffa431ab-a59b-4092-a418-905fcb1e4d5f
-  servername: s0p42f8wwpdde5tf7m4l6l.ab1x-sn9o4y3n7ondkrd.workers.dev
-  skip-cert-verify: true
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: chrome
-  ws-opts:
-    headers:
-      Host: s0p42f8wwpdde5tf7m4l6l.ab1x-sn9o4y3n7ondkrd.workers.dev
-    path: /vl/rYScQPG1EEjxXdswdMEU2b3rM4?ed=2560
-  name: 德国·18cdcb | 网页316.1ms | 134.1Mbps | 机房 | 网段纯净99.92
-- type: vless
-  network: ws
-  server: 172.64.149.54
-  port: 443
-  uuid: fe34b5df-e634-4c83-a057-e53f41ce8e27
-  servername: late-lab-d6a2.ciwoda8715.workers.dev
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: chrome
-  ws-opts:
-    headers:
-      Host: late-lab-d6a2.ciwoda8715.workers.dev
-    path: /eyJqdW5rIjoiQ3dmV1d4OUFQdSIsInByb3RvY29sIjoidmwiLCJtb2RlIjoicHJveHlpcCIsInBhbmVsSVBzIjpbXX0=?ed=2560
-  name: 德国·34c5df | 网页323.6ms | 78.4Mbps | 机房 | 网段纯净99.92
-- port: 8443
-  server: 44.229.69.166
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·fa77d1 | 网页277.7ms | 313.0Mbps | 机房 | 网段纯净99.18/有滥用
-- password: None
-  port: 443
-  server: purposebydesig.club
-  tls: true
-  type: http
-  udp: true
-  name: 美国·69882c | 网页333.7ms | 187.1Mbps | 机房 | 网段纯净99.60
-- type: vless
-  network: ws
-  server: 66.235.200.30
-  port: 8880
-  uuid: 6202b230-417c-4d8e-b624-0f71afa9c75d
-  tls: false
-  ws-opts:
-    headers:
-      Host: vms.lifetime47.workers.dev
-    path: /
-  name: 印度尼西亚·5f32db | 网页284.4ms | 4.8Mbps | 住宅候选 | 网段纯净99.92
-- port: 443
-  server: 12.221.146.147
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·dfa90b | 网页348.9ms | 529.8Mbps | 住宅候选 | 网段纯净100.00
-- password: None
-  port: 9002
-  server: 138.199.35.218
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: null
-  name: 美国·8d46b7 | 网页333.3ms | 290.7Mbps | 机房 | 网段纯净80.47/有滥用
-- password: None
-  port: 9002
-  server: 138.199.35.200
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 美国·1e389f | 网页314.2ms | 217.2Mbps | 机房 | 网段纯净80.47/有滥用
-- password: None
-  port: 9002
-  server: 138.199.35.213
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·a134d3 | 网页354ms | 327.6Mbps | 机房 | 网段纯净80.47/有滥用
-- port: 9002
-  server: 138.199.35.206
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 美国·7e108e | 网页343.2ms | 311.1Mbps | 机房 | 网段纯净80.47/有滥用
-- password: ''
-  port: 9002
-  server: 138.199.35.207
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  username: ''
-  name: 美国·fec11f | 网页368.3ms | 335.4Mbps | 机房 | 网段纯净80.47/有滥用
-- password: None
-  port: 9002
-  server: 138.199.35.197
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: null
-  name: 美国·f11a2f | 网页328.6ms | 327.0Mbps | 机房 | 网段纯净80.47/有滥用
-- password: null
-  port: 9002
-  server: 138.199.35.217
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: null
-  name: 美国·eb90f7 | 网页367.8ms | 1101.5Mbps | 机房 | 网段纯净80.47/有滥用
-- port: 9002
-  server: 138.199.35.198
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 美国·aea197 | 网页361.9ms | 16.3Mbps | 机房 | 网段纯净80.47/有滥用
-- password: None
-  port: 9002
-  server: 138.199.35.205
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·2ce02f | 网页336.5ms | 238.6Mbps | 机房 | 网段纯净80.47/有滥用
-- password: None
-  port: 9002
-  server: 138.199.35.220
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·c46373 | 网页397.9ms | 335.8Mbps | 机房 | 网段纯净80.47/有滥用
-- password: 'null'
-  port: 9002
-  server: 138.199.35.216
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  username: 'null'
-  name: 美国·4e6afc | 网页369.5ms | 1042.6Mbps | 机房 | 网段纯净80.47/有滥用
-- port: 9002
-  server: 138.199.35.195
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 美国·212782 | 网页400.4ms | 321.0Mbps | 机房 | 网段纯净80.47/有滥用
-- password: 'null'
-  port: 9002
-  server: 138.199.35.198
-  skip-cert-verify: true
-  sni: 138.199.35.198
-  tls: true
-  type: http
-  username: 'null'
-  name: 美国·db306c | 网页396.7ms | 13.4Mbps | 机房 | 网段纯净80.47/有滥用
-- port: 443
-  server: 12.202.180.10
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·95a0dc | 网页384.6ms | 425.8Mbps | 住宅候选 | 网段纯净99.97
+  name: 美国·02240d | 网页316.4ms | 183.0Mbps | 机房 | 网段纯净94.53
 - password: None
   port: 443
   server: 149.88.21.129
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国·537df6 | 网页455.2ms | 301.6Mbps | 机房 | 网段纯净94.53
-- port: 9443
-  server: 149.88.21.140
-  skip-cert-verify: true
+  name: 美国·537df6 | 网页416.9ms | 296.4Mbps | 机房 | 网段纯净94.53/有滥用
+- client-fingerprint: random
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: PKlt_5ASsz137EvA9SKSadtjEv1k_U7VRtoelKCgADs
+    short-id: 9ea74b83f4993ca9
+  server: nd-3.ardesnode.ru
+  servername: nd-3.ardesnode.ru
   tls: true
-  type: http
-  name: 美国·02240d | 网页452ms | 531.0Mbps | 机房 | 网段纯净94.53
-- port: 443
-  server: 23.133.176.14
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·779bb0 | 网页350.5ms | 719.7Mbps | 机房 | 网段纯净99.61
+  type: vless
+  udp: true
+  uuid: 616c7b3b-41f4-4038-88c6-d6fedd0ae4a7
+  name: 荷兰·d898eb | 网页486.5ms | 7.7Mbps | 机房 | 网段纯净98.05
 - port: 9443
   server: 198.44.157.19
   skip-cert-verify: true
   tls: true
   type: http
-  name: 加拿大·1ad741 | 网页487.3ms | 560.0Mbps | 机房 | 网段纯净97.68
-- password: None
+  name: 加拿大·1ad741 | 网页408.1ms | 633.4Mbps | 机房 | 网段纯净97.68
+- client-fingerprint: ios
+  flow: xtls-rprx-vision
+  network: tcp
   port: 443
-  server: 52.55.81.168
-  skip-cert-verify: true
+  reality-opts:
+    public-key: PKlt_5ASsz137EvA9SKSadtjEv1k_U7VRtoelKCgADs
+    short-id: 9ea74b83f4993ca9
+  server: nd-3.ardesnode.ru
+  servername: nd-3.ardesnode.ru
   tls: true
-  type: http
-  name: 美国·a04f78 | 网页455.7ms | 373.0Mbps | 机房 | 网段纯净99.35/有滥用
+  type: vless
+  udp: true
+  uuid: 616c7b3b-41f4-4038-88c6-d6fedd0ae4a7
+  name: 荷兰·8be336 | 网页486.7ms | 7.5Mbps | 机房 | 网段纯净98.05
 - port: 443
-  server: 35.183.131.26
+  server: 23.169.224.34
   skip-cert-verify: true
   tls: true
   type: http
-  name: 加拿大·881e61 | 网页504.8ms | 570.9Mbps | 机房 | 网段纯净97.59/有滥用
+  name: 加拿大·0a4adb | 网页542.5ms | 207.3Mbps | 机房 | 网段纯净91.80/有滥用
+- port: 443
+  server: 167.88.60.242
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国·7b754a | 网页531.2ms | 225.9Mbps | 机房 | 网段纯净93.75
+- port: 443
+  server: 185.164.138.156
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 英国·ecb813 | 网页572.2ms | 214.9Mbps | 机房 | 网段纯净68.75
 - port: 9443
   server: 198.44.157.27
   skip-cert-verify: true
   tls: true
   type: http
-  name: 加拿大·6f8cc1 | 网页470ms | 252.9Mbps | 机房 | 网段纯净97.68
-- port: 443
-  server: 206.223.183.16
-  skip-cert-verify: true
+  name: 加拿大·6f8cc1 | 网页486.2ms | 251.3Mbps | 机房 | 网段纯净97.68
+- server: 193.233.74.6
+  port: 8444
+  type: vless
+  uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
   tls: true
-  type: http
-  name: 加拿大·89f027 | 网页569.4ms | 502.3Mbps | 非机房 | 网段纯净100.00
-- type: http
-  server: 147.182.216.4
-  port: 443
-  username: testuser1
-  password: e4b72b531a2d10900519
-  tls: true
-  skip-cert-verify: true
-  name: 美国·0ac48a | 网页610ms | 839.2Mbps | 机房 | 网段纯净86.08/有滥用
-- port: 443
-  server: 206.223.183.13
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 加拿大·71b149 | 网页586.2ms | 202.4Mbps | 非机房 | 网段纯净100.00
-- client-fingerprint: firefox
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
   reality-opts:
-    public-key: 9ZCYjybxMQ7JpE39B8u_Bo-alI1LIbt5ER0E-4yMjiM
-    short-id: ea36c03d86f91287
-  server: 142.91.108.25
-  servername: jp3.nztvpn.com
-  tls: true
-  type: vless
+    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
+    short-id: 457fab2ac885dbe0
+  servername: github.com
+  client-fingerprint: chrome
+  network: grpc
+  grpc-opts:
+    grpc-mode: gun
+    grpc-service-name: GunService
   udp: true
-  uuid: ee18d188-14cc-417e-beb1-70e4add6d023
-  name: 日本·29618a | 网页634.6ms | 3.1Mbps | 机房 | 网段纯净95.46
-- client-fingerprint: random
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 9443
-  reality-opts:
-    public-key: 0hIFPaEn4RdFib8_eP8HYxMywR5izEwM3JA2W1Zo8U4
-    short-id: b390142456517acc
-  server: 156.224.77.171
-  servername: www.amazon.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: fe0721ac-c577-4938-b7ca-8ab5f43bb8da
-  name: 香港·24a64d | 网页764.2ms | 20.4Mbps | 机房 | 网段纯净100.00
-- port: 443
-  server: 212.102.63.31
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国·2396e6 | 网页845.2ms | 164.7Mbps | 机房 | 网段纯净78.52
-- port: 443
-  server: 212.102.63.61
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国·29d1e7 | 网页854.2ms | 167.2Mbps | 机房 | 网段纯净78.52
-- type: trojan
-  network: ws
-  server: 212.183.88.136
-  port: 443
-  password: humanity
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国·4d447b | 网页754.6ms | 120.9Mbps | 机房 | 网段纯净97.89
-- port: 9443
-  server: 84.17.50.214
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国·105125 | 网页857.1ms | 166.5Mbps | 机房 | 网段纯净98.83
-- port: 443
-  server: 84.17.50.193
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国·85cf9e | 网页822.9ms | 167.1Mbps | 机房 | 网段纯净85.94
-- port: 443
-  server: 212.102.63.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国·7f7d62 | 网页865.7ms | 208.3Mbps | 机房 | 网段纯净78.52
-- port: 9443
-  server: 149.36.51.157
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰·7bcba9 | 网页880.1ms | 185.1Mbps | 机房 | 网段纯净99.61
-- port: 9443
-  server: 213.139.9.142
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国·87860e | 网页882.9ms | 148.5Mbps | 机房 | 网段纯净82.42
-- password: None
-  port: 443
-  server: 146.70.123.98
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 比利时·81da2a | 网页896.6ms | 181.4Mbps | 机房 | 网段纯净92.19
-- server: 95.133.247.98
-  port: 995
-  type: vless
-  uuid: df275727-c25a-450b-99c3-29e4e6b0b6b9
-  tls: true
-  servername: love-paris.roxa.org
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /api/v1
-    headers:
-      Host: love-paris.roxa.org
-    v2ray-http-upgrade: true
-  udp: true
-  name: 法国·eb0699 | 网页898.7ms | 110.1Mbps | 机房 | 网段纯净98.44
+  name: 德国·523f05 | 网页421.9ms | 25.0Mbps | 机房 | 网段纯净92.19
 - password: None
   port: 443
   server: 37.120.233.18
   skip-cert-verify: true
   tls: true
   type: http
-  name: 英国·ba16d5 | 网页889.2ms | 160.6Mbps | 机房 | 网段纯净86.33
-- network: ws
-  password: humanity
-  port: 443
-  server: 165.215.250.14
-  skip-cert-verify: true
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国·8099c3 | 网页817ms | 152.4Mbps | 机房 | 网段纯净98.66/有滥用
-- port: 9443
-  server: 149.36.51.161
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰·35f245 | 网页925.9ms | 128.9Mbps | 机房 | 网段纯净87.11
-- network: ws
-  password: humanity
-  port: 443
-  server: www.calmlunch.com
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国·ad52e2 | 网页885.8ms | 183.4Mbps | 机房 | 网段纯净98.66
-- port: 9002
-  server: 84.17.47.146
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰·7bbe4e | 网页840ms | 126.3Mbps | 机房 | 网段纯净74.11/有滥用
-- password: None
-  port: 443
-  server: 149.36.50.157
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 德国·e0c531 | 网页932.9ms | 124.3Mbps | 机房 | 网段纯净85.16
-- port: 9443
-  server: 84.17.50.129
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国·247166 | 网页845.6ms | 161.9Mbps | 机房 | 网段纯净85.94
-- password: None
-  port: 443
-  server: 149.88.96.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 爱尔兰·ce1d84 | 网页875.1ms | 141.7Mbps | 机房 | 网段纯净97.27/有滥用
+  name: 英国·ba16d5 | 网页568.1ms | 200.6Mbps | 机房 | 网段纯净86.33/有滥用
 - port: 443
-  server: 82.65.162.76
+  server: 212.102.63.1
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国·5d6090 | 网页947ms | 97.6Mbps | 住宅候选 | 网段纯净99.77
-- port: 9002
-  server: 84.17.47.148
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰·f56e1c | 网页926.9ms | 99.6Mbps | 机房 | 网段纯净74.11/有滥用
-- port: 9443
-  server: 79.127.156.177
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 德国·45fcd7 | 网页960.6ms | 124.7Mbps | 机房 | 网段纯净99.22
+  name: 英国·7f7d62 | 网页661.1ms | 165.3Mbps | 机房 | 网段纯净78.52/有滥用
 - port: 443
-  server: 149.36.50.129
+  server: 212.102.63.61
   skip-cert-verify: true
   tls: true
   type: http
-  name: 德国·a80f6c | 网页957.3ms | 124.6Mbps | 机房 | 网段纯净85.16/有滥用
+  name: 英国·29d1e7 | 网页664ms | 161.9Mbps | 机房 | 网段纯净78.52
+- port: 9443
+  server: 149.36.51.157
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰·7bcba9 | 网页683.3ms | 148.1Mbps | 机房 | 网段纯净99.61
+- port: 9443
+  server: 149.88.27.46
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 瑞士·9b1671 | 网页667.9ms | 172.8Mbps | 机房 | 网段纯净91.02
+- port: 9443
+  server: 213.177.229.161
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 德国·89dff0 | 网页692.5ms | 174.3Mbps | 机房 | 网段纯净96.48/有滥用
+- port: 9443
+  server: 213.139.9.142
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 法国·87860e | 网页719.3ms | 141.3Mbps | 机房 | 网段纯净82.42
+- port: 9443
+  server: 146.70.170.210
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: NO·ba6a24 | 网页781.1ms | 154.9Mbps | 机房 | 网段纯净89.45/有滥用
 - port: 9443
   server: 37.120.213.210
   skip-cert-verify: true
@@ -1049,228 +708,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 瑞士·43f20a | 网页972.6ms | 143.0Mbps | 机房 | 网段纯净95.31/有滥用
-- port: 443
-  server: 149.34.248.65
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国·5c0fa0 | 网页987.3ms | 141.6Mbps | 机房 | 网段纯净98.05
-- port: 19362
-  server: 51.159.225.197
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰·1202c8 | 网页919.6ms | 135.9Mbps | 机房 | 网段纯净99.60
-- type: http
-  server: 185.238.168.20
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰·e32426 | 网页934.8ms | 32.7Mbps | 机房 | 网段纯净98.83/有滥用
-- port: 443
-  server: 5.255.125.187
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰·3c7681 | 网页952.7ms | 131.7Mbps | 机房 | 网段纯净91.41/有滥用
-- port: 9002
-  server: 84.17.47.149
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰·8e0c53 | 网页980.2ms | 141.8Mbps | 机房 | 网段纯净74.11/有滥用
-- port: 9002
-  server: 84.17.47.125
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰·6ae015 | 网页966.5ms | 127.9Mbps | 机房 | 网段纯净74.11/有滥用
-- port: 9002
-  server: 84.17.47.124
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰·16421a | 网页962.5ms | 133.2Mbps | 机房 | 网段纯净74.11/有滥用
-- password: None
-  port: 9002
-  server: 84.17.47.148
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰·4ce013 | 网页967.5ms | 102.1Mbps | 机房 | 网段纯净74.11/有滥用
-- port: 443
-  server: 185.246.153.42
-  skip-cert-verify: true
-  sni: 482c8436a1f7c908b48a1757abb5dd79-3791fb4df2db250b.apache-iv.com
-  tls: true
-  type: http
-  name: 荷兰·5167f1 | 网页989.5ms | 85.9Mbps | 机房 | 网段纯净99.22/有滥用
-- password: None
-  port: 443
-  server: 31.7.62.50
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 瑞士·f849cb | 网页1012.5ms | 167.9Mbps | 机房 | 网段纯净89.84/有滥用
-- type: http
-  server: 84.17.47.125
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰·dab2e1 | 网页1021.2ms | 118.0Mbps | 机房 | 网段纯净74.11/有滥用
-- network: ws
-  password: humanity
-  port: 2053
-  server: 185.114.72.31
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国·ebd2ca | 网页999ms | 3.4Mbps | 机房 | 网段纯净98.66/有滥用
-- port: 9002
-  server: 84.17.47.123
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰·288b8d | 网页991.2ms | 119.4Mbps | 机房 | 网段纯净74.11/有滥用
-- type: trojan
-  network: ws
-  server: 213.1.145.50
-  port: 443
-  password: humanity
-  skip-cert-verify: true
-  udp: true
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国·3de924 | 网页965.4ms | 4.4Mbps | 机房 | 网段纯净95.07
-- password: None
-  port: 443
-  server: 146.70.221.34
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 塞尔维亚·c3b9a6 | 网页1048.8ms | 149.2Mbps | 机房 | 网段纯净96.87
-- port: 9002
-  server: 84.17.47.150
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰·84f57c | 网页978.1ms | 122.3Mbps | 机房 | 网段纯净74.11/有滥用
-- type: http
-  server: 185.238.170.10
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰·d0f1d6 | 网页969.4ms | 27.7Mbps | 机房 | 网段纯净98.83/有滥用
-- password: None
-  port: 9002
-  server: 84.17.47.125
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰·71d24b | 网页963.9ms | 112.1Mbps | 机房 | 网段纯净74.11/有滥用
-- password: None
-  port: 443
-  server: 146.70.242.130
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 瑞典·61779d | 网页1007.1ms | 123.0Mbps | 机房 | 网段纯净91.02
-- client-fingerprint: chrome
-  network: grpc
-  port: 8444
-  reality-opts:
-    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
-    short-id: ''
-  server: 185.200.199.75
-  servername: github.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
-  name: 荷兰·f25f77 | 网页494.9ms | 199.1Mbps | 机房 | 网段纯净98.83
-- port: 9443
-  server: 95.153.31.66
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 爱沙尼亚·9bfab8 | 网页1048.8ms | 112.4Mbps | 机房 | 网段纯净88.67/有滥用
-- password: None
-  port: 443
-  server: 146.70.244.2
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 奥地利·fc25e7 | 网页1083.3ms | 112.7Mbps | 机房 | 网段纯净97.66
-- port: 9443
-  server: 146.70.170.210
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: NO·ba6a24 | 网页1082.6ms | 130.1Mbps | 机房 | 网段纯净89.45/有滥用
-- port: 443
-  server: 37.120.156.18
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 波兰·017e48 | 网页1081ms | 134.5Mbps | 机房 | 网段纯净96.48
-- password: None
-  port: 443
-  server: 185.183.105.146
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 意大利·ecc102 | 网页1074ms | 134.9Mbps | 机房 | 网段纯净96.35
-- alpn:
-  - http/1.1
-  network: ws
-  password: humanity
-  port: 443
-  server: 104.18.35.86
-  skip-cert-verify: true
-  sni: www.volumerOot.coM.
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.volumerOot.coM.
-    path: /assignment
-  name: 荷兰·0aac6c | 网页1106.9ms | 196.9Mbps | 机房 | 网段纯净94.81/有滥用
-- port: 9002
-  server: 158.173.154.5
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 德国·ff4732 | 网页1053.6ms | 109.1Mbps | 机房 | 网段纯净93.36
-- port: 443
-  server: 79.142.77.63
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 瑞典·e6f430 | 网页1070.2ms | 130.1Mbps | 机房 | 网段纯净93.74
-- port: 9002
-  server: 193.176.84.33
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚·06ce6c | 网页1124.6ms | 100.1Mbps | 机房 | 网段纯净86.72/有滥用
+  name: 瑞士·43f20a | 网页799.8ms | 140.1Mbps | 机房 | 网段纯净95.31
 - client-fingerprint: firefox
   network: grpc
   port: 8444
@@ -1283,275 +721,226 @@ proxies:
   type: vless
   udp: true
   uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
-  name: 德国·4c2305 | 网页618.3ms | 198.5Mbps | 机房 | 网段纯净92.19
-- port: 9002
-  server: 193.176.84.25
+  name: 德国·4c2305 | 网页461.6ms | 23.9Mbps | 机房 | 网段纯净92.19
+- password: None
+  port: 443
+  server: 31.7.62.50
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 瑞士·f849cb | 网页809.1ms | 130.0Mbps | 机房 | 网段纯净89.84
+- password: None
+  port: 443
+  server: 149.36.51.129
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰·a24837 | 网页840.1ms | 128.3Mbps | 机房 | 网段纯净87.11
+- port: 443
+  server: 146.70.176.242
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 比利时·e79476 | 网页834.1ms | 127.2Mbps | 机房 | 网段纯净91.41
+- type: http
+  server: 51.158.202.56
+  port: 14287
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰·f71709 | 网页847ms | 102.0Mbps | 机房 | 网段纯净94.81
+- password: None
+  port: 443
+  server: 87.249.132.97
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 德国·b0e6a2 | 网页847.7ms | 124.3Mbps | 机房 | 网段纯净92.48
+- password: None
+  port: 443
+  server: 185.245.84.50
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: DK·767592 | 网页834ms | 137.0Mbps | 机房 | 网段纯净87.89/有滥用
+- port: 443
+  server: 185.216.35.66
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚·179c6b | 网页1129ms | 85.0Mbps | 机房 | 网段纯净86.72/有滥用
-- port: 9002
-  server: 193.176.84.24
+  name: 捷克·09a158 | 网页856.8ms | 104.5Mbps | 机房 | 网段纯净94.92
+- password: None
+  port: 443
+  server: 185.183.105.146
   skip-cert-verify: true
   tls: true
   type: http
+  name: 意大利·ecc102 | 网页837.1ms | 126.5Mbps | 机房 | 网段纯净96.35/有滥用
+- port: 443
+  server: 149.34.248.65
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
   udp: true
-  name: 罗马尼亚·8a47e3 | 网页1117ms | 4.5Mbps | 机房 | 网段纯净86.72
+  name: 美国·5c0fa0 | 网页864.8ms | 122.8Mbps | 机房 | 网段纯净98.05
+- password: None
+  port: 443
+  server: 82.102.17.178
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 西班牙·97c7e4 | 网页889.6ms | 117.4Mbps | 机房 | 网段纯净96.87
 - port: 9443
-  server: 135.136.1.2
+  server: 138.199.47.247
   skip-cert-verify: true
   tls: true
   type: http
-  name: 罗马尼亚·1c83ba | 网页1137.7ms | 105.4Mbps | 机房 | 网段纯净94.53
-- client-fingerprint: firefox
-  network: grpc
-  port: 8444
-  reality-opts:
-    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
-    short-id: ''
-  server: 185.200.199.75
-  servername: github.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
-  name: 荷兰·87dace | 网页498.8ms | 183.2Mbps | 机房 | 网段纯净98.83
-- port: 9002
-  server: 193.176.84.21
+  name: 法国·a6b03c | 网页900.6ms | 118.2Mbps | 机房 | 网段纯净99.61
+- password: None
+  port: 443
+  server: 37.120.233.34
   skip-cert-verify: true
   tls: true
   type: http
-  name: 罗马尼亚·93ff9e | 网页1165.4ms | 59.1Mbps | 机房 | 网段纯净86.72/有滥用
+  name: 英国·ca34b9 | 网页808.4ms | 130.4Mbps | 机房 | 网段纯净86.33
+- port: 443
+  server: 79.142.77.63
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 瑞典·e6f430 | 网页900.6ms | 132.8Mbps | 机房 | 网段纯净93.74
+- port: 443
+  server: 37.120.156.34
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 波兰·49fb3e | 网页842.4ms | 137.1Mbps | 机房 | 网段纯净96.48
+- port: 443
+  server: 82.65.162.76
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 法国·5d6090 | 网页892.7ms | 93.9Mbps | 住宅候选 | 网段纯净99.77
+- password: None
+  port: 443
+  server: 146.70.221.34
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 塞尔维亚·c3b9a6 | 网页908.4ms | 125.3Mbps | 机房 | 网段纯净96.87
 - port: 443
   server: 82.64.255.151
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国·4ec7b2 | 网页1054.1ms | 102.6Mbps | 住宅候选 | 网段纯净100.00
-- password: None
-  port: 9002
-  server: 193.176.84.31
+  name: 法国·4ec7b2 | 网页919.8ms | 82.1Mbps | 住宅候选 | 网段纯净100.00
+- port: 443
+  server: 146.70.221.18
   skip-cert-verify: true
   tls: true
   type: http
-  udp: true
-  name: 罗马尼亚·ff1758 | 网页1145.5ms | 74.3Mbps | 机房 | 网段纯净86.72/有滥用
+  name: 塞尔维亚·75a2f6 | 网页950.1ms | 119.9Mbps | 机房 | 网段纯净96.87
 - port: 443
   server: 185.221.132.242
   skip-cert-verify: true
   tls: true
   type: http
-  name: 卢森堡·20e2cc | 网页960.9ms | 126.2Mbps | 机房 | 网段纯净93.36
+  name: 卢森堡·20e2cc | 网页888ms | 125.5Mbps | 机房 | 网段纯净93.36
 - port: 9443
-  server: 169.150.199.1
+  server: 79.127.156.177
   skip-cert-verify: true
   tls: true
   type: http
-  name: 罗马尼亚·515947 | 网页1190.4ms | 125.5Mbps | 机房 | 网段纯净91.41
-- password: 'null'
-  port: 9002
-  server: 193.176.84.17
+  name: 德国·45fcd7 | 网页855.1ms | 123.4Mbps | 机房 | 网段纯净99.22
+- port: 443
+  server: 37.120.156.18
   skip-cert-verify: true
   tls: true
   type: http
-  username: 'null'
-  name: 罗马尼亚·572236 | 网页1199ms | 82.2Mbps | 机房 | 网段纯净86.72/有滥用
+  name: 波兰·017e48 | 网页749.6ms | 167.1Mbps | 机房 | 网段纯净96.48
+- type: http
+  server: 51.158.194.16
+  port: 14287
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰·102537 | 网页735.1ms | 115.6Mbps | 机房 | 网段纯净94.81
+- port: 443
+  server: 149.22.85.78
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: GR·7c75df | 网页966.9ms | 123.6Mbps | 机房 | 网段纯净95.31/有滥用
 - port: 443
   server: 85.203.39.130
   skip-cert-verify: true
   tls: true
   type: http
-  name: 拉脱维亚·bfcd75 | 网页1205.5ms | 124.5Mbps | 机房 | 网段纯净94.53
-- port: 9002
-  server: 193.176.84.39
+  name: 拉脱维亚·bfcd75 | 网页1026.6ms | 113.8Mbps | 机房 | 网段纯净94.53
+- port: 443
+  server: 146.70.242.146
   skip-cert-verify: true
   tls: true
   type: http
-  udp: true
-  name: 罗马尼亚·c14fbf | 网页1171.2ms | 75.8Mbps | 机房 | 网段纯净86.72/有滥用
+  name: 瑞典·1bbe8a | 网页1029.9ms | 112.7Mbps | 机房 | 网段纯净91.02/有滥用
 - type: http
-  server: 103.86.117.202
+  server: 95.229.15.89
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 印度尼西亚·dac8c5 | 网页1232.2ms | 65.4Mbps | 住宅候选 | 网段纯净96.48/有滥用
-- type: http
-  server: 146.70.29.45
-  port: 443
-  username: testuser1
-  password: e4b72b531a2d10900519
-  tls: true
-  sni: 92461d2d.acsnet.co
-  skip-cert-verify: true
-  name: 新加坡·94eb49 | 网页1163.8ms | 60.6Mbps | 机房 | 网段纯净96.48/有滥用
-- port: 443
-  server: 185.219.159.15
+  name: 意大利·98d767 | 网页977.9ms | 83.9Mbps | 住宅候选 | 网段纯净99.93/有滥用
+- port: 9443
+  server: 169.150.199.1
   skip-cert-verify: true
   tls: true
   type: http
-  name: 拉脱维亚·b33cca | 网页1119.5ms | 104.6Mbps | 机房 | 网段纯净98.73/有滥用
-- password: None
-  port: 9002
-  server: 193.176.84.23
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚·c61328 | 网页1160.3ms | 3.9Mbps | 机房 | 网段纯净86.72/有滥用
-- port: 9002
-  server: 193.176.84.20
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚·cc6731 | 网页1122.1ms | 4.3Mbps | 机房 | 网段纯净86.72/有滥用
-- port: 9002
-  server: 193.176.84.17
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚·8922ce | 网页1194.1ms | 75.2Mbps | 机房 | 网段纯净86.72/有滥用
-- port: 9002
-  server: 193.176.84.19
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚·e79b52 | 网页1286.9ms | 38.6Mbps | 机房 | 网段纯净86.72
-- port: 9002
-  server: 193.176.84.23
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚·0be334 | 网页1182.3ms | 74.7Mbps | 机房 | 网段纯净86.72/有滥用
-- type: http
-  server: 62.90.77.30
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 以色列·08af63 | 网页1256.5ms | 68.7Mbps | 非机房 | 网段纯净99.61
-- port: 9002
-  server: 193.176.84.27
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚·3da7f0 | 网页1238.6ms | 73.4Mbps | 机房 | 网段纯净86.72
-- port: 9002
-  server: 193.176.84.32
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚·268541 | 网页1147.4ms | 31.3Mbps | 机房 | 网段纯净86.72/有滥用
-- password: gs4BXwT6SW
-  port: 10988
-  server: 154.26.192.123
-  tls: false
-  type: http
-  username: fQ67Dpe5dU
-  name: 美国·87b045 | 网页1167.4ms | 2.1Mbps | 非机房 | 网段纯净99.80/有滥用
-- port: 443
-  server: 148.135.10.80
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国·21d02e | 网页1328.5ms | 196.8Mbps | 机房 | 网段纯净99.21/有滥用
-- port: 443
-  server: 149.22.86.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: PT·f54a60 | 网页1360.7ms | 83.5Mbps | 机房 | 网段纯净96.09
-- port: 443
-  server: 185.164.35.16
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: BA·876e61 | 网页1291.7ms | 137.3Mbps | 机房 | 网段纯净94.14
+  name: 罗马尼亚·515947 | 网页1047.2ms | 109.5Mbps | 机房 | 网段纯净91.41/有滥用
 - password: None
   port: 443
   server: 149.22.86.14
   skip-cert-verify: true
   tls: true
   type: http
-  name: PT·aba2a3 | 网页1368.2ms | 104.2Mbps | 机房 | 网段纯净96.09
-- port: 443
-  server: 87.120.103.226
+  name: PT·aba2a3 | 网页1232ms | 86.3Mbps | 机房 | 网段纯净96.09
+- port: 9443
+  server: 135.136.1.2
   skip-cert-verify: true
   tls: true
   type: http
-  name: AL·9f75c6 | 网页1218.3ms | 103.8Mbps | 机房 | 网段纯净81.25
-- port: 9002
-  server: 193.176.84.30
+  name: 罗马尼亚·1c83ba | 网页1187.3ms | 104.9Mbps | 机房 | 网段纯净94.53
+- port: 443
+  server: 149.22.85.65
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚·1c34de | 网页1359.3ms | 103.7Mbps | 机房 | 网段纯净86.72
-- type: http
-  server: 193.176.84.35
-  port: 9002
-  tls: true
-  sni: www.bing.com
-  skip-cert-verify: true
-  name: 罗马尼亚·491078 | 网页1239ms | 33.5Mbps | 机房 | 网段纯净86.72
-- type: http
-  server: 193.176.84.35
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 193.176.84.35
-  skip-cert-verify: true
-  name: 罗马尼亚·4a209b | 网页1302.2ms | 62.4Mbps | 机房 | 网段纯净86.72
-- network: ws
-  password: humanity
-  port: 443
-  server: 104.19.229.21
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国·b13fc8 | 网页918.4ms | 170.1Mbps | 机房 | 网段纯净98.66/有滥用
-- network: ws
-  password: humanity
-  port: 443
-  server: 185.220.100.168
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国·72c499 | 网页1340.5ms | 78.5Mbps | 机房 | 网段纯净98.66
-- network: ws
-  password: humanity
-  port: 443
-  server: 212.183.88.136
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国·e2f948 | 网页809.9ms | 118.7Mbps | 机房 | 网段纯净97.89
-- password: None
-  port: 9002
-  server: 193.176.84.33
+  name: GR·45de2f | 网页1326.4ms | 88.6Mbps | 机房 | 网段纯净95.31
+- port: 443
+  server: 149.22.86.1
   skip-cert-verify: true
   tls: true
   type: http
-  username: 'null'
-  name: 罗马尼亚·7e8b65 | 网页1248ms | 94.0Mbps | 机房 | 网段纯净86.72/有滥用
+  name: PT·f54a60 | 网页1328.6ms | 83.6Mbps | 机房 | 网段纯净96.09
+- type: http
+  server: 165.231.253.210
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 印度·afc9b3 | 网页1180.4ms | 87.6Mbps | 机房 | 网段纯净99.83
+- password: None
+  port: 443
+  server: 146.70.123.98
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 比利时·81da2a | 网页749.7ms | 147.5Mbps | 机房 | 网段纯净92.19
+- type: http
+  server: 154.26.139.24
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 新加坡·1111fa | 网页1819.4ms | 58.6Mbps | 机房 | 网段纯净97.56/有滥用
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -1564,284 +953,143 @@ proxy-groups:
 - name: ⭐ 综合优选
   type: select
   proxies:
-  - 美国·f713be | 网页279ms | 242.7Mbps | 机房 | 网段纯净80.47/有滥用
-  - 德国·74a6e3 | 网页258.5ms | 97.4Mbps | 机房 | 纯净未知
-  - 美国·79ba21 | 网页294.2ms | 300.4Mbps | 机房 | 网段纯净99.88
-  - 美国·f1d0bc | 网页301.3ms | 159.7Mbps | 机房 | 网段纯净99.46
-  - 美国·cd6d3b | 网页302.7ms | 250.9Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·cbe264 | 网页292.4ms | 160.1Mbps | 机房 | 纯净未知
-  - 美国·cdfed7 | 网页294ms | 969.3Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·5eba1a | 网页299.2ms | 325.8Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·df9d14 | 网页280.8ms | 248.7Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·56db9a | 网页293.3ms | 1008.9Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·4cc004 | 网页316.7ms | 190.6Mbps | 机房 | 网段纯净99.59/有滥用
-  - 德国·18cdcb | 网页316.1ms | 134.1Mbps | 机房 | 网段纯净99.92
-  - 德国·34c5df | 网页323.6ms | 78.4Mbps | 机房 | 网段纯净99.92
-  - 美国·fa77d1 | 网页277.7ms | 313.0Mbps | 机房 | 网段纯净99.18/有滥用
-  - 美国·69882c | 网页333.7ms | 187.1Mbps | 机房 | 网段纯净99.60
-  - 印度尼西亚·5f32db | 网页284.4ms | 4.8Mbps | 住宅候选 | 网段纯净99.92
-  - 美国·dfa90b | 网页348.9ms | 529.8Mbps | 住宅候选 | 网段纯净100.00
-  - 美国·8d46b7 | 网页333.3ms | 290.7Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·1e389f | 网页314.2ms | 217.2Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·a134d3 | 网页354ms | 327.6Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·7e108e | 网页343.2ms | 311.1Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·fec11f | 网页368.3ms | 335.4Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·f11a2f | 网页328.6ms | 327.0Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·eb90f7 | 网页367.8ms | 1101.5Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·aea197 | 网页361.9ms | 16.3Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·2ce02f | 网页336.5ms | 238.6Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·c46373 | 网页397.9ms | 335.8Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·4e6afc | 网页369.5ms | 1042.6Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·212782 | 网页400.4ms | 321.0Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·db306c | 网页396.7ms | 13.4Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·95a0dc | 网页384.6ms | 425.8Mbps | 住宅候选 | 网段纯净99.97
-  - 美国·537df6 | 网页455.2ms | 301.6Mbps | 机房 | 网段纯净94.53
-  - 美国·02240d | 网页452ms | 531.0Mbps | 机房 | 网段纯净94.53
-  - 美国·779bb0 | 网页350.5ms | 719.7Mbps | 机房 | 网段纯净99.61
-  - 加拿大·1ad741 | 网页487.3ms | 560.0Mbps | 机房 | 网段纯净97.68
-  - 美国·a04f78 | 网页455.7ms | 373.0Mbps | 机房 | 网段纯净99.35/有滥用
-  - 加拿大·881e61 | 网页504.8ms | 570.9Mbps | 机房 | 网段纯净97.59/有滥用
-  - 加拿大·6f8cc1 | 网页470ms | 252.9Mbps | 机房 | 网段纯净97.68
-  - 加拿大·89f027 | 网页569.4ms | 502.3Mbps | 非机房 | 网段纯净100.00
-  - 美国·0ac48a | 网页610ms | 839.2Mbps | 机房 | 网段纯净86.08/有滥用
-  - 加拿大·71b149 | 网页586.2ms | 202.4Mbps | 非机房 | 网段纯净100.00
-  - 日本·29618a | 网页634.6ms | 3.1Mbps | 机房 | 网段纯净95.46
-  - 香港·24a64d | 网页764.2ms | 20.4Mbps | 机房 | 网段纯净100.00
-  - 英国·2396e6 | 网页845.2ms | 164.7Mbps | 机房 | 网段纯净78.52
-  - 英国·29d1e7 | 网页854.2ms | 167.2Mbps | 机房 | 网段纯净78.52
-  - 法国·4d447b | 网页754.6ms | 120.9Mbps | 机房 | 网段纯净97.89
-  - 英国·105125 | 网页857.1ms | 166.5Mbps | 机房 | 网段纯净98.83
-  - 英国·85cf9e | 网页822.9ms | 167.1Mbps | 机房 | 网段纯净85.94
-  - 英国·7f7d62 | 网页865.7ms | 208.3Mbps | 机房 | 网段纯净78.52
-  - 荷兰·7bcba9 | 网页880.1ms | 185.1Mbps | 机房 | 网段纯净99.61
-  - 法国·87860e | 网页882.9ms | 148.5Mbps | 机房 | 网段纯净82.42
-  - 比利时·81da2a | 网页896.6ms | 181.4Mbps | 机房 | 网段纯净92.19
-  - 法国·eb0699 | 网页898.7ms | 110.1Mbps | 机房 | 网段纯净98.44
-  - 英国·ba16d5 | 网页889.2ms | 160.6Mbps | 机房 | 网段纯净86.33
-  - 法国·8099c3 | 网页817ms | 152.4Mbps | 机房 | 网段纯净98.66/有滥用
-  - 荷兰·35f245 | 网页925.9ms | 128.9Mbps | 机房 | 网段纯净87.11
-  - 法国·ad52e2 | 网页885.8ms | 183.4Mbps | 机房 | 网段纯净98.66
-  - 荷兰·7bbe4e | 网页840ms | 126.3Mbps | 机房 | 网段纯净74.11/有滥用
-  - 德国·e0c531 | 网页932.9ms | 124.3Mbps | 机房 | 网段纯净85.16
-  - 英国·247166 | 网页845.6ms | 161.9Mbps | 机房 | 网段纯净85.94
-  - 爱尔兰·ce1d84 | 网页875.1ms | 141.7Mbps | 机房 | 网段纯净97.27/有滥用
-  - 法国·5d6090 | 网页947ms | 97.6Mbps | 住宅候选 | 网段纯净99.77
-  - 荷兰·f56e1c | 网页926.9ms | 99.6Mbps | 机房 | 网段纯净74.11/有滥用
-  - 德国·45fcd7 | 网页960.6ms | 124.7Mbps | 机房 | 网段纯净99.22
-  - 德国·a80f6c | 网页957.3ms | 124.6Mbps | 机房 | 网段纯净85.16/有滥用
-  - 瑞士·43f20a | 网页972.6ms | 143.0Mbps | 机房 | 网段纯净95.31/有滥用
-  - 美国·5c0fa0 | 网页987.3ms | 141.6Mbps | 机房 | 网段纯净98.05
-  - 荷兰·1202c8 | 网页919.6ms | 135.9Mbps | 机房 | 网段纯净99.60
-  - 荷兰·e32426 | 网页934.8ms | 32.7Mbps | 机房 | 网段纯净98.83/有滥用
-  - 荷兰·3c7681 | 网页952.7ms | 131.7Mbps | 机房 | 网段纯净91.41/有滥用
-  - 荷兰·8e0c53 | 网页980.2ms | 141.8Mbps | 机房 | 网段纯净74.11/有滥用
-  - 荷兰·6ae015 | 网页966.5ms | 127.9Mbps | 机房 | 网段纯净74.11/有滥用
-  - 荷兰·16421a | 网页962.5ms | 133.2Mbps | 机房 | 网段纯净74.11/有滥用
-  - 荷兰·4ce013 | 网页967.5ms | 102.1Mbps | 机房 | 网段纯净74.11/有滥用
-  - 荷兰·5167f1 | 网页989.5ms | 85.9Mbps | 机房 | 网段纯净99.22/有滥用
-  - 瑞士·f849cb | 网页1012.5ms | 167.9Mbps | 机房 | 网段纯净89.84/有滥用
-  - 荷兰·dab2e1 | 网页1021.2ms | 118.0Mbps | 机房 | 网段纯净74.11/有滥用
-  - 法国·ebd2ca | 网页999ms | 3.4Mbps | 机房 | 网段纯净98.66/有滥用
-  - 荷兰·288b8d | 网页991.2ms | 119.4Mbps | 机房 | 网段纯净74.11/有滥用
-  - 法国·3de924 | 网页965.4ms | 4.4Mbps | 机房 | 网段纯净95.07
-  - 塞尔维亚·c3b9a6 | 网页1048.8ms | 149.2Mbps | 机房 | 网段纯净96.87
-  - 荷兰·84f57c | 网页978.1ms | 122.3Mbps | 机房 | 网段纯净74.11/有滥用
-  - 荷兰·d0f1d6 | 网页969.4ms | 27.7Mbps | 机房 | 网段纯净98.83/有滥用
-  - 荷兰·71d24b | 网页963.9ms | 112.1Mbps | 机房 | 网段纯净74.11/有滥用
-  - 瑞典·61779d | 网页1007.1ms | 123.0Mbps | 机房 | 网段纯净91.02
-  - 荷兰·f25f77 | 网页494.9ms | 199.1Mbps | 机房 | 网段纯净98.83
-  - 爱沙尼亚·9bfab8 | 网页1048.8ms | 112.4Mbps | 机房 | 网段纯净88.67/有滥用
-  - 奥地利·fc25e7 | 网页1083.3ms | 112.7Mbps | 机房 | 网段纯净97.66
-  - NO·ba6a24 | 网页1082.6ms | 130.1Mbps | 机房 | 网段纯净89.45/有滥用
-  - 波兰·017e48 | 网页1081ms | 134.5Mbps | 机房 | 网段纯净96.48
-  - 意大利·ecc102 | 网页1074ms | 134.9Mbps | 机房 | 网段纯净96.35
-  - 荷兰·0aac6c | 网页1106.9ms | 196.9Mbps | 机房 | 网段纯净94.81/有滥用
-  - 德国·ff4732 | 网页1053.6ms | 109.1Mbps | 机房 | 网段纯净93.36
-  - 瑞典·e6f430 | 网页1070.2ms | 130.1Mbps | 机房 | 网段纯净93.74
-  - 罗马尼亚·06ce6c | 网页1124.6ms | 100.1Mbps | 机房 | 网段纯净86.72/有滥用
-  - 德国·4c2305 | 网页618.3ms | 198.5Mbps | 机房 | 网段纯净92.19
-  - 罗马尼亚·179c6b | 网页1129ms | 85.0Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·8a47e3 | 网页1117ms | 4.5Mbps | 机房 | 网段纯净86.72
-  - 罗马尼亚·1c83ba | 网页1137.7ms | 105.4Mbps | 机房 | 网段纯净94.53
-  - 荷兰·87dace | 网页498.8ms | 183.2Mbps | 机房 | 网段纯净98.83
-  - 罗马尼亚·93ff9e | 网页1165.4ms | 59.1Mbps | 机房 | 网段纯净86.72/有滥用
-  - 法国·4ec7b2 | 网页1054.1ms | 102.6Mbps | 住宅候选 | 网段纯净100.00
-  - 罗马尼亚·ff1758 | 网页1145.5ms | 74.3Mbps | 机房 | 网段纯净86.72/有滥用
-  - 卢森堡·20e2cc | 网页960.9ms | 126.2Mbps | 机房 | 网段纯净93.36
-  - 罗马尼亚·515947 | 网页1190.4ms | 125.5Mbps | 机房 | 网段纯净91.41
-  - 罗马尼亚·572236 | 网页1199ms | 82.2Mbps | 机房 | 网段纯净86.72/有滥用
-  - 拉脱维亚·bfcd75 | 网页1205.5ms | 124.5Mbps | 机房 | 网段纯净94.53
-  - 罗马尼亚·c14fbf | 网页1171.2ms | 75.8Mbps | 机房 | 网段纯净86.72/有滥用
-  - 印度尼西亚·dac8c5 | 网页1232.2ms | 65.4Mbps | 住宅候选 | 网段纯净96.48/有滥用
-  - 新加坡·94eb49 | 网页1163.8ms | 60.6Mbps | 机房 | 网段纯净96.48/有滥用
-  - 拉脱维亚·b33cca | 网页1119.5ms | 104.6Mbps | 机房 | 网段纯净98.73/有滥用
-  - 罗马尼亚·c61328 | 网页1160.3ms | 3.9Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·cc6731 | 网页1122.1ms | 4.3Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·8922ce | 网页1194.1ms | 75.2Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·e79b52 | 网页1286.9ms | 38.6Mbps | 机房 | 网段纯净86.72
-  - 罗马尼亚·0be334 | 网页1182.3ms | 74.7Mbps | 机房 | 网段纯净86.72/有滥用
-  - 以色列·08af63 | 网页1256.5ms | 68.7Mbps | 非机房 | 网段纯净99.61
-  - 罗马尼亚·3da7f0 | 网页1238.6ms | 73.4Mbps | 机房 | 网段纯净86.72
-  - 罗马尼亚·268541 | 网页1147.4ms | 31.3Mbps | 机房 | 网段纯净86.72/有滥用
-  - 美国·87b045 | 网页1167.4ms | 2.1Mbps | 非机房 | 网段纯净99.80/有滥用
-  - 美国·21d02e | 网页1328.5ms | 196.8Mbps | 机房 | 网段纯净99.21/有滥用
-  - PT·f54a60 | 网页1360.7ms | 83.5Mbps | 机房 | 网段纯净96.09
-  - BA·876e61 | 网页1291.7ms | 137.3Mbps | 机房 | 网段纯净94.14
-  - PT·aba2a3 | 网页1368.2ms | 104.2Mbps | 机房 | 网段纯净96.09
-  - AL·9f75c6 | 网页1218.3ms | 103.8Mbps | 机房 | 网段纯净81.25
-  - 罗马尼亚·1c34de | 网页1359.3ms | 103.7Mbps | 机房 | 网段纯净86.72
-  - 罗马尼亚·491078 | 网页1239ms | 33.5Mbps | 机房 | 网段纯净86.72
-  - 罗马尼亚·4a209b | 网页1302.2ms | 62.4Mbps | 机房 | 网段纯净86.72
-  - 法国·b13fc8 | 网页918.4ms | 170.1Mbps | 机房 | 网段纯净98.66/有滥用
-  - 法国·72c499 | 网页1340.5ms | 78.5Mbps | 机房 | 网段纯净98.66
-  - 法国·e2f948 | 网页809.9ms | 118.7Mbps | 机房 | 网段纯净97.89
-  - 罗马尼亚·7e8b65 | 网页1248ms | 94.0Mbps | 机房 | 网段纯净86.72/有滥用
+  - 美国·42af5f | 网页243.6ms | 661.8Mbps | 机房 | 网段纯净62.50/有滥用
+  - 美国·95a0dc | 网页244.8ms | 432.0Mbps | 住宅候选 | 网段纯净99.97
+  - 加拿大·89f027 | 网页311.4ms | 512.1Mbps | 非机房 | 网段纯净100.00
+  - 美国·d3db60 | 网页282ms | 74.7Mbps | 机房 | 网段纯净93.36
+  - 美国·dfa90b | 网页344.3ms | 175.6Mbps | 住宅候选 | 网段纯净100.00
+  - 美国·79ba21 | 网页364.8ms | 431.3Mbps | 机房 | 网段纯净99.88
+  - 美国·bd504a | 网页368.2ms | 280.1Mbps | 机房 | 网段纯净99.98/有滥用
+  - 美国·02240d | 网页316.4ms | 183.0Mbps | 机房 | 网段纯净94.53
+  - 美国·537df6 | 网页416.9ms | 296.4Mbps | 机房 | 网段纯净94.53/有滥用
+  - 荷兰·d898eb | 网页486.5ms | 7.7Mbps | 机房 | 网段纯净98.05
+  - 加拿大·1ad741 | 网页408.1ms | 633.4Mbps | 机房 | 网段纯净97.68
+  - 荷兰·8be336 | 网页486.7ms | 7.5Mbps | 机房 | 网段纯净98.05
+  - 加拿大·0a4adb | 网页542.5ms | 207.3Mbps | 机房 | 网段纯净91.80/有滥用
+  - 美国·7b754a | 网页531.2ms | 225.9Mbps | 机房 | 网段纯净93.75
+  - 英国·ecb813 | 网页572.2ms | 214.9Mbps | 机房 | 网段纯净68.75
+  - 加拿大·6f8cc1 | 网页486.2ms | 251.3Mbps | 机房 | 网段纯净97.68
+  - 德国·523f05 | 网页421.9ms | 25.0Mbps | 机房 | 网段纯净92.19
+  - 英国·ba16d5 | 网页568.1ms | 200.6Mbps | 机房 | 网段纯净86.33/有滥用
+  - 英国·7f7d62 | 网页661.1ms | 165.3Mbps | 机房 | 网段纯净78.52/有滥用
+  - 英国·29d1e7 | 网页664ms | 161.9Mbps | 机房 | 网段纯净78.52
+  - 荷兰·7bcba9 | 网页683.3ms | 148.1Mbps | 机房 | 网段纯净99.61
+  - 瑞士·9b1671 | 网页667.9ms | 172.8Mbps | 机房 | 网段纯净91.02
+  - 德国·89dff0 | 网页692.5ms | 174.3Mbps | 机房 | 网段纯净96.48/有滥用
+  - 法国·87860e | 网页719.3ms | 141.3Mbps | 机房 | 网段纯净82.42
+  - NO·ba6a24 | 网页781.1ms | 154.9Mbps | 机房 | 网段纯净89.45/有滥用
+  - 瑞士·43f20a | 网页799.8ms | 140.1Mbps | 机房 | 网段纯净95.31
+  - 德国·4c2305 | 网页461.6ms | 23.9Mbps | 机房 | 网段纯净92.19
+  - 瑞士·f849cb | 网页809.1ms | 130.0Mbps | 机房 | 网段纯净89.84
+  - 荷兰·a24837 | 网页840.1ms | 128.3Mbps | 机房 | 网段纯净87.11
+  - 比利时·e79476 | 网页834.1ms | 127.2Mbps | 机房 | 网段纯净91.41
+  - 荷兰·f71709 | 网页847ms | 102.0Mbps | 机房 | 网段纯净94.81
+  - 德国·b0e6a2 | 网页847.7ms | 124.3Mbps | 机房 | 网段纯净92.48
+  - DK·767592 | 网页834ms | 137.0Mbps | 机房 | 网段纯净87.89/有滥用
+  - 捷克·09a158 | 网页856.8ms | 104.5Mbps | 机房 | 网段纯净94.92
+  - 意大利·ecc102 | 网页837.1ms | 126.5Mbps | 机房 | 网段纯净96.35/有滥用
+  - 美国·5c0fa0 | 网页864.8ms | 122.8Mbps | 机房 | 网段纯净98.05
+  - 西班牙·97c7e4 | 网页889.6ms | 117.4Mbps | 机房 | 网段纯净96.87
+  - 法国·a6b03c | 网页900.6ms | 118.2Mbps | 机房 | 网段纯净99.61
+  - 英国·ca34b9 | 网页808.4ms | 130.4Mbps | 机房 | 网段纯净86.33
+  - 瑞典·e6f430 | 网页900.6ms | 132.8Mbps | 机房 | 网段纯净93.74
+  - 波兰·49fb3e | 网页842.4ms | 137.1Mbps | 机房 | 网段纯净96.48
+  - 法国·5d6090 | 网页892.7ms | 93.9Mbps | 住宅候选 | 网段纯净99.77
+  - 塞尔维亚·c3b9a6 | 网页908.4ms | 125.3Mbps | 机房 | 网段纯净96.87
+  - 法国·4ec7b2 | 网页919.8ms | 82.1Mbps | 住宅候选 | 网段纯净100.00
+  - 塞尔维亚·75a2f6 | 网页950.1ms | 119.9Mbps | 机房 | 网段纯净96.87
+  - 卢森堡·20e2cc | 网页888ms | 125.5Mbps | 机房 | 网段纯净93.36
+  - 德国·45fcd7 | 网页855.1ms | 123.4Mbps | 机房 | 网段纯净99.22
+  - 波兰·017e48 | 网页749.6ms | 167.1Mbps | 机房 | 网段纯净96.48
+  - 荷兰·102537 | 网页735.1ms | 115.6Mbps | 机房 | 网段纯净94.81
+  - GR·7c75df | 网页966.9ms | 123.6Mbps | 机房 | 网段纯净95.31/有滥用
+  - 拉脱维亚·bfcd75 | 网页1026.6ms | 113.8Mbps | 机房 | 网段纯净94.53
+  - 瑞典·1bbe8a | 网页1029.9ms | 112.7Mbps | 机房 | 网段纯净91.02/有滥用
+  - 意大利·98d767 | 网页977.9ms | 83.9Mbps | 住宅候选 | 网段纯净99.93/有滥用
+  - 罗马尼亚·515947 | 网页1047.2ms | 109.5Mbps | 机房 | 网段纯净91.41/有滥用
+  - PT·aba2a3 | 网页1232ms | 86.3Mbps | 机房 | 网段纯净96.09
+  - 罗马尼亚·1c83ba | 网页1187.3ms | 104.9Mbps | 机房 | 网段纯净94.53
+  - GR·45de2f | 网页1326.4ms | 88.6Mbps | 机房 | 网段纯净95.31
+  - PT·f54a60 | 网页1328.6ms | 83.6Mbps | 机房 | 网段纯净96.09
+  - 印度·afc9b3 | 网页1180.4ms | 87.6Mbps | 机房 | 网段纯净99.83
+  - 比利时·81da2a | 网页749.7ms | 147.5Mbps | 机房 | 网段纯净92.19
 - name: ⚡ 高速下载
   type: select
   proxies:
-  - 美国·eb90f7 | 网页367.8ms | 1101.5Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·4e6afc | 网页369.5ms | 1042.6Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·56db9a | 网页293.3ms | 1008.9Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·cdfed7 | 网页294ms | 969.3Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·0ac48a | 网页610ms | 839.2Mbps | 机房 | 网段纯净86.08/有滥用
-  - 美国·779bb0 | 网页350.5ms | 719.7Mbps | 机房 | 网段纯净99.61
-  - 加拿大·881e61 | 网页504.8ms | 570.9Mbps | 机房 | 网段纯净97.59/有滥用
-  - 加拿大·1ad741 | 网页487.3ms | 560.0Mbps | 机房 | 网段纯净97.68
-  - 美国·02240d | 网页452ms | 531.0Mbps | 机房 | 网段纯净94.53
-  - 美国·dfa90b | 网页348.9ms | 529.8Mbps | 住宅候选 | 网段纯净100.00
-  - 加拿大·89f027 | 网页569.4ms | 502.3Mbps | 非机房 | 网段纯净100.00
-  - 美国·95a0dc | 网页384.6ms | 425.8Mbps | 住宅候选 | 网段纯净99.97
-  - 美国·a04f78 | 网页455.7ms | 373.0Mbps | 机房 | 网段纯净99.35/有滥用
-  - 美国·c46373 | 网页397.9ms | 335.8Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·fec11f | 网页368.3ms | 335.4Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·a134d3 | 网页354ms | 327.6Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·f11a2f | 网页328.6ms | 327.0Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·5eba1a | 网页299.2ms | 325.8Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·212782 | 网页400.4ms | 321.0Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·fa77d1 | 网页277.7ms | 313.0Mbps | 机房 | 网段纯净99.18/有滥用
-  - 美国·7e108e | 网页343.2ms | 311.1Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·537df6 | 网页455.2ms | 301.6Mbps | 机房 | 网段纯净94.53
-  - 美国·79ba21 | 网页294.2ms | 300.4Mbps | 机房 | 网段纯净99.88
-  - 美国·8d46b7 | 网页333.3ms | 290.7Mbps | 机房 | 网段纯净80.47/有滥用
-  - 加拿大·6f8cc1 | 网页470ms | 252.9Mbps | 机房 | 网段纯净97.68
-  - 美国·cd6d3b | 网页302.7ms | 250.9Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·df9d14 | 网页280.8ms | 248.7Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·f713be | 网页279ms | 242.7Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·2ce02f | 网页336.5ms | 238.6Mbps | 机房 | 网段纯净80.47/有滥用
-  - 美国·1e389f | 网页314.2ms | 217.2Mbps | 机房 | 网段纯净80.47/有滥用
-  - 英国·7f7d62 | 网页865.7ms | 208.3Mbps | 机房 | 网段纯净78.52
-  - 加拿大·71b149 | 网页586.2ms | 202.4Mbps | 非机房 | 网段纯净100.00
-  - 荷兰·f25f77 | 网页494.9ms | 199.1Mbps | 机房 | 网段纯净98.83
-  - 德国·4c2305 | 网页618.3ms | 198.5Mbps | 机房 | 网段纯净92.19
-  - 荷兰·0aac6c | 网页1106.9ms | 196.9Mbps | 机房 | 网段纯净94.81/有滥用
-  - 美国·21d02e | 网页1328.5ms | 196.8Mbps | 机房 | 网段纯净99.21/有滥用
-  - 美国·4cc004 | 网页316.7ms | 190.6Mbps | 机房 | 网段纯净99.59/有滥用
-  - 美国·69882c | 网页333.7ms | 187.1Mbps | 机房 | 网段纯净99.60
-  - 荷兰·7bcba9 | 网页880.1ms | 185.1Mbps | 机房 | 网段纯净99.61
-  - 法国·ad52e2 | 网页885.8ms | 183.4Mbps | 机房 | 网段纯净98.66
-  - 荷兰·87dace | 网页498.8ms | 183.2Mbps | 机房 | 网段纯净98.83
-  - 比利时·81da2a | 网页896.6ms | 181.4Mbps | 机房 | 网段纯净92.19
-  - 法国·b13fc8 | 网页918.4ms | 170.1Mbps | 机房 | 网段纯净98.66/有滥用
-  - 瑞士·f849cb | 网页1012.5ms | 167.9Mbps | 机房 | 网段纯净89.84/有滥用
-  - 英国·29d1e7 | 网页854.2ms | 167.2Mbps | 机房 | 网段纯净78.52
-  - 英国·85cf9e | 网页822.9ms | 167.1Mbps | 机房 | 网段纯净85.94
-  - 英国·105125 | 网页857.1ms | 166.5Mbps | 机房 | 网段纯净98.83
-  - 英国·2396e6 | 网页845.2ms | 164.7Mbps | 机房 | 网段纯净78.52
-  - 英国·247166 | 网页845.6ms | 161.9Mbps | 机房 | 网段纯净85.94
-  - 英国·ba16d5 | 网页889.2ms | 160.6Mbps | 机房 | 网段纯净86.33
-  - 美国·cbe264 | 网页292.4ms | 160.1Mbps | 机房 | 纯净未知
-  - 美国·f1d0bc | 网页301.3ms | 159.7Mbps | 机房 | 网段纯净99.46
-  - 法国·8099c3 | 网页817ms | 152.4Mbps | 机房 | 网段纯净98.66/有滥用
-  - 塞尔维亚·c3b9a6 | 网页1048.8ms | 149.2Mbps | 机房 | 网段纯净96.87
-  - 法国·87860e | 网页882.9ms | 148.5Mbps | 机房 | 网段纯净82.42
-  - 瑞士·43f20a | 网页972.6ms | 143.0Mbps | 机房 | 网段纯净95.31/有滥用
-  - 荷兰·8e0c53 | 网页980.2ms | 141.8Mbps | 机房 | 网段纯净74.11/有滥用
-  - 爱尔兰·ce1d84 | 网页875.1ms | 141.7Mbps | 机房 | 网段纯净97.27/有滥用
-  - 美国·5c0fa0 | 网页987.3ms | 141.6Mbps | 机房 | 网段纯净98.05
-  - BA·876e61 | 网页1291.7ms | 137.3Mbps | 机房 | 网段纯净94.14
-  - 荷兰·1202c8 | 网页919.6ms | 135.9Mbps | 机房 | 网段纯净99.60
-  - 意大利·ecc102 | 网页1074ms | 134.9Mbps | 机房 | 网段纯净96.35
-  - 波兰·017e48 | 网页1081ms | 134.5Mbps | 机房 | 网段纯净96.48
-  - 德国·18cdcb | 网页316.1ms | 134.1Mbps | 机房 | 网段纯净99.92
-  - 荷兰·16421a | 网页962.5ms | 133.2Mbps | 机房 | 网段纯净74.11/有滥用
-  - 荷兰·3c7681 | 网页952.7ms | 131.7Mbps | 机房 | 网段纯净91.41/有滥用
-  - 瑞典·e6f430 | 网页1070.2ms | 130.1Mbps | 机房 | 网段纯净93.74
-  - NO·ba6a24 | 网页1082.6ms | 130.1Mbps | 机房 | 网段纯净89.45/有滥用
-  - 荷兰·35f245 | 网页925.9ms | 128.9Mbps | 机房 | 网段纯净87.11
-  - 荷兰·6ae015 | 网页966.5ms | 127.9Mbps | 机房 | 网段纯净74.11/有滥用
-  - 荷兰·7bbe4e | 网页840ms | 126.3Mbps | 机房 | 网段纯净74.11/有滥用
-  - 卢森堡·20e2cc | 网页960.9ms | 126.2Mbps | 机房 | 网段纯净93.36
-  - 罗马尼亚·515947 | 网页1190.4ms | 125.5Mbps | 机房 | 网段纯净91.41
-  - 德国·45fcd7 | 网页960.6ms | 124.7Mbps | 机房 | 网段纯净99.22
-  - 德国·a80f6c | 网页957.3ms | 124.6Mbps | 机房 | 网段纯净85.16/有滥用
-  - 拉脱维亚·bfcd75 | 网页1205.5ms | 124.5Mbps | 机房 | 网段纯净94.53
-  - 德国·e0c531 | 网页932.9ms | 124.3Mbps | 机房 | 网段纯净85.16
-  - 瑞典·61779d | 网页1007.1ms | 123.0Mbps | 机房 | 网段纯净91.02
-  - 荷兰·84f57c | 网页978.1ms | 122.3Mbps | 机房 | 网段纯净74.11/有滥用
-  - 法国·4d447b | 网页754.6ms | 120.9Mbps | 机房 | 网段纯净97.89
-  - 荷兰·288b8d | 网页991.2ms | 119.4Mbps | 机房 | 网段纯净74.11/有滥用
-  - 法国·e2f948 | 网页809.9ms | 118.7Mbps | 机房 | 网段纯净97.89
-  - 荷兰·dab2e1 | 网页1021.2ms | 118.0Mbps | 机房 | 网段纯净74.11/有滥用
-  - 奥地利·fc25e7 | 网页1083.3ms | 112.7Mbps | 机房 | 网段纯净97.66
-  - 爱沙尼亚·9bfab8 | 网页1048.8ms | 112.4Mbps | 机房 | 网段纯净88.67/有滥用
-  - 荷兰·71d24b | 网页963.9ms | 112.1Mbps | 机房 | 网段纯净74.11/有滥用
-  - 法国·eb0699 | 网页898.7ms | 110.1Mbps | 机房 | 网段纯净98.44
-  - 德国·ff4732 | 网页1053.6ms | 109.1Mbps | 机房 | 网段纯净93.36
-  - 罗马尼亚·1c83ba | 网页1137.7ms | 105.4Mbps | 机房 | 网段纯净94.53
-  - 拉脱维亚·b33cca | 网页1119.5ms | 104.6Mbps | 机房 | 网段纯净98.73/有滥用
-  - PT·aba2a3 | 网页1368.2ms | 104.2Mbps | 机房 | 网段纯净96.09
-  - AL·9f75c6 | 网页1218.3ms | 103.8Mbps | 机房 | 网段纯净81.25
-  - 罗马尼亚·1c34de | 网页1359.3ms | 103.7Mbps | 机房 | 网段纯净86.72
-  - 法国·4ec7b2 | 网页1054.1ms | 102.6Mbps | 住宅候选 | 网段纯净100.00
-  - 荷兰·4ce013 | 网页967.5ms | 102.1Mbps | 机房 | 网段纯净74.11/有滥用
-  - 罗马尼亚·06ce6c | 网页1124.6ms | 100.1Mbps | 机房 | 网段纯净86.72/有滥用
-  - 荷兰·f56e1c | 网页926.9ms | 99.6Mbps | 机房 | 网段纯净74.11/有滥用
-  - 法国·5d6090 | 网页947ms | 97.6Mbps | 住宅候选 | 网段纯净99.77
-  - 德国·74a6e3 | 网页258.5ms | 97.4Mbps | 机房 | 纯净未知
-  - 罗马尼亚·7e8b65 | 网页1248ms | 94.0Mbps | 机房 | 网段纯净86.72/有滥用
-  - 荷兰·5167f1 | 网页989.5ms | 85.9Mbps | 机房 | 网段纯净99.22/有滥用
-  - 罗马尼亚·179c6b | 网页1129ms | 85.0Mbps | 机房 | 网段纯净86.72/有滥用
-  - PT·f54a60 | 网页1360.7ms | 83.5Mbps | 机房 | 网段纯净96.09
-  - 罗马尼亚·572236 | 网页1199ms | 82.2Mbps | 机房 | 网段纯净86.72/有滥用
-  - 法国·72c499 | 网页1340.5ms | 78.5Mbps | 机房 | 网段纯净98.66
-  - 德国·34c5df | 网页323.6ms | 78.4Mbps | 机房 | 网段纯净99.92
-  - 罗马尼亚·c14fbf | 网页1171.2ms | 75.8Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·8922ce | 网页1194.1ms | 75.2Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·0be334 | 网页1182.3ms | 74.7Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·ff1758 | 网页1145.5ms | 74.3Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·3da7f0 | 网页1238.6ms | 73.4Mbps | 机房 | 网段纯净86.72
-  - 以色列·08af63 | 网页1256.5ms | 68.7Mbps | 非机房 | 网段纯净99.61
-  - 印度尼西亚·dac8c5 | 网页1232.2ms | 65.4Mbps | 住宅候选 | 网段纯净96.48/有滥用
-  - 罗马尼亚·4a209b | 网页1302.2ms | 62.4Mbps | 机房 | 网段纯净86.72
-  - 新加坡·94eb49 | 网页1163.8ms | 60.6Mbps | 机房 | 网段纯净96.48/有滥用
-  - 罗马尼亚·93ff9e | 网页1165.4ms | 59.1Mbps | 机房 | 网段纯净86.72/有滥用
-  - 罗马尼亚·e79b52 | 网页1286.9ms | 38.6Mbps | 机房 | 网段纯净86.72
-  - 罗马尼亚·491078 | 网页1239ms | 33.5Mbps | 机房 | 网段纯净86.72
-  - 荷兰·e32426 | 网页934.8ms | 32.7Mbps | 机房 | 网段纯净98.83/有滥用
-  - 罗马尼亚·268541 | 网页1147.4ms | 31.3Mbps | 机房 | 网段纯净86.72/有滥用
-  - 荷兰·d0f1d6 | 网页969.4ms | 27.7Mbps | 机房 | 网段纯净98.83/有滥用
-  - 香港·24a64d | 网页764.2ms | 20.4Mbps | 机房 | 网段纯净100.00
+  - 美国·42af5f | 网页243.6ms | 661.8Mbps | 机房 | 网段纯净62.50/有滥用
+  - 加拿大·1ad741 | 网页408.1ms | 633.4Mbps | 机房 | 网段纯净97.68
+  - 加拿大·89f027 | 网页311.4ms | 512.1Mbps | 非机房 | 网段纯净100.00
+  - 美国·95a0dc | 网页244.8ms | 432.0Mbps | 住宅候选 | 网段纯净99.97
+  - 美国·79ba21 | 网页364.8ms | 431.3Mbps | 机房 | 网段纯净99.88
+  - 美国·537df6 | 网页416.9ms | 296.4Mbps | 机房 | 网段纯净94.53/有滥用
+  - 美国·bd504a | 网页368.2ms | 280.1Mbps | 机房 | 网段纯净99.98/有滥用
+  - 加拿大·6f8cc1 | 网页486.2ms | 251.3Mbps | 机房 | 网段纯净97.68
+  - 美国·7b754a | 网页531.2ms | 225.9Mbps | 机房 | 网段纯净93.75
+  - 英国·ecb813 | 网页572.2ms | 214.9Mbps | 机房 | 网段纯净68.75
+  - 加拿大·0a4adb | 网页542.5ms | 207.3Mbps | 机房 | 网段纯净91.80/有滥用
+  - 英国·ba16d5 | 网页568.1ms | 200.6Mbps | 机房 | 网段纯净86.33/有滥用
+  - 美国·02240d | 网页316.4ms | 183.0Mbps | 机房 | 网段纯净94.53
+  - 美国·dfa90b | 网页344.3ms | 175.6Mbps | 住宅候选 | 网段纯净100.00
+  - 德国·89dff0 | 网页692.5ms | 174.3Mbps | 机房 | 网段纯净96.48/有滥用
+  - 瑞士·9b1671 | 网页667.9ms | 172.8Mbps | 机房 | 网段纯净91.02
+  - 波兰·017e48 | 网页749.6ms | 167.1Mbps | 机房 | 网段纯净96.48
+  - 英国·7f7d62 | 网页661.1ms | 165.3Mbps | 机房 | 网段纯净78.52/有滥用
+  - 英国·29d1e7 | 网页664ms | 161.9Mbps | 机房 | 网段纯净78.52
+  - NO·ba6a24 | 网页781.1ms | 154.9Mbps | 机房 | 网段纯净89.45/有滥用
+  - 荷兰·7bcba9 | 网页683.3ms | 148.1Mbps | 机房 | 网段纯净99.61
+  - 比利时·81da2a | 网页749.7ms | 147.5Mbps | 机房 | 网段纯净92.19
+  - 法国·87860e | 网页719.3ms | 141.3Mbps | 机房 | 网段纯净82.42
+  - 瑞士·43f20a | 网页799.8ms | 140.1Mbps | 机房 | 网段纯净95.31
+  - 波兰·49fb3e | 网页842.4ms | 137.1Mbps | 机房 | 网段纯净96.48
+  - DK·767592 | 网页834ms | 137.0Mbps | 机房 | 网段纯净87.89/有滥用
+  - 瑞典·e6f430 | 网页900.6ms | 132.8Mbps | 机房 | 网段纯净93.74
+  - 英国·ca34b9 | 网页808.4ms | 130.4Mbps | 机房 | 网段纯净86.33
+  - 瑞士·f849cb | 网页809.1ms | 130.0Mbps | 机房 | 网段纯净89.84
+  - 荷兰·a24837 | 网页840.1ms | 128.3Mbps | 机房 | 网段纯净87.11
+  - 比利时·e79476 | 网页834.1ms | 127.2Mbps | 机房 | 网段纯净91.41
+  - 意大利·ecc102 | 网页837.1ms | 126.5Mbps | 机房 | 网段纯净96.35/有滥用
+  - 卢森堡·20e2cc | 网页888ms | 125.5Mbps | 机房 | 网段纯净93.36
+  - 塞尔维亚·c3b9a6 | 网页908.4ms | 125.3Mbps | 机房 | 网段纯净96.87
+  - 德国·b0e6a2 | 网页847.7ms | 124.3Mbps | 机房 | 网段纯净92.48
+  - GR·7c75df | 网页966.9ms | 123.6Mbps | 机房 | 网段纯净95.31/有滥用
+  - 德国·45fcd7 | 网页855.1ms | 123.4Mbps | 机房 | 网段纯净99.22
+  - 美国·5c0fa0 | 网页864.8ms | 122.8Mbps | 机房 | 网段纯净98.05
+  - 塞尔维亚·75a2f6 | 网页950.1ms | 119.9Mbps | 机房 | 网段纯净96.87
+  - 法国·a6b03c | 网页900.6ms | 118.2Mbps | 机房 | 网段纯净99.61
+  - 西班牙·97c7e4 | 网页889.6ms | 117.4Mbps | 机房 | 网段纯净96.87
+  - 荷兰·102537 | 网页735.1ms | 115.6Mbps | 机房 | 网段纯净94.81
+  - 拉脱维亚·bfcd75 | 网页1026.6ms | 113.8Mbps | 机房 | 网段纯净94.53
+  - 瑞典·1bbe8a | 网页1029.9ms | 112.7Mbps | 机房 | 网段纯净91.02/有滥用
+  - 罗马尼亚·515947 | 网页1047.2ms | 109.5Mbps | 机房 | 网段纯净91.41/有滥用
+  - 罗马尼亚·1c83ba | 网页1187.3ms | 104.9Mbps | 机房 | 网段纯净94.53
+  - 捷克·09a158 | 网页856.8ms | 104.5Mbps | 机房 | 网段纯净94.92
+  - 荷兰·f71709 | 网页847ms | 102.0Mbps | 机房 | 网段纯净94.81
+  - 法国·5d6090 | 网页892.7ms | 93.9Mbps | 住宅候选 | 网段纯净99.77
+  - GR·45de2f | 网页1326.4ms | 88.6Mbps | 机房 | 网段纯净95.31
+  - 印度·afc9b3 | 网页1180.4ms | 87.6Mbps | 机房 | 网段纯净99.83
+  - PT·aba2a3 | 网页1232ms | 86.3Mbps | 机房 | 网段纯净96.09
+  - 意大利·98d767 | 网页977.9ms | 83.9Mbps | 住宅候选 | 网段纯净99.93/有滥用
+  - PT·f54a60 | 网页1328.6ms | 83.6Mbps | 机房 | 网段纯净96.09
+  - 法国·4ec7b2 | 网页919.8ms | 82.1Mbps | 住宅候选 | 网段纯净100.00
+  - 美国·d3db60 | 网页282ms | 74.7Mbps | 机房 | 网段纯净93.36
 - name: 🏠 非机房 IP
   type: select
   proxies:
-  - 美国·79ba21 | 网页294.2ms | 300.4Mbps | 机房 | 网段纯净99.88
-  - 印度尼西亚·5f32db | 网页284.4ms | 4.8Mbps | 住宅候选 | 网段纯净99.92
-  - 美国·dfa90b | 网页348.9ms | 529.8Mbps | 住宅候选 | 网段纯净100.00
-  - 美国·95a0dc | 网页384.6ms | 425.8Mbps | 住宅候选 | 网段纯净99.97
-  - 加拿大·89f027 | 网页569.4ms | 502.3Mbps | 非机房 | 网段纯净100.00
-  - 加拿大·71b149 | 网页586.2ms | 202.4Mbps | 非机房 | 网段纯净100.00
-  - 英国·105125 | 网页857.1ms | 166.5Mbps | 机房 | 网段纯净98.83
-  - 荷兰·7bcba9 | 网页880.1ms | 185.1Mbps | 机房 | 网段纯净99.61
-  - 法国·5d6090 | 网页947ms | 97.6Mbps | 住宅候选 | 网段纯净99.77
-  - 德国·45fcd7 | 网页960.6ms | 124.7Mbps | 机房 | 网段纯净99.22
-  - 德国·4c2305 | 网页618.3ms | 198.5Mbps | 机房 | 网段纯净92.19
-  - 法国·4ec7b2 | 网页1054.1ms | 102.6Mbps | 住宅候选 | 网段纯净100.00
-  - 印度尼西亚·dac8c5 | 网页1232.2ms | 65.4Mbps | 住宅候选 | 网段纯净96.48/有滥用
-  - 拉脱维亚·b33cca | 网页1119.5ms | 104.6Mbps | 机房 | 网段纯净98.73/有滥用
-  - 以色列·08af63 | 网页1256.5ms | 68.7Mbps | 非机房 | 网段纯净99.61
-  - 美国·87b045 | 网页1167.4ms | 2.1Mbps | 非机房 | 网段纯净99.80/有滥用
-  - 美国·21d02e | 网页1328.5ms | 196.8Mbps | 机房 | 网段纯净99.21/有滥用
+  - 美国·95a0dc | 网页244.8ms | 432.0Mbps | 住宅候选 | 网段纯净99.97
+  - 加拿大·89f027 | 网页311.4ms | 512.1Mbps | 非机房 | 网段纯净100.00
+  - 美国·d3db60 | 网页282ms | 74.7Mbps | 机房 | 网段纯净93.36
+  - 美国·dfa90b | 网页344.3ms | 175.6Mbps | 住宅候选 | 网段纯净100.00
+  - 美国·79ba21 | 网页364.8ms | 431.3Mbps | 机房 | 网段纯净99.88
+  - 美国·bd504a | 网页368.2ms | 280.1Mbps | 机房 | 网段纯净99.98/有滥用
+  - 荷兰·d898eb | 网页486.5ms | 7.7Mbps | 机房 | 网段纯净98.05
+  - 德国·523f05 | 网页421.9ms | 25.0Mbps | 机房 | 网段纯净92.19
+  - 荷兰·7bcba9 | 网页683.3ms | 148.1Mbps | 机房 | 网段纯净99.61
+  - 法国·a6b03c | 网页900.6ms | 118.2Mbps | 机房 | 网段纯净99.61
+  - 法国·5d6090 | 网页892.7ms | 93.9Mbps | 住宅候选 | 网段纯净99.77
+  - 法国·4ec7b2 | 网页919.8ms | 82.1Mbps | 住宅候选 | 网段纯净100.00
+  - 德国·45fcd7 | 网页855.1ms | 123.4Mbps | 机房 | 网段纯净99.22
+  - 意大利·98d767 | 网页977.9ms | 83.9Mbps | 住宅候选 | 网段纯净99.93/有滥用
 - name: 🌏 台湾／新加坡
   type: select
   proxies:
-  - 新加坡·94eb49 | 网页1163.8ms | 60.6Mbps | 机房 | 网段纯净96.48/有滥用
+  - 新加坡·1111fa | 网页1819.4ms | 58.6Mbps | 机房 | 网段纯净97.56/有滥用
