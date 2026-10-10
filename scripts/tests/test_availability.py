@@ -20,6 +20,8 @@ class AvailabilityTests(unittest.TestCase):
         for country_index, country in enumerate(('HK', 'US', 'JP')):
             for index in range(35):
                 records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
+                    'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
+                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.OVERSEAS_SITES},
                     'precheck': {'status': 'passed', 'median_elapsed_ms': country_index * 100 + index + 1},
                     'exit': {'country_code': country, 'exit_ip': f'8.8.{country_index}.{index + 1}'},
                     'ip_type': {'status': 'success', 'hosting': False},
@@ -47,7 +49,7 @@ class AvailabilityTests(unittest.TestCase):
             'ip_type': {'status': 'success', 'hosting': False}}
         a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, [record],
             {'n-unique': {'name': 'n-unique', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
-        self.assertEqual(record['name'], '美国·unique | 82.5ms | 83.9Mbps | 非机房 | 纯净未知')
+        self.assertEqual(record['name'], '美国·unique | 20482.5ms | 83.9Mbps | 非机房 | 纯净未知')
 
     def test_50mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
@@ -118,7 +120,8 @@ class AvailabilityTests(unittest.TestCase):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 1}}]*3, ('Google204',))['Google204']
         record = {'id': 'n-a', 'entry': {'status': 'passed'}, 'precheck': pre,
-            'websites': a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES}], a.POST_SITES),
+            'websites': {**a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.OVERSEAS_SITES}]*3, a.OVERSEAS_SITES),
+                **a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES if label not in a.OVERSEAS_SITES}], [label for label in a.POST_SITES if label not in a.OVERSEAS_SITES])},
             'download': {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 1000},
             'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
                 'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'elapsed_ms': 20000, 'speed_mib_s': 2, 'url': a.HIGH_DOWNLOAD_URL}}
@@ -271,7 +274,8 @@ class AvailabilityTests(unittest.TestCase):
                 site_check=websites, download=download, large_download=large_download)
         self.assertEqual(tested, [('8.8.8.8', 443)])
         self.assertEqual(endpoints, 1)
-        self.assertEqual(records[0]['websites']['Google']['round_count'], 1)
+        self.assertEqual(records[0]['websites']['Google']['round_count'], 3)
+        self.assertEqual(records[0]['websites']['ClaudeTrace']['round_count'], 1)
         self.assertIsNone(records[2]['websites'])
         self.assertEqual(records[2]['entry']['status'], 'unknown')
         self.assertEqual(records[2]['entry']['attempts'], 0)
@@ -387,7 +391,7 @@ class AvailabilityTests(unittest.TestCase):
             self.assertNotIn(group, groups)
             self.assertNotIn(group, groups['🚀 全局选择'])
         self.assertEqual(groups['🏠 非机房 IP'], ['REJECT'])
-        self.assertEqual(groups['⭐ 综合优选'], [records[0]['name']])
+        self.assertEqual(groups['⭐ 综合优选'], ['REJECT'])
         self.assertEqual(len(groups), 4)
         self.assertEqual(base, original)
         valid = {p['name'] for p in config['proxies']} | set(groups) | {'DIRECT', 'REJECT'}
@@ -399,7 +403,8 @@ class AvailabilityTests(unittest.TestCase):
         for country in ('JP', 'US'):
             for index in range(35):
                 records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
-                    'websites': {label: {'status': 'passed'} for label in a.PAGE_SITES},
+                    'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
+                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.PAGE_SITES},
                     'precheck': {'status': 'passed', 'median_elapsed_ms': index + 1},
                     'exit': {'country_code': country, 'exit_ip': f'8.8.{country == "JP"}.{index}'},
                     'download': {'status': 'passed', 'speed_mib_s': 1}})

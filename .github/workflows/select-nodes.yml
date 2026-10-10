@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 全量检测或重建已有结果（可刷新 IP 信誉）
+        description: 全量检测、重建配置或仅复测下载通过池的海外请求质量
         type: choice
         required: true
         default: full
-        options: [full, repair]
+        options: [full, repair, web-recheck]
 
 permissions:
   contents: read
@@ -23,7 +23,7 @@ concurrency:
 jobs:
   prepare:
     name: 获取全量订阅并去重
-    if: github.event_name != 'workflow_dispatch' || inputs.mode != 'repair'
+    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'full'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -148,7 +148,7 @@ jobs:
 
   repair:
     name: 修复手机兼容性并更新原订阅
-    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'repair'
+    if: github.event_name == 'workflow_dispatch' && inputs.mode != 'full'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -173,7 +173,13 @@ jobs:
       - name: 修复已有结果并验证订阅
         env:
           IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase repair --refresh-ip-reputation
+          UPDATE_MODE: ${{ inputs.mode }}
+        run: |
+          if [ "$UPDATE_MODE" = "web-recheck" ]; then
+            python scripts/availability.py --mihomo .node-work/bin/mihomo --phase web-recheck
+          else
+            python scripts/availability.py --mihomo .node-work/bin/mihomo --phase repair --refresh-ip-reputation
+          fi
       - name: 更新原订阅与报告
         run: |
           git config user.name 'github-actions[bot]'
@@ -185,5 +191,14 @@ jobs:
           git commit -m "Repair mobile YAML compatibility $(date -u +%Y-%m-%d)"
           git pull --rebase origin main
           git push origin HEAD:main
+      - name: 保存网站专项复测记录
+        if: always() && inputs.mode == 'web-recheck'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: web-quality-recheck
+          path: .node-work/availability/web-recheck-results.json
+          include-hidden-files: true
+          retention-days: 1
+          if-no-files-found: warn
       - name: 发布修复摘要
         run: cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
