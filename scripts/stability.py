@@ -26,6 +26,7 @@ def settings():
     return {'version': VERSION, 'rounds': ROUNDS, 'minimum_idle_seconds_between_rounds': GAP_SECONDS,
             'node_workers': WORKERS, 'requests_per_node_in_parallel': 1,
             'targets': {k: SITES[k] for k in TARGETS}, 'tls_hostname': TLS_HOST,
+            'failed_round_stops_extra_requests': True, 'every_node_retried_next_round': True,
             'requires_all_rounds': True, 'exit_ip_change_rejects': False,
             'authenticated_conversation_tested': False, 'automatic_switching': False}
 
@@ -88,18 +89,20 @@ def summarize(attempts):
     result = {'version': VERSION, 'attempts': attempts, 'round_count': len(attempts),
               'passed_count': sum(round_passed(x) for x in attempts),
               'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
-    result['status'] = 'passed' if evidence_passed(result) else 'failed'
+    result['status'] = ('incomplete' if len(attempts) != ROUNDS else
+                        'passed' if evidence_passed(result) else 'failed')
     result['failures'] = [{'round': sample['round'], 'target': label,
         'status': sample['sites'][label].get('status'),
         'reason': sample['sites'][label].get('reason')}
         for sample in attempts for label in TARGETS
-        if sample['sites'][label].get('status') != 'passed'
+        if sample['sites'][label].get('status') != 'skipped' and (sample['sites'][label].get('status') != 'passed'
         or not finite(sample['sites'][label].get('elapsed_ms'))
-        or not 0 <= sample['sites'][label]['elapsed_ms'] <= 5000]
+        or not 0 <= sample['sites'][label]['elapsed_ms'] <= 5000)]
     result['failures'] += [{'round': sample['round'], 'target': TLS_HOST,
         'status': sample['android_tls'].get('status'),
         'reason': sample['android_tls'].get('error_type', 'unverified_or_late_TLS')}
-        for sample in attempts if not tls_passed(sample['android_tls'])]
+        for sample in attempts if sample['android_tls'].get('status') != 'skipped' and not tls_passed(sample['android_tls'])]
+    result['skipped_count'] = sum(x['sites'][k].get('status') == 'skipped' for x in attempts for k in TARGETS)
     result['core_median_ms'] = {label: statistics.median(
         [x['sites'][label]['elapsed_ms'] for x in attempts
          if x['sites'][label].get('status') == 'passed' and finite(x['sites'][label].get('elapsed_ms'))])
@@ -114,8 +117,14 @@ def summarize(attempts):
 def sample_node(port, number, origin):
     started = time.monotonic()
     started_at = s.datetime.now(s.TZ).isoformat(timespec='seconds')
-    sites = {label: check_site(port, label, SITES[label]) for label in TARGETS}
-    tls = app_tls.probe(port, TLS_HOST)
+    sites, stopped = {}, False
+    for label in TARGETS:
+        sites[label] = ({'status': 'skipped', 'reason': '本轮前置请求失败，下一轮重新检查'} if stopped
+                        else check_site(port, label, SITES[label]))
+        item = sites[label]
+        stopped = stopped or item.get('status') != 'passed' or not finite(item.get('elapsed_ms')) or not 0 <= item['elapsed_ms'] <= 5000
+    tls = ({'status': 'skipped', 'hostname': TLS_HOST, 'reason': '本轮前置请求失败，下一轮重新检查'}
+           if stopped else app_tls.probe(port, TLS_HOST))
     return {'round': number, 'started_at': started_at,
             'started_offset_seconds': round(started - origin, 4),
             'finished_offset_seconds': round(time.monotonic() - origin, 4),
@@ -144,6 +153,19 @@ def recheck(records, mapping, binary, root):
     origin = time.monotonic()
     samples = {r['id']: [] for r in records}
     controls = []
+    def snapshot(complete):
+        results = {id: summarize(attempts) for id, attempts in samples.items()}
+        control_ok = all(x['sites']['Google204'].get('status') == 'passed'
+                         and tls_passed(x.get('android_tls')) for x in controls)
+        diagnostic = {'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
+                      'settings': settings(), 'node_count': len(records), 'complete': complete,
+                      'controls_valid': control_ok if complete else None,
+                      'controls': controls, 'nodes': [{'id': r['id'], 'previous_name': r.get('name'),
+                          'stability': results[r['id']]} for r in records]}
+        checkpoint = root / 'stability-results.tmp'
+        checkpoint.write_text(json.dumps(diagnostic, ensure_ascii=False, indent=2) + '\n')
+        checkpoint.replace(root / 'stability-results.json')
+        return diagnostic, results
     with s.Core(binary, root, [mapping[r['id']] for r in records], listeners):
         with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
             for number in range(1, ROUNDS + 1):
@@ -157,17 +179,10 @@ def recheck(records, mapping, binary, root):
                 previous_end = time.monotonic()
                 count = sum(all(round_passed(x) for x in samples[r['id']]) for r in records)
                 print(f'间隔稳定性 {number}/{ROUNDS}：{len(records)}节点，目前全轮通过{count}；节点并发{WORKERS}', flush=True)
-    # Direct Google/YT pages are recorded for comparison. Only direct 204 and
-    # verified Android TLS are runner controls; a control outage aborts publication.
-    control_ok = all(x['sites']['Google204'].get('status') == 'passed'
-                     and tls_passed(x.get('android_tls')) for x in controls)
-    results = {id: summarize(attempts) for id, attempts in samples.items()}
-    diagnostic = {'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
-                  'settings': settings(), 'node_count': len(records), 'controls_valid': control_ok,
-                  'controls': controls, 'nodes': [{'id': r['id'], 'previous_name': r.get('name'),
-                      'stability': results[r['id']]} for r in records]}
-    (root / 'stability-results.json').write_text(json.dumps(diagnostic, ensure_ascii=False, indent=2) + '\n')
-    if not control_ok:
+                snapshot(False)
+    # A runner-control outage aborts publication; partial records never qualify.
+    diagnostic, results = snapshot(True)
+    if not diagnostic['controls_valid']:
         raise RuntimeError('云端直连204或Android TLS对照异常，稳定性记录已保存；不据此淘汰或发布')
     for record in records:
         record['stability'] = results[record['id']]

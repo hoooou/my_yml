@@ -92,6 +92,23 @@ class StabilityProbeTests(unittest.TestCase):
         tls.assert_called_once_with(1234, st.TLS_HOST)
         self.assertTrue(st.round_passed(result))
 
+    def test_failed_round_stops_extra_requests_but_next_round_retries_all_targets(self):
+        with patch.object(st, 'check_site', return_value={'status': 'failed', 'elapsed_ms': 3000}) as check, \
+             patch.object(st.app_tls, 'probe') as tls:
+            first = st.sample_node(1234, 1, 0)
+        self.assertEqual(check.call_count, 1)
+        tls.assert_not_called()
+        self.assertEqual(first['sites']['YouTube']['status'], 'skipped')
+        with patch.object(st, 'check_site', return_value={'status': 'passed', 'elapsed_ms': 100}) as check, \
+             patch.object(st.app_tls, 'probe', return_value=sample(1)['android_tls']) as tls:
+            next_round = st.sample_node(1234, 2, 0)
+        self.assertEqual(check.call_count, 4)
+        self.assertTrue(st.round_passed(next_round))
+        partial = st.summarize([first])
+        self.assertEqual(partial['status'], 'incomplete')
+        self.assertEqual([x['target'] for x in partial['failures']], ['Google204'])
+        self.assertFalse(st.passed(partial))
+
     def test_runner_repeats_every_candidate_waits_after_round_and_aborts_on_bad_control(self):
         class Clock:
             value = 0
