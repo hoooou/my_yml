@@ -7,10 +7,15 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from tls_fixture import verified_tls
 import mobile_pilot as p
 
 
 class WebQualityTests(unittest.TestCase):
+    def setUp(self):
+        tls = patch.object(a.app_tls, 'check', return_value=verified_tls())
+        tls.start(); self.addCleanup(tls.stop)
+
     def test_successful_but_slow_response_is_not_a_fast_pass(self):
         class Response:
             status_code = 200
@@ -41,7 +46,7 @@ class WebQualityTests(unittest.TestCase):
         self.assertAlmostEqual(result['success_rate'], 2/3, places=4)
 
     def test_recheck_only_updates_passed_pool_and_preserves_tcp_download_and_trace(self):
-        records = [{'id': 'n-' + str(i), 'entry': {'status': 'passed'},
+        records = [{'app_tls': verified_tls(), 'id': 'n-' + str(i), 'entry': {'status': 'passed'},
             'download': {'status': status, 'speed_mib_s': 5}, 'high_speed_download': {'status': 'passed'},
             'websites': {'ClaudeTrace': {'status': 'passed', 'round_count': 1}},
             'precheck': {'status': 'passed'}} for i, status in enumerate(('passed', 'failed', 'skipped'))]
@@ -63,7 +68,7 @@ class WebQualityTests(unittest.TestCase):
             'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10}
             for label in a.OVERSEAS_SITES}
         sites['ClaudeTrace'] = {'status': 'passed', 'round_count': 1, 'passed_count': 1}
-        fast = {'id': 'n-fast', 'entry': {'status': 'passed'}, 'websites': sites,
+        fast = {'app_tls': verified_tls(), 'id': 'n-fast', 'entry': {'status': 'passed'}, 'websites': sites,
             'precheck': {'status': 'passed', 'median_elapsed_ms': 300},
             'download': {'status': 'passed', 'speed_mib_s': 2}}
         slow = copy.deepcopy(fast); slow['id'] = 'n-slow'
@@ -78,7 +83,7 @@ class WebQualityTests(unittest.TestCase):
             'median_elapsed_ms': 100, 'p95_elapsed_ms': 120, 'jitter_ms': 20}
             for label in a.OVERSEAS_SITES}
         sites['ClaudeTrace'] = {'status': 'passed', 'round_count': 1, 'passed_count': 1}
-        record = {'id': 'n-a', 'entry': {'status': 'passed'}, 'websites': sites,
+        record = {'app_tls': verified_tls(), 'id': 'n-a', 'entry': {'status': 'passed'}, 'websites': sites,
             'download': {'status': 'passed', 'speed_mib_s': 10}}
         self.assertTrue(a.web_quality_eligible(record))
         for changed in ('failed', 'single', 'slow'):

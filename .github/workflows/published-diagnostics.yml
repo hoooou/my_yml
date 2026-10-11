@@ -12,6 +12,10 @@ on:
         type: string
         required: true
         default: '793329f'
+      tls_only:
+        description: 只检查应用TLS及云端正常对照
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -39,9 +43,14 @@ jobs:
         env:
           CURRENT_REF: ${{ inputs.current_ref }}
           PREVIOUS_REF: ${{ inputs.previous_ref }}
+          TLS_ONLY: ${{ inputs.tls_only }}
         run: |
+          tls_args=()
+          if [ "$TLS_ONLY" = "true" ]; then
+            tls_args+=(--tls-only)
+          fi
           python scripts/published_diagnostics.py --mihomo .node-work/bin/mihomo \
-            --current-ref "$CURRENT_REF" --previous-ref "$PREVIOUS_REF"
+            --current-ref "$CURRENT_REF" --previous-ref "$PREVIOUS_REF" "${tls_args[@]}"
       - name: 保存诊断结果
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

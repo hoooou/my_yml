@@ -9,12 +9,17 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from tls_fixture import verified_tls
 from attempt_report import write_attempt
 
 
 class RequiredSiteTests(unittest.TestCase):
+    def setUp(self):
+        tls = patch.object(a.app_tls, 'check', return_value=verified_tls())
+        tls.start(); self.addCleanup(tls.stop)
+
     def record(self):
-        return {'id': 'n-a', 'entry': {'status': 'passed'},
+        return {'app_tls': verified_tls(), 'id': 'n-a', 'entry': {'status': 'passed'},
             'precheck': {'status': 'passed', 'round_count': 3, 'passed_count': 3},
             'download': {'status': 'passed', 'speed_mib_s': 5},
             'exit': {'country_code': 'TW', 'exit_ip': '8.8.8.8'},
