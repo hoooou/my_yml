@@ -57,6 +57,17 @@ class PublicationStabilityTests(unittest.TestCase):
 
 
 class StabilityProbeTests(unittest.TestCase):
+    def test_recheck_counts_exclude_historical_failures_and_legacy_summary_can_be_repaired(self):
+        fresh = record('n-fresh'); fresh['stability'] = evidence()
+        fresh['stability']['updated_at'] = '2026-10-12T04:00:00+08:00'
+        old = record('n-old'); old['stability'] = {'status': 'failed', 'updated_at': '2026-10-12T02:00:00+08:00'}
+        diag = {'updated_at': '2026-10-12T04:00:00+08:00', 'node_count': 1,
+                'controls_valid': True, 'nodes': [{'id': 'n-fresh'}]}
+        for current, previous in ((diag, None), (None, {k:v for k,v in diag.items() if k != 'nodes'})):
+            info = st.recheck_summary([fresh, old], current, previous, quality=lambda r: True)
+            self.assertEqual((info['node_count'], info['passed_count'], info['failed_count']), (1, 1, 0))
+            self.assertEqual(info['node_ids'], ['n-fresh'])
+
     def test_exit_ip_change_is_allowed_but_cert_timeouts_or_missing_rounds_are_not(self):
         good = evidence()
         good['attempts'][3]['sites']['ChatGPTTrace']['exit_ip'] = '1.1.1.1'
