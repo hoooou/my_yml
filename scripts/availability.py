@@ -22,6 +22,7 @@ from routing import optimize_routing
 import ip_reputation
 import app_tls
 import published_history
+import high_speed
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS
 
@@ -206,10 +207,10 @@ def shard_nodes(nodes, index, count):
 DOWNLOAD_URL = 'https://speed.cloudflare.com/__down?bytes=1000000'
 DOWNLOAD_BYTES = 1_000_000
 DOWNLOAD_BUDGET = 6
-HIGH_DOWNLOAD_BYTES = 50_000_000
-HIGH_DOWNLOAD_BUDGET = 20
-HIGH_DOWNLOAD_WORKERS = 2
-HIGH_DOWNLOAD_URL = 'https://speed.cloudflare.com/__down?bytes=50000000'
+HIGH_DOWNLOAD_BYTES = high_speed.BYTES
+HIGH_DOWNLOAD_BUDGET = high_speed.BUDGET
+HIGH_DOWNLOAD_WORKERS = high_speed.WORKERS
+HIGH_DOWNLOAD_URL = high_speed.URLS[0]
 
 
 def precheck_204(port):
@@ -218,9 +219,9 @@ def precheck_204(port):
     return summarize_rounds(outcomes, labels=('Google204',))['Google204']
 
 
-def download_sample(port, byte_count, budget):
+def download_sample(port, byte_count, budget, url=None):
     """One complete bounded sample; speed includes TLS and first byte."""
-    url = f'https://speed.cloudflare.com/__down?bytes={byte_count}'
+    url = url or f'https://speed.cloudflare.com/__down?bytes={byte_count}'
     label = f'{byte_count // 1_000_000} MB'
     started = time.perf_counter()
     received = 0
@@ -246,9 +247,10 @@ def download_sample(port, byte_count, budget):
                 if received != byte_count or elapsed > budget:
                     return {**result, 'reason': f'未在时间预算内完整下载 {label}', 'received_bytes': received,
                             'elapsed_ms': round(elapsed * 1000, 1)}
+                elapsed_ms = max(round(elapsed * 1000, 1), .1)
                 return {**result, 'status': 'passed', 'reason': f'{label} 完整下载；速度包含建连耗时',
-                        'received_bytes': received, 'elapsed_ms': round(elapsed * 1000, 1),
-                        'speed_mib_s': round(received / elapsed / 1048576, 3)}
+                        'received_bytes': received, 'elapsed_ms': elapsed_ms,
+                        'speed_mib_s': round(received / (elapsed_ms / 1000) / 1048576, 3)}
         except (s.requests.RequestException, OSError, s.requests.packages.urllib3.exceptions.HTTPError):
             return {**result, 'reason': f'{label} 下载连接、TLS 或读取失败', 'received_bytes': received}
 
@@ -258,7 +260,9 @@ def quick_download(port):
 
 
 def high_speed_download(port):
-    return download_sample(port, HIGH_DOWNLOAD_BYTES, HIGH_DOWNLOAD_BUDGET)
+    # Each target gets a fresh session and its own deadline; keep both outcomes.
+    return high_speed.summarize([download_sample(port, HIGH_DOWNLOAD_BYTES, HIGH_DOWNLOAD_BUDGET, url)
+                                 for url in high_speed.URLS])
 
 
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
@@ -279,7 +283,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                       'entry': {'status': 'unknown', 'attempts': 0, 'reason': '204 未通过，未提交国内 TCP 检测'},
                       'websites': None, 'exit': None, 'download': {'status': 'skipped', 'reason': '未进入下载阶段'},
                       'app_tls': {'status': 'skipped', 'reason': '必过网站未通过，未提交应用TLS检查'},
-                      'high_speed_download': {'status': 'skipped', 'reason': '1 MB 快测未通过，未提交 50 MB 测试'}}
+                      'high_speed_download': {'status': 'skipped', 'reason': '1 MB 快测未通过，未提交两轮100 MB测试'}}
             record['precheck'] = precheck(port)
             if record['precheck']['status'] == 'passed':
                 if not tcp_supported(node):
@@ -332,7 +336,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 progress['download'] += record['download']['status'] == 'passed'
                 progress['high_speed'] += record['high_speed_download']['status'] == 'passed'
                 if progress['done'] % 100 == 0 or progress['done'] == len(nodes):
-                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，网站完成 {progress["websites"]}，1MB通过 {progress["download"]}，50MB通过 {progress["high_speed"]}', flush=True)
+                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，网站完成 {progress["websites"]}，1MB通过 {progress["download"]}，100MB双轮通过 {progress["high_speed"]}', flush=True)
             return record
         with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             records = list(pool.map(measure, nodes))
@@ -400,12 +404,22 @@ def merge_shards(bundle, parts, count):
             high = record.get('high_speed_download') or {}
             should_high = record.get('download', {}).get('status') == 'passed'
             if high.get('status') not in (('passed', 'failed') if should_high else ('skipped',)):
-                raise ValueError('50 MB 阶段漏测或前置 1 MB 未通过')
-            if high['status'] == 'passed' and (high.get('received_bytes') != HIGH_DOWNLOAD_BYTES or
-                    high.get('requested_bytes') != HIGH_DOWNLOAD_BYTES or high.get('url') != HIGH_DOWNLOAD_URL or
-                    not 0 < high.get('elapsed_ms', math.inf) <= HIGH_DOWNLOAD_BUDGET * 1000 or
-                    not 0 < high.get('speed_mib_s', 0) < math.inf):
-                raise ValueError('50 MB 下载结果不完整或超出预算')
+                raise ValueError('100 MB双轮阶段漏测或前置1 MB未通过')
+            if should_high:
+                attempts = high.get('attempts') or []
+                if (high.get('version') != high_speed.VERSION or len(attempts) != len(high_speed.URLS)
+                        or any(item.get('status') not in ('passed', 'failed')
+                               or item.get('url') != url or item.get('requested_bytes') != HIGH_DOWNLOAD_BYTES
+                               or item.get('budget_seconds') != HIGH_DOWNLOAD_BUDGET
+                               for item, url in zip(attempts, high_speed.URLS))):
+                    raise ValueError('100 MB双轮检测证据缺失或目标不匹配')
+                expected = high_speed.summarize(attempts)
+                if any(high.get(key) != expected[key] for key in ('status', 'round_count', 'passed_count',
+                        'budget_seconds_per_round', 'speed_mib_s')):
+                    raise ValueError('100 MB双轮汇总与采样不一致')
+                if any(item['status'] == 'passed' and not high_speed.sample_passed(item, url)
+                       for item, url in zip(attempts, high_speed.URLS)):
+                    raise ValueError('100 MB下载结果不完整或超出预算')
             combined[record['id']] = record
     return [combined[n['name']] for n in bundle['nodes']], sum(p['endpoint_count'] for p in parts)
 
@@ -540,14 +554,9 @@ def high_speed_rank_key(record):
 
 
 def high_speed_eligible(record):
-    """Apply the current deadline even when rebuilding historical measurements."""
-    high = record.get('high_speed_download') or {}
+    """Historical one-target samples cannot qualify for the two-target policy."""
     return ((record.get('download') or {}).get('status') == 'passed'
-            and high.get('status') == 'passed'
-            and high.get('received_bytes') == high.get('requested_bytes') == HIGH_DOWNLOAD_BYTES
-            and high.get('url') == HIGH_DOWNLOAD_URL
-            and 0 < high.get('elapsed_ms', math.inf) <= HIGH_DOWNLOAD_BUDGET * 1000
-            and (high.get('speed_mib_s') or 0) > 0 and math.isfinite(high['speed_mib_s']))
+            and high_speed.passed(record.get('high_speed_download') or {}))
 
 
 def recheck_websites(records, mapping, binary, root):
@@ -777,7 +786,7 @@ def main():
     repairing = args.phase in ('repair', 'web-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 13,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 14,
               'historical_candidates': bundle.get('historical_candidates', {}),
               'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
                   'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
@@ -789,7 +798,7 @@ def main():
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
                   'scope': 'available_published_quick_download_passed', 'overseas_rounds': WEBSITE_ROUNDS,
                   'workers': 8, 'jobs': 1,
-                  'preserved_measurements': ['HTTPS204', 'domestic_TCP', 'domestic_pages', 'trace', '1MB_download', '50MB_download']}
+                  'preserved_measurements': ['HTTPS204', 'domestic_TCP', 'domestic_pages', 'trace', '1MB_download', 'high_speed_download']}
                   if args.phase == 'web-recheck' else previous.get('website_recheck') if repairing else None),
               'website_measurement_policy': {'version': 4, 'overseas_rounds': WEBSITE_ROUNDS,
                   'domestic_and_trace_rounds': 1, 'sample_bytes': 16384,
@@ -810,7 +819,7 @@ def main():
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': list(DOMESTIC_SITES), 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '50MB_download'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
@@ -819,7 +828,7 @@ def main():
               'web_user_agent': previous.get('web_user_agent') if repairing else WEB_USER_AGENT,
               'high_speed_download_test': previous.get('high_speed_download_test', False) if repairing else True,
               'high_speed_download_settings': ({**previous['high_speed_download_settings'], 'selection_limit': None}
-                  if previous.get('high_speed_download_settings') else None) if repairing else {'url': HIGH_DOWNLOAD_URL, 'bytes': HIGH_DOWNLOAD_BYTES, 'budget_seconds': HIGH_DOWNLOAD_BUDGET, 'rounds': 1, 'workers_per_shard': HIGH_DOWNLOAD_WORKERS, 'selection_limit': None, 'read_timeout_seconds': 1, 'includes_handshake': True},
+                  if previous.get('high_speed_download_settings') else None) if repairing else high_speed.settings(),
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
                   'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
@@ -841,8 +850,11 @@ def main():
                   'purity_formula': '100 * (1 - company.abuser_score_numeric_ratio)', 'score_scope': 'company_network_not_individual_ip',
                   'confirmed_nodes': sum((r.get('ip_reputation') or {}).get('status') == 'success' for r in records)},
               'high_speed_selection_policy': {'max_elapsed_seconds': HIGH_DOWNLOAD_BUDGET, 'selection_limit': None,
+                                              'required_urls': list(high_speed.URLS), 'required_bytes_per_round': HIGH_DOWNLOAD_BYTES,
+                                              'required_rounds': len(high_speed.URLS), 'speed_aggregation': 'minimum_of_completed_rounds',
                                               'selected_count': len([n for n in config['proxy-groups'][2]['proxies'] if n != 'REJECT'])},
-              'high_speed_download_counts': {v: sum((r.get('high_speed_download') or {}).get('status') == v for r in records) for v in ('passed', 'failed', 'skipped')},
+              'high_speed_download_counts': high_speed.result_counts(records),
+              'high_speed_target_counts': {url: high_speed.status_counts(records, i) for i, url in enumerate(high_speed.URLS)},
               'input_unique_count': input_count, 'parseable_count': bundle.get('parseable_count', len(nodes)), 'invalid_node_ids': rejected,
               'unique_tcp_endpoints': endpoint_count,
               'total_unique_tcp_endpoints': bundle.get('total_unique_tcp_endpoints',
@@ -862,7 +874,7 @@ def main():
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     rows = ['# 节点分阶段连通性与快速下载', '', f'发布时间：{now}；检测数据时间：{report["measurements_updated_at"]}', '',
             f'去重节点 {input_count}；内核可解析 {report["parseable_count"]}；实际发布 {report["published_node_count"]}；TCP 入口总数 {report["total_unique_tcp_endpoints"]}，原检测提交 {endpoint_count}。', '',
-            f'204 全通过 {report["precheck_counts"]["passed"]}；TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；海外访问检测 {len(reachable)}；1MB 快测通过 {report["download_counts"]["passed"]}；50MB 完整下载通过 {report["high_speed_download_counts"]["passed"]}。', '',
+            f'204 全通过 {report["precheck_counts"]["passed"]}；TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；海外访问检测 {len(reachable)}；1MB 快测通过 {report["download_counts"]["passed"]}；100MB双轮完整下载通过 {report["high_speed_download_counts"]["passed"]}。', '',
             f'检测顺序：{" → ".join(report["stages"])}。204 {report["precheck_rounds"]} 轮；海外网站 {report["website_rounds"]} 轮；国内及 trace 各 {report["trace_rounds"]} 轮；下载检测 {"开启" if report["download_test"] else "关闭"}。兼容性修复保留原检测数据，未测项目保持未测。', '',
             '204 三轮均返回 HTTPS 204 且无正文才进入 TCP；204 未通过的节点延迟显示未知，分类及跳过原因保留在 JSON 报告，不伪造国内入口不通。UDP 的 TCP 阶段不适用，保持未验证。', '',
             'TCP 来自小小 API 的国内探测点，运营商未公开，不代表移动或手机本地必然可用。共享主机和端口只提交一次，不同凭据分别检查 204 和海外访问。接口限流、超时、异常和目标不匹配均记为未验证。', '',
@@ -871,7 +883,8 @@ def main():
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
             '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
             'TCP通且指定12个海外网站各三轮均通过且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
-            f'仅 1 MB 快测通过的节点继续测试 Cloudflare __down?bytes=50000000：50 MB 一次，新检测采样预算 {HIGH_DOWNLOAD_BUDGET} 秒，读取超时 1 秒，每分片最多同时测试 2 个。本批数据的实际检测预算为 {(report["high_speed_download_settings"] or {}).get("budget_seconds", "未记录")} 秒；重建配置不改写历史检测时限。高速下载组仅接纳完整下载且耗时不超过 {HIGH_DOWNLOAD_BUDGET} 秒的节点，按实测速度从高到低保留；仅香港最多 30 个，其他地区不限制数量；本次入选 {report["high_speed_selection_policy"]["selected_count"]} 个。未通过 1 MB 的节点不消耗 50 MB 流量。', '',
+            f'仅1 MB快测通过的节点继续依次测试Cloudflare（{high_speed.URLS[0]}）和DataPacket（{high_speed.URLS[1]}），每次完整100,000,000字节、各自{HIGH_DOWNLOAD_BUDGET}秒，读取超时1秒，每分片最多同时测试2个节点。两次都通过才进入高速组，按较慢一次速度排序和命名；历史单轮结果不冒充双轮通过。本批数据的实际设置：{report["high_speed_download_settings"]}；重建配置不改写历史采样。香港最多30个，其他地区不限，本次高速组{report["high_speed_selection_policy"]["selected_count"]}个。未通过1 MB的节点不消耗大文件流量。', '',
+            f'逐目标100 MB结果：{report["high_speed_target_counts"]}。', '',
             '综合优选要求1 MB通过、指定12个海外网站各三轮均通过且Claude trace单轮通过；Google/YouTube、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
             '手机显示五个分组：全局选择、综合优选、高速下载、非机房 IP、台湾／新加坡。前三类节点组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
             f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮访问和Claude trace单轮均须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过，Claude仅检测trace；不允许其他页面或trace替代12站，不放行验证码、错误页面或未测项目。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
@@ -904,7 +917,7 @@ def main():
             return f'{item.get("passed_count", 0)}/{item.get("round_count", 0)}，{item.get("median_elapsed_ms")} / {item.get("p95_elapsed_ms")}ms'
         rows.append(f'| {record["id"][2:]} | {"是" if web_quality_eligible(record) else "否"} | {website_count(record)} | {timing(google)} | {timing(yt)}，极差{yt.get("jitter_ms")}ms，响应头{yt.get("median_ttfb_ms")}ms |')
     rows += ['', '## 手机对照', '', '刷新原订阅，进入“🚀 全局选择”，优先选择“⭐ 综合优选”；TCP 分类与 204 失败原因在下表及 JSON 报告查看。名称中的地区短标识对应本表节点编号前六位（重复时显示完整编号）。反馈节点编号和手机实际体验。', '',
-             '| 编号 | 入口 | TCP 分类 | 地区 | HTTPS204（三轮） | 海外通过 | 国内通过（经节点） | ChatGPTTrace | ClaudeTrace | 1MB快测 | 50MB下载 |',
+             '| 编号 | 入口 | TCP 分类 | 地区 | HTTPS204（三轮） | 海外通过 | 国内通过（经节点） | ChatGPTTrace | ClaudeTrace | 1MB快测 | 100MB双轮下载 |',
              '|' + '---|' * 11]
     for record in records:
         if not record.get('websites'):
@@ -922,7 +935,8 @@ def main():
         downloaded = record.get('download') or {}
         scores.append(f'{downloaded["speed_mib_s"]:.3f} MiB/s' if downloaded.get('status') == 'passed' else LABELS.get(downloaded.get('status'), '未测'))
         high = record.get('high_speed_download') or {}
-        scores.append(f'{high["speed_mib_s"]:.3f} MiB/s' if high.get('status') == 'passed' else LABELS.get(high.get('status'), '未测'))
+        scores.append(f'{high["speed_mib_s"]:.3f} MiB/s' if high_speed.passed(high) else
+                      '旧样本未验证双轮' if high.get('status') == 'passed' else LABELS.get(high.get('status'), '未测'))
         country = (record.get('exit') or {}).get('country_code')
         rows.append(f'| {record["id"][2:]} | {record["server"]}:{record["port"]} | {LABELS[record["entry"]["status"]]} | {s.COUNTRIES.get(country, country) or "未确认"} | ' + ' | '.join(scores) + ' |')
     if rejected:
