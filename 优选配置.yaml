@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-12T01:51:06+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-12T02:27:55+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -533,91 +533,20 @@ proxies:
   type: vless
   udp: true
   uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
-  name: 美国01|246ms|478Mbps|非住宅|纯净度0.0%
-- port: 443
-  server: 12.221.146.147
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国02|292ms|609Mbps|住宅|纯净度100.0%
+  name: 美国01|192ms|478Mbps|非住宅|纯净度0.0%
 - password: gs4BXwT6SW
   port: 10988
   server: 154.26.192.123
   tls: false
   type: http
   username: fQ67Dpe5dU
-  name: 美国03|390ms|2Mbps|住宅未知|纯净度99.8%
-- port: 9443
-  server: 149.88.21.140
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国04|378ms|509Mbps|非住宅|纯净度94.5%
-- type: http
-  server: 198.44.157.19
-  port: 9443
-  tls: true
-  skip-cert-verify: true
-  name: 加拿大01|430ms|527Mbps|非住宅|纯净度97.7%
-- port: 443
-  server: 12.202.180.10
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国05|411ms|370Mbps|住宅|纯净度100.0%
-- port: 443
-  server: 167.88.60.242
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国06|436ms|434Mbps|非住宅|纯净度93.8%
-- port: 9443
-  server: 198.44.157.27
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 加拿大02|492ms|342Mbps|非住宅|纯净度97.7%
-- port: 443
-  server: 206.223.183.16
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 加拿大03|569ms|344Mbps|住宅未知|纯净度100.0%
+  name: 美国02|373ms|2Mbps|住宅未知|纯净度99.8%
 - port: 443
   server: 64.98.50.100
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国07|548ms|328Mbps|非住宅|纯净度100.0%
-- port: 443
-  server: 206.223.183.21
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 加拿大04|644ms|390Mbps|住宅未知|纯净度100.0%
-- type: http
-  server: 51.158.194.16
-  port: 14287
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰01|717ms|115Mbps|非住宅|纯净度94.8%
-- network: ws
-  password: humanity
-  port: 443
-  server: www.calmlunch.com
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国01|643ms|153Mbps|非住宅|纯净度95.1%
-- port: 443
-  server: 185.164.138.156
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国01|727ms|245Mbps|非住宅|纯净度68.8%
+  name: 美国03|407ms|328Mbps|非住宅|纯净度100.0%
 - alpn:
   - http/1.1
   network: ws
@@ -631,263 +560,25 @@ proxies:
     headers:
       Host: www.trusteeforward.com
     path: /assignment
-  name: 荷兰02|669ms|143Mbps|非住宅|纯净度94.8%
-- port: 9443
-  server: 213.139.9.142
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国02|746ms|231Mbps|非住宅|纯净度82.4%
-- type: trojan
-  network: ws
-  server: 212.183.88.136
-  port: 443
-  password: humanity
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国03|775ms|137Mbps|非住宅|纯净度97.9%
-- network: ws
-  password: humanity
-  port: 443
-  server: 212.183.88.136
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国04|796ms|139Mbps|非住宅|纯净度97.9%
-- network: ws
-  password: humanity
-  port: 2053
-  server: 185.114.72.31
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国05|792ms|4Mbps|非住宅|纯净度98.7%
-- password: None
-  port: 443
-  server: 146.70.244.18
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 奥地利01|847ms|177Mbps|非住宅|纯净度97.7%
-- port: 443
-  server: 212.102.63.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 英国02|874ms|216Mbps|非住宅|纯净度78.5%
-- port: 9443
-  server: 213.177.229.161
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 德国01|865ms|178Mbps|非住宅|纯净度96.5%
+  name: 荷兰01|792ms|143Mbps|非住宅|纯净度94.8%
 - port: 443
   server: 82.65.162.76
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国06|874ms|118Mbps|住宅|纯净度99.8%
-- password: None
-  port: 443
-  server: 185.216.35.130
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 捷克01|854ms|20Mbps|非住宅|纯净度94.9%
+  name: 法国01|787ms|118Mbps|住宅|纯净度99.8%
 - type: http
   server: 51.158.202.56
   port: 14287
   tls: true
   skip-cert-verify: true
-  name: 荷兰03|868ms|104Mbps|非住宅|纯净度94.8%
-- port: 9443
-  server: 149.36.51.157
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰04|889ms|192Mbps|非住宅|纯净度99.6%
-- port: 9443
-  server: 37.120.213.210
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 瑞士01|971ms|223Mbps|非住宅|纯净度95.3%
-- client-fingerprint: firefox
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 8443
-  reality-opts:
-    public-key: CrczD7yTgleZrusuQSxwWtW9UB6xdwLbz-36XUsIf3A
-    short-id: 52c92aac1925af3b
-  server: pl.illusion-vpn.ru
-  servername: pl.illusion-vpn.ru
-  tls: true
-  type: vless
-  udp: true
-  uuid: b6492f9d-491a-5a05-bbfd-5e3630f94d00
-  name: 波兰01|964ms|111Mbps|非住宅|纯净度92.2%
-- port: 443
-  server: 37.120.156.18
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 波兰02|953ms|20Mbps|非住宅|纯净度96.5%
-- port: 9443
-  server: 149.88.27.46
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 瑞士02|980ms|197Mbps|非住宅|纯净度91.0%
-- password: None
-  port: 443
-  server: 149.36.51.129
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰05|851ms|209Mbps|非住宅|纯净度87.1%
-- password: None
-  port: 443
-  server: 185.183.105.130
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 意大利01|1002ms|196Mbps|非住宅|纯净度96.3%
-- type: socks5
-  server: 121.169.46.116
-  port: 1090
-  username: VDJjbE0wUWxNMFE2Og==
-  name: 韩国01|882ms|125Mbps|住宅|纯净度99.9%
+  name: 荷兰02|840ms|104Mbps|非住宅|纯净度94.8%
 - port: 443
   server: 82.64.255.151
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国07|966ms|132Mbps|住宅|纯净度100.0%
-- type: socks5
-  server: 121.169.46.116
-  port: 1090
-  username: Vm0xMFUxTXlSbkpQVm1SU1lrWmFjRnBYY0VKTmF6bHVVRlF3TmpvPTo=
-  name: 韩国02|988ms|63Mbps|住宅|纯净度99.9%
-- port: 443
-  server: 185.216.35.66
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 捷克02|870ms|19Mbps|非住宅|纯净度94.9%
-- port: 443
-  server: 79.142.77.63
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 瑞典01|962ms|198Mbps|非住宅|纯净度93.7%
-- password: None
-  port: 443
-  server: 146.70.242.130
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 瑞典02|1059ms|195Mbps|非住宅|纯净度91.0%
-- password: None
-  port: 443
-  server: 130.195.250.18
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 西班牙01|1011ms|21Mbps|非住宅|纯净度94.5%
-- type: http
-  server: 146.70.170.210
-  port: 9443
-  tls: true
-  skip-cert-verify: true
-  name: 挪威01|1100ms|204Mbps|非住宅|纯净度89.5%
-- port: 443
-  server: 37.120.156.34
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 波兰03|1115ms|20Mbps|非住宅|纯净度96.5%
-- password: None
-  port: 443
-  server: 146.70.221.34
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 塞尔维亚01|1157ms|18Mbps|非住宅|纯净度96.9%
-- type: http
-  server: 95.229.15.89
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 意大利02|1157ms|19Mbps|住宅|纯净度99.9%
-- password: None
-  port: 443
-  server: 31.7.62.50
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 瑞士03|1172ms|191Mbps|非住宅|纯净度89.8%
-- port: 9443
-  server: 169.150.199.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 罗马尼亚01|1230ms|185Mbps|非住宅|纯净度91.4%
-- password: None
-  port: 443
-  server: 185.94.192.210
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 保加利亚01|1169ms|17Mbps|非住宅|纯净度92.2%
-- port: 9443
-  server: 169.150.237.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 保加利亚02|1257ms|4Mbps|非住宅|纯净度92.2%
-- type: http
-  server: 68.235.56.59
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 美国08|1061ms|171Mbps|非住宅|纯净度95.7%
-- port: 9443
-  server: 135.136.1.2
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 罗马尼亚02|1146ms|18Mbps|非住宅|纯净度94.5%
-- port: 443
-  server: 154.47.29.161
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 克罗地亚01|1144ms|189Mbps|非住宅|纯净度92.5%
-- type: http
-  server: 185.245.84.50
-  port: 9443
-  tls: true
-  skip-cert-verify: true
-  name: 丹麦01|1099ms|189Mbps|非住宅|纯净度87.9%
-- type: http
-  server: 103.86.116.118
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 印度尼西亚01|1275ms|10Mbps|住宅|纯净度96.5%
+  name: 法国02|1033ms|132Mbps|住宅|纯净度100.0%
 - alterId: 0
   cipher: auto
   network: ws
@@ -899,101 +590,30 @@ proxies:
   type: vmess
   udp: true
   uuid: ecdc303d-bcbf-4129-bc02-dd67703f7081
-  name: 台湾01|1228ms|3Mbps|住宅|纯净度99.3%
-- encryption: none
-  network: ws
-  port: 443
-  server: 104.16.10.2
-  servername: v2ray.simspeedup.com
-  skip-cert-verify: false
-  tls: true
-  type: vless
-  uuid: 3c52e091-6714-4915-949f-2149fe69951b
-  ws-opts:
-    headers:
-      Host: v2ray.simspeedup.com
-    path: /ws
-  name: 泰国01|1344ms|11Mbps|非住宅|纯净度85.9%
-- port: 9443
-  server: 95.153.31.66
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 爱沙尼亚01|1196ms|186Mbps|非住宅|纯净度88.7%
-- network: ws
-  password: humanity
-  port: 443
-  server: 185.220.100.168
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国08|1169ms|4Mbps|非住宅|纯净度97.9%
-- port: 443
-  server: 94.177.163.156
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 意大利03|1375ms|20Mbps|非住宅|纯净度95.3%
+  name: 台湾01|938ms|3Mbps|住宅|纯净度99.3%
 - type: http
   server: 103.86.117.202
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 印度尼西亚02|1089ms|10Mbps|住宅|纯净度96.5%
-- port: 9443
-  server: 138.199.47.247
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国09|880ms|204Mbps|非住宅|纯净度99.6%
-- port: 443
-  server: 165.231.253.66
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 印度01|1363ms|11Mbps|非住宅|纯净度99.8%
+  name: 印度尼西亚01|1073ms|10Mbps|住宅|纯净度96.5%
 - type: http
-  server: 165.231.253.210
+  server: 103.86.116.118
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 印度02|1336ms|12Mbps|非住宅|纯净度99.8%
-- password: None
-  port: 443
-  server: 87.120.103.242
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 阿尔巴尼亚01|1429ms|17Mbps|非住宅|纯净度75.0%
-- port: 443
-  server: 185.221.132.242
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 卢森堡01|1069ms|14Mbps|非住宅|纯净度93.4%
-- type: http
-  server: 148.135.10.80
-  port: 443
-  tls: true
-  sni: 148.135.10.80
-  skip-cert-verify: true
-  name: 美国09|1451ms|530Mbps|非住宅|纯净度99.2%
-- port: 443
-  server: 149.22.86.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 葡萄牙01|1309ms|13Mbps|非住宅|纯净度96.1%
+  name: 印度尼西亚02|1101ms|10Mbps|住宅|纯净度96.5%
+- type: socks5
+  server: 121.169.46.116
+  port: 1090
+  username: VDJjbE0wUWxNMFE2Og==
+  name: 韩国01|1468ms|125Mbps|住宅|纯净度99.9%
 - type: http
   server: 154.26.139.24
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 新加坡01|1753ms|10Mbps|非住宅|纯净度97.6%
+  name: 新加坡01|1488ms|10Mbps|非住宅|纯净度97.6%
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -1007,197 +627,52 @@ proxy-groups:
 - name: ⭐ 综合优选
   type: select
   proxies:
-  - 美国01|246ms|478Mbps|非住宅|纯净度0.0%
-  - 美国02|292ms|609Mbps|住宅|纯净度100.0%
-  - 美国03|390ms|2Mbps|住宅未知|纯净度99.8%
-  - 美国04|378ms|509Mbps|非住宅|纯净度94.5%
-  - 加拿大01|430ms|527Mbps|非住宅|纯净度97.7%
-  - 美国05|411ms|370Mbps|住宅|纯净度100.0%
-  - 美国06|436ms|434Mbps|非住宅|纯净度93.8%
-  - 加拿大02|492ms|342Mbps|非住宅|纯净度97.7%
-  - 加拿大03|569ms|344Mbps|住宅未知|纯净度100.0%
-  - 美国07|548ms|328Mbps|非住宅|纯净度100.0%
-  - 加拿大04|644ms|390Mbps|住宅未知|纯净度100.0%
-  - 荷兰01|717ms|115Mbps|非住宅|纯净度94.8%
-  - 法国01|643ms|153Mbps|非住宅|纯净度95.1%
-  - 英国01|727ms|245Mbps|非住宅|纯净度68.8%
-  - 荷兰02|669ms|143Mbps|非住宅|纯净度94.8%
-  - 法国02|746ms|231Mbps|非住宅|纯净度82.4%
-  - 法国03|775ms|137Mbps|非住宅|纯净度97.9%
-  - 法国04|796ms|139Mbps|非住宅|纯净度97.9%
-  - 法国05|792ms|4Mbps|非住宅|纯净度98.7%
-  - 奥地利01|847ms|177Mbps|非住宅|纯净度97.7%
-  - 英国02|874ms|216Mbps|非住宅|纯净度78.5%
-  - 德国01|865ms|178Mbps|非住宅|纯净度96.5%
-  - 法国06|874ms|118Mbps|住宅|纯净度99.8%
-  - 捷克01|854ms|20Mbps|非住宅|纯净度94.9%
-  - 荷兰03|868ms|104Mbps|非住宅|纯净度94.8%
-  - 荷兰04|889ms|192Mbps|非住宅|纯净度99.6%
-  - 瑞士01|971ms|223Mbps|非住宅|纯净度95.3%
-  - 波兰01|964ms|111Mbps|非住宅|纯净度92.2%
-  - 波兰02|953ms|20Mbps|非住宅|纯净度96.5%
-  - 瑞士02|980ms|197Mbps|非住宅|纯净度91.0%
-  - 荷兰05|851ms|209Mbps|非住宅|纯净度87.1%
-  - 意大利01|1002ms|196Mbps|非住宅|纯净度96.3%
-  - 韩国01|882ms|125Mbps|住宅|纯净度99.9%
-  - 法国07|966ms|132Mbps|住宅|纯净度100.0%
-  - 韩国02|988ms|63Mbps|住宅|纯净度99.9%
-  - 捷克02|870ms|19Mbps|非住宅|纯净度94.9%
-  - 瑞典01|962ms|198Mbps|非住宅|纯净度93.7%
-  - 瑞典02|1059ms|195Mbps|非住宅|纯净度91.0%
-  - 西班牙01|1011ms|21Mbps|非住宅|纯净度94.5%
-  - 挪威01|1100ms|204Mbps|非住宅|纯净度89.5%
-  - 波兰03|1115ms|20Mbps|非住宅|纯净度96.5%
-  - 塞尔维亚01|1157ms|18Mbps|非住宅|纯净度96.9%
-  - 意大利02|1157ms|19Mbps|住宅|纯净度99.9%
-  - 瑞士03|1172ms|191Mbps|非住宅|纯净度89.8%
-  - 罗马尼亚01|1230ms|185Mbps|非住宅|纯净度91.4%
-  - 保加利亚01|1169ms|17Mbps|非住宅|纯净度92.2%
-  - 保加利亚02|1257ms|4Mbps|非住宅|纯净度92.2%
-  - 美国08|1061ms|171Mbps|非住宅|纯净度95.7%
-  - 罗马尼亚02|1146ms|18Mbps|非住宅|纯净度94.5%
-  - 克罗地亚01|1144ms|189Mbps|非住宅|纯净度92.5%
-  - 丹麦01|1099ms|189Mbps|非住宅|纯净度87.9%
-  - 印度尼西亚01|1275ms|10Mbps|住宅|纯净度96.5%
-  - 台湾01|1228ms|3Mbps|住宅|纯净度99.3%
-  - 泰国01|1344ms|11Mbps|非住宅|纯净度85.9%
-  - 爱沙尼亚01|1196ms|186Mbps|非住宅|纯净度88.7%
-  - 法国08|1169ms|4Mbps|非住宅|纯净度97.9%
-  - 意大利03|1375ms|20Mbps|非住宅|纯净度95.3%
-  - 印度尼西亚02|1089ms|10Mbps|住宅|纯净度96.5%
-  - 法国09|880ms|204Mbps|非住宅|纯净度99.6%
-  - 印度01|1363ms|11Mbps|非住宅|纯净度99.8%
-  - 印度02|1336ms|12Mbps|非住宅|纯净度99.8%
-  - 阿尔巴尼亚01|1429ms|17Mbps|非住宅|纯净度75.0%
-  - 卢森堡01|1069ms|14Mbps|非住宅|纯净度93.4%
-  - 美国09|1451ms|530Mbps|非住宅|纯净度99.2%
-  - 葡萄牙01|1309ms|13Mbps|非住宅|纯净度96.1%
+  - 美国01|192ms|478Mbps|非住宅|纯净度0.0%
+  - 美国02|373ms|2Mbps|住宅未知|纯净度99.8%
+  - 美国03|407ms|328Mbps|非住宅|纯净度100.0%
+  - 荷兰01|792ms|143Mbps|非住宅|纯净度94.8%
+  - 法国01|787ms|118Mbps|住宅|纯净度99.8%
+  - 荷兰02|840ms|104Mbps|非住宅|纯净度94.8%
+  - 法国02|1033ms|132Mbps|住宅|纯净度100.0%
+  - 台湾01|938ms|3Mbps|住宅|纯净度99.3%
+  - 印度尼西亚01|1073ms|10Mbps|住宅|纯净度96.5%
+  - 印度尼西亚02|1101ms|10Mbps|住宅|纯净度96.5%
+  - 韩国01|1468ms|125Mbps|住宅|纯净度99.9%
 - name: 🚄 中速下载
   type: select
   proxies:
-  - 美国05|411ms|370Mbps|住宅|纯净度100.0%
-  - 加拿大01|430ms|527Mbps|非住宅|纯净度97.7%
-  - 加拿大02|492ms|342Mbps|非住宅|纯净度97.7%
-  - 加拿大04|644ms|390Mbps|住宅未知|纯净度100.0%
-  - 加拿大03|569ms|344Mbps|住宅未知|纯净度100.0%
-  - 美国04|378ms|509Mbps|非住宅|纯净度94.5%
-  - 美国02|292ms|609Mbps|住宅|纯净度100.0%
-  - 美国01|246ms|478Mbps|非住宅|纯净度0.0%
-  - 美国06|436ms|434Mbps|非住宅|纯净度93.8%
-  - 美国09|1451ms|530Mbps|非住宅|纯净度99.2%
-  - 美国07|548ms|328Mbps|非住宅|纯净度100.0%
-  - 荷兰02|669ms|143Mbps|非住宅|纯净度94.8%
-  - 英国02|874ms|216Mbps|非住宅|纯净度78.5%
-  - 荷兰04|889ms|192Mbps|非住宅|纯净度99.6%
-  - 法国02|746ms|231Mbps|非住宅|纯净度82.4%
-  - 法国09|880ms|204Mbps|非住宅|纯净度99.6%
-  - 荷兰03|868ms|104Mbps|非住宅|纯净度94.8%
-  - 英国01|727ms|245Mbps|非住宅|纯净度68.8%
-  - 荷兰05|851ms|209Mbps|非住宅|纯净度87.1%
-  - 德国01|865ms|178Mbps|非住宅|纯净度96.5%
-  - 荷兰01|717ms|115Mbps|非住宅|纯净度94.8%
-  - 瑞士03|1172ms|191Mbps|非住宅|纯净度89.8%
-  - 法国06|874ms|118Mbps|住宅|纯净度99.8%
-  - 瑞士02|980ms|197Mbps|非住宅|纯净度91.0%
-  - 瑞士01|971ms|223Mbps|非住宅|纯净度95.3%
-  - 西班牙01|1011ms|21Mbps|非住宅|纯净度94.5%
-  - 丹麦01|1099ms|189Mbps|非住宅|纯净度87.9%
-  - 法国07|966ms|132Mbps|住宅|纯净度100.0%
-  - 克罗地亚01|1144ms|189Mbps|非住宅|纯净度92.5%
-  - 意大利03|1375ms|20Mbps|非住宅|纯净度95.3%
-  - 波兰02|953ms|20Mbps|非住宅|纯净度96.5%
-  - 波兰03|1115ms|20Mbps|非住宅|纯净度96.5%
-  - 捷克01|854ms|20Mbps|非住宅|纯净度94.9%
-  - 捷克02|870ms|19Mbps|非住宅|纯净度94.9%
-  - 瑞典01|962ms|198Mbps|非住宅|纯净度93.7%
-  - 意大利02|1157ms|19Mbps|住宅|纯净度99.9%
-  - 瑞典02|1059ms|195Mbps|非住宅|纯净度91.0%
-  - 爱沙尼亚01|1196ms|186Mbps|非住宅|纯净度88.7%
-  - 罗马尼亚02|1146ms|18Mbps|非住宅|纯净度94.5%
-  - 意大利01|1002ms|196Mbps|非住宅|纯净度96.3%
-  - 塞尔维亚01|1157ms|18Mbps|非住宅|纯净度96.9%
-  - 奥地利01|847ms|177Mbps|非住宅|纯净度97.7%
-  - 保加利亚01|1169ms|17Mbps|非住宅|纯净度92.2%
-  - 罗马尼亚01|1230ms|185Mbps|非住宅|纯净度91.4%
-  - 阿尔巴尼亚01|1429ms|17Mbps|非住宅|纯净度75.0%
-  - 挪威01|1100ms|204Mbps|非住宅|纯净度89.5%
-  - 美国08|1061ms|171Mbps|非住宅|纯净度95.7%
-  - 卢森堡01|1069ms|14Mbps|非住宅|纯净度93.4%
-  - 葡萄牙01|1309ms|13Mbps|非住宅|纯净度96.1%
-  - 印度02|1336ms|12Mbps|非住宅|纯净度99.8%
-  - 法国03|775ms|137Mbps|非住宅|纯净度97.9%
-  - 泰国01|1344ms|11Mbps|非住宅|纯净度85.9%
-  - 印度01|1363ms|11Mbps|非住宅|纯净度99.8%
-  - 印度尼西亚02|1089ms|10Mbps|住宅|纯净度96.5%
-  - 印度尼西亚01|1275ms|10Mbps|住宅|纯净度96.5%
-  - 新加坡01|1753ms|10Mbps|非住宅|纯净度97.6%
+  - 美国01|192ms|478Mbps|非住宅|纯净度0.0%
+  - 美国03|407ms|328Mbps|非住宅|纯净度100.0%
+  - 荷兰01|792ms|143Mbps|非住宅|纯净度94.8%
+  - 荷兰02|840ms|104Mbps|非住宅|纯净度94.8%
+  - 法国01|787ms|118Mbps|住宅|纯净度99.8%
+  - 法国02|1033ms|132Mbps|住宅|纯净度100.0%
+  - 印度尼西亚01|1073ms|10Mbps|住宅|纯净度96.5%
+  - 印度尼西亚02|1101ms|10Mbps|住宅|纯净度96.5%
+  - 新加坡01|1488ms|10Mbps|非住宅|纯净度97.6%
 - name: ⚡ 高速下载
   type: select
   proxies:
-  - 美国02|292ms|609Mbps|住宅|纯净度100.0%
-  - 美国09|1451ms|530Mbps|非住宅|纯净度99.2%
-  - 加拿大01|430ms|527Mbps|非住宅|纯净度97.7%
-  - 美国04|378ms|509Mbps|非住宅|纯净度94.5%
-  - 美国01|246ms|478Mbps|非住宅|纯净度0.0%
-  - 美国06|436ms|434Mbps|非住宅|纯净度93.8%
-  - 加拿大04|644ms|390Mbps|住宅未知|纯净度100.0%
-  - 美国05|411ms|370Mbps|住宅|纯净度100.0%
-  - 加拿大03|569ms|344Mbps|住宅未知|纯净度100.0%
-  - 加拿大02|492ms|342Mbps|非住宅|纯净度97.7%
-  - 美国07|548ms|328Mbps|非住宅|纯净度100.0%
-  - 英国01|727ms|245Mbps|非住宅|纯净度68.8%
-  - 法国02|746ms|231Mbps|非住宅|纯净度82.4%
-  - 瑞士01|971ms|223Mbps|非住宅|纯净度95.3%
-  - 英国02|874ms|216Mbps|非住宅|纯净度78.5%
-  - 荷兰05|851ms|209Mbps|非住宅|纯净度87.1%
-  - 法国09|880ms|204Mbps|非住宅|纯净度99.6%
-  - 挪威01|1100ms|204Mbps|非住宅|纯净度89.5%
-  - 瑞典01|962ms|198Mbps|非住宅|纯净度93.7%
-  - 瑞士02|980ms|197Mbps|非住宅|纯净度91.0%
-  - 意大利01|1002ms|196Mbps|非住宅|纯净度96.3%
-  - 瑞典02|1059ms|195Mbps|非住宅|纯净度91.0%
-  - 荷兰04|889ms|192Mbps|非住宅|纯净度99.6%
-  - 瑞士03|1172ms|191Mbps|非住宅|纯净度89.8%
-  - 丹麦01|1099ms|189Mbps|非住宅|纯净度87.9%
-  - 克罗地亚01|1144ms|189Mbps|非住宅|纯净度92.5%
-  - 爱沙尼亚01|1196ms|186Mbps|非住宅|纯净度88.7%
-  - 罗马尼亚01|1230ms|185Mbps|非住宅|纯净度91.4%
-  - 德国01|865ms|178Mbps|非住宅|纯净度96.5%
-  - 奥地利01|847ms|177Mbps|非住宅|纯净度97.7%
-  - 美国08|1061ms|171Mbps|非住宅|纯净度95.7%
-  - 法国01|643ms|153Mbps|非住宅|纯净度95.1%
-  - 荷兰02|669ms|143Mbps|非住宅|纯净度94.8%
-  - 法国04|796ms|139Mbps|非住宅|纯净度97.9%
-  - 法国03|775ms|137Mbps|非住宅|纯净度97.9%
-  - 法国07|966ms|132Mbps|住宅|纯净度100.0%
-  - 韩国01|882ms|125Mbps|住宅|纯净度99.9%
-  - 法国06|874ms|118Mbps|住宅|纯净度99.8%
-  - 荷兰01|717ms|115Mbps|非住宅|纯净度94.8%
-  - 波兰01|964ms|111Mbps|非住宅|纯净度92.2%
-  - 荷兰03|868ms|104Mbps|非住宅|纯净度94.8%
-  - 韩国02|988ms|63Mbps|住宅|纯净度99.9%
+  - 美国01|192ms|478Mbps|非住宅|纯净度0.0%
+  - 美国03|407ms|328Mbps|非住宅|纯净度100.0%
+  - 荷兰01|792ms|143Mbps|非住宅|纯净度94.8%
+  - 法国02|1033ms|132Mbps|住宅|纯净度100.0%
+  - 韩国01|1468ms|125Mbps|住宅|纯净度99.9%
+  - 法国01|787ms|118Mbps|住宅|纯净度99.8%
+  - 荷兰02|840ms|104Mbps|非住宅|纯净度94.8%
 - name: 🏠 非机房 IP
   type: select
   proxies:
-  - 美国01|246ms|478Mbps|非住宅|纯净度0.0%
-  - 美国02|292ms|609Mbps|住宅|纯净度100.0%
-  - 美国03|390ms|2Mbps|住宅未知|纯净度99.8%
-  - 美国05|411ms|370Mbps|住宅|纯净度100.0%
-  - 加拿大03|569ms|344Mbps|住宅未知|纯净度100.0%
-  - 美国07|548ms|328Mbps|非住宅|纯净度100.0%
-  - 加拿大04|644ms|390Mbps|住宅未知|纯净度100.0%
-  - 法国06|874ms|118Mbps|住宅|纯净度99.8%
-  - 荷兰04|889ms|192Mbps|非住宅|纯净度99.6%
-  - 韩国01|882ms|125Mbps|住宅|纯净度99.9%
-  - 法国07|966ms|132Mbps|住宅|纯净度100.0%
-  - 意大利02|1157ms|19Mbps|住宅|纯净度99.9%
-  - 印度尼西亚01|1275ms|10Mbps|住宅|纯净度96.5%
-  - 台湾01|1228ms|3Mbps|住宅|纯净度99.3%
-  - 泰国01|1344ms|11Mbps|非住宅|纯净度85.9%
-  - 法国09|880ms|204Mbps|非住宅|纯净度99.6%
-  - 美国09|1451ms|530Mbps|非住宅|纯净度99.2%
+  - 美国01|192ms|478Mbps|非住宅|纯净度0.0%
+  - 美国02|373ms|2Mbps|住宅未知|纯净度99.8%
+  - 美国03|407ms|328Mbps|非住宅|纯净度100.0%
+  - 法国01|787ms|118Mbps|住宅|纯净度99.8%
+  - 法国02|1033ms|132Mbps|住宅|纯净度100.0%
+  - 台湾01|938ms|3Mbps|住宅|纯净度99.3%
+  - 印度尼西亚01|1073ms|10Mbps|住宅|纯净度96.5%
+  - 韩国01|1468ms|125Mbps|住宅|纯净度99.9%
 - name: 🌏 台湾／新加坡
   type: select
   proxies:
-  - 台湾01|1228ms|3Mbps|住宅|纯净度99.3%
-  - 新加坡01|1753ms|10Mbps|非住宅|纯净度97.6%
+  - 台湾01|938ms|3Mbps|住宅|纯净度99.3%
+  - 新加坡01|1488ms|10Mbps|非住宅|纯净度97.6%
