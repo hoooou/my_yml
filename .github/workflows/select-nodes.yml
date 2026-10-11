@@ -73,7 +73,7 @@ jobs:
           overwrite: true
 
   probe:
-    name: 204 → TCP → 网站 → TLS → 1MB → 100MB双轮（分片 ${{ matrix.shard }}）
+    name: 204 → TCP → 网站 → TLS → 1MB → 5MB → 100MB双轮（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
     timeout-minutes: 90
@@ -207,7 +207,7 @@ jobs:
           python scripts/install_tools.py --mihomo-only
       - name: 检查手机兼容性逻辑
         run: python -m unittest discover -s scripts/tests -v
-      - name: 修复已有结果并验证订阅
+      - name: 补测或重建已有结果并验证订阅
         env:
           IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
           UPDATE_MODE: ${{ inputs.mode }}
