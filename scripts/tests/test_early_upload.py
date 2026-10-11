@@ -91,7 +91,7 @@ class EarlyUploadTests(unittest.TestCase):
         self.assertEqual(a.probe_pipeline([], 'unused', Path('.'), upload_controls=controls), ([], 0))
         self.assertTrue(controls['valid']); self.assertIsNone(controls['before'])
 
-    def test_final_upload_reuses_only_supplied_precheck_and_does_not_repeat_1mb(self):
+    def test_final_upload_reuses_only_supplied_precheck_and_does_not_repeat_3mb(self):
         first = verified_upload_precheck()
         with patch.object(up, 'sample') as fetch, patch.object(up, 'loaded_sample', side_effect=[sample(), sample()]) as loaded, \
              patch.object(up.time, 'sleep'), patch.object(up.time, 'monotonic', side_effect=[0, 20]):
@@ -101,6 +101,26 @@ class EarlyUploadTests(unittest.TestCase):
         with patch.object(up, 'sample') as fetch, patch.object(up, 'loaded_sample') as loaded:
             self.assertFalse(up.passed(up.check(1234, precheck={'status': 'failed'})))
             fetch.assert_not_called(); loaded.assert_not_called()
+
+    def test_3mb_precheck_budget_and_old_1mb_evidence_cannot_bypass_gate(self):
+        self.assertEqual(up.PRECHECK_BYTES, 3_000_000)
+        self.assertEqual(up.PRECHECK_BUDGET, 6)
+        at_limit = sample(3_000_000, 6, elapsed=6000)
+        self.assertTrue(up.sample_passed(at_limit, up.PRECHECK_BYTES, up.PRECHECK_BUDGET))
+        for invalid in (sample(1_000_000, 6), sample(3_000_000, 6, elapsed=6001),
+                        {**at_limit, 'uploaded_bytes': 2_999_999}):
+            self.assertFalse(up.sample_passed(invalid, up.PRECHECK_BYTES, up.PRECHECK_BUDGET))
+            with patch.object(up, 'sample') as fresh, patch.object(up, 'loaded_sample') as rounds:
+                self.assertFalse(up.passed(up.check(1234, precheck=invalid)))
+                fresh.assert_not_called(); rounds.assert_not_called()
+            # Realistic failed measurements must stop the pipeline before websites/downloads.
+            failed = {**invalid, 'status': 'failed'}
+            with patch.object(a, 'check_sites') as sites:
+                bundle, part = self.pipeline(lambda p: verified_upload_precheck() if p is None else failed,
+                                             {}, sites=sites)
+                sites.assert_not_called()
+            a.merge_shards(bundle, [part], 1)
+            self.assertEqual(part['records'][0]['download']['status'], 'skipped')
 
     def test_same_runner_upload_and_download_never_overlap_and_exception_releases_gate(self):
         gate = BandwidthGate(); attempted = threading.Event(); entered = threading.Event()

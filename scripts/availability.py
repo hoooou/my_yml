@@ -345,7 +345,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         record['upload_precheck_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                         controls['node_count'] += 1
                     if not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
-                        record['download']['reason'] = 'TCP通过但1MB上行预检未通过，跳过网站和下载'
+                        record['download']['reason'] = 'TCP通过但3MB上行预检未通过，跳过网站和下载'
                 if record['entry']['status'] == 'passed' and upload_speed.sample_passed(
                         record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                     rounds = [site_check(port)]
@@ -456,7 +456,7 @@ def merge_shards(bundle, parts, count):
                     raise ValueError('上行预检漏测或国内TCP未通过却已测速')
                 if early.get('status') == 'passed' and not upload_speed.sample_passed(
                         early, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
-                    raise ValueError('1MB上行预检证据不完整或超出预算')
+                    raise ValueError('3MB上行预检证据不完整或超出预算')
             should_web = record['entry']['status'] == 'passed' and (not uses_early or early.get('status') == 'passed')
             if not should_web and record.get('websites'):
                 raise ValueError('上行预检或前置阶段未通过却检测了网站')
@@ -952,7 +952,7 @@ def main():
                   'prepared_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
         bundle['id'] = hashlib.sha256(json.dumps(bundle, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
         bundle_path.write_text(json.dumps(bundle, ensure_ascii=False))
-        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备204→TCP→1MB上行预检→网站/TLS→下载；合并后进行两轮上行及稳定性', flush=True)
+        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备204→TCP→3MB上行预检→网站/TLS→下载；合并后进行两轮上行及稳定性', flush=True)
         if args.phase == 'prepare':
             return
     else:
@@ -1040,7 +1040,7 @@ def main():
     repairing = args.phase in repair_modes
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 19,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 20,
               'upload_precheck_policy': upload_speed.precheck_settings(),
               'early_upload_precheck_enabled': previous.get('early_upload_precheck_enabled', False) if repairing else bool(bundle.get('early_upload_precheck')),
               'upload_precheck_counts': {v: sum((r.get('upload_precheck') or {}).get('status', 'unmeasured') == v for r in records)
@@ -1094,7 +1094,7 @@ def main():
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(DAILY_SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': [], 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', '1MB_upload_precheck', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'time_spaced_stability'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', '3MB_upload_precheck', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'time_spaced_stability'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,

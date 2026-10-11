@@ -163,6 +163,21 @@ class UploadTests(unittest.TestCase):
         with patch.object(up.subprocess, 'run', side_effect=subprocess.TimeoutExpired([], 13)):
             self.assertEqual(up.sample(1234)['error_type'], 'process_deadline')
 
+    def test_early_upload_caller_sends_3mb_with_six_second_total_deadline(self):
+        def run(command, **kwargs):
+            self.assertEqual(command[-1], 'https://speed.cloudflare.com/__up?bytes=3000000')
+            self.assertEqual(command[command.index('--max-time') + 1], '6')
+            payload = Path(command[command.index('--data-binary') + 1][1:])
+            self.assertEqual(payload.stat().st_size, 3_000_000)
+            self.assertNotIn('--insecure', command)
+            return subprocess.CompletedProcess(command, 0, json.dumps({'time_total': 6,
+                'http_code': 200, 'url_effective': command[-1], 'size_upload': 3_000_000,
+                'ssl_verify_result': 0, 'num_redirects': 0}), '')
+        with patch.object(up.subprocess, 'run', side_effect=run):
+            result = up.sample(1234, up.PRECHECK_BYTES, up.PRECHECK_BUDGET)
+        self.assertTrue(up.sample_passed(result, 3_000_000, 6))
+        self.assertEqual(result['speed_mbps'], 4)
+
     def test_failed_precheck_skips_bandwidth_rounds_and_failed_first_round_still_retests(self):
         with patch.object(up, 'sample', return_value={'status': 'failed'}), patch.object(up, 'loaded_sample') as probe:
             self.assertFalse(up.passed(up.check(1234))); probe.assert_not_called()
