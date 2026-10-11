@@ -62,6 +62,13 @@ class CleanReportTests(unittest.TestCase):
         self.assertEqual(d.group_counts(config), [('⭐ 综合优选', 1), ('⚡ 高速下载', 0)])
         self.assertIn('不能将数量相加', text)
 
+    def test_latest_flow_labels_3mb_upload_separately_from_1mb_download(self):
+        report, config = fixture(); text = render(report, config)
+        self.assertIn('| 3 | 3MB上行预检 | 6秒内完整上传', text)
+        self.assertIn('复用本轮3MB预检', text)
+        self.assertIn('| 6 | 1MB下载 | 6秒内完整下载', text)
+        self.assertNotIn('1MB上行预检', text)
+
     def test_cached_pass_status_does_not_show_ssl_or_stability_as_verified(self):
         report, config = fixture()
         row = report['nodes'][0]
