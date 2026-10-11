@@ -6,12 +6,17 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from medium_speed_fixture import verified_medium
 import high_speed
 from high_speed_fixture import verified_high
 from tls_fixture import verified_tls
 
 
 class DoubleDownloadTests(unittest.TestCase):
+    def setUp(self):
+        medium = patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium())
+        medium.start(); self.addCleanup(medium.stop)
+
     def test_cloudflare_100mb_request_supplies_required_speed_site_referer(self):
         class Response:
             url = high_speed.URLS[0]

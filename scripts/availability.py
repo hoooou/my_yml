@@ -23,6 +23,7 @@ import ip_reputation
 import app_tls
 import published_history
 import high_speed
+import medium_speed
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
 
@@ -227,16 +228,20 @@ def download_sample(port, byte_count, budget, url=None):
     received = 0
     result = {'status': 'failed', 'url': url, 'requested_bytes': byte_count,
               'budget_seconds': budget, 'speed_mib_s': None}
+    request_headers = high_speed.request_headers(url)
+    if url == medium_speed.URL:
+        request_headers['Referer'] = 'https://speed.cloudflare.com/'
     with s.session() as client:
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
             with client.get(url, stream=True, timeout=(2, 1), allow_redirects=False,
                             headers={'Accept-Encoding': 'identity', 'Cache-Control': 'no-cache', 'User-Agent': WEB_USER_AGENT,
-                                     **high_speed.request_headers(url)}) as response:
+                                     **request_headers}) as response:
                 result['http_status'] = response.status_code
                 result['response_length'] = response.headers.get('Content-Length')
                 result['response_type'] = response.headers.get('Content-Type')
-                result['request_headers'] = high_speed.request_headers(url)
+                result['response_encoding'] = response.headers.get('Content-Encoding', 'identity')
+                result['request_headers'] = request_headers
                 if (response.status_code != 200 or response.url != url
                         or response.headers.get('Content-Length') != str(byte_count)
                         or response.headers.get('Content-Type', '').split(';')[0] != 'application/octet-stream'
@@ -264,6 +269,10 @@ def quick_download(port):
     return download_sample(port, DOWNLOAD_BYTES, DOWNLOAD_BUDGET)
 
 
+def medium_speed_download(port):
+    return download_sample(port, medium_speed.BYTES, medium_speed.BUDGET, medium_speed.URL)
+
+
 def high_speed_download(port):
     # Each target gets a fresh session and its own deadline; keep both outcomes.
     return high_speed.summarize([download_sample(port, HIGH_DOWNLOAD_BYTES, HIGH_DOWNLOAD_BUDGET, url)
@@ -271,16 +280,18 @@ def high_speed_download(port):
 
 
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
-                   site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16):
+                   site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16, medium_download=None):
     """Per-node stages are ordered, while different nodes overlap across stages."""
+    medium_download = medium_download or medium_speed_download
     if not nodes:
         return [], 0
     site_check_is_default = site_check is None
     site_check = site_check or (lambda port: check_sites(port, POST_SITES))
     listeners, ports = s.make_listeners({'id': n['name']} for n in nodes)
     pace, lock, tcp_jobs = Pace(interval), threading.Lock(), {}
+    medium_slots = threading.BoundedSemaphore(medium_speed.WORKERS)
     large_slots = threading.BoundedSemaphore(HIGH_DOWNLOAD_WORKERS)
-    progress = {'done': 0, 'precheck': 0, 'tcp': 0, 'websites': 0, 'download': 0, 'high_speed': 0}
+    progress = {'done': 0, 'precheck': 0, 'tcp': 0, 'websites': 0, 'download': 0, 'medium_speed': 0, 'high_speed': 0}
     with s.Core(binary, root, nodes, listeners), futures.ThreadPoolExecutor(max_workers=10) as tcp_pool:
         def measure(node):
             port = ports[node['name']]
@@ -288,6 +299,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                       'entry': {'status': 'unknown', 'attempts': 0, 'reason': '204 未通过，未提交国内 TCP 检测'},
                       'websites': None, 'exit': None, 'download': {'status': 'skipped', 'reason': '未进入下载阶段'},
                       'app_tls': {'status': 'skipped', 'reason': '必过网站未通过，未提交应用TLS检查'},
+                      'medium_speed_download': {'status': 'skipped', 'reason': '1 MB快测未通过，未提交5 MB测试'},
                       'high_speed_download': {'status': 'skipped', 'reason': '1 MB 快测未通过，未提交两轮100 MB测试'}}
             record['precheck'] = precheck(port)
             if record['precheck']['status'] == 'passed':
@@ -327,6 +339,9 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         if app_tls.passed(record['app_tls']):
                             record['download'] = download(port)
                             if record['download']['status'] == 'passed':
+                                with medium_slots:
+                                    record['medium_speed_download'] = medium_download(port)
+                                record['medium_speed_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                                 with large_slots:
                                     record['high_speed_download'] = large_download(port)
                         else:
@@ -339,9 +354,10 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 progress['tcp'] += record['entry']['status'] == 'passed'
                 progress['websites'] += record['websites'] is not None
                 progress['download'] += record['download']['status'] == 'passed'
+                progress['medium_speed'] += medium_speed.passed(record['medium_speed_download'])
                 progress['high_speed'] += record['high_speed_download']['status'] == 'passed'
                 if progress['done'] % 100 == 0 or progress['done'] == len(nodes):
-                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，网站完成 {progress["websites"]}，1MB通过 {progress["download"]}，100MB双轮通过 {progress["high_speed"]}', flush=True)
+                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，网站完成 {progress["websites"]}，1MB通过 {progress["download"]}，5MB通过 {progress["medium_speed"]}，100MB双轮通过 {progress["high_speed"]}', flush=True)
             return record
         with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             records = list(pool.map(measure, nodes))
@@ -410,6 +426,16 @@ def merge_shards(bundle, parts, count):
                     record['download'].get('received_bytes') != DOWNLOAD_BYTES or
                     not 0 < record['download'].get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
                 raise ValueError('下载结果不完整或节点未通过前置阶段')
+            medium = record.get('medium_speed_download') or {}
+            should_medium = record.get('download', {}).get('status') == 'passed'
+            if medium.get('status') not in (('passed', 'failed') if should_medium else ('skipped',)):
+                raise ValueError('5 MB阶段漏测或前置1 MB未通过')
+            if should_medium and (medium.get('url') != medium_speed.URL
+                    or medium.get('requested_bytes') != medium_speed.BYTES
+                    or medium.get('budget_seconds') != medium_speed.BUDGET):
+                raise ValueError('5 MB检测目标或预算不匹配')
+            if medium.get('status') == 'passed' and not medium_speed.passed(medium):
+                raise ValueError('5 MB结果不完整或超出预算')
             high = record.get('high_speed_download') or {}
             should_high = record.get('download', {}).get('status') == 'passed'
             if high.get('status') not in (('passed', 'failed') if should_high else ('skipped',)):
@@ -641,6 +667,22 @@ def recheck_websites(records, mapping, binary, root):
     return len(candidates)
 
 
+def recheck_medium_download(records, mapping, binary, root):
+    candidates = [r for r in records if r['id'] in mapping
+                  and r.get('download', {}).get('status') == 'passed']
+    if not candidates:
+        raise RuntimeError('没有1 MB已通过节点，保留旧订阅')
+    listeners, ports = s.make_listeners(candidates)
+    with s.Core(binary, root, [mapping[r['id']] for r in candidates], listeners):
+        def measure(record):
+            record['medium_speed_download'] = medium_speed_download(ports[record['id']])
+            record['medium_speed_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+        with futures.ThreadPoolExecutor(max_workers=medium_speed.WORKERS) as pool:
+            list(pool.map(measure, candidates))
+    print(f'已有1 MB通过节点补测5 MB完成：{len(candidates)}个，完整通过{sum(medium_speed.passed(r["medium_speed_download"]) for r in candidates)}个', flush=True)
+    return len(candidates)
+
+
 def limit_hong_kong(records):
     """Keep ranked Hong Kong candidates up to 30; other regions are unlimited."""
     selected, hong_kong_count = [], 0
@@ -666,9 +708,7 @@ def render_comparison(base, records, mapping):
         and (web_quality_eligible(r) or regional_eligible(r))), key=rank_key))
     strict = [r for r in ranked if web_quality_eligible(r)]
     strict_ids = {r['id'] for r in strict}
-    short_ids = {}
-    for record in ranked:
-        short_ids.setdefault(record['id'][2:8], []).append(record['id'])
+    region_numbers = {}
     non_dc, seen_ips = [], set()
     for record in ranked:
         region_code = (record.get('exit') or {}).get('country_code')
@@ -678,17 +718,27 @@ def render_comparison(base, records, mapping):
         latency = max(core_latencies) if all(isinstance(v, (float, int)) and math.isfinite(v) for v in core_latencies) else None
         if latency is None:
             latency = pre.get('median_elapsed_ms') if pre.get('status') == 'passed' else None
-        delay = (f'{"网页" if all(isinstance(v, (float, int)) for v in core_latencies) else "204"}{latency:g}ms'
-            if isinstance(latency, (int, float)) and math.isfinite(latency) else '延迟未知')
-        measured = record.get('high_speed_download') if high_speed_eligible(record) else record.get('download')
+        delay = (f'{latency:.0f}ms'
+            if isinstance(latency, (int, float)) and math.isfinite(latency) else '?ms')
+        measured = (record.get('high_speed_download') if high_speed_eligible(record) else
+                    record.get('medium_speed_download') if medium_speed.passed(record.get('medium_speed_download') or {})
+                    else record.get('download'))
         speed = (measured or {}).get('speed_mib_s')
-        bandwidth = (f'{speed * 1048576 * 8 / 1000000:.1f}Mbps'
+        bandwidth = (f'{speed * 1048576 * 8 / 1000000:.0f}Mbps'
             if (measured or {}).get('status') == 'passed' and isinstance(speed, (int, float))
-            and math.isfinite(speed) and speed > 0 else '带宽未知')
-        short_id = record['id'][2:8] if len(short_ids[record['id'][2:8]]) == 1 else record['id'][2:]
-        name = ' | '.join([f"{region}·{short_id}", delay, bandwidth,
-                           ip_reputation.residence_label(record), ip_reputation.purity_label(record)])
+            and math.isfinite(speed) and speed > 0 else '?Mbps')
+        housing = {'住宅候选': '住宅', '机房': '非住宅', '移动网络': '非住宅',
+                   '非机房': '住宅未知', '住宅未知': '住宅未知'}[ip_reputation.residence_label(record)]
+        info = record.get('ip_reputation') or {}
+        purity = info.get('network_purity_score') if info.get('status') == 'success' else None
+        purity_text = (f'纯净度{purity:.1f}%' if isinstance(purity, (int, float))
+                       and math.isfinite(purity) else '纯净度未知')
+        region_numbers[region] = region_numbers.get(region, 0) + 1
+        name = '|'.join([f'{region}{region_numbers[region]:02d}', delay, bandwidth, housing, purity_text])
         record['name'] = name
+        record['name_latency_source'] = 'Google_YouTube_slower_median' if all(isinstance(v, (float, int)) and math.isfinite(v) for v in core_latencies) else 'HTTPS204_median'
+        record['name_bandwidth_source'] = ('100MB_double_minimum' if high_speed_eligible(record) else
+            '5MB' if medium_speed.passed(record.get('medium_speed_download') or {}) else '1MB')
         node = copy.deepcopy(mapping[record['id']]); node['name'] = name; proxies.append(node)
         ip = (record.get('exit') or {}).get('exit_ip')
         if (record['id'] in strict_ids and record.get('exit_consistent') is not False
@@ -697,18 +747,21 @@ def render_comparison(base, records, mapping):
             non_dc.append(record); seen_ips.add(ip)
     non_dc = [r['name'] for r in non_dc]
     high = [r['name'] for r in sorted(strict, key=high_speed_rank_key) if high_speed_eligible(r)]
+    medium = [r['name'] for r in sorted(strict, key=lambda r: (
+        -((r.get('medium_speed_download') or {}).get('speed_mib_s') or 0), r['id']))
+        if medium_speed.passed(r.get('medium_speed_download') or {})]
     recommended = [r['name'] for r in strict]
     regional = [r['name'] for r in ranked if regional_eligible(r)]
     def group(name, names):
         return {'name': name, 'type': 'select', 'proxies': names or ['REJECT']}
     config['proxies'] = proxies
-    choices = ['⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
+    choices = ['⭐ 综合优选', medium_speed.GROUP, '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
     if not recommended and regional:
         choices.remove(REGIONAL_GROUP); choices.insert(0, REGIONAL_GROUP)
     config['proxy-groups'] = [
         group('🚀 全局选择', choices),
-        group('⭐ 综合优选', recommended), group('⚡ 高速下载', high), group('🏠 非机房 IP', non_dc),
-        group(REGIONAL_GROUP, regional),
+        group('⭐ 综合优选', recommended), group(medium_speed.GROUP, medium),
+        group('⚡ 高速下载', high), group('🏠 非机房 IP', non_dc), group(REGIONAL_GROUP, regional),
     ]
     if mobile_control_paths(config):
         raise ValueError('配置包含解码后的控制字符，拒绝发布到手机')
@@ -718,7 +771,7 @@ def render_comparison(base, records, mapping):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
-    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair', 'web-recheck'), default='all')
+    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair', 'web-recheck', 'medium-recheck'), default='all')
     parser.add_argument('--sample', help='Optional fixture; default pulls ALL subscriptions')
     parser.add_argument('--work-dir', default='.node-work/availability')
     parser.add_argument('--shard-index', type=int, default=0)
@@ -729,7 +782,7 @@ def main():
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     binary = str(Path(args.mihomo).resolve())
     bundle_path = root / 'bundle.json'
-    if args.phase in ('repair', 'web-recheck'):
+    if args.phase in ('repair', 'web-recheck', 'medium-recheck'):
         previous = json.loads(Path('连通性报告.json').read_text())
         published = yaml.safe_load(Path('优选配置.yaml').read_text())
         by_name = {n['name']: n for n in published['proxies']}
@@ -803,18 +856,20 @@ def main():
     if args.phase == 'publish':
         parts = [json.loads(p.read_text()) for p in Path(args.results_dir).glob('shard-*.json')]
         records, endpoint_count = merge_shards(bundle, parts, args.shard_count)
-    elif args.phase not in ('repair', 'web-recheck'):
+    elif args.phase not in ('repair', 'web-recheck', 'medium-recheck'):
         records, endpoint_count = probe_pipeline(nodes, binary, root)
+    if args.phase == 'medium-recheck':
+        medium_rechecked_count = recheck_medium_download(records, mapping, binary, root)
     if args.phase == 'web-recheck':
         website_rechecked_count = recheck_websites(records, mapping, binary, root)
     reachable = [r for r in records if r['entry']['status'] == 'passed']
-    if args.phase not in ('repair', 'web-recheck'):
+    if args.phase not in ('repair', 'web-recheck', 'medium-recheck'):
         ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
         for record in records:
             record['sources'] = metadata.get(record['id'], {}).get('sources', [])
             record['candidate_origin'] = metadata.get(record['id'], {}).get('candidate_origin', 'latest_subscriptions')
             record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
-    if args.phase not in ('repair', 'web-recheck') or args.refresh_ip_reputation:
+    if args.phase not in ('repair', 'web-recheck', 'medium-recheck') or args.refresh_ip_reputation:
         eligible_ips = [(r.get('exit') or {}).get('exit_ip') for r in records
                         if (r.get('download') or {}).get('status') == 'passed'
                         and r.get('exit_consistent') is not False]
@@ -837,10 +892,10 @@ def main():
         raise RuntimeError('最终订阅校验失败，不发布')
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
-    repairing = args.phase in ('repair', 'web-recheck')
+    repairing = args.phase in ('repair', 'web-recheck', 'medium-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 15,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 16,
               'historical_candidates': bundle.get('historical_candidates', {}),
               'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
                   'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
@@ -879,13 +934,21 @@ def main():
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': list(DOMESTIC_SITES), 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
               'download_test': previous.get('download_test', False) if repairing else True,
               'download_settings': previous.get('download_settings') if repairing else {'url': DOWNLOAD_URL, 'bytes': DOWNLOAD_BYTES, 'budget_seconds': DOWNLOAD_BUDGET, 'rounds': 1, 'read_timeout_seconds': 1, 'includes_handshake': True},
               'web_user_agent': previous.get('web_user_agent') if repairing else WEB_USER_AGENT,
+              'medium_speed_download_settings': medium_speed.settings(),
+              'medium_speed_download_counts': medium_speed.counts(records),
+              'medium_speed_selection_policy': {'group': medium_speed.GROUP, 'requires_5mb_pass': True,
+                  'requires_strict_pool': True, 'hong_kong_limit': 30, 'other_regions_limit': None,
+                  'selected_count': sum(n != 'REJECT' for g in config['proxy-groups'] if g['name'] == medium_speed.GROUP for n in g['proxies'])},
+              'medium_speed_recheck': ({'updated_at': now, 'node_count': medium_rechecked_count,
+                  'scope': 'published_1mb_passed', 'preserved_measurements': ['204', 'TCP', 'websites', 'app_TLS', '1MB', '100MB_double']}
+                  if args.phase == 'medium-recheck' else previous.get('medium_speed_recheck') if repairing else None),
               'high_speed_download_test': previous.get('high_speed_download_test', False) if repairing else True,
               'high_speed_download_settings': ({**previous['high_speed_download_settings'], 'selection_limit': None}
                   if previous.get('high_speed_download_settings') else None) if repairing else high_speed.settings(),
@@ -905,6 +968,9 @@ def main():
                       and (r.get('exit') or {}).get('country_code') == cc for r in records)
                       for cc in REGIONAL_COUNTRIES}},
               'published_node_count': len(config['proxies']), 'published_node_ids': published_ids,
+              'node_naming_policy': {'format': '地区编号|延迟ms|带宽Mbps|住宅类型|纯净度百分比',
+                  'numbering': 'ranked_per_region_starting_01', 'speed_source_priority': ['100MB_double_minimum', '5MB', '1MB'],
+                  'residential_label': 'ipapi_isp_and_not_datacenter', 'unknown_fields_remain_unknown': True},
               'ip_reputation_policy': {'provider': 'ipapi.is', 'scope': 'quick_download_passed_unique_exits',
                   'configured': bool(os.environ.get('IPAPI_IS_KEY')), 'lookup_budget_per_run': ip_reputation.DAILY_LOOKUP_BUDGET,
                   'purity_formula': '100 * (1 - company.abuser_score_numeric_ratio)', 'score_scope': 'company_network_not_individual_ip',
@@ -912,7 +978,7 @@ def main():
               'high_speed_selection_policy': {'max_elapsed_seconds': HIGH_DOWNLOAD_BUDGET, 'selection_limit': None,
                                               'required_urls': list(high_speed.URLS), 'required_bytes_per_round': HIGH_DOWNLOAD_BYTES,
                                               'required_rounds': len(high_speed.URLS), 'speed_aggregation': 'minimum_of_completed_rounds',
-                                              'selected_count': len([n for n in config['proxy-groups'][2]['proxies'] if n != 'REJECT'])},
+                                              'selected_count': sum(n != 'REJECT' for g in config['proxy-groups'] if g['name'] == '⚡ 高速下载' for n in g['proxies'])},
               'high_speed_download_counts': high_speed.result_counts(records),
               'high_speed_target_counts': {url: high_speed.status_counts(records, i) for i, url in enumerate(high_speed.URLS)},
               'input_unique_count': input_count, 'parseable_count': bundle.get('parseable_count', len(nodes)), 'invalid_node_ids': rejected,
@@ -943,12 +1009,13 @@ def main():
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
             '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；明确cf-mitigated: challenge且来自预期HTTPS网站的验证页单列CF需验证，认可网站可达，不记访问失败；普通403、其他验证码或风控仍需复核。CF验证响应不作为真实页面速度，不替代204、trace或应用TLS。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
             'TCP通且指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
+            f'1 MB通过后增加Cloudflare 5 MB快测（{medium_speed.URL}），完整5,000,000字节、{medium_speed.BUDGET}秒内完成，每分片最多{medium_speed.WORKERS}节点并发。中速组只从严格合格池选择真实5 MB通过节点；不补用1 MB或100 MB成绩。5 MB失败不取消其他组资格或后续100 MB测试；香港最多30个、其他地区不限。中速组本次{report["medium_speed_selection_policy"]["selected_count"]}个。', '',
             f'仅1 MB快测通过的节点继续依次测试Cloudflare（{high_speed.URLS[0]}）和DataPacket（{high_speed.URLS[1]}），每次完整100,000,000字节、各自{HIGH_DOWNLOAD_BUDGET}秒，读取超时1秒，每分片最多同时测试2个节点。两次都通过才进入高速组，按较慢一次速度排序和命名；历史单轮结果不冒充双轮通过。本批数据的实际设置：{report["high_speed_download_settings"]}；重建配置不改写历史采样。香港最多30个，其他地区不限，本次高速组{report["high_speed_selection_policy"]["selected_count"]}个。未通过1 MB的节点不消耗大文件流量。', '',
             f'逐目标100 MB结果：{report["high_speed_target_counts"]}。', '',
             '综合优选要求1 MB通过、指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过；Google/YouTube三轮真实页面、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
-            '手机显示五个分组：全局选择、综合优选、高速下载、非机房 IP、台湾／新加坡。前三类节点组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
+            '手机显示六个分组：全局选择、综合优选、中速下载、高速下载、非机房 IP、台湾／新加坡。下载组及综合、非机房组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
             f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮正常响应或明确CF验证，Claude trace单轮须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过（明确CF验证认可可达），Claude仅检测trace；不允许其他页面或trace替代12站，其他验证码、错误页面或未测项目不放行。Google/YouTube响应质量仍要求三轮真实页面，验证页速度不参与质量判定。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
-            '节点名称：地区·唯一短标识｜网页响应中位耗时（无数据时明确标204）｜下载换算 Mbps｜住宅类型｜网段纯净度。住宅候选表示 ISP 网络且非机房；非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
+            '节点名称：美国01|120ms|85Mbps|住宅/非住宅|纯净度99.2%。每地区独立从01顺序编号，不加空格或节点哈希。延迟取Google/YouTube真实页面较慢的中位数，缺失时采用204中位数；带宽优先双100 MB较慢速度，其次5 MB、最后1 MB；住宅依据ipapi.is的ISP且非机房分类，表示网络类型判断，不保证独享静态家庭IP；机房/移动网络标非住宅，只有hosting=false时仍标住宅未知。缺少信誉数据标纯净度未知，已知滥用详情保留JSON。非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
     for name, service in services.items():
@@ -965,6 +1032,9 @@ def main():
                    for status in ('passed', 'failed', 'slow', 'unstable', 'verification_required', 'needs_review')}
         kind = '国内（经节点）' if label in DOMESTIC_SITES else 'trace' if label in CONNECTIVITY_SITES else '海外'
         rows.append(f'| [{label}]({url}) | {kind} | {tallies["passed"]} | {tallies["failed"]} | {tallies["slow"]} | {tallies["unstable"]} | {tallies["verification_required"]} | {tallies["needs_review"]} | {sum(item is None for item in measured)} |')
+    medium_rechecked = report.get('medium_speed_recheck')
+    if medium_rechecked:
+        rows += ['', f'5 MB专项补测：{medium_rechecked["updated_at"]}；{medium_rechecked["node_count"]}个已发布1 MB通过节点，4节点并发。5 MB采样时间单独记录，204、TCP、网站、TLS、1 MB和100 MB双轮保留原测量时间。', '']
     rechecked = report.get('website_recheck')
     if rechecked:
         rows += ['', f'海外网站专项复测：{rechecked["updated_at"]}；{rechecked["node_count"]} 个旧下载通过节点，单作业8节点并发。未复测的旧网站结果保持原轮数；TCP、204、下载、国内网页和trace仍使用原测量时间。', '']
@@ -978,9 +1048,9 @@ def main():
         def timing(item):
             return f'{item.get("passed_count", 0)}/{item.get("round_count", 0)}，{item.get("median_elapsed_ms")} / {item.get("p95_elapsed_ms")}ms'
         rows.append(f'| {record["id"][2:]} | {"是" if web_quality_eligible(record) else "否"} | {website_count(record)} | {timing(google)} | {timing(yt)}，极差{yt.get("jitter_ms")}ms，响应头{yt.get("median_ttfb_ms")}ms |')
-    rows += ['', '## 手机对照', '', '刷新原订阅，进入“🚀 全局选择”，优先选择“⭐ 综合优选”；TCP 分类与 204 失败原因在下表及 JSON 报告查看。名称中的地区短标识对应本表节点编号前六位（重复时显示完整编号）。反馈节点编号和手机实际体验。', '',
-             '| 编号 | 入口 | TCP 分类 | 地区 | HTTPS204（三轮） | 海外通过 | 国内通过（经节点） | ChatGPTTrace | ClaudeTrace | 1MB快测 | 100MB双轮下载 |',
-             '|' + '---|' * 11]
+    rows += ['', '## 手机对照', '', '刷新原订阅，进入“🚀 全局选择”，优先选择“⭐ 综合优选”；TCP 分类与 204 失败原因在下表及 JSON 报告查看。下表列出完整节点名称与报告编号的对应关系。反馈完整节点名称和手机实际体验。', '',
+             '| 节点名 | 编号 | 入口 | TCP 分类 | 地区 | HTTPS204（三轮） | 海外通过 | 国内通过（经节点） | ChatGPTTrace | ClaudeTrace | 1MB快测 | 5MB快测 | 100MB双轮下载 |',
+             '|' + '---|' * 13]
     for record in records:
         if not record.get('websites'):
             continue
@@ -996,11 +1066,14 @@ def main():
         scores += [LABELS.get((results.get(label) or {}).get('status'), '未测') for label in ('ChatGPTTrace', 'ClaudeTrace')]
         downloaded = record.get('download') or {}
         scores.append(f'{downloaded["speed_mib_s"]:.3f} MiB/s' if downloaded.get('status') == 'passed' else LABELS.get(downloaded.get('status'), '未测'))
+        medium = record.get('medium_speed_download') or {}
+        scores.append(f'{medium["speed_mib_s"]:.3f} MiB/s' if medium_speed.passed(medium) else LABELS.get(medium.get('status'), '未测'))
         high = record.get('high_speed_download') or {}
         scores.append(f'{high["speed_mib_s"]:.3f} MiB/s' if high_speed.passed(high) else
                       '旧样本未验证双轮' if high.get('status') == 'passed' else LABELS.get(high.get('status'), '未测'))
         country = (record.get('exit') or {}).get('country_code')
-        rows.append(f'| {record["id"][2:]} | {record["server"]}:{record["port"]} | {LABELS[record["entry"]["status"]]} | {s.COUNTRIES.get(country, country) or "未确认"} | ' + ' | '.join(scores) + ' |')
+        display_name = record.get('name', '未入选').replace('|', '\\|')
+        rows.append(f'| {display_name} | {record["id"][2:]} | {record["server"]}:{record["port"]} | {LABELS[record["entry"]["status"]]} | {s.COUNTRIES.get(country, country) or "未确认"} | ' + ' | '.join(scores) + ' |')
     if rejected:
         rows += ['', '内核或手机兼容性校验未通过的节点未写入订阅，编号：' + '、'.join(rejected)]
     Path('连通性报告.md').write_text('\n'.join(rows) + '\n')

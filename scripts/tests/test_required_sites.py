@@ -9,12 +9,15 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
 from attempt_report import write_attempt
 
 
 class RequiredSiteTests(unittest.TestCase):
     def setUp(self):
+        medium = patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium())
+        medium.start(); self.addCleanup(medium.stop)
         tls = patch.object(a.app_tls, 'check', return_value=verified_tls())
         tls.start(); self.addCleanup(tls.stop)
 

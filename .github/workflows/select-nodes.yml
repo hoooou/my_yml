@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 全量检测、重建配置、海外请求复测或Claude独立诊断
+        description: 全量检测、重建、网站复测、5MB补测或Claude诊断
         type: choice
         required: true
         default: full
-        options: [full, repair, web-recheck, claude-diagnostics]
+        options: [full, repair, web-recheck, medium-recheck, claude-diagnostics]
       diagnostic_run_id:
         description: Claude诊断使用的已完成全量检测运行编号（仅诊断模式使用）
         type: string
@@ -184,8 +184,8 @@ jobs:
           fi
 
   repair:
-    name: 修复手机兼容性并更新原订阅
-    if: github.event_name == 'workflow_dispatch' && (inputs.mode == 'repair' || inputs.mode == 'web-recheck')
+    name: 补测或重建并更新原订阅
+    if: github.event_name == 'workflow_dispatch' && (inputs.mode == 'repair' || inputs.mode == 'web-recheck' || inputs.mode == 'medium-recheck')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -214,6 +214,8 @@ jobs:
         run: |
           if [ "$UPDATE_MODE" = "web-recheck" ]; then
             python scripts/availability.py --mihomo .node-work/bin/mihomo --phase web-recheck
+          elif [ "$UPDATE_MODE" = "medium-recheck" ]; then
+            python scripts/availability.py --mihomo .node-work/bin/mihomo --phase medium-recheck
           else
             python scripts/availability.py --mihomo .node-work/bin/mihomo --phase repair --refresh-ip-reputation
           fi

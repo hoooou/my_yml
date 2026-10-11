@@ -12,12 +12,15 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
 from high_speed_fixture import verified_high
 
 
 class AvailabilityTests(unittest.TestCase):
     def setUp(self):
+        medium = patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium())
+        medium.start(); self.addCleanup(medium.stop)
         tls = patch.object(a.app_tls, 'check', return_value=verified_tls())
         tls.start(); self.addCleanup(tls.stop)
 
@@ -44,7 +47,7 @@ class AvailabilityTests(unittest.TestCase):
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
         by_name = {r['name']: r for r in records if 'name' in r}
-        for group in config['proxy-groups'][1:4]:
+        for group in (g for g in config['proxy-groups'] if g['name'] in ('⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP')):
             countries = [by_name[n]['exit']['country_code'] for n in group['proxies']]
             self.assertEqual(countries.count('HK'), 30)
             self.assertEqual(countries.count('US'), 35)
@@ -60,7 +63,7 @@ class AvailabilityTests(unittest.TestCase):
             'ip_type': {'status': 'success', 'hosting': False}}
         a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, [record],
             {'n-unique': {'name': 'n-unique', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
-        self.assertEqual(record['name'], '美国·unique | 网页100ms | 83.9Mbps | 非机房 | 纯净未知')
+        self.assertEqual(record['name'], '美国01|100ms|84Mbps|住宅未知|纯净度未知')
 
     def test_100mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
@@ -133,7 +136,7 @@ class AvailabilityTests(unittest.TestCase):
             'websites': {**a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.OVERSEAS_SITES}]*3, a.OVERSEAS_SITES),
                 **a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES if label not in a.OVERSEAS_SITES}], [label for label in a.POST_SITES if label not in a.OVERSEAS_SITES])},
             'download': {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 1000},
-            'high_speed_download': verified_high(5)}
+            'medium_speed_download': verified_medium(), 'high_speed_download': verified_high(5)}
         part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': 1, 'records': [record]}
         bundle = {'id': 'batch', 'nodes': [node]}
         a.merge_shards(bundle, [part], 1)
@@ -250,7 +253,7 @@ class AvailabilityTests(unittest.TestCase):
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 20}}] * 3, ('Google204',))['Google204']
         parts = [{'bundle_id': 'batch', 'index': i, 'count': 4, 'endpoint_count': len(a.shard_nodes(nodes, i, 4)),
                   'records': [{'app_tls': {'status': 'skipped'}, 'id': n['name'], 'precheck': copy.deepcopy(pre), 'entry': {'status': 'failed'}, 'websites': None,
-                               'download': {'status': 'skipped'}, 'high_speed_download': {'status': 'skipped'}}
+                               'download': {'status': 'skipped'}, 'medium_speed_download': {'status': 'skipped'}, 'high_speed_download': {'status': 'skipped'}}
                               for n in a.shard_nodes(nodes, i, 4)]} for i in range(4)]
         records, endpoints = a.merge_shards(bundle, parts, 4)
         self.assertEqual([r['id'] for r in records], [n['name'] for n in nodes])
@@ -391,7 +394,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(rows[0]['download']['status'],'skipped')
         self.assertEqual(rows[0]['high_speed_download']['status'],'skipped')
 
-    def test_five_groups_have_valid_references_without_diagnostic_groups(self):
+    def test_six_groups_have_valid_references_without_diagnostic_groups(self):
         records = [{'app_tls': {'status': 'skipped'}, 'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
                    for i, status in [(1, 'passed'), (2, 'failed'), (3, 'unknown')]]
         records[0]['websites'] = self.stable_sites()
@@ -405,14 +408,14 @@ class AvailabilityTests(unittest.TestCase):
         config = a.render_comparison(base, records, mapping)
         self.assertEqual(len(config['proxies']), 1)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
-        self.assertEqual(set(groups), {'🚀 全局选择', '⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', a.REGIONAL_GROUP})
+        self.assertEqual(set(groups), {'🚀 全局选择', '⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP', a.REGIONAL_GROUP, a.medium_speed.GROUP})
         for group in ('🌍 按地区选择', '📶 TCP通', '⛔ TCP不通', '🔎 TCP未验证', '🎯 全部节点'):
             self.assertNotIn(group, groups)
             self.assertNotIn(group, groups['🚀 全局选择'])
         self.assertEqual(groups['🏠 非机房 IP'], ['REJECT'])
         self.assertEqual(groups['⭐ 综合优选'], [config['proxies'][0]['name']])
         self.assertEqual(groups[a.REGIONAL_GROUP], ['REJECT'])
-        self.assertEqual(len(groups), 5)
+        self.assertEqual(len(groups), 6)
         self.assertEqual(base, original)
         valid = {p['name'] for p in config['proxies']} | set(groups) | {'DIRECT', 'REJECT'}
         self.assertTrue(all(name in valid for proxies in groups.values() for name in proxies))
@@ -432,9 +435,9 @@ class AvailabilityTests(unittest.TestCase):
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
         recommended = groups['⭐ 综合优选']
-        self.assertEqual(len(groups), 5)
-        self.assertEqual(sum(name.startswith('日本·') for name in recommended), 35)
-        self.assertEqual(sum(name.startswith('美国·') for name in recommended), 35)
+        self.assertEqual(len(groups), 6)
+        self.assertEqual(sum(name.startswith('日本') for name in recommended), 35)
+        self.assertEqual(sum(name.startswith('美国') for name in recommended), 35)
         self.assertNotIn('日本', groups)
         self.assertNotIn('美国', groups)
         self.assertEqual(len(config['proxies']), 70)
@@ -457,7 +460,7 @@ class AvailabilityTests(unittest.TestCase):
                    for r in records if r['id'] != 'n-missing_credentials'}
         config = a.render_comparison({}, records, mapping)
         self.assertEqual(len(config['proxies']), 1)
-        for group in config['proxy-groups'][1:4]:
+        for group in (g for g in config['proxy-groups'] if g['name'] in ('⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP')):
             self.assertEqual(group['proxies'], [good['name']])
 
     def test_regional_exception_is_isolated_and_can_publish_without_strict_nodes(self):
@@ -475,9 +478,9 @@ class AvailabilityTests(unittest.TestCase):
         config = a.render_comparison({}, [record], {'n-slow-tw': {'name': 'n-slow-tw',
             'type': 'http', 'server': '8.8.8.8', 'port': 80}})
         self.assertEqual(len(config['proxies']), 1)
-        for group in config['proxy-groups'][1:4]:
+        for group in (g for g in config['proxy-groups'] if g['name'] in ('⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP')):
             self.assertEqual(group['proxies'], ['REJECT'])
-        self.assertEqual(config['proxy-groups'][4]['proxies'], [record['name']])
+        self.assertEqual(next(g['proxies'] for g in config['proxy-groups'] if g['name'] == a.REGIONAL_GROUP), [record['name']])
         self.assertEqual(config['proxy-groups'][0]['proxies'][0], a.REGIONAL_GROUP)
         for country in ('TW', 'SG'):
             record['exit']['country_code'] = country
