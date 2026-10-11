@@ -6,6 +6,7 @@ from pathlib import Path
 import app_tls
 import high_speed
 import medium_speed
+from select_nodes import COUNTRIES
 import stability
 import upload_speed
 
@@ -62,7 +63,7 @@ def download(row):
 
 def ssl_passed(row):
     explicit_error = any(a.get('tls_error_kind') == 'certificate_verification_failed'
-        for item in (row.get('websites') or {}).values() for a in item.get('attempts', []))
+        for item in (row.get('websites') or {}).values() for a in item.get('attempts', [item]))
     return (not explicit_error and app_tls.passed(row.get('app_tls'))
             and app_tls.passed(row.get('post_upload_tls')))
 
@@ -153,7 +154,9 @@ def write_report(report, config, path, candidate=False, website_gate=None):
                 reasons.append('上传后SSL未通过')
             if row.get('stability') and not stability.passed(row['stability']):
                 reasons.append('间隔稳定性未通过')
-            rows.append(f'| {cell((row.get("name") or row["id"]).split("|")[0])} | {"；".join(reasons) or "未满足当前综合／地区门槛"} |')
+            cc = (row.get('exit') or {}).get('country_code')
+            label = (row.get('name') or f'{COUNTRIES.get(cc, cc) or "地区未知"}（{row["id"][-4:]}）').split('|')[0]
+            rows.append(f'| {cell(label)} | {"；".join(reasons) or "未满足当前综合／地区门槛"} |')
         if not excluded:
             rows.append('| 无 | 本轮候选全部保留 |')
     else:
