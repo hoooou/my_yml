@@ -744,7 +744,7 @@ def rank_key(record):
     response_band = math.ceil(temporal_tail / 250) if upload_ok and math.isfinite(temporal_tail) else temporal_tail
     duplex = min(down_mbps, uplink['speed_mbps']) if upload_ok else 0
     prefix = ()
-    if temporal.get('version') == continuous_stability.VERSION:
+    if temporal.get('version') in (2, continuous_stability.VERSION):
         metrics = continuous_stability.metrics(temporal)
         core = continuous_stability.core_metrics(temporal)
         p95 = max((x['p95_ms'] for x in core.values()), default=math.inf)

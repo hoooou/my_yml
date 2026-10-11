@@ -16,23 +16,27 @@ import time
 import select_nodes as s
 import stability as legacy
 
-VERSION = 2
-MIN_ROUNDS = 20
-INTERVAL = 30
+VERSION = 3
+INTERVAL = 15
+PEER_POLL_SECONDS = 30
+STANDALONE_SECONDS = 300
 WORKERS = 8
 MAX_SECONDS = 75 * 60
 PEER_JOB = '两轮上行及负载后SSL'
 
 
-def settings():
-    return {**legacy.settings(), 'version': VERSION, 'rounds': None,
-            'minimum_rounds': MIN_ROUNDS, 'minimum_start_interval_seconds': INTERVAL,
+def settings(version=VERSION):
+    policy = {**legacy.settings(), 'version': VERSION, 'rounds': None,
+            'minimum_rounds': None, 'minimum_start_interval_seconds': INTERVAL,
             'minimum_idle_seconds_between_rounds': None, 'node_workers': WORKERS,
             'requires_all_rounds': False, 'minimum_success_rate': .90,
             'parallel_independent_runner': True, 'scope': 'domestic_TCP_and_3MB_upload_passed',
             'observes_until': 'uplink_job_completed_and_every_node_sampled_after_completion',
             'maximum_runtime_seconds': MAX_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
             'continuous_latency_hard_caps': False, 'explicit_certificate_error_rejects': True}
+    if version == 2:
+        policy.update(version=2, minimum_rounds=20, minimum_start_interval_seconds=30)
+    return policy
 
 
 def certificate_error(sample):
@@ -42,11 +46,13 @@ def certificate_error(sample):
 
 
 def valid_evidence(result):
-    if not isinstance(result, dict) or result.get('version') != VERSION:
+    if not isinstance(result, dict) or result.get('version') not in (2, VERSION):
         return False
     attempts = result.get('attempts') or []
     cutoff = result.get('peer_completed_offset_seconds')
-    if len(attempts) < MIN_ROUNDS or not legacy.finite(cutoff) or cutoff < 0:
+    interval = 30 if result['version'] == 2 else INTERVAL
+    enough = len(attempts) >= 20 if result['version'] == 2 else bool(attempts)
+    if not enough or not legacy.finite(cutoff) or cutoff < 0:
         return False
     last_start, last_end = None, None
     for number, sample in enumerate(attempts, 1):
@@ -54,7 +60,7 @@ def valid_evidence(result):
         if (sample.get('round') != number or not legacy.finite(start) or not legacy.finite(end)
                 or not 0 <= start <= end or set(sample.get('sites') or {}) != set(legacy.TARGETS)
                 or not isinstance(sample.get('android_tls'), dict)
-                or (last_start is not None and (start - last_start < INTERVAL - .001 or start < last_end))):
+                or (last_start is not None and (start - last_start < interval - .001 or start < last_end))):
             return False
         last_start, last_end = start, end
     return last_start >= cutoff
@@ -97,8 +103,8 @@ def core_metrics(result):
             for label, item in metrics(result)['targets'].items() if label in ('Google', 'YouTube')}
 
 
-def summarize(attempts, cutoff=None):
-    result = {'version': VERSION, 'attempts': attempts, **metrics({'attempts': attempts}),
+def summarize(attempts, cutoff=None, version=VERSION):
+    result = {'version': version, 'attempts': attempts, **metrics({'attempts': attempts}),
               'peer_completed_offset_seconds': cutoff,
               'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
     result['status'] = 'passed'
@@ -161,7 +167,7 @@ def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=
                 if now >= next_peer and cutoff is None:
                     if peer():
                         cutoff = clock() - origin
-                    next_peer = clock() + INTERVAL
+                    next_peer = clock() + PEER_POLL_SECONDS
                 if now >= next_control:
                     control(len(attempts), origin)
                     checkpoint(attempts, cutoff, False)
@@ -174,8 +180,7 @@ def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=
                     id = running.pop(job)
                     item = job.result()
                     attempts[id].append(item)
-                    if not (len(attempts[id]) >= MIN_ROUNDS and cutoff is not None
-                            and item['started_offset_seconds'] >= cutoff):
+                    if not (cutoff is not None and item['started_offset_seconds'] >= cutoff):
                         heapq.heappush(due, (max(origin + item['started_offset_seconds'] + INTERVAL,
                                                origin + item['finished_offset_seconds']), id))
                 if due or running:
@@ -199,7 +204,10 @@ def observe(records, mapping, binary, root, peer=None):
     controls, health = [], []
     policy = settings()
     if peer is not None:
-        policy.update(parallel_independent_runner=False, observes_until='minimum_20_rounds_after_previous_stages', scope='eligible_pool_after_upload')
+        policy.update(parallel_independent_runner=False, observes_until='standalone_300_second_window',
+                      standalone_window_seconds=STANDALONE_SECONDS, scope='eligible_pool_after_upload')
+        previous_peer, deadline = peer, time.monotonic() + STANDALONE_SECONDS
+        peer = lambda: previous_peer() and time.monotonic() >= deadline
     peer = (peer or PeerJob()) if records else (lambda: True)
     def snapshot(attempts, cutoff, complete):
         results = {id: summarize(items, cutoff) for id, items in attempts.items()}
@@ -243,6 +251,9 @@ def merge(bundle, parts, records, count, shard_nodes):
         if part.get('bundle_id') != bundle['id'] or part.get('count') != count:
             raise ValueError('持续观察批次或分片不一致')
         diagnostic = part.get('diagnostic') or {}
+        expected_version = (bundle.get('stability_policy') or {}).get('version', VERSION)
+        if (diagnostic.get('settings') or {}).get('version') != expected_version:
+            raise ValueError('持续观察策略版本与本轮输入不一致')
         expected = {n['name'] for n in shard_nodes(bundle['nodes'], part['index'], count)} & eligible
         rows = diagnostic.get('nodes') or []
         if (len(rows) != len(expected) or {r['id'] for r in rows} != expected
@@ -266,15 +277,15 @@ def merge(bundle, parts, records, count, shard_nodes):
                         for a, b in zip(checks, checks[1:]))):
                 raise ValueError('持续观察环境对照未覆盖检测窗口')
         for row in rows:
-            if not valid_evidence(row.get('stability')):
-                raise ValueError('持续观察缺少20轮、时间间隔或主流程结束后的复测')
-            combined[row['id']] = summarize(row['stability']['attempts'], row['stability']['peer_completed_offset_seconds'])
+            if (row.get('stability') or {}).get('version') != expected_version or not valid_evidence(row.get('stability')):
+                raise ValueError('持续观察缺少有效样本、时间间隔或主流程结束后的复测')
+            combined[row['id']] = summarize(row['stability']['attempts'], row['stability']['peer_completed_offset_seconds'], version=expected_version)
         diagnostics.append(diagnostic)
     for record in records:
         if record['id'] in combined:
             record['stability'] = combined[record['id']]
     return {'updated_at': max((d['updated_at'] for d in diagnostics), default=None),
-            'settings': settings(), 'scope': 'domestic_TCP_and_3MB_upload_passed',
+            'settings': settings((bundle.get('stability_policy') or {}).get('version', VERSION)), 'scope': 'domestic_TCP_and_3MB_upload_passed',
             'node_count': len(combined), 'complete': True, 'controls_valid': True,
             'nodes': [{'id': id, 'stability': item} for id, item in combined.items()],
             'shards': diagnostics}
