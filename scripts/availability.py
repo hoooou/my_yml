@@ -25,6 +25,7 @@ import published_history
 import high_speed
 import medium_speed
 import stability
+import continuous_stability
 import upload_speed
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report
@@ -290,19 +291,31 @@ def high_speed_download(port):
 
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
                    site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
-                   medium_download=None, upload_precheck=None, upload_controls=None):
+                   medium_download=None, upload_precheck=None, upload_controls=None,
+                   preflight_only=False, initial_records=None):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
     upload_precheck = upload_precheck or (lambda port: upload_speed.sample(
         port, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET, root))
     controls = upload_controls if upload_controls is not None else {}
-    controls.update(before=None, after=None, valid=None, node_count=0)
+    if initial_records is None:
+        controls.update(before=None, after=None, valid=None, node_count=0)
     if not nodes:
         controls['valid'] = True
         return [], 0
     site_check_is_default = site_check is None
     site_check = site_check or (lambda port: check_sites(port, DAILY_POST_SITES))
-    listeners, ports = s.make_listeners({'id': n['name']} for n in nodes)
+    seed = {r['id']: r for r in initial_records or []}
+    if initial_records is not None and set(seed) != {n['name'] for n in nodes}:
+        raise ValueError('前置记录存在缺失或多余节点')
+    active = [n for n in nodes if initial_records is None or
+              (seed[n['name']]['entry']['status'] == 'passed' and upload_speed.sample_passed(
+                  seed[n['name']].get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET))]
+    initial_endpoint_count = len({endpoint_key(n) for n in nodes if tcp_supported(n)
+        and seed[n['name']]['precheck']['status'] == 'passed'}) if initial_records is not None else None
+    if not active:
+        return copy.deepcopy(initial_records), initial_endpoint_count
+    listeners, ports = s.make_listeners({'id': n['name']} for n in active)
     pace, lock, tcp_jobs = Pace(interval), threading.Lock(), {}
     medium_slots = threading.BoundedSemaphore(medium_speed.WORKERS)
     large_slots = threading.BoundedSemaphore(HIGH_DOWNLOAD_WORKERS)
@@ -310,11 +323,11 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     abort = threading.Event()
     progress = {'done': 0, 'precheck': 0, 'tcp': 0, 'upload_precheck': 0,
                 'websites': 0, 'download': 0, 'medium_speed': 0, 'high_speed': 0}
-    with s.Core(binary, root, nodes, listeners), futures.ThreadPoolExecutor(max_workers=10) as tcp_pool:
+    with s.Core(binary, root, active, listeners), futures.ThreadPoolExecutor(max_workers=10) as tcp_pool:
         def measure(node):
             if abort.is_set():
                 raise RuntimeError('上行预检对照异常，停止本分片')
-            port = ports[node['name']]
+            port = ports.get(node['name'])
             record = {'id': node['name'], 'server': node['server'], 'port': node['port'], 'protocol': node['type'],
                       'entry': {'status': 'unknown', 'attempts': 0, 'reason': '204 未通过，未提交国内 TCP 检测'},
                       'upload_precheck': {'status': 'skipped', 'reason': '国内TCP未通过，未提交上行预检'},
@@ -322,8 +335,11 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                       'app_tls': {'status': 'skipped', 'reason': '必过网站未通过，未提交应用TLS检查'},
                       'medium_speed_download': {'status': 'skipped', 'reason': '1 MB快测未通过，未提交5 MB测试'},
                       'high_speed_download': {'status': 'skipped', 'reason': '1 MB 快测未通过，未提交两轮100 MB测试'}}
-            record['precheck'] = precheck(port)
-            if record['precheck']['status'] == 'passed':
+            if initial_records is not None:
+                record = copy.deepcopy(seed[node['name']])
+            else:
+                record['precheck'] = precheck(port)
+            if initial_records is None and record['precheck']['status'] == 'passed':
                 if not tcp_supported(node):
                     record['entry']['reason'] = 'UDP 协议不适用 TCP 检测，后续阶段未测'
                 else:
@@ -346,6 +362,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         controls['node_count'] += 1
                     if not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                         record['download']['reason'] = 'TCP通过但3MB上行预检未通过，跳过网站和下载'
+            if not preflight_only:
                 if record['entry']['status'] == 'passed' and upload_speed.sample_passed(
                         record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                     rounds = [site_check(port)]
@@ -400,6 +417,8 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
             return record
         with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             records = list(pool.map(measure, nodes))
+        if initial_records is not None:
+            return records, initial_endpoint_count
         if controls['node_count']:
             controls['after'] = upload_precheck(None)
             controls['valid'] = upload_speed.sample_passed(controls['after'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)
@@ -410,7 +429,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     return records, len(tcp_jobs)
 
 
-def merge_shards(bundle, parts, count):
+def merge_shards(bundle, parts, count, preflight_only=False):
     if len(parts) != count or {p['index'] for p in parts} != set(range(count)):
         raise ValueError('缺少分片，拒绝发布')
     combined = {}
@@ -420,7 +439,8 @@ def merge_shards(bundle, parts, count):
         if part['count'] != count:
             raise ValueError('分片数量不一致')
         subset = shard_nodes(bundle['nodes'], part['index'], count)
-        expected = {n['name'] for n in subset}
+        definitions = {n['name']: n for n in subset}
+        expected = set(definitions)
         rows = part['records']
         if len(rows) != len(expected) or {r['id'] for r in rows} != expected:
             raise ValueError('分片存在漏测、重复或串片节点')
@@ -438,6 +458,9 @@ def merge_shards(bundle, parts, count):
         if part['endpoint_count'] != len(eligible):
             raise ValueError('TCP 入口统计不完整')
         for record in rows:
+            node = definitions[record['id']]
+            if bundle.get('parallel_observation') and any(record.get(key) != node[field] for key, field in (('server', 'server'), ('port', 'port'), ('protocol', 'type'))):
+                raise ValueError('节点与本轮定义不一致')
             pre = record.get('precheck', {})
             if pre.get('round_count') != 3 or len(pre.get('attempts', [])) != 3:
                 raise ValueError('节点缺少三轮 204 检测')
@@ -457,7 +480,7 @@ def merge_shards(bundle, parts, count):
                 if early.get('status') == 'passed' and not upload_speed.sample_passed(
                         early, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                     raise ValueError('3MB上行预检证据不完整或超出预算')
-            should_web = record['entry']['status'] == 'passed' and (not uses_early or early.get('status') == 'passed')
+            should_web = not preflight_only and record['entry']['status'] == 'passed' and (not uses_early or early.get('status') == 'passed')
             if not should_web and record.get('websites'):
                 raise ValueError('上行预检或前置阶段未通过却检测了网站')
             if should_web and (not record.get('websites') or any(
@@ -720,7 +743,14 @@ def rank_key(record):
     # of the two measured rates rather than rewarding download alone.
     response_band = math.ceil(temporal_tail / 250) if upload_ok and math.isfinite(temporal_tail) else temporal_tail
     duplex = min(down_mbps, uplink['speed_mbps']) if upload_ok else 0
-    return (downloaded.get('status') != 'passed', not web_quality_eligible(record), response_band,
+    prefix = ()
+    if temporal.get('version') == continuous_stability.VERSION:
+        metrics = continuous_stability.metrics(temporal)
+        core = continuous_stability.core_metrics(temporal)
+        p95 = max((x['p95_ms'] for x in core.values()), default=math.inf)
+        jitter = max((x['iqr_ms'] for x in core.values()), default=math.inf)
+        prefix = (-metrics['success_rate'], metrics['maximum_consecutive_failures'], p95, jitter)
+    return prefix + (downloaded.get('status') != 'passed', not web_quality_eligible(record), response_band,
             -duplex, -(uplink.get('speed_ratio') or 0) if upload_ok else 0,
             *web_rank_metrics(record), -website_count(record), -connectivity_count(record),
             temporal_tail,
@@ -882,15 +912,61 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
     return config
 
 
+def eligible_for_upload(records, mapping):
+    return [r for r in records if r['id'] in mapping and r['entry']['status'] == 'passed'
+            and (r.get('download') or {}).get('status') == 'passed'
+            and (web_quality_eligible(r) or regional_eligible(r))]
+
+
+def merge_uplink(bundle, records, stage, mapping):
+    if stage.get('bundle_id') != bundle['id']:
+        raise ValueError('上行复测批次不一致')
+    rows = stage.get('records') or []
+    expected = {r['id']: r for r in records}
+    if len(rows) != len(expected) or {r['id'] for r in rows} != set(expected):
+        raise ValueError('上行复测节点缺失或重复')
+    eligible = {r['id'] for r in eligible_for_upload(records, mapping)}
+    diagnostic = stage.get('diagnostic') or {}
+    measured = diagnostic.get('nodes') or []
+    if (diagnostic.get('node_count') != len(eligible) or len(measured) != len(eligible)
+            or {r['id'] for r in measured} != eligible):
+        raise ValueError('上行复测范围与本轮候选不一致')
+    if eligible and (diagnostic.get('controls_valid') is not True
+            or not all(upload_speed.passed((diagnostic.get('controls') or {}).get(k)) for k in ('before', 'after'))
+            or not stability.core_healthy(diagnostic.get('core_health') or {})):
+        raise ValueError('上行复测环境对照异常')
+    evidence = {r['id']: r for r in measured}
+    for row in rows:
+        original = expected[row['id']]
+        if {k: v for k, v in row.items() if k not in ('upload', 'post_upload_tls')} != original:
+            raise ValueError('上行复测修改了原网站或下载证据')
+        if row['id'] in eligible:
+            for key in ('upload', 'post_upload_tls'):
+                if row.get(key) != evidence[row['id']].get(key) or not isinstance(row.get(key), dict):
+                    raise ValueError('上行复测缺少对应原始证据')
+            if (row['upload'].get('precheck') or {}) != original.get('upload_precheck'):
+                raise ValueError('上行复测复用的预检不属于本轮节点')
+        elif 'upload' in row or 'post_upload_tls' in row:
+            raise ValueError('非候选节点出现上行复测')
+    # Mutate only after validating the entire artifact.
+    for row in rows:
+        if row['id'] in eligible:
+            expected[row['id']].update(upload=row['upload'], post_upload_tls=row['post_upload_tls'])
+    return diagnostic
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
-    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair', 'web-recheck', 'medium-recheck', 'stability-recheck', 'uplink-recheck'), default='all')
+    parser.add_argument('--phase', choices=('all', 'prepare', 'preflight', 'probe', 'observe', 'uplink-stage', 'publish', 'repair', 'web-recheck', 'medium-recheck', 'stability-recheck', 'uplink-recheck'), default='all')
     parser.add_argument('--sample', help='Optional fixture; default pulls ALL subscriptions')
     parser.add_argument('--work-dir', default='.node-work/availability')
     parser.add_argument('--shard-index', type=int, default=0)
     parser.add_argument('--shard-count', type=int, default=4)
     parser.add_argument('--results-dir', default='.node-work/shards')
+    parser.add_argument('--preflight-dir', default='.node-work/preflight')
+    parser.add_argument('--observations-dir', default='.node-work/observations')
+    parser.add_argument('--uplink-result', default='.node-work/uplink/uplink-stage.json')
     parser.add_argument('--refresh-ip-reputation', action='store_true', help='Refresh optional IP metadata in repair mode')
     args = parser.parse_args()
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
@@ -945,6 +1021,8 @@ def main():
         rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
                   'early_upload_precheck': True,
+                  'parallel_observation': args.phase == 'prepare',
+                  'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
                   'historical_candidates': historical,
                   'input_count': input_count, 'rejected': rejected, 'services': service_status(),
                   'mobile_rejections': mobile_rejections,
@@ -952,7 +1030,7 @@ def main():
                   'prepared_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
         bundle['id'] = hashlib.sha256(json.dumps(bundle, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
         bundle_path.write_text(json.dumps(bundle, ensure_ascii=False))
-        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备204→TCP→3MB上行预检→网站/TLS→下载；合并后进行两轮上行及稳定性', flush=True)
+        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备204→TCP→3MB上行预检；后续网站/下载与独立稳定性持续观察并行，最终校验两轮上行和全部证据', flush=True)
         if args.phase == 'prepare':
             return
     else:
@@ -961,20 +1039,37 @@ def main():
     base, metadata, sources = bundle['base'], bundle['metadata'], bundle['sources']
     input_count, rejected, services = bundle['input_count'], bundle['rejected'], bundle['services']
     mapping = {n['name']: n for n in nodes}
-    if args.phase == 'probe':
+    if args.phase in ('preflight', 'probe', 'observe'):
         subset = shard_nodes(nodes, args.shard_index, args.shard_count)
-        print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)} 节点，TCP 与网站同时检测', flush=True)
-        controls = {}
+        controls, seed = {}, None
+        if args.phase in ('probe', 'observe') and bundle.get('parallel_observation'):
+            pre_parts = [json.loads(p.read_text()) for p in Path(args.preflight_dir).glob('shard-*.json')]
+            pre_records, _ = merge_shards(bundle, pre_parts, args.shard_count, preflight_only=True)
+            subset_ids = {n['name'] for n in subset}
+            seed = [r for r in pre_records if r['id'] in subset_ids]
+            controls = copy.deepcopy(next(p['upload_precheck_controls'] for p in pre_parts if p['index'] == args.shard_index))
+        if args.phase == 'observe':
+            if seed is None:
+                raise ValueError('持续观察必须来自同轮前置检测')
+            candidates = [r for r in seed if r['entry']['status'] == 'passed'
+                and upload_speed.sample_passed(r.get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)]
+            diagnostic = continuous_stability.observe(candidates, mapping, binary, root)
+            result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
+                      'diagnostic': diagnostic}
+            (root / f'observation-{args.shard_index}.json').write_text(json.dumps(result, ensure_ascii=False))
+            return
+        print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)}节点，阶段{args.phase}', flush=True)
         try:
             records, endpoint_count = probe_pipeline(subset, binary, root,
-                interval=.25 * args.shard_count, upload_controls=controls)
+                interval=.25 * args.shard_count, upload_controls=controls,
+                preflight_only=args.phase == 'preflight', initial_records=seed)
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
         result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
                   'records': records, 'endpoint_count': endpoint_count, 'upload_precheck_controls': controls}
         (root / f'shard-{args.shard_index}.json').write_text(json.dumps(result, ensure_ascii=False))
         return
-    if args.phase == 'publish':
+    if args.phase in ('publish', 'uplink-stage'):
         parts = [json.loads(p.read_text()) for p in Path(args.results_dir).glob('shard-*.json')]
         records, endpoint_count = merge_shards(bundle, parts, args.shard_count)
     elif args.phase not in repair_modes:
@@ -983,6 +1078,21 @@ def main():
             records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls)
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
+    upload_diagnostic = stability_diagnostic = None
+    if args.phase == 'uplink-stage':
+        candidates = eligible_for_upload(records, mapping)
+        upload_diagnostic = upload_speed.recheck(candidates, mapping, binary, root, reuse_precheck=True)
+        (root / 'uplink-stage.json').write_text(json.dumps({'bundle_id': bundle['id'],
+            'records': records, 'diagnostic': upload_diagnostic}, ensure_ascii=False))
+        return
+    parallel_publish = args.phase == 'publish' and bundle.get('parallel_observation')
+    if parallel_publish:
+        stage = json.loads(Path(args.uplink_result).read_text())
+        upload_diagnostic = merge_uplink(bundle, records, stage, mapping)
+        observations = [json.loads(p.read_text()) for p in Path(args.observations_dir).glob('observation-*.json')]
+        stability_diagnostic = continuous_stability.merge(bundle, observations, records, args.shard_count, shard_nodes)
+        (root / 'stability-results.json').write_text(json.dumps(stability_diagnostic, ensure_ascii=False))
+        (root / 'upload-results.json').write_text(json.dumps(upload_diagnostic, ensure_ascii=False))
     if args.phase == 'medium-recheck':
         medium_rechecked_count = recheck_medium_download(records, mapping, binary, root)
     if args.phase == 'web-recheck':
@@ -1002,20 +1112,24 @@ def main():
         for record in records:
             record['ip_reputation'] = reputations.get((record.get('exit') or {}).get('exit_ip'),
                 {'status': 'unknown', 'provider': 'ipapi.is', 'reason': 'not_eligible'})
-    upload_diagnostic = None
-    if args.phase in ('all', 'publish', 'uplink-recheck'):
+    if not parallel_publish and args.phase in ('all', 'publish', 'uplink-recheck'):
         upload_candidates = [r for r in records if r['id'] in mapping
             and r['entry']['status'] == 'passed' and (r.get('download') or {}).get('status') == 'passed'
             and (web_quality_eligible(r) or regional_eligible(r))]
         upload_diagnostic = upload_speed.recheck(upload_candidates, mapping, binary, root,
             reuse_precheck=args.phase in ('all', 'publish'))
-    stability_diagnostic = None
-    if args.phase in ('all', 'publish', 'stability-recheck', 'uplink-recheck'):
+    if not parallel_publish and args.phase in ('all', 'publish', 'stability-recheck', 'uplink-recheck'):
         candidates = [r for r in records if r['id'] in mapping
             and r['entry']['status'] == 'passed'
             and (r.get('download') or {}).get('status') == 'passed'
             and (web_quality_eligible(r) or regional_eligible(r))]
-        stability_diagnostic = stability.recheck(candidates, mapping, binary, root)
+        if args.phase in ('stability-recheck', 'uplink-recheck'):
+            stability_diagnostic = continuous_stability.observe(candidates, mapping, binary, root, peer=lambda: True)
+            observations = {r['id']: r['stability'] for r in stability_diagnostic['nodes']}
+            for r in candidates:
+                r['stability'] = observations[r['id']]
+        else:
+            stability_diagnostic = stability.recheck(candidates, mapping, binary, root)
     requires_stability = (args.phase in ('all', 'publish', 'stability-recheck', 'uplink-recheck')
         or (args.phase in repair_modes
             and previous.get('node_selection_policy', {}).get('requires_time_spaced_stability') is True))
@@ -1025,7 +1139,8 @@ def main():
     if args.phase in ('all', 'publish'):
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES,
-                      required_gate=required_websites_passed)
+                      required_gate=required_websites_passed,
+                      stability_policy=(stability_diagnostic or {}).get('settings') or stability.settings(records))
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
             print('全量检测完成：无符合页面、trace及应用TLS门槛的节点，报告已保存；原订阅未更新', flush=True)
@@ -1040,7 +1155,7 @@ def main():
     repairing = args.phase in repair_modes
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 20,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 21,
               'upload_precheck_policy': upload_speed.precheck_settings(),
               'early_upload_precheck_enabled': previous.get('early_upload_precheck_enabled', False) if repairing else bool(bundle.get('early_upload_precheck')),
               'upload_precheck_counts': {v: sum((r.get('upload_precheck') or {}).get('status', 'unmeasured') == v for r in records)
@@ -1051,7 +1166,7 @@ def main():
               'upload_recheck': upload_speed.recheck_summary(records, upload_diagnostic,
                   previous.get('upload_recheck') if repairing else None),
               'historical_candidates': bundle.get('historical_candidates', {}),
-              'stability_policy': stability.settings(),
+              'stability_policy': (stability_diagnostic.get('settings', stability.settings(records)) if stability_diagnostic else previous.get('stability_policy', stability.settings(records)) if repairing else stability.settings(records)),
               'stability_recheck': stability.recheck_summary(records, stability_diagnostic,
                   previous.get('stability_recheck') if repairing else None,
                   quality=lambda r: web_quality_eligible(r) or regional_eligible(r)),
@@ -1094,7 +1209,7 @@ def main():
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(DAILY_SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': [], 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', '3MB_upload_precheck', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'time_spaced_stability'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', '3MB_upload_precheck', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'parallel_continuous_stability' if parallel_publish else 'time_spaced_stability'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
@@ -1116,7 +1231,7 @@ def main():
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
                   'requires_time_spaced_stability': requires_stability,
                   'requires_uplink_pass': requires_upload,
-                  'ranking': 'core_response_250ms_band_then_min_upload_download_mbps_then_upload_repeat_ratio_then_web_quality',
+                  'ranking': ('success_rate_then_failure_streak_then_successful_P95_IQR_then_duplex' if parallel_publish else 'core_response_250ms_band_then_min_upload_download_mbps_then_upload_repeat_ratio_then_web_quality'),
                   'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
                   'rejects_explicit_certificate_error_on_any_tested_website': True,
                   'rejected_proxy_definitions': 'omitted',

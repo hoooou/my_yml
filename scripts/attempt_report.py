@@ -8,7 +8,7 @@ import stability
 import upload_speed
 
 
-def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None):
+def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None):
     coverage = {}
     labels = {label for record in records for label in (record.get('websites') or {})}
     for label in sorted(labels):
@@ -31,7 +31,7 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
             'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
             'android_certificate_pinning_emulated': False},
         'app_tls_counts': dict(Counter((r.get('app_tls') or {}).get('status', 'missing') for r in records)),
-        'stability_policy': stability.settings(),
+        'stability_policy': stability_policy or stability.settings(records),
         'upload_policy': upload_speed.settings(),
         'upload_precheck_policy': upload_speed.precheck_settings(),
         'early_upload_precheck_enabled': all('upload_precheck' in r for r in records),

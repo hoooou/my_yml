@@ -22,7 +22,10 @@ TARGETS = ('Google204', 'Google', 'YouTube', 'ChatGPTTrace')
 TLS_HOST = 'android.chat.openai.com'
 
 
-def settings():
+def settings(records=None):
+    if records and any((r.get('stability') or {}).get('version') == 2 for r in records):
+        import continuous_stability
+        return continuous_stability.settings()
     return {'version': VERSION, 'rounds': ROUNDS, 'minimum_idle_seconds_between_rounds': GAP_SECONDS,
             'node_workers': WORKERS, 'requests_per_node_in_parallel': 1,
             'targets': {k: SITES[k] for k in TARGETS}, 'tls_hostname': TLS_HOST,
@@ -69,17 +72,25 @@ def evidence_passed(result):
 
 
 def passed(result):
+    if isinstance(result, dict) and result.get('version') == 2:
+        import continuous_stability
+        return continuous_stability.passed(result)
     return isinstance(result, dict) and result.get('status') == 'passed' and evidence_passed(result)
 
 
 def core_metrics(result):
     """Derive latency from actual samples rather than trusting cached summaries."""
+    if result.get('version') == 2:
+        import continuous_stability
+        return continuous_stability.core_metrics(result)
     values = {label: [x['sites'][label]['elapsed_ms'] for x in result['attempts']] for label in ('Google', 'YouTube')}
     return {label: {'median_ms': statistics.median(items), 'tail_ms': max(items),
                     'jitter_ms': max(items) - min(items)} for label, items in values.items()}
 
 
 def quality_passed(result, median_limit, tail_limit, jitter_limit):
+    if isinstance(result, dict) and result.get('version') == 2:
+        return passed(result)
     return passed(result) and all(item['median_ms'] <= median_limit
         and item['tail_ms'] <= tail_limit and item['jitter_ms'] <= jitter_limit
         for item in core_metrics(result).values())
@@ -172,7 +183,7 @@ def recheck_summary(records, diagnostic=None, previous=None, quality=None):
     if diagnostic and diagnostic.get('node_count'):
         ids = {x['id'] for x in diagnostic['nodes']}
         info = {'updated_at': diagnostic['updated_at'], 'node_count': len(ids),
-                'controls_valid': diagnostic['controls_valid'], 'scope': 'eligible_pool_after_downloads'}
+                'controls_valid': diagnostic['controls_valid'], 'scope': diagnostic.get('scope', 'eligible_pool_after_downloads')}
     elif previous:
         info = dict(previous)
         ids = set(previous.get('node_ids') or [])
