@@ -21,6 +21,7 @@ from mobile_pilot import check_site, check_sites, SITES, PAGE_SITES, OVERSEAS_SI
 from routing import optimize_routing
 import ip_reputation
 import app_tls
+import published_history
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS
 
@@ -693,12 +694,16 @@ def main():
         print(f'按当前规则重建已有结果：剔除 {len(mobile_rejections)} 个损坏节点，保留 {len(nodes)} 个；本模式 {args.phase}', flush=True)
     elif args.phase in ('all', 'prepare'):
         base = yaml.safe_load(Path('聚合配置.yaml').read_text())
+        historical = {'added_count': 0, 'refs': [], 'measurement_reuse': False, 'status': 'fixture'}
         if args.sample:
             samples = yaml.safe_load(Path(args.sample).read_text())['samples']
             nodes = [{**r['node'], 'name': r['id']} for r in samples]
             metadata, sources = {}, []
         else:
             nodes, metadata, sources = s.collect(base, root, extra_sources=s.load_sources(Path('节点来源.yaml')))
+            if not nodes:
+                raise RuntimeError('没有来源节点；保留已发布订阅')
+            nodes, metadata, historical = published_history.collect(nodes, metadata)
         input_count = len(nodes)
         if not nodes:
             raise RuntimeError('没有来源节点；保留已发布订阅')
@@ -708,6 +713,7 @@ def main():
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
+                  'historical_candidates': historical,
                   'input_count': input_count, 'rejected': rejected, 'services': service_status(),
                   'mobile_rejections': mobile_rejections,
                   'scope': 'fixture' if args.sample else 'all_subscriptions',
@@ -743,6 +749,7 @@ def main():
         ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
         for record in records:
             record['sources'] = metadata.get(record['id'], {}).get('sources', [])
+            record['candidate_origin'] = metadata.get(record['id'], {}).get('candidate_origin', 'latest_subscriptions')
             record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
     if args.phase not in ('repair', 'web-recheck') or args.refresh_ip_reputation:
         eligible_ips = [(r.get('exit') or {}).get('exit_ip') for r in records
@@ -771,6 +778,7 @@ def main():
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
     report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 13,
+              'historical_candidates': bundle.get('historical_candidates', {}),
               'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
                   'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
                   'requires_trusted_chain_hostname_validity': True, 'android_certificate_pinning_emulated': False},

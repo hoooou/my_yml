@@ -49,6 +49,19 @@ class AppTLSGateTests(unittest.TestCase):
             else: bad['version'] = 0
             self.assertFalse(app_tls.passed(bad), mutate)
 
+    def test_missing_tls_or_forged_evidence_cannot_publish_including_regional_pool(self):
+        from test_required_sites import RequiredSiteTests
+        record = RequiredSiteTests().record()
+        self.assertTrue(a.web_quality_eligible(record))
+        self.assertTrue(a.regional_eligible(record))
+        for result in (None, {'status': 'passed'}, verified_tls()):
+            bad = copy.deepcopy(record)
+            bad['app_tls'] = result
+            if result and 'targets' in result:
+                result['targets'][app_tls.TARGETS[0]]['attempts'][0]['validity_verified'] = False
+            self.assertFalse(a.web_quality_eligible(bad))
+            self.assertFalse(a.regional_eligible(bad))
+
 
 class ActualTLSValidationTests(unittest.TestCase):
     @classmethod
