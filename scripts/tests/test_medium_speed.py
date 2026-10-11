@@ -75,7 +75,7 @@ class MediumDownloadTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, '5 MB'):
                     a.merge_shards(bundle, [part], 1)
 
-    def test_medium_evidence_and_strict_pool_required_without_limiting_non_hk(self):
+    def test_medium_evidence_and_eligible_pool_required_without_limiting_non_hk(self):
         records = [record(f'n-{i}', 'HK' if i < 35 else 'US') for i in range(75)]
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         bad = copy.deepcopy(records[-1]); bad['id'] = 'n-blocked'; bad['entry']['status'] = 'failed'
@@ -97,6 +97,20 @@ class MediumDownloadTests(unittest.TestCase):
             groups = {g['name']: g['proxies'] for g in cfg['proxy-groups']}
             self.assertEqual(groups[m.GROUP], ['REJECT'], mutate)
             self.assertEqual(len(cfg['proxies']), 1)  # General selection is preserved.
+
+    def test_medium_group_includes_regional_only_node_after_5mb_pass(self):
+        row = record(country='TW')
+        row['precheck'] = {'status': 'passed', 'round_count': 3, 'passed_count': 3}
+        for label in a.CORE_SITES:
+            row['websites'][label].update(median_elapsed_ms=2500, p95_elapsed_ms=3000, jitter_ms=500)
+        self.assertFalse(a.web_quality_eligible(row))
+        self.assertTrue(a.regional_eligible(row))
+        cfg = a.render_comparison({}, [row], {'n-a': {'name': 'n-a', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
+        groups = {g['name']:g['proxies'] for g in cfg['proxy-groups']}
+        self.assertEqual(groups[m.GROUP], [row['name']])
+        self.assertEqual(groups[a.REGIONAL_GROUP], [row['name']])
+        self.assertEqual(groups['⭐ 综合优选'], ['REJECT'])
+        self.assertEqual(groups['⚡ 高速下载'], ['REJECT'])
 
     def test_names_exact_format_region_numbering_housing_unknown_and_speed_priority(self):
         rows = [record('n-b'), record('n-a'), record('n-c', 'JP')]

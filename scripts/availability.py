@@ -747,7 +747,7 @@ def render_comparison(base, records, mapping):
             non_dc.append(record); seen_ips.add(ip)
     non_dc = [r['name'] for r in non_dc]
     high = [r['name'] for r in sorted(strict, key=high_speed_rank_key) if high_speed_eligible(r)]
-    medium = [r['name'] for r in sorted(strict, key=lambda r: (
+    medium = [r['name'] for r in sorted(ranked, key=lambda r: (
         -((r.get('medium_speed_download') or {}).get('speed_mib_s') or 0), r['id']))
         if medium_speed.passed(r.get('medium_speed_download') or {})]
     recommended = [r['name'] for r in strict]
@@ -944,7 +944,7 @@ def main():
               'medium_speed_download_settings': medium_speed.settings(),
               'medium_speed_download_counts': medium_speed.counts(records),
               'medium_speed_selection_policy': {'group': medium_speed.GROUP, 'requires_5mb_pass': True,
-                  'requires_strict_pool': True, 'hong_kong_limit': 30, 'other_regions_limit': None,
+                  'requires_published_eligible_pool': True, 'regional_exception_allowed': True, 'hong_kong_limit': 30, 'other_regions_limit': None,
                   'selected_count': sum(n != 'REJECT' for g in config['proxy-groups'] if g['name'] == medium_speed.GROUP for n in g['proxies'])},
               'medium_speed_recheck': ({'updated_at': now, 'node_count': medium_rechecked_count,
                   'scope': 'published_1mb_passed', 'preserved_measurements': ['204', 'TCP', 'websites', 'app_TLS', '1MB', '100MB_double']}
@@ -1009,12 +1009,12 @@ def main():
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
             '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；明确cf-mitigated: challenge且来自预期HTTPS网站的验证页单列CF需验证，认可网站可达，不记访问失败；普通403、其他验证码或风控仍需复核。CF验证响应不作为真实页面速度，不替代204、trace或应用TLS。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
             'TCP通且指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
-            f'1 MB通过后增加Cloudflare 5 MB快测（{medium_speed.URL}），完整5,000,000字节、{medium_speed.BUDGET}秒内完成，每分片最多{medium_speed.WORKERS}节点并发。中速组只从严格合格池选择真实5 MB通过节点；不补用1 MB或100 MB成绩。5 MB失败不取消其他组资格或后续100 MB测试；香港最多30个、其他地区不限。中速组本次{report["medium_speed_selection_policy"]["selected_count"]}个。', '',
+            f'1 MB通过后增加Cloudflare 5 MB快测（{medium_speed.URL}），完整5,000,000字节、{medium_speed.BUDGET}秒内完成，每分片最多{medium_speed.WORKERS}节点并发。中速组保留已入选合格池中全部真实5 MB通过节点（含仅符合台湾／新加坡较宽网页门槛者）；不补用1 MB或100 MB成绩。5 MB失败不取消其他组资格或后续100 MB测试；香港最多30个、其他地区不限。中速组本次{report["medium_speed_selection_policy"]["selected_count"]}个。', '',
             f'仅1 MB快测通过的节点继续依次测试Cloudflare（{high_speed.URLS[0]}）和DataPacket（{high_speed.URLS[1]}），每次完整100,000,000字节、各自{HIGH_DOWNLOAD_BUDGET}秒，读取超时1秒，每分片最多同时测试2个节点。两次都通过才进入高速组，按较慢一次速度排序和命名；历史单轮结果不冒充双轮通过。本批数据的实际设置：{report["high_speed_download_settings"]}；重建配置不改写历史采样。香港最多30个，其他地区不限，本次高速组{report["high_speed_selection_policy"]["selected_count"]}个。未通过1 MB的节点不消耗大文件流量。', '',
             f'逐目标100 MB结果：{report["high_speed_target_counts"]}。', '',
             '综合优选要求1 MB通过、指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过；Google/YouTube三轮真实页面、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
-            '手机显示六个分组：全局选择、综合优选、中速下载、高速下载、非机房 IP、台湾／新加坡。下载组及综合、非机房组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
-            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮正常响应或明确CF验证，Claude trace单轮须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过（明确CF验证认可可达），Claude仅检测trace；不允许其他页面或trace替代12站，其他验证码、错误页面或未测项目不放行。Google/YouTube响应质量仍要求三轮真实页面，验证页速度不参与质量判定。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
+            '手机显示六个分组：全局选择、综合优选、中速下载、高速下载、非机房 IP、台湾／新加坡。综合、高速和非机房组共用严格合格池；地区组使用用户授权的较宽响应门槛；中速组接受两类合格池中5 MB通过者；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
+            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮正常响应或明确CF验证，Claude trace单轮须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过（明确CF验证认可可达），Claude仅检测trace；不允许其他页面或trace替代12站，其他验证码、错误页面或未测项目不放行。Google/YouTube响应质量仍要求三轮真实页面，验证页速度不参与质量判定。仅满足地区门槛的节点进入地区组，5 MB通过时也进入中速组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
             '节点名称：美国01|120ms|85Mbps|住宅/非住宅|纯净度99.2%。每地区独立从01顺序编号，不加空格或节点哈希。延迟取Google/YouTube真实页面较慢的中位数，缺失时采用204中位数；带宽优先双100 MB较慢速度，其次5 MB、最后1 MB；住宅依据ipapi.is的ISP且非机房分类，表示网络类型判断，不保证独享静态家庭IP；机房/移动网络标非住宅，只有hosting=false时仍标住宅未知。缺少信誉数据标纯净度未知，已知滥用详情保留JSON。非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
