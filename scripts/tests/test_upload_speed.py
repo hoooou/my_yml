@@ -1,5 +1,6 @@
 import copy
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -28,6 +29,49 @@ def evidence():
 
 
 class UploadTests(unittest.TestCase):
+    def test_full_publication_runs_upload_before_final_stability_and_persists_gate(self):
+        from test_medium_speed import record
+        from test_stability import evidence as stable_evidence
+        row = record(); row.update(server='8.8.8.8', port=443, protocol='ss')
+        row['precheck'] = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 100}}]*3, ('Google204',))['Google204']
+        node = {'name': row['id'], 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
+        bundle = {'nodes': [node], 'base': {}, 'metadata': {}, 'sources': [], 'input_count': 1,
+                  'rejected': [], 'services': {}, 'scope': 'all_subscriptions', 'id': 'batch'}
+        calls = []
+        def upload(rows, *_):
+            calls.append('upload')
+            self.assertEqual([r['id'] for r in rows], [row['id']])
+            row['upload'] = evidence(); row['post_upload_tls'] = verified_tls()
+            return {'updated_at': '2026-10-12T06:00:00+08:00', 'node_count': 1, 'controls_valid': True,
+                    'nodes': [{'id': row['id'], 'upload': row['upload']}]}
+        def stable(rows, *_):
+            calls.append('stability'); self.assertTrue(up.passed(rows[0]['upload']))
+            row['stability'] = stable_evidence()
+            return {'updated_at': '2026-10-12T06:00:00+08:00', 'node_count': 1, 'controls_valid': True,
+                    'nodes': [{'id': row['id']}]}
+        with tempfile.TemporaryDirectory() as folder:
+            cwd = os.getcwd()
+            try:
+                os.chdir(folder); root = Path('.node-work/availability'); root.mkdir(parents=True)
+                (root / 'bundle.json').write_text(json.dumps(bundle))
+                with patch.object(sys, 'argv', ['availability', '--phase', 'publish', '--mihomo', 'unused']), \
+                     patch.object(a, 'merge_shards', return_value=([row], 1)), \
+                     patch.object(a.s, 'lookup_ip_types', return_value={}), \
+                     patch.object(a.ip_reputation, 'lookup', return_value={}), \
+                     patch.object(a.upload_speed, 'recheck', side_effect=upload), \
+                     patch.object(a.stability, 'recheck', side_effect=stable), \
+                     patch.object(a.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)):
+                    a.main()
+                self.assertEqual(calls, ['upload', 'stability'])
+                report = json.loads(Path('连通性报告.json').read_text())
+                self.assertTrue(report['node_selection_policy']['requires_uplink_pass'])
+                self.assertEqual(report['published_node_count'], 1)
+                self.assertEqual(report['upload_recheck']['node_ids'], [row['id']])
+                self.assertEqual(report['domestic_target_count'], 0)
+                self.assertIn('upload_double', report['stages'])
+            finally:
+                os.chdir(cwd)
+
     def test_upload_or_post_load_certificate_failure_removes_node_from_all_groups(self):
         from test_medium_speed import record
         from test_stability import evidence as stable_evidence
