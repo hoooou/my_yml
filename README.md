@@ -30,6 +30,8 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E4%BC%98%E9%80%89%E9%85%8D
 
 ## 每日更新
 
+2026-10-11 增加必过的应用TLS筛选：指定12页面三轮加Claude trace通过后，检查 `chatgpt.com`、`android.chat.openai.com`、`auth.openai.com`、`cdn.oaistatic.com`。每个域名经同一节点建立两次独立TLS连接，单次总预算5秒，要求TLS 1.2或以上、Mozilla根证书信任链、证书域名及有效期全部正常；失败或漏测不进入下载和任何发布组。401/403不在此阶段被当成页面可用，TLS通过仅证明握手及标准证书验证。记录错误类别、签发者、证书有效期和指纹；不固定CDN证书指纹，避免正常证书轮换误淘汰。此检测不模拟Android应用内部的证书固定或你手机Wi-Fi的链路，不能保证排除全部手机端SSL报错。依据[Python TLS证书验证文档](https://docs.python.org/3.12/library/ssl.html#ssl.PROTOCOL_TLS_CLIENT)。
+
 GitHub Actions 的“每日节点连通性分类”每天北京时间 **08:00 开始**，也支持手动触发。四个免费标准 Actions 分片并行，每片最多同时处理 16 个节点；同一节点按下面的顺序过关，不同节点可以同时处于不同阶段，不等待全量上一阶段结束。
 
 1. 获取原配置 11 个来源和新增 6 个公开来源的最新节点，按连接配置去重；不同密码、UUID、协议或传输参数保留。内核不支持或包含非法控制字符的节点在报告记录，不写入手机订阅。

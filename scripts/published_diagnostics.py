@@ -117,15 +117,53 @@ def run(binary, root, current_ref, previous_ref):
     return result
 
 
+def tls_only(binary, root, current_ref, previous_ref):
+    current, _, current_nodes = snapshot(current_ref)
+    previous, _, previous_nodes = snapshot(previous_ref)
+    nodes = {**previous_nodes, **current_nodes}
+    if not 0 < len(nodes) <= 150:
+        raise ValueError('Diagnostic node budget exceeded')
+    control = a.app_tls.check(None)
+    if not a.app_tls.passed(control):
+        raise RuntimeError('Cloud direct TLS controls failed; diagnose target/service before promotion')
+    listeners, ports = s.make_listeners({'id': key} for key in nodes)
+    with s.Core(str(Path(binary).resolve()), root, list(nodes.values()), listeners):
+        def measure(identity):
+            result = a.app_tls.check(ports[identity])
+            print('Application TLS recheck complete: ' + identity, flush=True)
+            return {'id': identity, 'protocol': nodes[identity]['type'],
+                    'current_published': identity in current_nodes,
+                    'previous_published': identity in previous_nodes, 'app_tls': result}
+        with futures.ThreadPoolExecutor(max_workers=8) as pool:
+            rows = list(pool.map(measure, sorted(nodes)))
+    result = {'scope': 'diagnostic_only_no_subscription_change', 'direct_control': control,
+        'current_ref': current_ref, 'previous_ref': previous_ref,
+        'checked_at': datetime.now(s.TZ).isoformat(timespec='seconds'), 'nodes': rows,
+        'current_counts': dict(Counter(r['app_tls']['status'] for r in rows if r['current_published'])),
+        'previous_counts': dict(Counter(r['app_tls']['status'] for r in rows if r['previous_published']))}
+    (root / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    lines = ['# 应用TLS云端筛选对照', '',
+        '标准TLS证书链、域名和有效期校验；不模拟Android证书固定或手机Wi-Fi链路。', '',
+        f"当前：{result['current_counts']}；前版：{result['previous_counts']}", '',
+        '|节点|协议|本版/前版|应用TLS|失败原因|', '|---|---|---|---|---|']
+    for row in rows:
+        errors = Counter(attempt.get('error_type', 'passed')
+            for item in row['app_tls']['targets'].values() for attempt in item['attempts'])
+        lines.append('|' + '|'.join([row['id'], row['protocol'],
+            f"{row['current_published']}/{row['previous_published']}", row['app_tls']['status'], str(dict(errors))]) + '|')
+    text = '\n'.join(lines) + '\n'; (root / 'summary.md').write_text(text); print(text, flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
     parser.add_argument('--current-ref', required=True)
     parser.add_argument('--previous-ref', required=True)
+    parser.add_argument('--tls-only', action='store_true')
     args = parser.parse_args()
     root = Path('.node-work/published-diagnostics').resolve()
     root.mkdir(parents=True, exist_ok=True)
-    run(args.mihomo, root, args.current_ref, args.previous_ref)
+    (tls_only if args.tls_only else run)(args.mihomo, root, args.current_ref, args.previous_ref)
 
 
 if __name__ == '__main__':

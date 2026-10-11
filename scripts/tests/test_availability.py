@@ -12,9 +12,14 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from tls_fixture import verified_tls
 
 
 class AvailabilityTests(unittest.TestCase):
+    def setUp(self):
+        tls = patch.object(a.app_tls, 'check', return_value=verified_tls())
+        tls.start(); self.addCleanup(tls.stop)
+
     @staticmethod
     def stable_sites():
         return {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
@@ -25,7 +30,7 @@ class AvailabilityTests(unittest.TestCase):
         records = []
         for country_index, country in enumerate(('HK', 'US', 'JP')):
             for index in range(35):
-                records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
+                records.append({'app_tls': verified_tls(), 'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
                     'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
                         'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.OVERSEAS_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
                     'precheck': {'status': 'passed', 'median_elapsed_ms': country_index * 100 + index + 1},
@@ -48,7 +53,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(len(config['proxies']), 101)
 
     def test_compact_name_contains_five_fields_and_correct_bandwidth_without_fake_housing(self):
-        record = {'id': 'n-unique', 'entry': {'status': 'passed'},
+        record = {'app_tls': verified_tls(), 'id': 'n-unique', 'entry': {'status': 'passed'},
             'websites': self.stable_sites(),
             'exit': {'country_code': 'US', 'exit_ip': '8.8.8.8'},
             'precheck': {'status': 'passed', 'median_elapsed_ms': 82.5},
@@ -84,7 +89,7 @@ class AvailabilityTests(unittest.TestCase):
             late = a.high_speed_download(1234)
         self.assertEqual(late['received_bytes'], 50_000_000)
         self.assertEqual(late['status'], 'failed')
-        records = [{'id': f'n-{i}', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
+        records = [{'app_tls': verified_tls(), 'id': f'n-{i}', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
                     'exit': None, 'download': {'status': 'passed', 'speed_mib_s': 1},
                     'high_speed_download': {**result, 'speed_mib_s': i+1}} for i in range(40)]
         # A bogus high result without the 1 MB prerequisite must not enter the group.
@@ -126,7 +131,7 @@ class AvailabilityTests(unittest.TestCase):
     def test_merge_rejects_missing_partial_and_over_budget_50mb_results(self):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 1}}]*3, ('Google204',))['Google204']
-        record = {'id': 'n-a', 'entry': {'status': 'passed'}, 'precheck': pre,
+        record = {'app_tls': verified_tls(), 'id': 'n-a', 'entry': {'status': 'passed'}, 'precheck': pre,
             'websites': {**a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.OVERSEAS_SITES}]*3, a.OVERSEAS_SITES),
                 **a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES if label not in a.OVERSEAS_SITES}], [label for label in a.POST_SITES if label not in a.OVERSEAS_SITES])},
             'download': {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 1000},
@@ -170,7 +175,7 @@ class AvailabilityTests(unittest.TestCase):
     def test_repair_preserves_measurements_and_never_retests_network(self):
         good = {'name': 'good', 'type': 'trojan', 'server': 'example.com', 'port': 443, 'password': 'same'}
         bad = {**good, 'name': 'bad', 'sni': 'bad\x9f'}
-        records = [{'id': ident, 'name': name, 'server': 'example.com', 'port': 443,
+        records = [{'app_tls': verified_tls(), 'id': ident, 'name': name, 'server': 'example.com', 'port': 443,
                     'protocol': 'trojan', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
                     'download': {'status': 'passed', 'speed_mib_s': 5},
                     'exit': None, 'ip_type': {'status': 'unknown'}} for ident, name in [('n-a', 'good'), ('n-b', 'bad')]]
@@ -208,7 +213,7 @@ class AvailabilityTests(unittest.TestCase):
                 os.chdir(old_cwd)
 
     def test_publication_rejects_controls_even_when_source_yaml_escaped_them(self):
-        record = {'id': 'n-a', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
+        record = {'app_tls': verified_tls(), 'id': 'n-a', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
                   'download': {'status': 'passed', 'speed_mib_s': 5}, 'exit': None}
         original = {'name': 'n-a', 'type': 'trojan', 'server': 'example.com', 'port': 443,
                     'password': 'unchanged', 'sni': 'https://t.me/wangcai2\xf0\x9f\x87'}
@@ -241,7 +246,7 @@ class AvailabilityTests(unittest.TestCase):
         bundle = {'id': 'batch', 'nodes': nodes}
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 20}}] * 3, ('Google204',))['Google204']
         parts = [{'bundle_id': 'batch', 'index': i, 'count': 4, 'endpoint_count': len(a.shard_nodes(nodes, i, 4)),
-                  'records': [{'id': n['name'], 'precheck': copy.deepcopy(pre), 'entry': {'status': 'failed'}, 'websites': None,
+                  'records': [{'app_tls': {'status': 'skipped'}, 'id': n['name'], 'precheck': copy.deepcopy(pre), 'entry': {'status': 'failed'}, 'websites': None,
                                'download': {'status': 'skipped'}, 'high_speed_download': {'status': 'skipped'}}
                               for n in a.shard_nodes(nodes, i, 4)]} for i in range(4)]
         records, endpoints = a.merge_shards(bundle, parts, 4)
@@ -355,7 +360,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(result['ClaudeTrace']['median_elapsed_ms'], 25)
         self.assertEqual(result['ClaudeTrace']['max_elapsed_ms'], 30)
         self.assertEqual(result['ClaudeTrace']['passed_count'], 2)
-        record = {'id': 'n-a', 'entry': {'status': 'passed', 'latency_ms': 10}, 'websites': result}
+        record = {'app_tls': verified_tls(), 'id': 'n-a', 'entry': {'status': 'passed', 'latency_ms': 10}, 'websites': result}
         self.assertEqual(a.website_count(record), len(a.OVERSEAS_SITES))
         self.assertEqual(a.connectivity_count(record), 2)
         faster = copy.deepcopy(record); faster['id'] = 'n-b'; faster['entry']['latency_ms'] = 100
@@ -369,7 +374,7 @@ class AvailabilityTests(unittest.TestCase):
     def test_domestic_successes_do_not_inflate_rank_or_trigger_download(self):
         pages = {label: {'status': 'passed' if label in a.DOMESTIC_SITES else 'failed', 'elapsed_ms': 1}
                  for label in a.POST_SITES}
-        record = {'websites': {label: {'status': item['status']} for label, item in pages.items()}}
+        record = {'app_tls': verified_tls(), 'websites': {label: {'status': item['status']} for label, item in pages.items()}}
         self.assertEqual(a.website_count(record),0)
         self.assertEqual(a.domestic_count(record),13)
         self.assertFalse(a.overseas_reachable(record))
@@ -384,9 +389,10 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(rows[0]['high_speed_download']['status'],'skipped')
 
     def test_five_groups_have_valid_references_without_diagnostic_groups(self):
-        records = [{'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
+        records = [{'app_tls': {'status': 'skipped'}, 'id': 'n-' + str(i)*12, 'entry': {'status': status}, 'websites': None, 'exit': None}
                    for i, status in [(1, 'passed'), (2, 'failed'), (3, 'unknown')]]
         records[0]['websites'] = self.stable_sites()
+        records[0]['app_tls'] = verified_tls()
         records[0]['download'] = {'status': 'passed', 'speed_mib_s': 5}
         records[0]['exit'] = {'country_code': 'HK', 'exit_ip': '8.8.8.8'}
         records[0]['ip_type'] = {'status': 'unknown', 'hosting': None}
@@ -413,7 +419,7 @@ class AvailabilityTests(unittest.TestCase):
         records = []
         for country in ('JP', 'US'):
             for index in range(35):
-                records.append({'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
+                records.append({'app_tls': verified_tls(), 'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
                     'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
                         'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.PAGE_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
                     'precheck': {'status': 'passed', 'median_elapsed_ms': index + 1},
@@ -432,7 +438,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertNotIn('🌍 按地区选择', groups)
 
     def test_rejected_nodes_cannot_leak_through_high_speed_or_residential_group(self):
-        good = {'id': 'n-good', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
+        good = {'app_tls': verified_tls(), 'id': 'n-good', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
             'download': {'status': 'passed', 'speed_mib_s': 5},
             'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
                 'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,
@@ -454,7 +460,7 @@ class AvailabilityTests(unittest.TestCase):
             self.assertEqual(group['proxies'], [good['name']])
 
     def test_regional_exception_is_isolated_and_can_publish_without_strict_nodes(self):
-        record = {'id': 'n-slow-tw', 'entry': {'status': 'passed'},
+        record = {'app_tls': verified_tls(), 'id': 'n-slow-tw', 'entry': {'status': 'passed'},
             'precheck': {'status': 'passed', 'round_count': 3, 'passed_count': 3},
             'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
                 'median_elapsed_ms': 2200, 'p95_elapsed_ms': 3200, 'jitter_ms': 1200}
@@ -492,10 +498,10 @@ class AvailabilityTests(unittest.TestCase):
 
     def test_repeated_repair_preserves_audit_for_nodes_absent_from_subscription(self):
         good = {'name': 'good', 'type': 'trojan', 'server': 'example.com', 'port': 443, 'password': 'same'}
-        records = [{'id': 'n-good', 'name': 'good', 'server': 'example.com', 'port': 443,
+        records = [{'app_tls': verified_tls(), 'id': 'n-good', 'name': 'good', 'server': 'example.com', 'port': 443,
             'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
             'download': {'status': 'passed', 'speed_mib_s': 5}, 'exit': None},
-            {'id': 'n-failed', 'name': 'old-rejected-name', 'server': 'example.org', 'port': 443,
+            {'app_tls': {'status': 'skipped'}, 'id': 'n-failed', 'name': 'old-rejected-name', 'server': 'example.org', 'port': 443,
              'entry': {'status': 'failed'}, 'websites': None, 'exit': None}]
         report = {'updated_at': '2026-10-10T11:20:18+08:00', 'scope': 'all_subscriptions',
             'nodes': records, 'sources': [], 'services': {}, 'input_unique_count': 2,

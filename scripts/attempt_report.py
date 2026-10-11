@@ -1,6 +1,7 @@
 """Archive each completed full measurement, including zero-qualified runs."""
 from collections import Counter
 import json
+import app_tls
 
 
 def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=()):
@@ -20,6 +21,10 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'selection_outcome': 'candidate_ready' if selected else 'no_eligible_nodes_previous_subscription_retained',
         'required_websites': list(required_sites), 'required_rounds': 3,
         'required_traces': list(required_traces), 'required_trace_rounds': 1,
+        'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
+            'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
+            'android_certificate_pinning_emulated': False},
+        'app_tls_counts': dict(Counter((r.get('app_tls') or {}).get('status', 'missing') for r in records)),
         'precheck_counts': dict(Counter((r.get('precheck') or {}).get('status', 'missing') for r in records)),
         'entry_counts': dict(Counter(r['entry']['status'] for r in records)),
         'download_counts': dict(Counter((r.get('download') or {}).get('status', 'missing') for r in records)),
@@ -29,6 +34,8 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         '必过网站（三轮均通过）：' + '、'.join(required_sites) + '。', '',
         '必过连通检测（单轮）：' + ('、'.join(required_traces) if required_traces else '无') + '。', '',
         'Claude首页不检测，仅检查Claude trace；trace不证明登录或对话可用。', '',
+        '必过应用TLS：' + '、'.join(app_tls.TARGETS) + '；每个域名两次独立握手，校验可信证书链、域名和有效期。', '',
+        '应用TLS结果：' + str(report['app_tls_counts']) + '。云端标准TLS检查不模拟Android证书固定，也不证明手机Wi-Fi路径正常。', '',
         '抖音不检测；其国内直连规则保留。', '',
         '有合格候选，继续校验并发布；最终发布状态以 Actions 为准。' if selected else
         '**本次无合格节点，未覆盖原订阅。原订阅仍是上次结果，不代表通过这次页面与trace必过门槛。**', '',

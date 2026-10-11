@@ -20,6 +20,7 @@ import select_nodes as s
 from mobile_pilot import check_site, check_sites, SITES, PAGE_SITES, OVERSEAS_SITES, DOMESTIC_SITES, CONNECTIVITY_SITES, POST_SITES, SITE_WORKERS, WEB_USER_AGENT, UDP_TYPES
 from routing import optimize_routing
 import ip_reputation
+import app_tls
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS
 
@@ -276,6 +277,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
             record = {'id': node['name'], 'server': node['server'], 'port': node['port'], 'protocol': node['type'],
                       'entry': {'status': 'unknown', 'attempts': 0, 'reason': '204 未通过，未提交国内 TCP 检测'},
                       'websites': None, 'exit': None, 'download': {'status': 'skipped', 'reason': '未进入下载阶段'},
+                      'app_tls': {'status': 'skipped', 'reason': '必过网站未通过，未提交应用TLS检查'},
                       'high_speed_download': {'status': 'skipped', 'reason': '1 MB 快测未通过，未提交 50 MB 测试'}}
             record['precheck'] = precheck(port)
             if record['precheck']['status'] == 'passed':
@@ -311,10 +313,14 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         except (s.requests.RequestException, ValueError, KeyError):
                             record['exit_reason'] = '出口 IP/地区未确认'
                     if required_websites_passed(record):
-                        record['download'] = download(port)
-                        if record['download']['status'] == 'passed':
-                            with large_slots:
-                                record['high_speed_download'] = large_download(port)
+                        record['app_tls'] = app_tls.check(port)
+                        if app_tls.passed(record['app_tls']):
+                            record['download'] = download(port)
+                            if record['download']['status'] == 'passed':
+                                with large_slots:
+                                    record['high_speed_download'] = large_download(port)
+                        else:
+                            record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
                         record['download']['reason'] = '12个必过页面未全部三轮通过或Claude trace未通过，跳过下载'
             with lock:
@@ -375,12 +381,18 @@ def merge_shards(bundle, parts, count):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
             if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
                 raise ValueError('节点未按阶段筛选')
-            should_download = record['entry']['status'] == 'passed' and required_websites_passed(record)
+            should_tls = record['entry']['status'] == 'passed' and required_websites_passed(record)
+            tls = record.get('app_tls') or {}
+            if tls.get('status') not in (('passed', 'failed') if should_tls else ('skipped',)):
+                raise ValueError('应用TLS阶段漏测或顺序异常')
+            if tls.get('status') == 'passed' and not app_tls.passed(tls):
+                raise ValueError('应用TLS证书证据不完整，拒绝发布')
+            should_download = should_tls and app_tls.passed(tls)
             if record.get('download', {}).get('status') not in (('passed', 'failed') if should_download else ('skipped',)):
                 raise ValueError('下载阶段漏测或顺序异常')
             if record.get('download', {}).get('status') == 'passed' and (
                     record['entry']['status'] != 'passed' or
-                    not required_websites_passed(record) or
+                    not required_websites_passed(record) or not app_tls.passed(tls) or
                     record['download'].get('received_bytes') != DOWNLOAD_BYTES or
                     not 0 < record['download'].get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
                 raise ValueError('下载结果不完整或节点未通过前置阶段')
@@ -455,7 +467,7 @@ def required_websites_passed(record):
 
 
 def web_quality_eligible(record):
-    if not required_websites_passed(record):
+    if not required_websites_passed(record) or not app_tls.passed(record.get('app_tls')):
         return False
     sites = record.get('websites') or {}
     for label in CORE_SITES:
@@ -488,6 +500,7 @@ def web_rank_metrics(record):
 def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
     if (not required_websites_passed(record)
+            or not app_tls.passed(record.get('app_tls'))
             or (record.get('exit') or {}).get('country_code') not in REGIONAL_COUNTRIES
             or record.get('exit_consistent') is False
             or record['entry']['status'] != 'passed'
@@ -553,6 +566,7 @@ def recheck_websites(records, mapping, binary, root):
             # Preserve old domestic/trace results and their original measurement times.
             record.setdefault('websites', {}).update(summarize_rounds(rounds, OVERSEAS_SITES))
             record['websites_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+            record['app_tls'] = app_tls.check(port) if required_websites_passed(record) else {'status': 'skipped'}
             with lock:
                 done += 1
                 if done % 10 == 0 or done == len(candidates):
@@ -744,7 +758,7 @@ def main():
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES)
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
-            print('全量检测完成：无符合12个页面加Claude trace门槛的节点，报告已保存；原订阅未更新', flush=True)
+            print('全量检测完成：无符合页面、trace及应用TLS门槛的节点，报告已保存；原订阅未更新', flush=True)
             return
         raise RuntimeError('没有满足综合或台湾／新加坡门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
@@ -756,7 +770,12 @@ def main():
     repairing = args.phase in ('repair', 'web-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 12,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 13,
+              'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
+                  'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
+                  'requires_trusted_chain_hostname_validity': True, 'android_certificate_pinning_emulated': False},
+              'app_tls_counts': {v: sum((r.get('app_tls') or {}).get('status') == v for r in records)
+                                 for v in ('passed', 'failed', 'skipped')},
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
@@ -783,7 +802,7 @@ def main():
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': list(DOMESTIC_SITES), 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'quick_download', '50MB_download'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '50MB_download'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
@@ -795,7 +814,8 @@ def main():
                   if previous.get('high_speed_download_settings') else None) if repairing else {'url': HIGH_DOWNLOAD_URL, 'bytes': HIGH_DOWNLOAD_BYTES, 'budget_seconds': HIGH_DOWNLOAD_BUDGET, 'rounds': 1, 'workers_per_shard': HIGH_DOWNLOAD_WORKERS, 'selection_limit': None, 'read_timeout_seconds': 1, 'includes_handshake': True},
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
-                  'requires_domestic_tcp_pass': True, 'rejected_proxy_definitions': 'omitted',
+                  'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
+                  'rejected_proxy_definitions': 'omitted',
                   'regional_exception': {'group': REGIONAL_GROUP, 'country_codes': list(REGIONAL_COUNTRIES),
                       'median_limit_ms': REGIONAL_MEDIAN_MS, 'tail_limit_ms': REGIONAL_TAIL_MS,
                       'jitter_limit_ms': REGIONAL_JITTER_MS, 'required_core_rounds': WEBSITE_ROUNDS,
