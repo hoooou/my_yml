@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import app_tls
 import availability as a
 from tls_fixture import verified_tls
+from high_speed_fixture import verified_high
 
 
 class AppTLSGateTests(unittest.TestCase):
@@ -73,9 +74,7 @@ class AppTLSGateTests(unittest.TestCase):
                 precheck=lambda port: pre, probe=lambda key, pace: {'status': 'passed'},
                 site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
                 download=lambda port: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
-                large_download=lambda port: {'status': 'passed', 'received_bytes': a.HIGH_DOWNLOAD_BYTES,
-                    'requested_bytes': a.HIGH_DOWNLOAD_BYTES, 'elapsed_ms': 1000,
-                    'speed_mib_s': 50, 'url': a.HIGH_DOWNLOAD_URL})
+                large_download=lambda port: verified_high(50))
         bundle = {'id': 'batch', 'nodes': [node]}
         part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': count, 'records': rows}
         a.merge_shards(bundle, [part], 1)

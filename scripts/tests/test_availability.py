@@ -13,6 +13,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
 from tls_fixture import verified_tls
+from high_speed_fixture import verified_high
 
 
 class AvailabilityTests(unittest.TestCase):
@@ -37,9 +38,7 @@ class AvailabilityTests(unittest.TestCase):
                     'exit': {'country_code': country, 'exit_ip': f'8.8.{country_index}.{index + 1}'},
                     'ip_type': {'status': 'success', 'hosting': False},
                     'download': {'status': 'passed', 'speed_mib_s': 1},
-                    'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
-                        'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,
-                        'elapsed_ms': 10000, 'speed_mib_s': 5}})
+                    'high_speed_download': verified_high(5)})
         duplicate = copy.deepcopy(records[-1]); duplicate['id'] = 'n-duplicate'
         records.append(duplicate)
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
@@ -63,7 +62,7 @@ class AvailabilityTests(unittest.TestCase):
             {'n-unique': {'name': 'n-unique', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
         self.assertEqual(record['name'], '美国·unique | 网页100ms | 83.9Mbps | 非机房 | 纯净未知')
 
-    def test_50mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
+    def test_100mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
             def __init__(self): self.remaining = a.HIGH_DOWNLOAD_BYTES
             def read1(self, size):
@@ -76,33 +75,32 @@ class AvailabilityTests(unittest.TestCase):
             def __init__(self): self.raw = Raw()
             def __enter__(self): return self
             def __exit__(self, *args): pass
-        with patch.object(a.s, 'session') as session, patch.object(a.time, 'perf_counter', side_effect=[0] + [2]*4000):
+        with patch.object(a.s, 'session') as session, patch.object(a.time, 'perf_counter', side_effect=[0] + [2]*7000):
             session.return_value.__enter__.return_value.get.return_value = Response()
-            result = a.high_speed_download(1234)
+            result = a.download_sample(1234, a.HIGH_DOWNLOAD_BYTES, a.HIGH_DOWNLOAD_BUDGET)
         self.assertEqual(result['status'], 'passed')
-        self.assertEqual(result['received_bytes'], 50_000_000)
+        self.assertEqual(result['received_bytes'], 100_000_000)
         self.assertEqual(result['budget_seconds'], 20)
-        # Completing the entire body just after the new deadline still fails.
+        # Completing the entire body just after the deadline still fails.
         with patch.object(a.s, 'session') as session, patch.object(a.time, 'perf_counter',
-                side_effect=[0] + [19]*3052 + [20.001]*10):
+                side_effect=[0] + [19]*6104 + [20.001]*10):
             session.return_value.__enter__.return_value.get.return_value = Response()
-            late = a.high_speed_download(1234)
-        self.assertEqual(late['received_bytes'], 50_000_000)
+            late = a.download_sample(1234, a.HIGH_DOWNLOAD_BYTES, a.HIGH_DOWNLOAD_BUDGET)
+        self.assertEqual(late['received_bytes'], 100_000_000)
         self.assertEqual(late['status'], 'failed')
         records = [{'app_tls': verified_tls(), 'id': f'n-{i}', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
                     'exit': None, 'download': {'status': 'passed', 'speed_mib_s': 1},
-                    'high_speed_download': {**result, 'speed_mib_s': i+1}} for i in range(40)]
-        # A bogus high result without the 1 MB prerequisite must not enter the group.
+                    'high_speed_download': verified_high(i+5)} for i in range(40)]
         records[39]['download']['status'] = 'failed'
         records[38]['high_speed_download']['status'] = 'failed'
-        # Old 30-second measurements are reselected, without changing the data.
-        records[37]['high_speed_download']['elapsed_ms'] = 20001
-        records[36]['high_speed_download']['received_bytes'] = 49_999_999
-        records[35]['high_speed_download']['elapsed_ms'] = 20000
+        records[37]['high_speed_download']['attempts'][1]['elapsed_ms'] = 20001
+        records[36]['high_speed_download']['attempts'][1]['received_bytes'] = 99_999_999
+        # Historical single-target data cannot be promoted to double-round evidence.
+        records[35]['high_speed_download'] = result
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
         config = a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, records, mapping)
         groups = {g['name']: g['proxies'] for g in config['proxy-groups']}
-        self.assertEqual(groups['⚡ 高速下载'], [r['name'] for r in reversed(records[:36])])
+        self.assertEqual(groups['⚡ 高速下载'], [r['name'] for r in reversed(records[:35])])
         self.assertEqual(records[37]['high_speed_download']['status'], 'passed')
 
     def test_large_tests_require_quick_pass_and_never_exceed_two_concurrent_downloads(self):
@@ -128,21 +126,24 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(peak, 2)
         self.assertEqual([r['high_speed_download']['status'] for r in rows], ['passed']*4+['skipped']*2)
 
-    def test_merge_rejects_missing_partial_and_over_budget_50mb_results(self):
+    def test_merge_rejects_missing_partial_and_over_budget_100mb_results(self):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 1}}]*3, ('Google204',))['Google204']
         record = {'app_tls': verified_tls(), 'id': 'n-a', 'entry': {'status': 'passed'}, 'precheck': pre,
             'websites': {**a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.OVERSEAS_SITES}]*3, a.OVERSEAS_SITES),
                 **a.summarize_rounds([{label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES if label not in a.OVERSEAS_SITES}], [label for label in a.POST_SITES if label not in a.OVERSEAS_SITES])},
             'download': {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 1000},
-            'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
-                'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'elapsed_ms': 20000, 'speed_mib_s': 2, 'url': a.HIGH_DOWNLOAD_URL}}
+            'high_speed_download': verified_high(5)}
         part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': 1, 'records': [record]}
         bundle = {'id': 'batch', 'nodes': [node]}
         a.merge_shards(bundle, [part], 1)
-        for key, value in [('status','skipped'), ('received_bytes',49_999_999), ('elapsed_ms',20001), ('speed_mib_s',float('inf'))]:
-            invalid = copy.deepcopy(part); invalid['records'][0]['high_speed_download'][key] = value
+        for key, value in [('status','skipped'), ('received_bytes',99_999_999), ('elapsed_ms',20001), ('speed_mib_s',float('inf'))]:
+            invalid = copy.deepcopy(part)
+            invalid['records'][0]['high_speed_download']['attempts'][1][key] = value
             with self.assertRaises(ValueError): a.merge_shards(bundle, [invalid], 1)
+        invalid = copy.deepcopy(part)
+        invalid['records'][0]['high_speed_download']['attempts'].pop()
+        with self.assertRaises(ValueError): a.merge_shards(bundle, [invalid], 1)
 
     def test_quick_download_requires_full_uncompressed_file_and_deadline(self):
         class Response:
@@ -207,7 +208,9 @@ class AvailabilityTests(unittest.TestCase):
                 self.assertEqual(result['high_speed_download_settings']['budget_seconds'], 30)
                 self.assertIsNone(result['high_speed_download_settings']['selection_limit'])
                 self.assertEqual(result['high_speed_selection_policy'],
-                                 {'max_elapsed_seconds': 20, 'selection_limit': None, 'selected_count': 0})
+                                 {'max_elapsed_seconds': 20, 'selection_limit': None, 'required_urls': list(a.high_speed.URLS),
+                                  'required_bytes_per_round': 100_000_000, 'required_rounds': 2,
+                                  'speed_aggregation': 'minimum_of_completed_rounds', 'selected_count': 0})
                 self.assertEqual(result['routing_policy']['group_count'], len(config['proxy-groups']))
             finally:
                 os.chdir(old_cwd)
@@ -281,7 +284,7 @@ class AvailabilityTests(unittest.TestCase):
             events.append(('download', port)); return {'status': 'passed', 'speed_mib_s': 1}
         def large_download(port):
             self.assertIn(('download', port), events)
-            events.append(('50MB', port)); return {'status': 'passed', 'speed_mib_s': 5}
+            events.append(('100MB', port)); return {'status': 'passed', 'speed_mib_s': 5}
         with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-0': 1, 'n-1': 2, 'n-2': 3})), \
              patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}):
             records, endpoints = a.probe_pipeline(nodes, 'unused', Path('.'), probe=tcp, precheck=precheck,
@@ -294,7 +297,7 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(records[2]['entry']['status'], 'unknown')
         self.assertEqual(records[2]['entry']['attempts'], 0)
         self.assertNotIn(('download', 3), events)
-        self.assertNotIn(('50MB', 3), events)
+        self.assertNotIn(('100MB', 3), events)
 
     def test_three_204_rounds_are_independent_and_all_required(self):
         with patch.object(a, 'check_site', side_effect=[{'status': 'passed', 'elapsed_ms': 5}, {'status': 'failed'}, {'status': 'passed', 'elapsed_ms': 10}]) as check:
@@ -440,9 +443,7 @@ class AvailabilityTests(unittest.TestCase):
     def test_rejected_nodes_cannot_leak_through_high_speed_or_residential_group(self):
         good = {'app_tls': verified_tls(), 'id': 'n-good', 'entry': {'status': 'passed'}, 'websites': self.stable_sites(),
             'download': {'status': 'passed', 'speed_mib_s': 5},
-            'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
-                'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,
-                'elapsed_ms': 10000, 'speed_mib_s': 5},
+            'high_speed_download': verified_high(5),
             'exit': {'exit_ip': '8.8.8.8', 'country_code': 'US'},
             'ip_type': {'status': 'success', 'hosting': False}}
         records = [good]
@@ -466,9 +467,7 @@ class AvailabilityTests(unittest.TestCase):
                 'median_elapsed_ms': 2200, 'p95_elapsed_ms': 3200, 'jitter_ms': 1200}
                 for label in a.REQUIRED_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
             'download': {'status': 'passed', 'speed_mib_s': 5},
-            'high_speed_download': {'status': 'passed', 'requested_bytes': a.HIGH_DOWNLOAD_BYTES,
-                'received_bytes': a.HIGH_DOWNLOAD_BYTES, 'url': a.HIGH_DOWNLOAD_URL,
-                'elapsed_ms': 10000, 'speed_mib_s': 5},
+            'high_speed_download': verified_high(5),
             'exit': {'country_code': 'TW', 'exit_ip': '8.8.8.8'},
             'ip_type': {'status': 'success', 'hosting': False}}
         self.assertFalse(a.web_quality_eligible(record))
