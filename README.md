@@ -45,7 +45,7 @@ GitHub Actions 的“每日节点连通性分类”每天北京时间 **08:00 �
 7. 严格合格池要求国内 TCP 明确通过、1 MB 完整下载通过，以及指定12个海外网站各三轮均通过且Claude trace单轮通过；Google/YouTube中位样本耗时不超过 1.5 秒、最慢一轮不超过 3 秒、三轮耗时极差不超过 1.5 秒；其余海外网站保留检测结果。再比较核心站最差尾延迟、中位耗时和波动、其他海外稳定站的耗时、覆盖数量、204 延迟与下载速度。另按上述地区门槛选取台湾／新加坡节点。不满足任一门槛的节点不写入订阅或任何组；两类门槛均无合格节点时保留旧订阅，不伪造通过或回退到失败节点。高速和非机房均只从严格合格池选取。非机房组要求明确 `hosting=false`、不同 trace 未发现出口不一致，并按独立出口 IP 去重；仅香港最多 30 个，其他地区不限数量。未确认 IP 类型不进入非机房组。
 8. 四片结果全部合并，检查批次、完整覆盖、各阶段顺序和轮数、下载完整性。缺片或漏测拒绝发布。Mihomo 最终配置校验通过后，更新原订阅和 `连通性报告.json/md`。分片临时文件保留 1 天。
 
-Cloudflare 官方测速引擎使用 `https://speed.cloudflare.com/__down`，`bytes` 参数指定字节数，见[官方项目](https://github.com/cloudflare/speedtest)。本流程先用1,000,000字节（1 MB），通过后分别从Cloudflare和DataPacket完整下载100,000,000字节（100 MB），无需安装或调用clash-speedtest。
+Cloudflare 官方测速引擎使用 `https://speed.cloudflare.com/__down`，`bytes` 参数指定字节数，见[官方项目](https://github.com/cloudflare/speedtest)。本流程先用1,000,000字节（1 MB），通过后分别从Cloudflare和DataPacket完整下载100,000,000字节（100 MB），无需安装或调用clash-speedtest。Cloudflare的100 MB请求带 `Referer: https://speed.cloudflare.com/`；实际对照中缺失时返回403，补上后返回200与正确100 MB长度。请求来源信息及响应状态/长度/类型记录在每次下载结果中，避免把测速端兼容问题混同节点下载不完整。
 
 探测服务：
 

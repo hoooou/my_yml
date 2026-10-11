@@ -11,11 +11,17 @@ URLS = (
 )
 
 
+def request_headers(url):
+    # The official download endpoint requires its speed-site Referer for 100 MB.
+    return {'Referer': 'https://speed.cloudflare.com/'} if url == URLS[0] else {}
+
+
 def settings():
     return {'version': VERSION, 'urls': list(URLS), 'bytes': BYTES,
             'budget_seconds': BUDGET, 'rounds': len(URLS), 'sequential_per_node': True,
             'workers_per_shard': WORKERS, 'selection_limit': None,
             'read_timeout_seconds': 1, 'includes_handshake': True,
+            'required_request_headers': {url: request_headers(url) for url in URLS},
             'speed_aggregation': 'minimum_of_completed_rounds'}
 
 

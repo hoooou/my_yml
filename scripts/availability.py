@@ -231,7 +231,12 @@ def download_sample(port, byte_count, budget, url=None):
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
             with client.get(url, stream=True, timeout=(2, 1), allow_redirects=False,
-                            headers={'Accept-Encoding': 'identity', 'Cache-Control': 'no-cache', 'User-Agent': WEB_USER_AGENT}) as response:
+                            headers={'Accept-Encoding': 'identity', 'Cache-Control': 'no-cache', 'User-Agent': WEB_USER_AGENT,
+                                     **high_speed.request_headers(url)}) as response:
+                result['http_status'] = response.status_code
+                result['response_length'] = response.headers.get('Content-Length')
+                result['response_type'] = response.headers.get('Content-Type')
+                result['request_headers'] = high_speed.request_headers(url)
                 if (response.status_code != 200 or response.url != url
                         or response.headers.get('Content-Length') != str(byte_count)
                         or response.headers.get('Content-Type', '').split(';')[0] != 'application/octet-stream'

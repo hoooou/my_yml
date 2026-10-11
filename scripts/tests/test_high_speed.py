@@ -12,6 +12,27 @@ from tls_fixture import verified_tls
 
 
 class DoubleDownloadTests(unittest.TestCase):
+    def test_cloudflare_100mb_request_supplies_required_speed_site_referer(self):
+        class Response:
+            url = high_speed.URLS[0]
+            headers = {'Content-Length': str(high_speed.BYTES), 'Content-Type': 'application/octet-stream'}
+            def __init__(self, allowed):
+                self.status_code = 200 if allowed else 403
+                self.raw = self
+                self.remaining = high_speed.BYTES
+            def read1(self, size):
+                count = min(size, self.remaining); self.remaining -= count
+                return b'x' * count
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+        def fetch(url, **kwargs):
+            return Response(kwargs['headers'].get('Referer') == 'https://speed.cloudflare.com/')
+        with patch.object(a.s, 'session') as session, \
+             patch.object(a.time, 'perf_counter', side_effect=[0] + [2] * 7000):
+            session.return_value.__enter__.return_value.get.side_effect = fetch
+            result = a.download_sample(1234, high_speed.BYTES, high_speed.BUDGET, high_speed.URLS[0])
+        self.assertEqual(result['status'], 'passed')
+
     def test_pipeline_uses_both_targets_with_independent_deadlines_after_quick_pass(self):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         samples = verified_high(10)['attempts']
