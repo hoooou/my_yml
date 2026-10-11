@@ -5,6 +5,7 @@ import app_tls
 import high_speed
 import medium_speed
 import stability
+import upload_speed
 
 
 def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=()):
@@ -31,6 +32,9 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
             'android_certificate_pinning_emulated': False},
         'app_tls_counts': dict(Counter((r.get('app_tls') or {}).get('status', 'missing') for r in records)),
         'stability_policy': stability.settings(),
+        'upload_policy': upload_speed.settings(),
+        'upload_counts': dict(Counter((r.get('upload') or {}).get('status', 'not_candidate') for r in records)),
+        'post_upload_tls_counts': dict(Counter((r.get('post_upload_tls') or {}).get('status', 'not_candidate') for r in records)),
         'stability_counts': dict(Counter((r.get('stability') or {}).get('status', 'not_candidate') for r in records)),
         'stability_failure_targets': dict(Counter(f['target'] for r in records
             for f in (r.get('stability') or {}).get('failures', []))),
@@ -54,8 +58,9 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         '高速下载：Cloudflare和DataPacket各完整100 MB，每轮20秒；两轮都通过才进入高速组，按两轮中较慢的速度排序。', '',
         '两轮均通过：' + str(report['high_speed_download_counts']) + '；逐目标结果：' + str(report['high_speed_target_counts']) + '。', '',
         '最终间隔稳定性：' + str(report['stability_counts']) + '；失败目标请求数：' + str(report['stability_failure_targets']) + '。', '',
+        '上行：1MB预检后5MB两轮，每轮10秒、轮间20秒，取较低Mbps；上传后4个应用域名两次严格证书握手。上传结果：' + str(report['upload_counts']) + '；负载后证书：' + str(report['post_upload_tls_counts']) + '。云端请求完成不等于服务端逐字节接收回执，也不代表中国移动上行。', '',
         '下载后合格候选低并发复测5轮，轮间至少空闲30秒；204、Google、YouTube、ChatGPT trace及Android证书握手每轮均须通过，核心响应耗时仍须满足所在分组门槛。未进入该阶段的节点记为not_candidate，不冒充稳定性失败。IP变化不淘汰，所有分组保持手动选择；数分钟云端观察不证明长期稳定或手机ChatGPT持续对话正常。', '',
-        '抖音不检测；其国内直连规则保留。', '',
+        '国内网页不逐节点检测；国内入口TCP及国内直连/DNS规则保留。', '',
         '有合格候选，继续校验并发布；最终发布状态以 Actions 为准。' if selected else
         '**本次无合格节点，未覆盖原订阅。原订阅仍是上次结果，不代表通过这次页面与trace必过门槛。**', '',
         '| 网站 | 通过 | 失败 | CF需验证 | 需复核 | 响应慢 | 波动 | 未测 |', '|---|---:|---:|---:|---:|---:|---:|---:|']

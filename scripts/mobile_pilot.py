@@ -201,6 +201,7 @@ def check_site(port, label, url, timeout=(3, 2)):
             current_url = url
             for hop in range(3):
                 with client.get(current_url, stream=True, timeout=timeout, allow_redirects=False,
+                                verify=True,
                                 headers={'User-Agent': WEB_USER_AGENT}) as response:
                     location = response.headers.get('Location')
                     if label in PAGE_HOSTS and 300 <= response.status_code < 400 and location:

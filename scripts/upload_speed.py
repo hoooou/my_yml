@@ -14,6 +14,7 @@ import tempfile
 import time
 
 import certifi
+import app_tls
 import select_nodes as s
 from mobile_pilot import check_site, SITES
 
@@ -69,7 +70,7 @@ def sample(port, byte_count=BYTES, budget=BUDGET, directory=None):
         root = Path(folder)
         payload, body, headers = root / 'payload.bin', root / 'response', root / 'headers'
         payload.write_bytes(os.urandom(byte_count))
-        command = ['curl', '--disable', '--silent', '--show-error', '--http1.1',
+        command = ['curl', '--disable', '--silent', '--show-error', '--http1.1', '--tlsv1.2',
                    '--proto', '=https', '--connect-timeout', '2', '--max-time', str(budget),
                    '--cacert', certifi.where(), '--noproxy', '',
                    '--proxy', f'http://127.0.0.1:{port}' if port is not None else '',
@@ -165,10 +166,14 @@ def recheck(records, mapping, binary, root):
     listeners, ports = s.make_listeners(records)
     with s.Core(binary, root, [mapping[r['id']] for r in records], listeners) as core:
         control_before = check(None, root)
+        def measure(row):
+            result = check(ports[row['id']], root)
+            tls = app_tls.check(ports[row['id']])
+            return result, tls
         with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
-            jobs = {pool.submit(check, ports[r['id']], root): r for r in records}
+            jobs = {pool.submit(measure, r): r for r in records}
             for job in futures.as_completed(jobs):
-                row = jobs[job]; row['upload'] = job.result()
+                row = jobs[job]; row['upload'], row['post_upload_tls'] = job.result()
                 print('上传复测完成 ' + row['id'] + '：' + row['upload']['status'], flush=True)
         control_after = check(None, root)
         import stability
@@ -177,7 +182,7 @@ def recheck(records, mapping, binary, root):
         'settings': settings(), 'node_count': len(records), 'core_health': health,
         'controls': {'before': control_before, 'after': control_after},
         'controls_valid': passed(control_before) and passed(control_after) and stability.core_healthy(health),
-        'nodes': [{'id': r['id'], 'upload': r['upload']} for r in records]}
+        'nodes': [{'id': r['id'], 'upload': r['upload'], 'post_upload_tls': r['post_upload_tls']} for r in records]}
     (root / 'upload-results.json').write_text(json.dumps(diagnostic, ensure_ascii=False, indent=2) + '\n')
     if not diagnostic['controls_valid']:
         raise RuntimeError('上传直连或内核对照异常，记录已保存；不据此淘汰或发布')

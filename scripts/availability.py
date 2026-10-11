@@ -25,6 +25,7 @@ import published_history
 import high_speed
 import medium_speed
 import stability
+import upload_speed
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
 
@@ -44,6 +45,10 @@ REGIONAL_COUNTRIES = ('TW', 'SG')
 REGIONAL_MEDIAN_MS = 3000
 REGIONAL_TAIL_MS = 5000
 REGIONAL_JITTER_MS = 3000
+# Domestic apps use DIRECT: keep their routing catalog, but avoid measuring
+# unrelated return-to-China pages through every overseas proxy each day.
+DAILY_POST_SITES = {label: url for label, url in POST_SITES.items() if label not in DOMESTIC_SITES}
+DAILY_SITES = {'Google204': SITES['Google204'], **DAILY_POST_SITES}
 
 
 class Pace:
@@ -236,6 +241,7 @@ def download_sample(port, byte_count, budget, url=None):
         client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
             with client.get(url, stream=True, timeout=(2, 1), allow_redirects=False,
+                            verify=True,
                             headers={'Accept-Encoding': 'identity', 'Cache-Control': 'no-cache', 'User-Agent': WEB_USER_AGENT,
                                      **request_headers}) as response:
                 result['http_status'] = response.status_code
@@ -287,7 +293,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     if not nodes:
         return [], 0
     site_check_is_default = site_check is None
-    site_check = site_check or (lambda port: check_sites(port, POST_SITES))
+    site_check = site_check or (lambda port: check_sites(port, DAILY_POST_SITES))
     listeners, ports = s.make_listeners({'id': n['name']} for n in nodes)
     pace, lock, tcp_jobs = Pace(interval), threading.Lock(), {}
     medium_slots = threading.BoundedSemaphore(medium_speed.WORKERS)
@@ -315,13 +321,13 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                     record['entry'] = copy.deepcopy(job.result())
                 if record['entry']['status'] == 'passed':
                     rounds = [site_check(port)]
-                    # Domestic pages and trace remain one round; overseas pages get three.
+                    # Only traces get one round; overseas pages get three.
                     for _ in range(WEBSITE_ROUNDS - 1):
                         rounds.append(check_sites(port, {label: SITES[label] for label in OVERSEAS_SITES})
                             if site_check_is_default else site_check(port))
                     record['websites'] = summarize_rounds(rounds, labels=OVERSEAS_SITES)
                     record['websites'].update(summarize_rounds(rounds[:1],
-                        labels=[label for label in POST_SITES if label not in OVERSEAS_SITES]))
+                        labels=[label for label in DAILY_POST_SITES if label not in OVERSEAS_SITES]))
                     record['websites_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                     traces = [record['websites'][label]['attempts'][0] for label in ('ChatGPTTrace', 'ClaudeTrace')
                               if record['websites'][label]['status'] == 'passed'
@@ -398,8 +404,8 @@ def merge_shards(bundle, parts, count):
             if record['entry']['status'] == 'passed' and (not record.get('websites') or any(
                     record['websites'].get(site, {}).get('round_count') != (WEBSITE_ROUNDS if site in OVERSEAS_SITES else 1) or
                     len(record['websites'].get(site, {}).get('attempts', [])) != (WEBSITE_ROUNDS if site in OVERSEAS_SITES else 1)
-                    for site in POST_SITES)):
-                raise ValueError('通过节点缺少海外三轮或国内/trace 单轮检测')
+                    for site in DAILY_POST_SITES)):
+                raise ValueError('通过节点缺少海外三轮或trace 单轮检测')
             if record.get('websites'):
                 for label, item in record['websites'].items():
                     if any(a.get('status') == 'verification_required'
@@ -563,6 +569,8 @@ def required_websites_passed(record):
 
 
 def web_quality_eligible(record):
+    if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
+        return False
     if 'stability' in record and not stability.quality_passed(record['stability'], CORE_MEDIAN_MS, CORE_TAIL_MS, CORE_JITTER_MS):
         return False
     if not required_websites_passed(record) or not app_tls.passed(record.get('app_tls')):
@@ -595,6 +603,8 @@ def web_rank_metrics(record):
 
 def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
+    if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
+        return False
     if 'stability' in record and not stability.quality_passed(record['stability'], REGIONAL_MEDIAN_MS, REGIONAL_TAIL_MS, REGIONAL_JITTER_MS):
         return False
     if (not required_websites_passed(record)
@@ -627,8 +637,20 @@ def rank_key(record):
         for label in CORE_SITES if isinstance(x.get('sites', {}).get(label, {}).get('elapsed_ms'), (int, float))]
     temporal_tail = max(values) if values else math.inf
     downloaded = record.get('download') or {}
-    return (downloaded.get('status') != 'passed', not web_quality_eligible(record), temporal_tail,
+    uplink = record.get('upload') or {}
+    upload_ok = upload_speed.passed(uplink)
+    measured = (record.get('high_speed_download') if high_speed_eligible(record) else
+                record.get('medium_speed_download') if medium_speed.passed(record.get('medium_speed_download') or {})
+                else downloaded)
+    down_mbps = (measured.get('speed_mib_s') or 0) * 1048576 * 8 / 1_000_000
+    # Within the same 250ms worst-response band, prefer the weaker direction
+    # of the two measured rates rather than rewarding download alone.
+    response_band = math.ceil(temporal_tail / 250) if upload_ok and math.isfinite(temporal_tail) else temporal_tail
+    duplex = min(down_mbps, uplink['speed_mbps']) if upload_ok else 0
+    return (downloaded.get('status') != 'passed', not web_quality_eligible(record), response_band,
+            -duplex, -(uplink.get('speed_ratio') or 0) if upload_ok else 0,
             *web_rank_metrics(record), -website_count(record), -connectivity_count(record),
+            temporal_tail,
             pre.get('median_elapsed_ms') if pre.get('median_elapsed_ms') is not None else math.inf,
             -(downloaded.get('speed_mib_s') or 0), record['entry'].get('latency_ms', math.inf), record['id'])
 
@@ -704,7 +726,7 @@ def limit_hong_kong(records):
     return selected
 
 
-def render_comparison(base, records, mapping, require_stability=False):
+def render_comparison(base, records, mapping, require_stability=False, require_upload=False):
     """Publish the strict pool and an explicitly authorized regional exception."""
     # Clear former publication names before renumbering. Otherwise an excluded
     # node can collide with a retained node's new name in report membership.
@@ -718,6 +740,8 @@ def render_comparison(base, records, mapping, require_stability=False):
     # The slower regional pool is selectable only in its own group.
     ranked = limit_hong_kong(sorted((r for r in records if r['id'] in mapping
         and (stability.passed(r.get('stability')) if require_stability or 'stability' in r else True)
+        and (upload_speed.passed(r.get('upload')) if require_upload or 'upload' in r else True)
+        and (app_tls.passed(r.get('post_upload_tls')) if require_upload else True)
         and r['entry']['status'] == 'passed'
         and (r.get('download') or {}).get('status') == 'passed'
         and (web_quality_eligible(r) or regional_eligible(r))), key=rank_key))
@@ -788,7 +812,7 @@ def render_comparison(base, records, mapping, require_stability=False):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
-    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair', 'web-recheck', 'medium-recheck', 'stability-recheck'), default='all')
+    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair', 'web-recheck', 'medium-recheck', 'stability-recheck', 'uplink-recheck'), default='all')
     parser.add_argument('--sample', help='Optional fixture; default pulls ALL subscriptions')
     parser.add_argument('--work-dir', default='.node-work/availability')
     parser.add_argument('--shard-index', type=int, default=0)
@@ -799,7 +823,8 @@ def main():
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     binary = str(Path(args.mihomo).resolve())
     bundle_path = root / 'bundle.json'
-    if args.phase in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck'):
+    repair_modes = ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck', 'uplink-recheck')
+    if args.phase in repair_modes:
         previous = json.loads(Path('连通性报告.json').read_text())
         published = yaml.safe_load(Path('优选配置.yaml').read_text())
         by_name = {n['name']: n for n in published['proxies']}
@@ -873,20 +898,20 @@ def main():
     if args.phase == 'publish':
         parts = [json.loads(p.read_text()) for p in Path(args.results_dir).glob('shard-*.json')]
         records, endpoint_count = merge_shards(bundle, parts, args.shard_count)
-    elif args.phase not in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck'):
+    elif args.phase not in repair_modes:
         records, endpoint_count = probe_pipeline(nodes, binary, root)
     if args.phase == 'medium-recheck':
         medium_rechecked_count = recheck_medium_download(records, mapping, binary, root)
     if args.phase == 'web-recheck':
         website_rechecked_count = recheck_websites(records, mapping, binary, root)
     reachable = [r for r in records if r['entry']['status'] == 'passed']
-    if args.phase not in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck'):
+    if args.phase not in repair_modes:
         ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
         for record in records:
             record['sources'] = metadata.get(record['id'], {}).get('sources', [])
             record['candidate_origin'] = metadata.get(record['id'], {}).get('candidate_origin', 'latest_subscriptions')
             record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
-    if args.phase not in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck') or args.refresh_ip_reputation:
+    if args.phase not in repair_modes or args.refresh_ip_reputation:
         eligible_ips = [(r.get('exit') or {}).get('exit_ip') for r in records
                         if (r.get('download') or {}).get('status') == 'passed'
                         and r.get('exit_consistent') is not False]
@@ -894,17 +919,25 @@ def main():
         for record in records:
             record['ip_reputation'] = reputations.get((record.get('exit') or {}).get('exit_ip'),
                 {'status': 'unknown', 'provider': 'ipapi.is', 'reason': 'not_eligible'})
+    upload_diagnostic = None
+    if args.phase in ('all', 'publish', 'uplink-recheck'):
+        upload_candidates = [r for r in records if r['id'] in mapping
+            and r['entry']['status'] == 'passed' and (r.get('download') or {}).get('status') == 'passed'
+            and (web_quality_eligible(r) or regional_eligible(r))]
+        upload_diagnostic = upload_speed.recheck(upload_candidates, mapping, binary, root)
     stability_diagnostic = None
-    if args.phase in ('all', 'publish', 'stability-recheck'):
+    if args.phase in ('all', 'publish', 'stability-recheck', 'uplink-recheck'):
         candidates = [r for r in records if r['id'] in mapping
             and r['entry']['status'] == 'passed'
             and (r.get('download') or {}).get('status') == 'passed'
             and (web_quality_eligible(r) or regional_eligible(r))]
         stability_diagnostic = stability.recheck(candidates, mapping, binary, root)
-    requires_stability = (args.phase in ('all', 'publish', 'stability-recheck')
-        or (args.phase in ('repair', 'web-recheck', 'medium-recheck')
+    requires_stability = (args.phase in ('all', 'publish', 'stability-recheck', 'uplink-recheck')
+        or (args.phase in repair_modes
             and previous.get('node_selection_policy', {}).get('requires_time_spaced_stability') is True))
-    config = render_comparison(base, records, mapping, require_stability=requires_stability)
+    requires_upload = (args.phase in ('all', 'publish', 'uplink-recheck')
+        or (args.phase in repair_modes and previous.get('node_selection_policy', {}).get('requires_uplink_pass') is True))
+    config = render_comparison(base, records, mapping, require_stability=requires_stability, require_upload=requires_upload)
     if args.phase in ('all', 'publish'):
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES)
@@ -919,10 +952,16 @@ def main():
         raise RuntimeError('最终订阅校验失败，不发布')
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
-    repairing = args.phase in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck')
+    repairing = args.phase in repair_modes
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 17,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 18,
+              'upload_policy': upload_speed.settings(),
+              'upload_recheck': ({'updated_at': upload_diagnostic['updated_at'],
+                  'node_ids': [n['id'] for n in upload_diagnostic['nodes']],
+                  'node_count': upload_diagnostic['node_count'], 'controls_valid': upload_diagnostic['controls_valid'],
+                  'passed_count': sum(upload_speed.passed(n['upload']) for n in upload_diagnostic['nodes'])}
+                  if upload_diagnostic and upload_diagnostic['node_count'] else previous.get('upload_recheck') if repairing else None),
               'historical_candidates': bundle.get('historical_candidates', {}),
               'stability_policy': stability.settings(),
               'stability_recheck': stability.recheck_summary(records, stability_diagnostic,
@@ -933,6 +972,8 @@ def main():
                   'requires_trusted_chain_hostname_validity': True, 'android_certificate_pinning_emulated': False},
               'app_tls_counts': {v: sum((r.get('app_tls') or {}).get('status') == v for r in records)
                                  for v in ('passed', 'failed', 'skipped')},
+              'post_upload_tls_counts': {v: sum((r.get('post_upload_tls') or {}).get('status') == v for r in records)
+                                         for v in ('passed', 'failed')},
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
@@ -943,11 +984,11 @@ def main():
               'cloudflare_classification_update': ({'updated_at': now, 'reclassified_attempts': reclassified_count,
                   'new_measurements': False, 'source': 'captured_cloudflare_challenge_restriction'}
                   if repairing else None),
-              'website_measurement_policy': {'version': 5,
+              'website_measurement_policy': {'version': 6,
                   'confirmed_cloudflare_challenge': 'accepted_access_verification_required',
                   'challenge_in_page_speed_ranking': False,
                   'challenge_can_replace_204_or_trace': False, 'overseas_rounds': WEBSITE_ROUNDS,
-                  'domestic_and_trace_rounds': 1, 'sample_bytes': 16384,
+                  'domestic_pages_probed_daily': False, 'trace_rounds': 1, 'sample_bytes': 16384,
                   'sample_bytes_overrides': PAGE_SAMPLE_LIMITS,
                   'max_ttfb_ms': MAX_TTFB_MS, 'max_sample_ms': MAX_SAMPLE_MS,
                   'required_core_sites': list(CORE_SITES), 'required_websites': list(REQUIRED_SITES),
@@ -962,10 +1003,10 @@ def main():
               'pipeline': True, 'parallel_shards': bundle.get('parallel_shards', args.shard_count if args.phase == 'publish' else 1),
               'website_workers_per_shard': 16,
               'parallel_sites_per_node': previous.get('parallel_sites_per_node', 3) if repairing else SITE_WORKERS,
-              'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(SITES),
-              'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': list(DOMESTIC_SITES), 'connectivity': list(CONNECTIVITY_SITES)},
+              'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(DAILY_SITES),
+              'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': [], 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'time_spaced_stability'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'time_spaced_stability'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
@@ -986,6 +1027,8 @@ def main():
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
                   'requires_time_spaced_stability': requires_stability,
+                  'requires_uplink_pass': requires_upload,
+                  'ranking': 'core_response_250ms_band_then_min_upload_download_mbps_then_upload_repeat_ratio_then_web_quality',
                   'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
                   'rejected_proxy_definitions': 'omitted',
                   'regional_exception': {'group': REGIONAL_GROUP, 'country_codes': list(REGIONAL_COUNTRIES),
@@ -1022,7 +1065,7 @@ def main():
               'entry_counts': counts, 'website_tested_count': len(reachable),
               'website_target_count': sum(label in (previous.get('test_targets') or {}) for label in PAGE_SITES) if repairing else len(PAGE_SITES),
               'overseas_target_count': sum(label in (previous.get('test_targets') or {}) for label in OVERSEAS_SITES) if repairing else len(OVERSEAS_SITES),
-              'domestic_target_count': sum(label in (previous.get('test_targets') or {}) for label in DOMESTIC_SITES) if repairing else len(DOMESTIC_SITES),
+              'domestic_target_count': sum(label in (previous.get('test_targets') or {}) for label in DOMESTIC_SITES) if repairing else 0,
               'all_websites_passed': sum(all((r.get('websites') or {}).get(label, {}).get('status') == 'passed' for label in OVERSEAS_SITES) for r in records),
               'three_connectivity_passed': sum(connectivity_count(r) == 3 for r in records),
               'download_counts': {v: sum((r.get('download') or {}).get('status') == v for r in records)
@@ -1038,7 +1081,7 @@ def main():
             'TCP 来自小小 API 的国内探测点，运营商未公开，不代表移动或手机本地必然可用。共享主机和端口只提交一次，不同凭据分别检查 204 和海外访问。接口限流、超时、异常和目标不匹配均记为未验证。', '',
             f'本轮 {report["parallel_shards"]} 个并行 Actions 分片，每片最多同时检测 16 个节点。同一节点按顺序过关，不同节点可同时处于不同阶段；海外网页各请求三轮，国内及 trace 各一次，每节点最多五个请求并发；新增网站不会增加并发连接上限。', '',
             '海外网页目标：' + '、'.join(OVERSEAS_SITES) + '；另测 ChatGPT、Claude 两个 trace。', '',
-            '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
+            '日常不再逐节点请求国内网页；国内入口TCP和国内网站直连/DNS规则保留。报告里已有的国内网页结果是旧测量，不代表手机直连或移动线路实测。', '',
             '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；明确cf-mitigated: challenge且来自预期HTTPS网站的验证页单列CF需验证，认可网站可达，不记访问失败；普通403、其他验证码或风控仍需复核。CF验证响应不作为真实页面速度，不替代204、trace或应用TLS。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
             'TCP通且指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
             f'1 MB通过后增加Cloudflare 5 MB快测（{medium_speed.URL}），完整5,000,000字节、{medium_speed.BUDGET}秒内完成，每分片最多{medium_speed.WORKERS}节点并发。中速组保留已入选合格池中全部真实5 MB通过节点（含仅符合台湾／新加坡较宽网页门槛者）；不补用1 MB或100 MB成绩。5 MB失败不取消其他组资格或后续100 MB测试；香港最多30个、其他地区不限。中速组本次{report["medium_speed_selection_policy"]["selected_count"]}个。', '',
@@ -1111,6 +1154,17 @@ def main():
     temporal = report.get('stability_recheck')
     if temporal:
         rows[6:6] = [f'间隔稳定性复测：{temporal["updated_at"]}；检测{temporal["node_count"]}，通过{temporal["passed_count"]}，未通过{temporal["failed_count"]}。5轮各检查204、Google、YouTube、ChatGPT trace和Android域名证书握手；轮间至少空闲30秒，4节点并发，每节点串行请求。5轮全部通过才发布，出口IP变化不淘汰，所有分组仍手动选择。这是数分钟的云端观察，不证明手机移动/Wi-Fi或登录后的ChatGPT持续对话可用。原始下载及网页时间保持原样。', '']
+    uplink = report.get('upload_recheck')
+    if uplink:
+        rows[6:6] = [f'上行复测：{uplink["updated_at"]}；检测{uplink["node_count"]}，完整两轮通过{uplink["passed_count"]}。1MB预检后5MB两轮，每轮10秒、轮间空闲20秒，4节点并发；两轮均完成且上传后4个应用域名证书正常才具备入选资格，仍需最终五轮稳定性通过。上传阶段与下载阶段错开。HTTP完成不等于服务端逐字节回执，云端数据不代表中国移动上行。', '']
+        rows += ['', '## 上行与负载后证书', '',
+                 '| 节点编号 | 上传两轮 | 较低上行Mbps | 两轮较低/较高速率 | 上传中204通过/检测 | 上传后证书 |',
+                 '|---|---|---:|---:|---|---|']
+        for id in uplink['node_ids']:
+            row = next(r for r in records if r['id'] == id)
+            item = row.get('upload') or {}
+            probes = [p for sample in item.get('attempts', []) for p in sample.get('loaded_204', [])]
+            rows.append(f'| {id} | {LABELS.get(item.get("status"), "未测")} | {item.get("speed_mbps")} | {item.get("speed_ratio")} | {sum(p.get("status") == "passed" for p in probes)}/{len(probes)} | {"正常" if app_tls.passed(row.get("post_upload_tls")) else "未通过"} |')
     Path('连通性报告.md').write_text('\n'.join(rows) + '\n')
     print(f'分阶段分类完成，配置校验通过；204 {report["precheck_counts"]}；TCP {counts}；下载 {report["download_counts"]}', flush=True)
 

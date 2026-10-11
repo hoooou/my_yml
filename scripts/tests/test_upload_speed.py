@@ -9,6 +9,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import upload_speed as up
+from tls_fixture import verified_tls
+import availability as a
 
 
 def sample(byte_count=up.BYTES, budget=up.BUDGET, elapsed=1000):
@@ -26,6 +28,38 @@ def evidence():
 
 
 class UploadTests(unittest.TestCase):
+    def test_upload_or_post_load_certificate_failure_removes_node_from_all_groups(self):
+        from test_medium_speed import record
+        from test_stability import evidence as stable_evidence
+        row = record(); row['stability'] = stable_evidence()
+        mapping = {row['id']: {'name': row['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80}}
+        self.assertEqual(a.render_comparison({}, [row], mapping, require_upload=True)['proxies'], [])
+        row['upload'] = evidence(); row['post_upload_tls'] = verified_tls()
+        self.assertEqual(len(a.render_comparison({}, [row], mapping, require_upload=True)['proxies']), 1)
+        row['upload']['attempts'][1]['uploaded_bytes'] -= 1
+        self.assertEqual(a.render_comparison({}, [row], mapping, require_upload=True)['proxies'], [])
+        row['upload'] = evidence()
+        row['post_upload_tls']['targets']['chatgpt.com']['attempts'][0]['hostname_verified'] = False
+        self.assertEqual(a.render_comparison({}, [row], mapping, require_upload=True)['proxies'], [])
+
+    def test_similar_response_band_prefers_balanced_upload_over_download_only(self):
+        from test_medium_speed import record
+        from test_stability import evidence as stable_evidence
+        first = record('n-down-only'); first['stability'] = stable_evidence(); first['upload'] = evidence()
+        first['upload'] = up.summarize(first['upload']['precheck'], [sample(elapsed=9000)] * 2, 20)
+        second = record('n-balanced'); second['stability'] = stable_evidence(); second['upload'] = evidence()
+        for attempt in second['stability']['attempts']:
+            for label in ('Google', 'YouTube'): attempt['sites'][label]['elapsed_ms'] += 30
+        self.assertLess(a.rank_key(second), a.rank_key(first))
+
+    def test_daily_targets_omit_domestic_pages_without_losing_routing_or_traces(self):
+        from routing import optimize_routing
+        self.assertFalse(set(a.DAILY_POST_SITES) & set(a.DOMESTIC_SITES))
+        self.assertTrue(set(a.REQUIRED_SITES) | set(a.REQUIRED_TRACES) <= set(a.DAILY_POST_SITES))
+        cfg = {}; optimize_routing(cfg)
+        self.assertIn('RULE-SET,domestic-services,DIRECT', cfg['rules'])
+        self.assertIn('+.bilibili.com', cfg['rule-providers']['domestic-services']['payload'])
+
     def test_complete_two_rounds_take_lower_speed_and_recompute_evidence(self):
         good = evidence(); self.assertTrue(up.passed(good))
         self.assertEqual(good['speed_mbps'], 20)
@@ -83,6 +117,7 @@ class UploadTests(unittest.TestCase):
             with tempfile.TemporaryDirectory() as root, patch.object(up.s, 'Core'), \
                  patch.object(up.s, 'make_listeners', return_value=([], {'n-a': 1234})), \
                  patch.object(up, 'check', side_effect=checks), \
+                 patch.object(up.app_tls, 'check', return_value=verified_tls()), \
                  patch('stability.core_health', return_value={'process_alive': True, 'api_available': True, 'file_limit_errors': 0}):
                 if control_ok:
                     result = up.recheck(records, {'n-a': {}}, 'unused', root)
