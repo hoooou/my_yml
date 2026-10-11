@@ -227,8 +227,9 @@ def check_site(port, label, url, timeout=(3, 2)):
                         result.update(status='slow', reason='HTTP 和网页特征正常，但请求响应超过速度预算')
                     result['redirect_hops'] = hop
                     return result
-        except s.requests.RequestException:
+        except s.requests.RequestException as error:
             return {'status': 'failed', 'reason': '连接、TLS 或读取失败',
+                    'error_type': type(error).__name__,
                     'elapsed_ms': round((time.perf_counter() - started) * 1000, 1)}
 
 
