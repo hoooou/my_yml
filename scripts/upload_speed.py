@@ -156,6 +156,26 @@ def passed(item):
         for k in ('round_count', 'passed_count', 'speed_mbps', 'speed_ratio'))
 
 
+def recheck_summary(records, diagnostic=None, previous=None):
+    if diagnostic and diagnostic.get('node_count'):
+        info = {k: diagnostic[k] for k in ('updated_at', 'node_count', 'controls_valid')}
+        ids = {n['id'] for n in diagnostic['nodes']}
+    elif previous:
+        info = dict(previous)
+        ids = set(previous.get('node_ids') or [])
+        if not ids:
+            return previous
+    else:
+        return None
+    cohort = [r for r in records if r['id'] in ids]
+    if len(cohort) != len(ids):
+        raise ValueError('上行复测摘要缺少对应节点记录')
+    good = sum(passed(r.get('upload')) for r in cohort)
+    info.update(node_ids=sorted(ids), node_count=len(cohort), passed_count=good,
+                failed_count=len(cohort) - good)
+    return info
+
+
 def check(port, directory=None):
     precheck = sample(port, PRECHECK_BYTES, PRECHECK_BUDGET, directory)
     if not sample_passed(precheck, PRECHECK_BYTES, PRECHECK_BUDGET):

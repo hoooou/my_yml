@@ -26,6 +26,7 @@ import high_speed
 import medium_speed
 import stability
 import upload_speed
+from detection_report import write_report
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
 
@@ -568,7 +569,15 @@ def required_websites_passed(record):
         for label in REQUIRED_TRACES)
 
 
+def destination_certificate_failure(record):
+    return any(attempt.get('tls_error_kind') == 'certificate_verification_failed'
+        for item in (record.get('websites') or {}).values()
+        for attempt in item.get('attempts', [item]))
+
+
 def web_quality_eligible(record):
+    if destination_certificate_failure(record):
+        return False
     if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
         return False
     if 'stability' in record and not stability.quality_passed(record['stability'], CORE_MEDIAN_MS, CORE_TAIL_MS, CORE_JITTER_MS):
@@ -603,6 +612,8 @@ def web_rank_metrics(record):
 
 def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
+    if destination_certificate_failure(record):
+        return False
     if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
         return False
     if 'stability' in record and not stability.quality_passed(record['stability'], REGIONAL_MEDIAN_MS, REGIONAL_TAIL_MS, REGIONAL_JITTER_MS):
@@ -940,7 +951,8 @@ def main():
     config = render_comparison(base, records, mapping, require_stability=requires_stability, require_upload=requires_upload)
     if args.phase in ('all', 'publish'):
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
-                      s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES)
+                      s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES,
+                      required_gate=required_websites_passed)
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
             print('全量检测完成：无符合页面、trace及应用TLS门槛的节点，报告已保存；原订阅未更新', flush=True)
@@ -957,11 +969,8 @@ def main():
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
     report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 18,
               'upload_policy': upload_speed.settings(),
-              'upload_recheck': ({'updated_at': upload_diagnostic['updated_at'],
-                  'node_ids': [n['id'] for n in upload_diagnostic['nodes']],
-                  'node_count': upload_diagnostic['node_count'], 'controls_valid': upload_diagnostic['controls_valid'],
-                  'passed_count': sum(upload_speed.passed(n['upload']) for n in upload_diagnostic['nodes'])}
-                  if upload_diagnostic and upload_diagnostic['node_count'] else previous.get('upload_recheck') if repairing else None),
+              'upload_recheck': upload_speed.recheck_summary(records, upload_diagnostic,
+                  previous.get('upload_recheck') if repairing else None),
               'historical_candidates': bundle.get('historical_candidates', {}),
               'stability_policy': stability.settings(),
               'stability_recheck': stability.recheck_summary(records, stability_diagnostic,
@@ -1030,6 +1039,7 @@ def main():
                   'requires_uplink_pass': requires_upload,
                   'ranking': 'core_response_250ms_band_then_min_upload_download_mbps_then_upload_repeat_ratio_then_web_quality',
                   'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
+                  'rejects_explicit_certificate_error_on_any_tested_website': True,
                   'rejected_proxy_definitions': 'omitted',
                   'regional_exception': {'group': REGIONAL_GROUP, 'country_codes': list(REGIONAL_COUNTRIES),
                       'median_limit_ms': REGIONAL_MEDIAN_MS, 'tail_limit_ms': REGIONAL_TAIL_MS,
@@ -1063,7 +1073,7 @@ def main():
               'precheck_counts': {v: sum((r.get('precheck') or {}).get('status') == v for r in records)
                                   for v in ('passed', 'failed', 'unstable', 'needs_review')},
               'entry_counts': counts, 'website_tested_count': len(reachable),
-              'website_target_count': sum(label in (previous.get('test_targets') or {}) for label in PAGE_SITES) if repairing else len(PAGE_SITES),
+              'website_target_count': sum(label in (previous.get('test_targets') or {}) for label in PAGE_SITES) if repairing else len(OVERSEAS_SITES),
               'overseas_target_count': sum(label in (previous.get('test_targets') or {}) for label in OVERSEAS_SITES) if repairing else len(OVERSEAS_SITES),
               'domestic_target_count': sum(label in (previous.get('test_targets') or {}) for label in DOMESTIC_SITES) if repairing else 0,
               'all_websites_passed': sum(all((r.get('websites') or {}).get(label, {}).get('status') == 'passed' for label in OVERSEAS_SITES) for r in records),
@@ -1073,99 +1083,7 @@ def main():
               'services': services, 'sources': sources, 'nodes': records}
     Path('优选配置.yaml').write_text(f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text())
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    rows = ['# 节点分阶段连通性与快速下载', '', f'发布时间：{now}；检测数据时间：{report["measurements_updated_at"]}', '',
-            f'去重节点 {input_count}；内核可解析 {report["parseable_count"]}；实际发布 {report["published_node_count"]}；TCP 入口总数 {report["total_unique_tcp_endpoints"]}，原检测提交 {endpoint_count}。', '',
-            f'204 全通过 {report["precheck_counts"]["passed"]}；TCP 通 {counts["passed"]}，不通 {counts["failed"]}，未验证 {counts["unknown"]}；海外访问检测 {len(reachable)}；1MB 快测通过 {report["download_counts"]["passed"]}；100MB双轮完整下载通过 {report["high_speed_download_counts"]["passed"]}。', '',
-            f'原网页/下载检测顺序：{" → ".join(report["stages"])}。204 {report["precheck_rounds"]} 轮；海外网站 {report["website_rounds"]} 轮；trace {report["trace_rounds"]} 轮；下载检测 {"开启" if report["download_test"] else "关闭"}。专项复测另列时间；其余原测量保留，未测项目保持未测。', '',
-            '204 三轮均返回 HTTPS 204 且无正文才进入 TCP；204 未通过的节点延迟显示未知，分类及跳过原因保留在 JSON 报告，不伪造国内入口不通。UDP 的 TCP 阶段不适用，保持未验证。', '',
-            'TCP 来自小小 API 的国内探测点，运营商未公开，不代表移动或手机本地必然可用。共享主机和端口只提交一次，不同凭据分别检查 204 和海外访问。接口限流、超时、异常和目标不匹配均记为未验证。', '',
-            f'原全量使用 {report["parallel_shards"]} 个并行 Actions 分片，每片最多同时检测16个节点；海外网页各三轮、trace单轮，每节点最多五个请求并发。分片下载结束后，上传和最终稳定性各使用单作业4节点并发，避免上传与下载争抢带宽。', '',
-            '海外网页目标：' + '、'.join(OVERSEAS_SITES) + '；另测 ChatGPT、Claude 两个 trace。', '',
-            '日常不再逐节点请求国内网页；国内入口TCP和国内网站直连/DNS规则保留。报告里已有的国内网页结果是旧测量，不代表手机直连或移动线路实测。', '',
-            '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；明确cf-mitigated: challenge且来自预期HTTPS网站的验证页单列CF需验证，认可网站可达，不记访问失败；普通403、其他验证码或风控仍需复核。CF验证响应不作为真实页面速度，不替代204、trace或应用TLS。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
-            'TCP通且指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
-            f'1 MB通过后增加Cloudflare 5 MB快测（{medium_speed.URL}），完整5,000,000字节、{medium_speed.BUDGET}秒内完成，每分片最多{medium_speed.WORKERS}节点并发。中速组保留已入选合格池中全部真实5 MB通过节点（含仅符合台湾／新加坡较宽网页门槛者）；不补用1 MB或100 MB成绩。5 MB失败不取消其他组资格或后续100 MB测试；香港最多30个、其他地区不限。中速组本次{report["medium_speed_selection_policy"]["selected_count"]}个。', '',
-            f'仅1 MB快测通过的节点继续依次测试Cloudflare（{high_speed.URLS[0]}）和DataPacket（{high_speed.URLS[1]}），每次完整100,000,000字节、各自{HIGH_DOWNLOAD_BUDGET}秒，读取超时1秒，每分片最多同时测试2个节点。两次都通过才进入高速组，按较慢一次速度排序和命名；历史单轮结果不冒充双轮通过。本批数据的实际设置：{report["high_speed_download_settings"]}；重建配置不改写历史采样。香港最多30个，其他地区不限，本次高速组{report["high_speed_selection_policy"]["selected_count"]}个。未通过1 MB的节点不消耗大文件流量。', '',
-            f'逐目标100 MB结果：{report["high_speed_target_counts"]}。', '',
-            '综合优选要求1 MB通过、指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过；Google/YouTube三轮真实页面、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
-            '手机显示六个分组：全局选择、综合优选、中速下载、高速下载、非机房 IP、台湾／新加坡。综合、高速和非机房组共用严格合格池；地区组使用用户授权的较宽响应门槛；中速组接受两类合格池中5 MB通过者；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
-            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮正常响应或明确CF验证，Claude trace单轮须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过（明确CF验证认可可达），Claude仅检测trace；不允许其他页面或trace替代12站，其他验证码、错误页面或未测项目不放行。Google/YouTube响应质量仍要求三轮真实页面，验证页速度不参与质量判定。仅满足地区门槛的节点进入地区组，5 MB通过时也进入中速组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
-            '节点名称：美国01|120ms|85Mbps|住宅/非住宅|纯净度99.2%。每地区独立从01顺序编号，不加空格或节点哈希。延迟取Google/YouTube真实页面较慢的中位数，缺失时采用204中位数；带宽优先双100 MB较慢速度，其次5 MB、最后1 MB；住宅依据ipapi.is的ISP且非机房分类，表示网络类型判断，不保证独享静态家庭IP；机房/移动网络标非住宅，只有hosting=false时仍标住宅未知。缺少信誉数据标纯净度未知，已知滥用详情保留JSON。非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
-            '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
-            '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
-    for name, service in services.items():
-        rows.append(f'| [{name}]({service["url"]}) | {service["mode"]} | {service.get("reason", "公开 TCPing API，最多 5 次请求/秒")} |')
-    rows += ['', '表格仅展示进入海外网站检测的节点；全部节点及跳过原因见 [JSON 完整报告](连通性报告.json)。', '']
-    if repairing:
-        rows += ['', f'本次按新策略重新分类{reclassified_count}次已记录的明确CF验证响应；保留原HTTP状态、采样耗时和测量时间，没有重新测速。', '']
-    rows += ['## 网站覆盖', '', '| 网站 | 分类 | 通过 | 不通过 | 响应慢 | 波动 | CF需验证 | 需复核 | 未测 |', '|---|---|---:|---:|---:|---:|---:|---:|---:|']
-    for label, url in report['test_targets'].items():
-        if label == 'Google204':
-            continue
-        measured = [(record.get('websites') or {}).get(label) for record in reachable]
-        tallies = {status: sum(item is not None and item['status'] == status for item in measured)
-                   for status in ('passed', 'failed', 'slow', 'unstable', 'verification_required', 'needs_review')}
-        kind = '国内（经节点）' if label in DOMESTIC_SITES else 'trace' if label in CONNECTIVITY_SITES else '海外'
-        rows.append(f'| [{label}]({url}) | {kind} | {tallies["passed"]} | {tallies["failed"]} | {tallies["slow"]} | {tallies["unstable"]} | {tallies["verification_required"]} | {tallies["needs_review"]} | {sum(item is None for item in measured)} |')
-    medium_rechecked = report.get('medium_speed_recheck')
-    if medium_rechecked:
-        rows += ['', f'5 MB专项补测：{medium_rechecked["updated_at"]}；{medium_rechecked["node_count"]}个已发布1 MB通过节点，4节点并发。5 MB采样时间单独记录，204、TCP、网站、TLS、1 MB和100 MB双轮保留原测量时间。', '']
-    rechecked = report.get('website_recheck')
-    if rechecked:
-        rows += ['', f'海外网站专项复测：{rechecked["updated_at"]}；{rechecked["node_count"]} 个旧下载通过节点，单作业8节点并发。未复测的旧网站结果保持原轮数；TCP、204、下载、国内网页和trace仍使用原测量时间。', '']
-    rows += ['', '## 请求响应质量', '', '下表仅展示海外三轮数据。P95为三次测量的最大值，波动为极差；响应头耗时为近似首字节时间，含建连和跳转。', '',
-        '| 节点 | 综合合格 | 海外稳定站 | Google 成功/中位/P95 | YouTube 成功/中位/P95/波动/响应头 |', '|---|---|---:|---|---|']
-    for record in records:
-        results = record.get('websites') or {}
-        yt = results.get('YouTube') or {}; google = results.get('Google') or {}
-        if yt.get('round_count') != WEBSITE_ROUNDS:
-            continue
-        def timing(item):
-            return f'{item.get("passed_count", 0)}/{item.get("round_count", 0)}，{item.get("median_elapsed_ms")} / {item.get("p95_elapsed_ms")}ms'
-        rows.append(f'| {record["id"][2:]} | {"是" if web_quality_eligible(record) else "否"} | {website_count(record)} | {timing(google)} | {timing(yt)}，极差{yt.get("jitter_ms")}ms，响应头{yt.get("median_ttfb_ms")}ms |')
-    rows += ['', '## 手机对照', '', '刷新原订阅，进入“🚀 全局选择”，优先选择“⭐ 综合优选”；TCP 分类与 204 失败原因在下表及 JSON 报告查看。下表列出完整节点名称与报告编号的对应关系。反馈完整节点名称和手机实际体验。', '',
-             '| 节点名 | 编号 | 入口 | TCP 分类 | 地区 | HTTPS204（三轮） | 海外通过 | 国内通过（经节点） | ChatGPTTrace | ClaudeTrace | 1MB快测 | 5MB快测 | 100MB双轮下载 |',
-             '|' + '---|' * 13]
-    for record in records:
-        if not record.get('websites'):
-            continue
-        results = record['websites']
-        scores = []
-        for item in [record.get('precheck')]:
-            score = f'{item["passed_count"]}/{item["round_count"]} {LABELS[item["status"]]}' if item else '未测'
-            if item and item.get('median_elapsed_ms') is not None:
-                score += f'，中位 {item["median_elapsed_ms"]}ms / 最大 {item.get("max_elapsed_ms", "未记录")}ms'
-            scores.append(score)
-        scores += [f'{website_count(record)}/{sum(label in results for label in OVERSEAS_SITES)}',
-                   f'{domestic_count(record)}/{sum(label in results for label in DOMESTIC_SITES)}']
-        scores += [LABELS.get((results.get(label) or {}).get('status'), '未测') for label in ('ChatGPTTrace', 'ClaudeTrace')]
-        downloaded = record.get('download') or {}
-        scores.append(f'{downloaded["speed_mib_s"]:.3f} MiB/s' if downloaded.get('status') == 'passed' else LABELS.get(downloaded.get('status'), '未测'))
-        medium = record.get('medium_speed_download') or {}
-        scores.append(f'{medium["speed_mib_s"]:.3f} MiB/s' if medium_speed.passed(medium) else LABELS.get(medium.get('status'), '未测'))
-        high = record.get('high_speed_download') or {}
-        scores.append(f'{high["speed_mib_s"]:.3f} MiB/s' if high_speed.passed(high) else
-                      '旧样本未验证双轮' if high.get('status') == 'passed' else LABELS.get(high.get('status'), '未测'))
-        country = (record.get('exit') or {}).get('country_code')
-        display_name = record.get('name', '未入选').replace('|', '\\|')
-        rows.append(f'| {display_name} | {record["id"][2:]} | {record["server"]}:{record["port"]} | {LABELS[record["entry"]["status"]]} | {s.COUNTRIES.get(country, country) or "未确认"} | ' + ' | '.join(scores) + ' |')
-    if rejected:
-        rows += ['', '内核或手机兼容性校验未通过的节点未写入订阅，编号：' + '、'.join(rejected)]
-    temporal = report.get('stability_recheck')
-    if temporal:
-        rows[6:6] = [f'间隔稳定性复测：{temporal["updated_at"]}；检测{temporal["node_count"]}，通过{temporal["passed_count"]}，未通过{temporal["failed_count"]}。5轮各检查204、Google、YouTube、ChatGPT trace和Android域名证书握手；轮间至少空闲30秒，4节点并发，每节点串行请求。5轮全部通过才发布，出口IP变化不淘汰，所有分组仍手动选择。这是数分钟的云端观察，不证明手机移动/Wi-Fi或登录后的ChatGPT持续对话可用。原始下载及网页时间保持原样。', '']
-    uplink = report.get('upload_recheck')
-    if uplink:
-        rows[6:6] = [f'上行复测：{uplink["updated_at"]}；检测{uplink["node_count"]}，完整两轮通过{uplink["passed_count"]}。1MB预检后5MB两轮，每轮10秒、轮间空闲20秒，4节点并发；两轮均完成、上传中204全部通过且上传后4个应用域名证书正常才具备入选资格，仍需最终五轮稳定性通过。上传阶段与下载阶段错开。HTTP完成不等于服务端逐字节回执，云端数据不代表中国移动上行。', '']
-        rows += ['', '## 上行与负载后证书', '',
-                 '| 节点编号 | 上传两轮 | 较低上行Mbps | 两轮较低/较高速率 | 上传中204通过/检测 | 上传后证书 |',
-                 '|---|---|---:|---:|---|---|']
-        for id in uplink['node_ids']:
-            row = next(r for r in records if r['id'] == id)
-            item = row.get('upload') or {}
-            probes = [p for sample in item.get('attempts', []) for p in sample.get('loaded_204', [])]
-            rows.append(f'| {id} | {LABELS.get(item.get("status"), "未测")} | {item.get("speed_mbps")} | {item.get("speed_ratio")} | {sum(p.get("status") == "passed" for p in probes)}/{len(probes)} | {"正常" if app_tls.passed(row.get("post_upload_tls")) else "未通过"} |')
-    Path('连通性报告.md').write_text('\n'.join(rows) + '\n')
+    write_report(report, config, Path('连通性报告.md'), website_gate=required_websites_passed)
     print(f'分阶段分类完成，配置校验通过；204 {report["precheck_counts"]}；TCP {counts}；下载 {report["download_counts"]}', flush=True)
 
 
