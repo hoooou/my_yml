@@ -84,6 +84,36 @@ def upload_failure(row):
     return '两轮上传或完整验证证据未通过'
 
 
+def stability_details(nodes):
+    """Explain the latest real rounds without trusting cached pass counts."""
+    measured = [r['stability'] for r in nodes if len((r.get('stability') or {}).get('attempts', [])) == stability.ROUNDS]
+    if not measured:
+        return []
+    distribution, targets = {}, {}
+    for item in measured:
+        good = sum(stability.round_passed(x) for x in item['attempts'])
+        distribution[good] = distribution.get(good, 0) + 1
+        failed_targets = set()
+        for attempt in item['attempts']:
+            for label in stability.TARGETS:
+                sample = (attempt.get('sites') or {}).get(label) or {}
+                if sample.get('status') == 'skipped':
+                    continue
+                if sample.get('status') != 'passed' or not stability.finite(sample.get('elapsed_ms')) or not 0 <= sample['elapsed_ms'] <= 5000:
+                    failed_targets.add(label)
+            tls = attempt.get('android_tls') or {}
+            if tls.get('status') != 'skipped' and not stability.tls_passed(tls):
+                failed_targets.add('Android SSL')
+        for label in failed_targets:
+            targets[label] = targets.get(label, 0) + 1
+    counts = '；'.join(f'{good}/5轮通过 **{distribution[good]}** 个' for good in sorted(distribution, reverse=True))
+    details = [f'稳定性细分（{len(measured)}个实测候选）：{counts}。']
+    if targets:
+        labels = {'Google204': 'HTTPS 204', 'ChatGPTTrace': 'ChatGPT trace'}
+        details.append('未通过目标：' + '；'.join(f'{labels.get(label, label)} **{count}** 个' for label, count in sorted(targets.items(), key=lambda x: (-x[1], x[0]))) + '。按涉及节点计，跳过不算失败，各项可能重叠。')
+    return details
+
+
 def write_report(report, config, path, candidate=False, website_gate=None):
     nodes = report.get('nodes', [])
     selected_ids = set(report.get('published_node_ids', []))
@@ -182,7 +212,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
             good = sum(validator(x) for x in items)
             untested = sum(x.get('status', 'missing') in ('missing', 'skipped', 'unknown', 'not_candidate') for x in items)
             rows.append(f'| {label} | {good} | {len(items)-good-untested} | {untested} |')
-        rows += ['', '各阶段仅检测满足前置条件的候选；同一节点可能在多项中失败，不能把失败数相加。逐网站及逐节点失败明细保存在JSON。']
+        rows += ['', '各阶段仅检测满足前置条件的候选；同一节点可能在多项中失败，不能把失败数相加。逐网站及逐节点失败明细保存在JSON。', '']
+        rows += stability_details(nodes)
     rows += ['', '## 最新筛选流程', '', '| 顺序 | 检查 | 要求 |', '|---:|---|---|',
              '| 1 | HTTPS 204 | 三轮全部通过 |',
              '| 2 | 国内入口TCP | 国内探测点连接成功；未验证不放行 |',

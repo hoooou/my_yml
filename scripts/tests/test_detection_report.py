@@ -69,6 +69,22 @@ class CleanReportTests(unittest.TestCase):
         self.assertIn('| 6 | 1MB下载 | 6秒内完整下载', text)
         self.assertNotIn('1MB上行预检', text)
 
+    def test_stability_details_separate_repeated_failure_and_skipped_targets(self):
+        rows = [{'stability': stable_evidence()} for _ in range(3)]
+        rows[1]['stability']['passed_count'] = 5  # Cached counts must not hide raw failure.
+        for attempt in rows[1]['stability']['attempts']:
+            attempt['sites']['Google204'].update(status='failed', error_type='ReadTimeout')
+            for key in ('Google', 'YouTube', 'ChatGPTTrace'):
+                attempt['sites'][key]['status'] = 'skipped'
+            attempt['android_tls']['status'] = 'skipped'
+        rows[2]['stability']['attempts'][0]['sites']['ChatGPTTrace']['status'] = 'failed'
+        rows[2]['stability']['attempts'][0]['android_tls']['status'] = 'skipped'
+        text = '\n'.join(d.stability_details(rows))
+        for value in ('5/5轮通过 **1**', '4/5轮通过 **1**', '0/5轮通过 **1**',
+                      'HTTPS 204 **1**', 'ChatGPT trace **1**'):
+            self.assertIn(value, text)
+        self.assertNotIn('Android SSL **', text)
+
     def test_cached_pass_status_does_not_show_ssl_or_stability_as_verified(self):
         report, config = fixture()
         row = report['nodes'][0]
