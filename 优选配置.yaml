@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-12T05:35:56+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-12T06:06:58+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -533,13 +533,33 @@ proxies:
   type: vless
   udp: true
   uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
-  name: 美国01|247ms|478Mbps|非住宅|纯净度0.0%
+  name: 美国01|183ms|391Mbps|非住宅|纯净度0.0%
+- client-fingerprint: random
+  network: grpc
+  port: 8444
+  reality-opts:
+    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
+    short-id: ''
+  server: 147.45.60.160
+  servername: github.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
+  name: 美国02|198ms|460Mbps|非住宅|纯净度0.0%
 - port: 443
   server: 64.98.50.100
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国02|301ms|328Mbps|非住宅|纯净度100.0%
+  name: 美国03|394ms|250Mbps|非住宅|纯净度100.0%
+- password: gs4BXwT6SW
+  port: 10988
+  server: 154.26.192.123
+  tls: false
+  type: http
+  username: fQ67Dpe5dU
+  name: 美国04|255ms|2Mbps|住宅未知|纯净度99.8%
 - alpn:
   - http/1.1
   network: ws
@@ -553,37 +573,60 @@ proxies:
     headers:
       Host: www.trusteeforward.com
     path: /assignment
-  name: 荷兰01|634ms|143Mbps|非住宅|纯净度94.8%
-- type: http
-  server: 51.158.202.56
-  port: 14287
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰02|745ms|104Mbps|非住宅|纯净度94.8%
+  name: 荷兰01|763ms|145Mbps|非住宅|纯净度94.8%
 - port: 443
   server: 82.65.162.76
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国01|772ms|118Mbps|住宅|纯净度99.8%
-- port: 443
-  server: 82.64.255.151
-  skip-cert-verify: true
+  name: 法国01|897ms|112Mbps|住宅|纯净度99.8%
+- type: http
+  server: 51.158.202.56
+  port: 14287
   tls: true
-  type: http
-  name: 法国02|906ms|132Mbps|住宅|纯净度100.0%
+  skip-cert-verify: true
+  name: 荷兰02|829ms|112Mbps|非住宅|纯净度94.8%
+- network: ws
+  password: humanity
+  port: 443
+  server: www.calmlunch.com
+  sni: www.calmlunch.com
+  type: trojan
+  ws-opts:
+    headers:
+      Host: www.calmlunch.com
+    path: /assignment
+  name: 法国02|847ms|14Mbps|非住宅|纯净度97.7%
 - type: http
   server: 103.86.117.202
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 印度尼西亚01|1173ms|10Mbps|住宅|纯净度96.5%
-- type: http
-  server: 103.86.116.118
+  name: 印度尼西亚01|1218ms|13Mbps|住宅|纯净度96.5%
+- network: ws
+  password: humanity
   port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 印度尼西亚02|1195ms|10Mbps|住宅|纯净度96.5%
+  server: 185.220.100.168
+  skip-cert-verify: false
+  sni: www.calmlunch.com
+  type: trojan
+  ws-opts:
+    headers:
+      Host: www.calmlunch.com
+    path: /assignment
+  name: 法国03|1018ms|15Mbps|非住宅|纯净度97.9%
+- network: ws
+  password: humanity
+  port: 2053
+  server: 185.114.72.31
+  skip-cert-verify: false
+  sni: www.calmlunch.com
+  type: trojan
+  ws-opts:
+    headers:
+      Host: www.calmlunch.com
+    path: /assignment
+  name: 法国04|886ms|4Mbps|非住宅|纯净度98.7%
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -597,42 +640,47 @@ proxy-groups:
 - name: ⭐ 综合优选
   type: select
   proxies:
-  - 美国01|247ms|478Mbps|非住宅|纯净度0.0%
-  - 美国02|301ms|328Mbps|非住宅|纯净度100.0%
-  - 荷兰01|634ms|143Mbps|非住宅|纯净度94.8%
-  - 荷兰02|745ms|104Mbps|非住宅|纯净度94.8%
-  - 法国01|772ms|118Mbps|住宅|纯净度99.8%
-  - 法国02|906ms|132Mbps|住宅|纯净度100.0%
-  - 印度尼西亚01|1173ms|10Mbps|住宅|纯净度96.5%
-  - 印度尼西亚02|1195ms|10Mbps|住宅|纯净度96.5%
+  - 美国01|183ms|391Mbps|非住宅|纯净度0.0%
+  - 美国02|198ms|460Mbps|非住宅|纯净度0.0%
+  - 美国03|394ms|250Mbps|非住宅|纯净度100.0%
+  - 美国04|255ms|2Mbps|住宅未知|纯净度99.8%
+  - 荷兰01|763ms|145Mbps|非住宅|纯净度94.8%
+  - 法国01|897ms|112Mbps|住宅|纯净度99.8%
+  - 荷兰02|829ms|112Mbps|非住宅|纯净度94.8%
+  - 法国02|847ms|14Mbps|非住宅|纯净度97.7%
+  - 印度尼西亚01|1218ms|13Mbps|住宅|纯净度96.5%
+  - 法国03|1018ms|15Mbps|非住宅|纯净度97.9%
+  - 法国04|886ms|4Mbps|非住宅|纯净度98.7%
 - name: 🚄 中速下载
   type: select
   proxies:
-  - 美国01|247ms|478Mbps|非住宅|纯净度0.0%
-  - 美国02|301ms|328Mbps|非住宅|纯净度100.0%
-  - 荷兰01|634ms|143Mbps|非住宅|纯净度94.8%
-  - 荷兰02|745ms|104Mbps|非住宅|纯净度94.8%
-  - 法国01|772ms|118Mbps|住宅|纯净度99.8%
-  - 法国02|906ms|132Mbps|住宅|纯净度100.0%
-  - 印度尼西亚01|1173ms|10Mbps|住宅|纯净度96.5%
-  - 印度尼西亚02|1195ms|10Mbps|住宅|纯净度96.5%
+  - 美国02|198ms|460Mbps|非住宅|纯净度0.0%
+  - 美国01|183ms|391Mbps|非住宅|纯净度0.0%
+  - 美国03|394ms|250Mbps|非住宅|纯净度100.0%
+  - 荷兰01|763ms|145Mbps|非住宅|纯净度94.8%
+  - 荷兰02|829ms|112Mbps|非住宅|纯净度94.8%
+  - 法国01|897ms|112Mbps|住宅|纯净度99.8%
+  - 法国03|1018ms|15Mbps|非住宅|纯净度97.9%
+  - 法国02|847ms|14Mbps|非住宅|纯净度97.7%
+  - 印度尼西亚01|1218ms|13Mbps|住宅|纯净度96.5%
+  - 法国04|886ms|4Mbps|非住宅|纯净度98.7%
 - name: ⚡ 高速下载
   type: select
   proxies:
-  - 美国01|247ms|478Mbps|非住宅|纯净度0.0%
-  - 美国02|301ms|328Mbps|非住宅|纯净度100.0%
-  - 荷兰01|634ms|143Mbps|非住宅|纯净度94.8%
-  - 法国02|906ms|132Mbps|住宅|纯净度100.0%
-  - 法国01|772ms|118Mbps|住宅|纯净度99.8%
-  - 荷兰02|745ms|104Mbps|非住宅|纯净度94.8%
+  - 美国02|198ms|460Mbps|非住宅|纯净度0.0%
+  - 美国01|183ms|391Mbps|非住宅|纯净度0.0%
+  - 美国03|394ms|250Mbps|非住宅|纯净度100.0%
+  - 荷兰01|763ms|145Mbps|非住宅|纯净度94.8%
+  - 荷兰02|829ms|112Mbps|非住宅|纯净度94.8%
+  - 法国01|897ms|112Mbps|住宅|纯净度99.8%
 - name: 🏠 非机房 IP
   type: select
   proxies:
-  - 美国01|247ms|478Mbps|非住宅|纯净度0.0%
-  - 美国02|301ms|328Mbps|非住宅|纯净度100.0%
-  - 法国01|772ms|118Mbps|住宅|纯净度99.8%
-  - 法国02|906ms|132Mbps|住宅|纯净度100.0%
-  - 印度尼西亚01|1173ms|10Mbps|住宅|纯净度96.5%
+  - 美国01|183ms|391Mbps|非住宅|纯净度0.0%
+  - 美国03|394ms|250Mbps|非住宅|纯净度100.0%
+  - 美国04|255ms|2Mbps|住宅未知|纯净度99.8%
+  - 法国01|897ms|112Mbps|住宅|纯净度99.8%
+  - 印度尼西亚01|1218ms|13Mbps|住宅|纯净度96.5%
 - name: 🌏 台湾／新加坡
   type: select
   proxies:
