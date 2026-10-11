@@ -62,6 +62,27 @@ class AppTLSGateTests(unittest.TestCase):
             self.assertFalse(a.web_quality_eligible(bad))
             self.assertFalse(a.regional_eligible(bad))
 
+    def test_shard_merge_rejects_tls_evidence_removed_after_download(self):
+        node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
+        pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 10}}] * 3,
+                                ('Google204',))['Google204']
+        with patch.object(a.s, 'Core'), patch.object(a.s, 'query_exit', return_value=None), \
+             patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1234})), \
+             patch.object(a.app_tls, 'check', return_value=verified_tls()):
+            rows, count = a.probe_pipeline([node], 'unused', Path('.'),
+                precheck=lambda port: pre, probe=lambda key, pace: {'status': 'passed'},
+                site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
+                download=lambda port: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
+                large_download=lambda port: {'status': 'passed', 'received_bytes': a.HIGH_DOWNLOAD_BYTES,
+                    'requested_bytes': a.HIGH_DOWNLOAD_BYTES, 'elapsed_ms': 1000,
+                    'speed_mib_s': 50, 'url': a.HIGH_DOWNLOAD_URL})
+        bundle = {'id': 'batch', 'nodes': [node]}
+        part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': count, 'records': rows}
+        a.merge_shards(bundle, [part], 1)
+        rows[0]['app_tls']['targets'].pop('android.chat.openai.com')
+        with self.assertRaisesRegex(ValueError, 'TLS'):
+            a.merge_shards(bundle, [part], 1)
+
 
 class ActualTLSValidationTests(unittest.TestCase):
     @classmethod
