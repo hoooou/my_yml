@@ -23,9 +23,9 @@ TLS_HOST = 'android.chat.openai.com'
 
 
 def settings(records=None):
-    if records and any((r.get('stability') or {}).get('version') == 2 for r in records):
+    if records and any((r.get('stability') or {}).get('version') in (2, 3) for r in records):
         import continuous_stability
-        return continuous_stability.settings()
+        return continuous_stability.settings(max((r.get('stability') or {}).get('version', 1) for r in records))
     return {'version': VERSION, 'rounds': ROUNDS, 'minimum_idle_seconds_between_rounds': GAP_SECONDS,
             'node_workers': WORKERS, 'requests_per_node_in_parallel': 1,
             'targets': {k: SITES[k] for k in TARGETS}, 'tls_hostname': TLS_HOST,
@@ -72,7 +72,7 @@ def evidence_passed(result):
 
 
 def passed(result):
-    if isinstance(result, dict) and result.get('version') == 2:
+    if isinstance(result, dict) and result.get('version') in (2, 3):
         import continuous_stability
         return continuous_stability.passed(result)
     return isinstance(result, dict) and result.get('status') == 'passed' and evidence_passed(result)
@@ -80,7 +80,7 @@ def passed(result):
 
 def core_metrics(result):
     """Derive latency from actual samples rather than trusting cached summaries."""
-    if result.get('version') == 2:
+    if result.get('version') in (2, 3):
         import continuous_stability
         return continuous_stability.core_metrics(result)
     values = {label: [x['sites'][label]['elapsed_ms'] for x in result['attempts']] for label in ('Google', 'YouTube')}
@@ -89,7 +89,7 @@ def core_metrics(result):
 
 
 def quality_passed(result, median_limit, tail_limit, jitter_limit):
-    if isinstance(result, dict) and result.get('version') == 2:
+    if isinstance(result, dict) and result.get('version') in (2, 3):
         return passed(result)
     return passed(result) and all(item['median_ms'] <= median_limit
         and item['tail_ms'] <= tail_limit and item['jitter_ms'] <= jitter_limit

@@ -36,7 +36,7 @@ def evidence(failures=0, cutoff=0):
 
 def observation(bundle, rows):
     return {'bundle_id': bundle['id'], 'index': 0, 'count': 1, 'diagnostic': {
-        'updated_at': '2026-10-12T08:00:00+08:00', 'complete': True, 'controls_valid': True,
+        'settings': cs.settings(), 'updated_at': '2026-10-12T08:00:00+08:00', 'complete': True, 'controls_valid': True,
         'node_count': len(rows), 'nodes': [{'id': r['id'], 'stability': evidence()} for r in rows],
         'controls': [{'sites': {'Google204': {'status': 'passed', 'elapsed_ms': 10}},
                       'android_tls': sample(1)['android_tls'], 'started_offset_seconds': i*60, 'finished_offset_seconds': i*60+1} for i in range(11)],
@@ -71,8 +71,8 @@ class EvidenceTests(unittest.TestCase):
     def test_missing_rounds_rushed_gaps_overlap_or_no_post_peer_sample_cannot_publish(self):
         for fault in ('missing', 'rushed', 'overlap', 'no_peer', 'late_peer', 'nan', 'bad_round', 'missing_site'):
             item = evidence()
-            if fault == 'missing': item['attempts'].pop()
-            elif fault == 'rushed': item['attempts'][1]['started_offset_seconds'] = 29
+            if fault == 'missing': item['attempts'].clear()
+            elif fault == 'rushed': item['attempts'][1]['started_offset_seconds'] = 14
             elif fault == 'overlap': item['attempts'][0]['finished_offset_seconds'] = 31
             elif fault == 'no_peer': item['peer_completed_offset_seconds'] = None
             elif fault == 'late_peer': item['peer_completed_offset_seconds'] = 571
@@ -80,6 +80,20 @@ class EvidenceTests(unittest.TestCase):
             elif fault == 'bad_round': item['attempts'][0]['round'] = 2
             else: item['attempts'][0]['sites'].pop('Google')
             self.assertFalse(cs.passed(item), fault)
+
+    def test_new_policy_accepts_actual_short_window_and_keeps_old_version_requirements(self):
+        attempts = [sample(i, (i-1)*15) for i in range(1, 4)]
+        current = cs.summarize(attempts, cutoff=20)
+        self.assertTrue(st.passed(current))
+        self.assertIsNone(cs.settings()['minimum_rounds'])
+        self.assertEqual(cs.settings()['minimum_start_interval_seconds'], 15)
+        old = copy.deepcopy(current); old['version'] = 2
+        self.assertFalse(st.passed(old))
+        old = evidence(); old['version'] = 2
+        self.assertTrue(st.passed(old))
+        old['attempts'].pop()
+        self.assertFalse(st.passed(old))
+        self.assertEqual(st.settings([{'stability': {'version': 2}}])['minimum_start_interval_seconds'], 30)
 
     def test_successful_percentiles_ignore_failed_short_elapsed_and_do_not_pool_targets(self):
         item = evidence(1)
@@ -146,13 +160,13 @@ class ScheduleTests(unittest.TestCase):
         for item in results.values():
             self.assertTrue(cs.passed(item)); self.assertGreater(item['round_count'], 20)
             self.assertGreaterEqual(item['attempts'][-1]['started_offset_seconds'], item['peer_completed_offset_seconds'])
-            self.assertTrue(all(b['started_offset_seconds']-a['started_offset_seconds'] >= 29.999
+            self.assertTrue(all(b['started_offset_seconds']-a['started_offset_seconds'] >= 14.999
                 and b['started_offset_seconds'] >= a['finished_offset_seconds']
                 for a,b in zip(item['attempts'], item['attempts'][1:])))
 
-    def test_even_fast_peer_requires_full_twenty_round_window(self):
+    def test_fast_peer_does_not_wait_for_twenty_rounds(self):
         results, _, _ = self.run_schedule(peer_at=0)
-        self.assertTrue(all(len(x['attempts']) == 20 and cs.passed(x) for x in results.values()))
+        self.assertTrue(all(len(x['attempts']) == 1 and cs.passed(x) for x in results.values()))
 
     def test_control_failure_aborts_and_empty_shard_is_safe_without_core_or_api(self):
         with self.assertRaisesRegex(RuntimeError, '对照异常'): self.run_schedule(bad_control=True)
@@ -171,11 +185,12 @@ class ScheduleTests(unittest.TestCase):
             item = sample(number, started); item['finished_offset_seconds'] = time.monotonic()-origin
             with lock: active.remove(id)
             return item
-        with patch.object(cs, 'MIN_ROUNDS', 2), patch.object(cs, 'INTERVAL', .03):
-            result = cs.schedule(['a','b','c','d'], probe, lambda: True,
+        with patch.object(cs, 'INTERVAL', .03), patch.object(cs, 'PEER_POLL_SECONDS', .03):
+            origin = time.monotonic()
+            result = cs.schedule(['a','b','c','d'], probe, lambda: time.monotonic()-origin >= .04,
                 lambda *_: None, lambda attempts, cutoff, complete: attempts, workers=2)
         self.assertEqual(max(peaks), 2); self.assertEqual(active, set())
-        self.assertTrue(all(len(x) == 2 for x in result.values()))
+        self.assertTrue(all(len(x) >= 2 for x in result.values()))
         for items in result.values():
             self.assertGreaterEqual(items[1]['started_offset_seconds'], items[0]['finished_offset_seconds'])
 
@@ -207,7 +222,7 @@ class MergeTests(unittest.TestCase):
             elif fault == 'duplicate': bad['diagnostic']['nodes'] *= 2
             elif fault == 'controls': bad['diagnostic']['controls'][0]['android_tls']['chain_verified'] = False
             elif fault == 'control_window': bad['diagnostic']['controls'] = bad['diagnostic']['controls'][:1]
-            elif fault == 'rounds': bad['diagnostic']['nodes'][0]['stability']['attempts'].pop()
+            elif fault == 'rounds': bad['diagnostic']['nodes'][0]['stability']['attempts'].clear()
             elif fault == 'complete': bad['diagnostic']['complete'] = False
             else: bad['diagnostic']['nodes'][0]['id'] = 'n-b'
             with self.assertRaises(ValueError, msg=fault): cs.merge(bundle, [bad], [row, skipped], 1, a.shard_nodes)
@@ -243,7 +258,7 @@ class MergeTests(unittest.TestCase):
         report['stability_policy'] = cs.settings(); report['publication_mode'] = 'full'
         text = render(report, config)
         self.assertIn('18/20 / 90.0%', text); self.assertIn('P95 / P99', text)
-        self.assertIn('启动间隔至少30秒', text); self.assertNotIn('| 五轮间隔稳定性 |', text)
+        self.assertIn('启动间隔至少15秒', text); self.assertIn('不设固定轮数', text); self.assertNotIn('| 五轮间隔稳定性 |', text)
         self.assertIn('JSON', text)
 
 
