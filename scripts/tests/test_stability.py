@@ -114,7 +114,7 @@ class StabilityProbeTests(unittest.TestCase):
             value = 0
             def now(self): return self.value
             def sleep(self, seconds): self.value += seconds
-        for control_ok in (True, False):
+        for control_ok, core_ok in ((True, True), (False, True), (True, False)):
             clock = Clock()
             rows = [record('n-a'), record('n-b')]
             def probe(port, number, origin):
@@ -129,9 +129,10 @@ class StabilityProbeTests(unittest.TestCase):
                  patch.object(st.s, 'make_listeners', return_value=([], {'n-a': 1234, 'n-b': 1235})), \
                  patch.object(st, 'sample_node', side_effect=probe) as measure, \
                  patch.object(st, 'sample_control', return_value=control), \
+                 patch.object(st, 'core_health', return_value={'process_alive': core_ok, 'api_available': core_ok, 'file_limit_errors': 0}), \
                  patch.object(st.time, 'monotonic', side_effect=clock.now), \
                  patch.object(st.time, 'sleep', side_effect=clock.sleep) as sleep:
-                if control_ok:
+                if control_ok and core_ok:
                     result = st.recheck(rows, {'n-a': {}, 'n-b': {}}, 'unused', Path(directory))
                     self.assertTrue(st.passed(rows[0]['stability']))
                     self.assertFalse(st.passed(rows[1]['stability']))

@@ -143,6 +143,29 @@ def wait_between_rounds(previous_end, clock=None, sleep=None):
         sleep(GAP_SECONDS - (clock() - previous_end))
 
 
+def core_health(core, root):
+    """Record counts only; controller payloads and core logs stay private."""
+    result = {'process_alive': core.process.poll() is None}
+    try:
+        result['open_connections'] = len(core.get('/connections').get('connections') or [])
+        result['api_available'] = True
+    except Exception as error:
+        result.update(api_available=False, api_error_type=type(error).__name__)
+    try:
+        fd_path = Path('/proc') / str(core.process.pid) / 'fd'
+        if fd_path.exists():
+            result['open_file_descriptors'] = len(list(fd_path.iterdir()))
+        log_path = Path(root) / 'core.log'
+        result['file_limit_errors'] = log_path.read_text(errors='replace').lower().count('too many open files') if log_path.exists() else 0
+    except OSError as error:
+        result['resource_measurement_error'] = type(error).__name__
+    return result
+
+
+def core_healthy(result):
+    return result.get('process_alive') is True and result.get('api_available') is True and result.get('file_limit_errors', 0) == 0
+
+
 def recheck(records, mapping, binary, root):
     """Only callers' eligible candidates; reports contain no node credentials."""
     if not records:
@@ -153,20 +176,21 @@ def recheck(records, mapping, binary, root):
     origin = time.monotonic()
     samples = {r['id']: [] for r in records}
     controls = []
+    health = []
     def snapshot(complete):
         results = {id: summarize(attempts) for id, attempts in samples.items()}
-        control_ok = all(x['sites']['Google204'].get('status') == 'passed'
+        control_ok = all(core_healthy(x) for x in health) and all(x['sites']['Google204'].get('status') == 'passed'
                          and tls_passed(x.get('android_tls')) for x in controls)
         diagnostic = {'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
                       'settings': settings(), 'node_count': len(records), 'complete': complete,
                       'controls_valid': control_ok if complete else None,
-                      'controls': controls, 'nodes': [{'id': r['id'], 'previous_name': r.get('name'),
+                      'controls': controls, 'core_health': health, 'nodes': [{'id': r['id'], 'previous_name': r.get('name'),
                           'stability': results[r['id']]} for r in records]}
         checkpoint = root / 'stability-results.tmp'
         checkpoint.write_text(json.dumps(diagnostic, ensure_ascii=False, indent=2) + '\n')
         checkpoint.replace(root / 'stability-results.json')
         return diagnostic, results
-    with s.Core(binary, root, [mapping[r['id']] for r in records], listeners):
+    with s.Core(binary, root, [mapping[r['id']] for r in records], listeners) as core:
         with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
             for number in range(1, ROUNDS + 1):
                 if number > 1:
@@ -177,13 +201,14 @@ def recheck(records, mapping, binary, root):
                 for job in futures.as_completed(jobs):
                     samples[jobs[job]].append(job.result())
                 previous_end = time.monotonic()
+                health.append({'round': number, **core_health(core, root)})
                 count = sum(all(round_passed(x) for x in samples[r['id']]) for r in records)
                 print(f'间隔稳定性 {number}/{ROUNDS}：{len(records)}节点，目前全轮通过{count}；节点并发{WORKERS}', flush=True)
                 snapshot(False)
     # A runner-control outage aborts publication; partial records never qualify.
     diagnostic, results = snapshot(True)
     if not diagnostic['controls_valid']:
-        raise RuntimeError('云端直连204或Android TLS对照异常，稳定性记录已保存；不据此淘汰或发布')
+        raise RuntimeError('测速内核、云端直连204或Android TLS对照异常，稳定性记录已保存；不据此淘汰或发布')
     for record in records:
         record['stability'] = results[record['id']]
     return diagnostic
