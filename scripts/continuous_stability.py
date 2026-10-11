@@ -1,0 +1,280 @@
+"""Independent, scheduled observations while the main screening job runs.
+
+Successful-request percentiles and failed-round frequency are separate metrics.
+No authenticated app/session or domestic-mobile throughput is claimed.
+"""
+import concurrent.futures as futures
+import heapq
+import json
+import math
+import os
+from pathlib import Path
+import re
+import statistics
+import time
+
+import select_nodes as s
+import stability as legacy
+
+VERSION = 2
+MIN_ROUNDS = 20
+INTERVAL = 30
+WORKERS = 8
+MAX_SECONDS = 75 * 60
+PEER_JOB = '两轮上行及负载后SSL'
+
+
+def settings():
+    return {**legacy.settings(), 'version': VERSION, 'rounds': None,
+            'minimum_rounds': MIN_ROUNDS, 'minimum_start_interval_seconds': INTERVAL,
+            'minimum_idle_seconds_between_rounds': None, 'node_workers': WORKERS,
+            'requires_all_rounds': False, 'minimum_success_rate': .90,
+            'parallel_independent_runner': True, 'scope': 'domestic_TCP_and_3MB_upload_passed',
+            'observes_until': 'uplink_job_completed_and_every_node_sampled_after_completion',
+            'maximum_runtime_seconds': MAX_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
+            'continuous_latency_hard_caps': False, 'explicit_certificate_error_rejects': True}
+
+
+def certificate_error(sample):
+    items = list((sample.get('sites') or {}).values()) + [sample.get('android_tls') or {}]
+    return any(x.get('tls_error_kind') == 'certificate_verification_failed'
+               or x.get('error_type') == 'certificate_verification_failed' for x in items)
+
+
+def valid_evidence(result):
+    if not isinstance(result, dict) or result.get('version') != VERSION:
+        return False
+    attempts = result.get('attempts') or []
+    cutoff = result.get('peer_completed_offset_seconds')
+    if len(attempts) < MIN_ROUNDS or not legacy.finite(cutoff) or cutoff < 0:
+        return False
+    last_start, last_end = None, None
+    for number, sample in enumerate(attempts, 1):
+        start, end = sample.get('started_offset_seconds'), sample.get('finished_offset_seconds')
+        if (sample.get('round') != number or not legacy.finite(start) or not legacy.finite(end)
+                or not 0 <= start <= end or set(sample.get('sites') or {}) != set(legacy.TARGETS)
+                or not isinstance(sample.get('android_tls'), dict)
+                or (last_start is not None and (start - last_start < INTERVAL - .001 or start < last_end))):
+            return False
+        last_start, last_end = start, end
+    return last_start >= cutoff
+
+
+def passed(result):
+    return (isinstance(result, dict) and result.get('status') == 'passed' and valid_evidence(result)
+            and not any(certificate_error(x) for x in result['attempts'])
+            and sum(legacy.round_passed(x) for x in result['attempts']) * 10 >= len(result['attempts']) * 9)
+
+
+def percentile(values, fraction):
+    return sorted(values)[max(0, math.ceil(fraction * len(values)) - 1)] if values else None
+
+
+def metrics(result):
+    attempts = result.get('attempts') or []
+    good = sum(legacy.round_passed(x) for x in attempts)
+    streak, worst = 0, 0
+    for item in attempts:
+        streak = 0 if legacy.round_passed(item) else streak + 1
+        worst = max(worst, streak)
+    targets = {}
+    for label in legacy.TARGETS:
+        values = [x['sites'][label]['elapsed_ms'] for x in attempts
+                  if (x.get('sites', {}).get(label) or {}).get('status') == 'passed'
+                  and legacy.finite(x['sites'][label].get('elapsed_ms'))
+                  and 0 <= x['sites'][label]['elapsed_ms'] <= 5000]
+        if values:
+            targets[label] = {'sample_count': len(values), 'median_ms': statistics.median(values),
+                              'p95_ms': percentile(values, .95), 'p99_ms': percentile(values, .99),
+                              'iqr_ms': percentile(values, .75) - percentile(values, .25)}
+    return {'round_count': len(attempts), 'passed_count': good,
+            'success_rate': good / len(attempts) if attempts else 0,
+            'maximum_consecutive_failures': worst, 'targets': targets}
+
+
+def core_metrics(result):
+    return {label: {**item, 'tail_ms': item['p95_ms'], 'jitter_ms': item['iqr_ms']}
+            for label, item in metrics(result)['targets'].items() if label in ('Google', 'YouTube')}
+
+
+def summarize(attempts, cutoff=None):
+    result = {'version': VERSION, 'attempts': attempts, **metrics({'attempts': attempts}),
+              'peer_completed_offset_seconds': cutoff,
+              'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
+    result['status'] = 'passed'
+    result['status'] = 'incomplete' if not valid_evidence(result) else 'passed' if passed(result) else 'failed'
+    result['failures'] = [{'round': x['round'], 'target': k,
+        'status': item.get('status'), 'reason': item.get('reason', item.get('error_type'))}
+        for x in attempts for k, item in list((x.get('sites') or {}).items()) + [('Android SSL', x.get('android_tls') or {})]
+        if item.get('status') != 'skipped' and (not legacy.tls_passed(item) if k == 'Android SSL' else
+            item.get('status') != 'passed' or not legacy.finite(item.get('elapsed_ms')) or not 0 <= item['elapsed_ms'] <= 5000)]
+    result['window_seconds'] = attempts[-1]['finished_offset_seconds'] - attempts[0]['started_offset_seconds'] if attempts else 0
+    return result
+
+
+def control_passed(control):
+    page = (control.get('sites') or {}).get('Google204') or {}
+    return (page.get('status') == 'passed' and legacy.finite(page.get('elapsed_ms'))
+            and 0 <= page['elapsed_ms'] <= 5000 and legacy.tls_passed(control.get('android_tls')))
+
+
+class PeerJob:
+    """Read this attempt's upstream jobs, never a cached/historical run."""
+    def __init__(self):
+        self.repo, self.run = os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_RUN_ID']
+        self.attempt = int(os.environ['GITHUB_RUN_ATTEMPT'])
+        self.token = os.environ['GH_TOKEN']
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', self.repo) or not self.run.isdigit():
+            raise ValueError('无效运行标识')
+
+    def __call__(self):
+        response = s.requests.get(
+            f'https://api.github.com/repos/{self.repo}/actions/runs/{self.run}/attempts/{self.attempt}/jobs',
+            headers={'Authorization': 'Bearer ' + self.token, 'Accept': 'application/vnd.github+json'},
+            params={'per_page': 100}, timeout=(5, 10))
+        response.raise_for_status()
+        jobs = response.json()['jobs']
+        # An upstream failure must terminate observers even if the final job is not yet created.
+        for job in jobs:
+            if (job['name'].startswith('网站、TLS与下载') or job['name'] == PEER_JOB) and job['status'] == 'completed' and job['conclusion'] != 'success':
+                raise RuntimeError('主筛选任务失败，停止观察并保留原订阅')
+        peer = [x for x in jobs if x['name'] == PEER_JOB]
+        if len(peer) > 1:
+            raise RuntimeError('主筛选任务标识重复')
+        return bool(peer and peer[0]['status'] == 'completed' and peer[0]['conclusion'] == 'success')
+
+
+def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=time.sleep, workers=WORKERS):
+    """A due-time heap keeps sleeping candidates from occupying worker slots."""
+    origin = clock()
+    attempts = {id: [] for id in ids}
+    due = [(origin, id) for id in ids]
+    heapq.heapify(due)
+    running, cutoff = {}, None
+    next_control = next_peer = origin
+    try:
+        with futures.ThreadPoolExecutor(max_workers=workers) as pool:
+            while due or running:
+                now = clock()
+                if now - origin > MAX_SECONDS:
+                    raise RuntimeError('观察时间超出预算，保留原订阅')
+                if now >= next_peer and cutoff is None:
+                    if peer():
+                        cutoff = clock() - origin
+                    next_peer = clock() + INTERVAL
+                if now >= next_control:
+                    control(len(attempts), origin)
+                    checkpoint(attempts, cutoff, False)
+                    next_control = clock() + 60
+                while due and due[0][0] <= clock() and len(running) < workers:
+                    _, id = heapq.heappop(due)
+                    running[pool.submit(probe, id, len(attempts[id]) + 1, origin)] = id
+                done = [job for job in running if job.done()]
+                for job in done:
+                    id = running.pop(job)
+                    item = job.result()
+                    attempts[id].append(item)
+                    if not (len(attempts[id]) >= MIN_ROUNDS and cutoff is not None
+                            and item['started_offset_seconds'] >= cutoff):
+                        heapq.heappush(due, (max(origin + item['started_offset_seconds'] + INTERVAL,
+                                               origin + item['finished_offset_seconds']), id))
+                if due or running:
+                    # Poll only active futures briefly; otherwise sleep to the next due/control/API tick.
+                    if running:
+                        futures.wait(running, timeout=.1, return_when=futures.FIRST_COMPLETED)
+                    else:
+                        sleep(max(.001, min(due[0][0], next_control, next_peer if cutoff is None else math.inf) - clock()))
+    except Exception:
+        checkpoint(attempts, cutoff, False)
+        raise
+
+    if ids:
+        control(len(attempts), origin)
+    return checkpoint(attempts, cutoff, True)
+
+
+def observe(records, mapping, binary, root, peer=None):
+    root = Path(root); root.mkdir(parents=True, exist_ok=True)
+    listeners, ports = s.make_listeners(records)
+    controls, health = [], []
+    policy = settings()
+    if peer is not None:
+        policy.update(parallel_independent_runner=False, observes_until='minimum_20_rounds_after_previous_stages', scope='eligible_pool_after_upload')
+    peer = (peer or PeerJob()) if records else (lambda: True)
+    def snapshot(attempts, cutoff, complete):
+        results = {id: summarize(items, cutoff) for id, items in attempts.items()}
+        result = {'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
+                  'settings': policy, 'node_count': len(records), 'complete': complete,
+                  'scope': policy['scope'],
+                  'controls_valid': bool(complete and all(control_passed(x) for x in controls)
+                                         and all(legacy.core_healthy(x) for x in health)),
+                  'controls': controls, 'core_health': health,
+                  'nodes': [{'id': id, 'stability': item} for id, item in results.items()]}
+        temp = root / 'stability-results.tmp'
+        temp.write_text(json.dumps(result, ensure_ascii=False, indent=2))
+        temp.replace(root / 'stability-results.json')
+        rounds = [len(x) for x in attempts.values()]
+        print(f'持续稳定性：{len(records)}节点，轮数{min(rounds, default=0)}～{max(rounds, default=0)}，主流程已完成{cutoff is not None}', flush=True)
+        return result
+    if not records:
+        return snapshot({}, None, True)
+    snapshot({r['id']: [] for r in records}, None, False)
+    with s.Core(binary, root, [mapping[r['id']] for r in records], listeners) as core:
+        def control(number, origin):
+            started = time.monotonic() - origin
+            sample = legacy.sample_control(len(controls) + 1, origin)
+            state = legacy.core_health(core, root)
+            sample.update(started_offset_seconds=started, finished_offset_seconds=time.monotonic() - origin)
+            controls.append(sample); health.append(state)
+            if not control_passed(sample) or not legacy.core_healthy(state):
+                raise RuntimeError('独立观察环境对照异常，保留原订阅')
+        return schedule([r['id'] for r in records],
+                lambda id, number, origin: legacy.sample_node(ports[id], number, origin),
+                peer, control, snapshot)
+
+
+def merge(bundle, parts, records, count, shard_nodes):
+    if len(parts) != count or {p.get('index') for p in parts} != set(range(count)):
+        raise ValueError('持续观察缺少分片')
+    eligible = {r['id'] for r in records if r['entry']['status'] == 'passed'
+                and (r.get('upload_precheck') or {}).get('status') == 'passed'}
+    combined, diagnostics = {}, []
+    for part in parts:
+        if part.get('bundle_id') != bundle['id'] or part.get('count') != count:
+            raise ValueError('持续观察批次或分片不一致')
+        diagnostic = part.get('diagnostic') or {}
+        expected = {n['name'] for n in shard_nodes(bundle['nodes'], part['index'], count)} & eligible
+        rows = diagnostic.get('nodes') or []
+        if (len(rows) != len(expected) or {r['id'] for r in rows} != expected
+                or diagnostic.get('node_count') != len(expected)
+                or diagnostic.get('complete') is not True or diagnostic.get('controls_valid') is not True):
+            raise ValueError('持续观察缺失、重复或未完成')
+        if expected and (not diagnostic.get('controls') or not diagnostic.get('core_health')
+                or not all(control_passed(x) for x in diagnostic['controls'])
+                or not all(legacy.core_healthy(x) for x in diagnostic['core_health'])):
+            raise ValueError('持续观察缺少有效环境对照')
+        if expected:
+            checks = diagnostic['controls']
+            end = max(r['stability']['attempts'][-1]['finished_offset_seconds'] for r in rows if r.get('stability', {}).get('attempts')) if all(r.get('stability', {}).get('attempts') for r in rows) else math.inf
+            if (len(checks) < 2 or any(not legacy.finite(c.get('started_offset_seconds'))
+                    or not legacy.finite(c.get('finished_offset_seconds'))
+                    or not 0 <= c['started_offset_seconds'] <= c['finished_offset_seconds'] for c in checks)
+                    or checks[0]['started_offset_seconds'] > 30
+                    or checks[-1]['finished_offset_seconds'] + .001 < end
+                    or any(b['started_offset_seconds'] < a['finished_offset_seconds']
+                        or b['started_offset_seconds'] - a['finished_offset_seconds'] > 90
+                        for a, b in zip(checks, checks[1:]))):
+                raise ValueError('持续观察环境对照未覆盖检测窗口')
+        for row in rows:
+            if not valid_evidence(row.get('stability')):
+                raise ValueError('持续观察缺少20轮、时间间隔或主流程结束后的复测')
+            combined[row['id']] = summarize(row['stability']['attempts'], row['stability']['peer_completed_offset_seconds'])
+        diagnostics.append(diagnostic)
+    for record in records:
+        if record['id'] in combined:
+            record['stability'] = combined[record['id']]
+    return {'updated_at': max((d['updated_at'] for d in diagnostics), default=None),
+            'settings': settings(), 'scope': 'domestic_TCP_and_3MB_upload_passed',
+            'node_count': len(combined), 'complete': True, 'controls_valid': True,
+            'nodes': [{'id': id, 'stability': item} for id, item in combined.items()],
+            'shards': diagnostics}

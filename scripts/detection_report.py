@@ -8,6 +8,7 @@ import high_speed
 import medium_speed
 from select_nodes import COUNTRIES
 import stability
+import continuous_stability as cs
 import upload_speed
 
 
@@ -86,6 +87,14 @@ def upload_failure(row):
 
 def stability_details(nodes):
     """Explain the latest real rounds without trusting cached pass counts."""
+    continuous = [r['stability'] for r in nodes if (r.get('stability') or {}).get('version') == cs.VERSION]
+    if continuous:
+        stats = [cs.metrics(x) for x in continuous]
+        good = sum(stability.passed(x) for x in continuous)
+        low_rate = sum(x['success_rate'] < .90 for x in stats)
+        certs = sum(any(cs.certificate_error(a) for a in x['attempts']) for x in continuous)
+        rounds = [x['round_count'] for x in stats]
+        return [f'持续稳定性：**{len(continuous)}**个候选，每节点**{min(rounds)}～{max(rounds)}**轮；通过**{good}**个，成功率低于90% **{low_rate}**个，明确证书错误 **{certs}**个。原因可能重叠。']
     measured = [r['stability'] for r in nodes if len((r.get('stability') or {}).get('attempts', [])) == stability.ROUNDS]
     if not measured:
         return []
@@ -116,6 +125,8 @@ def stability_details(nodes):
 
 def write_report(report, config, path, candidate=False, website_gate=None):
     nodes = report.get('nodes', [])
+    continuous = (report.get('stability_policy') or {}).get('version') == cs.VERSION or any((r.get('stability') or {}).get('version') == cs.VERSION for r in nodes)
+    stable_label = '持续并行稳定性' if continuous else '最终间隔稳定性'
     selected_ids = set(report.get('published_node_ids', []))
     names = {n['name'] for n in config.get('proxies', [])}
     selected = [r for r in nodes if r['id'] in selected_ids and r.get('name') in names]
@@ -145,12 +156,12 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     rows += ['## 测量时间', '', '| 数据 | 完成时间（北京时间） |', '|---|---|',
              f'| 原全量网页／TCP／1MB及100MB下载 | {clock(report.get("measurements_updated_at") or report.get("updated_at"))} |']
     for key, label in (('website_recheck', '海外网页专项复测'), ('medium_speed_recheck', '5MB下载专项补测'),
-                       ('upload_recheck', '上行与负载后SSL'), ('stability_recheck', '最终间隔稳定性')):
+                       ('upload_recheck', '上行与负载后SSL'), ('stability_recheck', stable_label)):
         if report.get(key):
             rows.append(f'| {label} | {clock(report[key].get("updated_at"))} |')
     if mode == 'full':
         for summary, key, label in (('upload_recheck', 'upload', '上行与负载后SSL'),
-                                    ('stability_recheck', 'stability', '最终间隔稳定性')):
+                                    ('stability_recheck', 'stability', stable_label)):
             if not report.get(summary):
                 timestamps = [(r.get(key) or {}).get('updated_at') for r in nodes
                               if (r.get(key) or {}).get('updated_at')]
@@ -158,6 +169,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     rows += ['', '## 入选节点', '',
              '| 节点 | 响应延迟 / 波动 ms | 下行 Mbps / 样本 | 上行 Mbps | 上传中204 | SSL | 稳定性 |',
              '|---|---:|---:|---:|---:|---|---|']
+    if continuous:
+        rows[-2] = '| 节点 | P95 / P99 / 波动 ms | 下行 Mbps / 样本 | 上行 Mbps | 上传中204 | SSL | 成功轮数 / 成功率 |'
     for row in selected:
         stable = row.get('stability') or {}
         good_stable = stability.passed(stable)
@@ -167,13 +180,17 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         upload = row.get('upload') or {}
         good_upload = upload_speed.passed(upload)
         probes = [p for a in upload.get('attempts', []) for p in a.get('loaded_204', [])]
-        rows.append(f'| {cell(row["name"].split("|")[0])} | {number(latency)} / {number(jitter)} | '
+        success = cs.metrics(stable) if stable.get('version') == cs.VERSION else {}
+        stability_text = (f'{success["passed_count"]}/{success["round_count"]} / {success["success_rate"]:.1%}' if success and good_stable else '5/5' if good_stable else '未验证／需复核')
+        delay_text = (f'{number(max((x["p95_ms"] for x in metrics.values()), default=None))} / {number(max((x["p99_ms"] for x in metrics.values()), default=None))} / {number(jitter)}' if continuous else f'{number(latency)} / {number(jitter)}')
+        rows.append(f'| {cell(row["name"].split("|")[0])} | {delay_text} | '
             f'{download(row)} | {number(upload.get("speed_mbps"), 1) if good_upload else "—"} | '
             f'{sum(p.get("status") == "passed" for p in probes)}/{len(probes)} | '
-            f'{"通过" if ssl_passed(row) else "未验证／需复核"} | {"5/5" if good_stable else "未验证／需复核"} |')
+            f'{"通过" if ssl_passed(row) else "未验证／需复核"} | {stability_text} |')
     if not selected:
         rows.append('| 本轮没有入选节点 | — | — | — | — | — | — |')
-    rows += ['', '延迟取最终五轮Google／YouTube中较慢的中位数，波动取较大的极差；下行优先双100MB较低速度，上行取两轮5MB较低速度。名称中的住宅和纯净度仍保留在订阅里。', '',
+    explanation = ('P95／P99取Google／YouTube各自成功请求统计中较慢的一站，波动为较大的四分位距；失败由成功率和连续失败次数单独计入排名。20个成功样本的P99接近最大值，仅作参考；每站样本数见JSON。' if continuous else '延迟取最终五轮Google／YouTube中较慢的中位数，波动取较大的极差。')
+    rows += ['', explanation + '下行优先双100MB较低速度，上行取两轮5MB较低速度；名称延迟仍用中位数。', '',
              '## 最近一轮未入选原因', '']
     excluded = [r for r in cohort if r['id'] not in selected_ids]
     if mode != 'full':
@@ -207,11 +224,13 @@ def write_report(report, config, path, candidate=False, website_gate=None):
                 ('high_speed_download', '双100MB下载（高速组）', high_speed.passed),
                 ('upload', '两轮上行及上传中204', upload_speed.passed),
                 ('post_upload_tls', '上传后SSL', app_tls.passed),
-                ('stability', '五轮间隔稳定性', stability.passed)):
+                ('stability', '持续并行稳定性' if continuous else '五轮间隔稳定性', stability.passed)):
             items = [r.get(key) or {} for r in nodes]
             good = sum(validator(x) for x in items)
             untested = sum(x.get('status', 'missing') in ('missing', 'skipped', 'unknown', 'not_candidate') for x in items)
             rows.append(f'| {label} | {good} | {len(items)-good-untested} | {untested} |')
+        if continuous:
+            rows += ['', '稳定性在国内TCP与3MB上传通过后独立并行检测，覆盖范围大于后续下载、上行复测；持续检测行不是最后一道串行统计。']
         rows += ['', '各阶段仅检测满足前置条件的候选；同一节点可能在多项中失败，不能把失败数相加。逐网站及逐节点失败明细保存在JSON。', '']
         rows += stability_details(nodes)
     rows += ['', '## 最新筛选流程', '', '| 顺序 | 检查 | 要求 |', '|---:|---|---|',
@@ -225,7 +244,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '| 8 | 双100MB下载 | Cloudflare和DataPacket各20秒内完成才进入高速组 |',
              '| 9 | 上行及负载 | 复用本轮3MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',
              '| 10 | 负载后SSL | 再检查四个应用域名，各两次 |',
-             '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |', '']
+             ('| 并行 | 持续稳定性 | TCP与3MB上传通过即启动独立观察；每节点至少20轮，启动间隔至少30秒，成功率≥90%；持续到两轮上行及负载后SSL结束，再补每节点一轮；明确证书错误淘汰 |' if continuous else '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |'), '']
     required = (report.get('website_measurement_policy') or {}).get('required_websites', report.get('required_websites', []))
     if required:
         rows += ['必过网站：' + '、'.join(required) + '。明确的Cloudflare人机验证认可可达，但不当作真实页面速度；任何已检测网站出现明确证书校验错误均不放行。', '']
