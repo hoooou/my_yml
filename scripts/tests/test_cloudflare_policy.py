@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from upload_fixture import verified_upload_precheck
 from medium_speed_fixture import verified_medium
 import mobile_pilot as pilot
 from tls_fixture import verified_tls
@@ -87,7 +88,7 @@ class CloudflarePolicyTests(unittest.TestCase):
              patch.object(a.app_tls, 'check', return_value=verified_tls()) as tls:
             rows, _ = a.probe_pipeline([node], 'unused', Path('.'), precheck=lambda port: pre,
                 probe=lambda key, pace: {'status': 'passed'}, site_check=lambda port: pages,
-                download=lambda port: calls.append(port) or {'status': 'failed'})
+                download=lambda port: calls.append(port) or {'status': 'failed'}, upload_precheck=verified_upload_precheck)
         self.assertEqual(calls, [1234])
         tls.assert_called_once_with(1234)
         bundle = {'id': 'batch', 'nodes': [node]}

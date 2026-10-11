@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from upload_fixture import verified_upload_precheck
 from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
 from high_speed_fixture import verified_high
@@ -109,6 +110,10 @@ class AvailabilityTests(unittest.TestCase):
     def test_large_tests_require_quick_pass_and_never_exceed_two_concurrent_downloads(self):
         nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': '8.8.8.8', 'port': 443} for i in range(6)]
         lock, barrier = threading.Lock(), threading.Barrier(2)
+        websites_ready = threading.Barrier(5)
+        def websites(port):
+            websites_ready.wait(2)  # Finish all early uploads before blocking download fixtures.
+            return {label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES}
         active, peak, seen = 0, 0, []
         def large(port):
             nonlocal active, peak
@@ -123,8 +128,8 @@ class AvailabilityTests(unittest.TestCase):
             rows, _ = a.probe_pipeline(nodes, 'unused', Path('.'),
                 precheck=lambda port: {'status': 'passed' if port < 5 else 'failed'},
                 probe=lambda key, pace: {'status': 'passed'},
-                site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES},
-                download=lambda port: {'status': 'passed' if port < 4 else 'failed'}, large_download=large)
+                site_check=websites,
+                download=lambda port: {'status': 'passed' if port < 4 else 'failed'}, large_download=large, upload_precheck=verified_upload_precheck)
         self.assertEqual(sorted(seen), [0,1,2,3])
         self.assertEqual(peak, 2)
         self.assertEqual([r['high_speed_download']['status'] for r in rows], ['passed']*4+['skipped']*2)
@@ -291,7 +296,7 @@ class AvailabilityTests(unittest.TestCase):
         with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-0': 1, 'n-1': 2, 'n-2': 3})), \
              patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}):
             records, endpoints = a.probe_pipeline(nodes, 'unused', Path('.'), probe=tcp, precheck=precheck,
-                site_check=websites, download=download, large_download=large_download)
+                site_check=websites, download=download, large_download=large_download, upload_precheck=verified_upload_precheck)
         self.assertEqual(tested, [('8.8.8.8', 443)])
         self.assertEqual(endpoints, 1)
         self.assertEqual(records[0]['websites']['Google']['round_count'], 3)
@@ -342,7 +347,7 @@ class AvailabilityTests(unittest.TestCase):
         with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1, 'n-b': 2})):
             rows, count = a.probe_pipeline(nodes, 'unused', Path('.'),
                 precheck=lambda port: {'status': 'passed'}, probe=lambda key, pace: {'status': 'failed'},
-                site_check=forbidden, download=forbidden)
+                site_check=forbidden, download=forbidden, upload_precheck=verified_upload_precheck)
         self.assertEqual(count, 1)
         self.assertEqual([r['entry']['status'] for r in rows], ['failed', 'unknown'])
 
@@ -390,7 +395,7 @@ class AvailabilityTests(unittest.TestCase):
                 'unused',Path('.'),precheck=lambda port:{'status':'passed'},
                 probe=lambda key,pace:{'status':'passed'},site_check=lambda port:pages,
                 download=lambda port:self.fail('domestic-only nodes must skip downloads'),
-                large_download=lambda port:self.fail('must skip large downloads'))
+                large_download=lambda port:self.fail('must skip large downloads'), upload_precheck=verified_upload_precheck)
         self.assertEqual(rows[0]['download']['status'],'skipped')
         self.assertEqual(rows[0]['high_speed_download']['status'],'skipped')
 

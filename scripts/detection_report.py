@@ -103,6 +103,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         rows += [f'最近一次上行／稳定性检测覆盖 **{len(cohort)}** 个节点；其中 **{sum(r["id"] in selected_ids for r in cohort)}** 个保留在订阅。网页、TCP和下载沿用各自的原测量。', '']
         if mode == 'repair':
             rows += ['本次仅重建配置和报告，没有重新测速。', '']
+    if not report.get('early_upload_precheck_enabled'):
+        rows += ['1MB上行预检前置将在下一轮全量检测启用；当前数据仍保留调整前的实际测量时间和顺序。', '']
     counts = group_counts(config)
     if counts:
         rows += [' · '.join(f'{cell(name)} **{count}**' for name, count in counts), '',
@@ -168,6 +170,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         for key, label, validator in (
                 ('precheck', '204三轮', lambda x: x.get('status') == 'passed'),
                 ('entry', '国内入口TCP', lambda x: x.get('status') == 'passed'),
+                ('upload_precheck', '1MB上行预检', lambda x: upload_speed.sample_passed(x, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)),
                 ('app_tls', '应用SSL', app_tls.passed),
                 ('download', '1MB下载', lambda x: x.get('status') == 'passed'),
                 ('medium_speed_download', '5MB下载（中速组）', medium_speed.passed),
@@ -183,14 +186,15 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     rows += ['', '## 最新筛选流程', '', '| 顺序 | 检查 | 要求 |', '|---:|---|---|',
              '| 1 | HTTPS 204 | 三轮全部通过 |',
              '| 2 | 国内入口TCP | 国内探测点连接成功；未验证不放行 |',
-             '| 3 | 海外网站及trace | 指定12站各三轮；Claude仅测trace |',
-             '| 4 | 应用SSL | 四个域名各两次，严格校验证书链、域名和有效期 |',
-             '| 5 | 1MB下载 | 6秒内完整下载，所有入选节点必过 |',
-             '| 6 | 5MB下载 | 10秒内完成才进入中速组 |',
-             '| 7 | 双100MB下载 | Cloudflare和DataPacket各20秒内完成才进入高速组 |',
-             '| 8 | 上行及负载 | 1MB预检后两轮5MB，各10秒，间隔20秒；上传中204全部通过 |',
-             '| 9 | 负载后SSL | 再检查四个应用域名，各两次 |',
-             '| 10 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |', '']
+             '| 3 | 1MB上行预检 | 6秒内完整上传；失败跳过网站和下载，每分片同时一个，与下载错开 |',
+             '| 4 | 海外网站及trace | 指定12站各三轮；Claude仅测trace |',
+             '| 5 | 应用SSL | 四个域名各两次，严格校验证书链、域名和有效期 |',
+             '| 6 | 1MB下载 | 6秒内完整下载，所有入选节点必过 |',
+             '| 7 | 5MB下载 | 10秒内完成才进入中速组 |',
+             '| 8 | 双100MB下载 | Cloudflare和DataPacket各20秒内完成才进入高速组 |',
+             '| 9 | 上行及负载 | 复用本轮1MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',
+             '| 10 | 负载后SSL | 再检查四个应用域名，各两次 |',
+             '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |', '']
     required = (report.get('website_measurement_policy') or {}).get('required_websites', report.get('required_websites', []))
     if required:
         rows += ['必过网站：' + '、'.join(required) + '。明确的Cloudflare人机验证认可可达，但不当作真实页面速度；任何已检测网站出现明确证书校验错误均不放行。', '']

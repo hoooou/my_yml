@@ -51,8 +51,9 @@ class UploadTests(unittest.TestCase):
         bundle = {'nodes': [node], 'base': {}, 'metadata': {}, 'sources': [], 'input_count': 1,
                   'rejected': [], 'services': {}, 'scope': 'all_subscriptions', 'id': 'batch'}
         calls = []
-        def upload(rows, *_):
+        def upload(rows, *_, **kwargs):
             calls.append('upload')
+            self.assertTrue(kwargs['reuse_precheck'])
             self.assertEqual([r['id'] for r in rows], [row['id']])
             row['upload'] = evidence(); row['post_upload_tls'] = verified_tls()
             return {'updated_at': '2026-10-12T06:00:00+08:00', 'node_count': 1, 'controls_valid': True,

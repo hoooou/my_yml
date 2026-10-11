@@ -26,6 +26,7 @@ import high_speed
 import medium_speed
 import stability
 import upload_speed
+from bandwidth_gate import BandwidthGate
 from detection_report import write_report
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
@@ -288,10 +289,16 @@ def high_speed_download(port):
 
 
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
-                   site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16, medium_download=None):
+                   site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
+                   medium_download=None, upload_precheck=None, upload_controls=None):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
+    upload_precheck = upload_precheck or (lambda port: upload_speed.sample(
+        port, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET, root))
+    controls = upload_controls if upload_controls is not None else {}
+    controls.update(before=None, after=None, valid=None, node_count=0)
     if not nodes:
+        controls['valid'] = True
         return [], 0
     site_check_is_default = site_check is None
     site_check = site_check or (lambda port: check_sites(port, DAILY_POST_SITES))
@@ -299,12 +306,18 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     pace, lock, tcp_jobs = Pace(interval), threading.Lock(), {}
     medium_slots = threading.BoundedSemaphore(medium_speed.WORKERS)
     large_slots = threading.BoundedSemaphore(HIGH_DOWNLOAD_WORKERS)
-    progress = {'done': 0, 'precheck': 0, 'tcp': 0, 'websites': 0, 'download': 0, 'medium_speed': 0, 'high_speed': 0}
+    bandwidth = BandwidthGate()
+    abort = threading.Event()
+    progress = {'done': 0, 'precheck': 0, 'tcp': 0, 'upload_precheck': 0,
+                'websites': 0, 'download': 0, 'medium_speed': 0, 'high_speed': 0}
     with s.Core(binary, root, nodes, listeners), futures.ThreadPoolExecutor(max_workers=10) as tcp_pool:
         def measure(node):
+            if abort.is_set():
+                raise RuntimeError('上行预检对照异常，停止本分片')
             port = ports[node['name']]
             record = {'id': node['name'], 'server': node['server'], 'port': node['port'], 'protocol': node['type'],
                       'entry': {'status': 'unknown', 'attempts': 0, 'reason': '204 未通过，未提交国内 TCP 检测'},
+                      'upload_precheck': {'status': 'skipped', 'reason': '国内TCP未通过，未提交上行预检'},
                       'websites': None, 'exit': None, 'download': {'status': 'skipped', 'reason': '未进入下载阶段'},
                       'app_tls': {'status': 'skipped', 'reason': '必过网站未通过，未提交应用TLS检查'},
                       'medium_speed_download': {'status': 'skipped', 'reason': '1 MB快测未通过，未提交5 MB测试'},
@@ -321,6 +334,20 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         job = tcp_jobs[key]
                     record['entry'] = copy.deepcopy(job.result())
                 if record['entry']['status'] == 'passed':
+                    with bandwidth.upload():
+                        if controls['before'] is None:
+                            controls['before'] = upload_precheck(None)
+                        if not upload_speed.sample_passed(controls['before'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+                            controls['valid'] = False
+                            abort.set()
+                            raise RuntimeError('上行预检直连对照异常，不据此淘汰或发布')
+                        record['upload_precheck'] = upload_precheck(port)
+                        record['upload_precheck_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+                        controls['node_count'] += 1
+                    if not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+                        record['download']['reason'] = 'TCP通过但1MB上行预检未通过，跳过网站和下载'
+                if record['entry']['status'] == 'passed' and upload_speed.sample_passed(
+                        record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                     rounds = [site_check(port)]
                     # Only traces get one round; overseas pages get three.
                     for _ in range(WEBSITE_ROUNDS - 1):
@@ -345,13 +372,16 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                     if required_websites_passed(record):
                         record['app_tls'] = app_tls.check(port)
                         if app_tls.passed(record['app_tls']):
-                            record['download'] = download(port)
+                            with bandwidth.download():
+                                record['download'] = download(port)
                             if record['download']['status'] == 'passed':
                                 with medium_slots:
-                                    record['medium_speed_download'] = medium_download(port)
+                                    with bandwidth.download():
+                                        record['medium_speed_download'] = medium_download(port)
                                 record['medium_speed_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                                 with large_slots:
-                                    record['high_speed_download'] = large_download(port)
+                                    with bandwidth.download():
+                                        record['high_speed_download'] = large_download(port)
                         else:
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
@@ -360,15 +390,23 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
                 progress['tcp'] += record['entry']['status'] == 'passed'
+                progress['upload_precheck'] += upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)
                 progress['websites'] += record['websites'] is not None
                 progress['download'] += record['download']['status'] == 'passed'
                 progress['medium_speed'] += medium_speed.passed(record['medium_speed_download'])
                 progress['high_speed'] += record['high_speed_download']['status'] == 'passed'
                 if progress['done'] % 100 == 0 or progress['done'] == len(nodes):
-                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，网站完成 {progress["websites"]}，1MB通过 {progress["download"]}，5MB通过 {progress["medium_speed"]}，100MB双轮通过 {progress["high_speed"]}', flush=True)
+                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，上行预检通过 {progress["upload_precheck"]}，网站完成 {progress["websites"]}，1MB下载通过 {progress["download"]}，5MB通过 {progress["medium_speed"]}，100MB双轮通过 {progress["high_speed"]}', flush=True)
             return record
         with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             records = list(pool.map(measure, nodes))
+        if controls['node_count']:
+            controls['after'] = upload_precheck(None)
+            controls['valid'] = upload_speed.sample_passed(controls['after'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)
+            if not controls['valid']:
+                raise RuntimeError('上行预检结束直连对照异常，不据此淘汰或发布')
+        else:
+            controls['valid'] = True  # No TCP-qualified candidate needed an upload.
     return records, len(tcp_jobs)
 
 
@@ -387,6 +425,14 @@ def merge_shards(bundle, parts, count):
         if len(rows) != len(expected) or {r['id'] for r in rows} != expected:
             raise ValueError('分片存在漏测、重复或串片节点')
         by_id = {r['id']: r for r in rows}
+        if bundle.get('early_upload_precheck'):
+            controls = part.get('upload_precheck_controls') or {}
+            tested = sum(r['entry']['status'] == 'passed' for r in rows)
+            if controls.get('valid') is not True or controls.get('node_count') != tested:
+                raise ValueError('上行预检缺少分片对照或检测计数不一致')
+            if tested and not all(upload_speed.sample_passed(controls.get(k) or {},
+                    upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET) for k in ('before', 'after')):
+                raise ValueError('上行预检直连对照未通过，拒绝发布')
         eligible = {endpoint_key(n) for n in subset if tcp_supported(n) and
                     by_id[n['name']].get('precheck', {}).get('status') == 'passed'}
         if part['endpoint_count'] != len(eligible):
@@ -402,7 +448,19 @@ def merge_shards(bundle, parts, count):
                 raise ValueError('204 未通过却进入 TCP 阶段')
             if pre['status'] != 'passed' and (record['entry'].get('attempts') != 0 or record.get('websites')):
                 raise ValueError('204 未通过却执行后续阶段')
-            if record['entry']['status'] == 'passed' and (not record.get('websites') or any(
+            early = record.get('upload_precheck') or {}
+            uses_early = bundle.get('early_upload_precheck') or 'upload_precheck' in record
+            if uses_early:
+                expected_status = ('passed', 'failed') if record['entry']['status'] == 'passed' else ('skipped',)
+                if early.get('status') not in expected_status:
+                    raise ValueError('上行预检漏测或国内TCP未通过却已测速')
+                if early.get('status') == 'passed' and not upload_speed.sample_passed(
+                        early, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+                    raise ValueError('1MB上行预检证据不完整或超出预算')
+            should_web = record['entry']['status'] == 'passed' and (not uses_early or early.get('status') == 'passed')
+            if not should_web and record.get('websites'):
+                raise ValueError('上行预检或前置阶段未通过却检测了网站')
+            if should_web and (not record.get('websites') or any(
                     record['websites'].get(site, {}).get('round_count') != (WEBSITE_ROUNDS if site in OVERSEAS_SITES else 1) or
                     len(record['websites'].get(site, {}).get('attempts', [])) != (WEBSITE_ROUNDS if site in OVERSEAS_SITES else 1)
                     for site in DAILY_POST_SITES)):
@@ -419,7 +477,7 @@ def merge_shards(bundle, parts, count):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
             if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
                 raise ValueError('节点未按阶段筛选')
-            should_tls = record['entry']['status'] == 'passed' and required_websites_passed(record)
+            should_tls = should_web and required_websites_passed(record)
             tls = record.get('app_tls') or {}
             if tls.get('status') not in (('passed', 'failed') if should_tls else ('skipped',)):
                 raise ValueError('应用TLS阶段漏测或顺序异常')
@@ -576,6 +634,8 @@ def destination_certificate_failure(record):
 
 
 def web_quality_eligible(record):
+    if 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+        return False
     if destination_certificate_failure(record):
         return False
     if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
@@ -612,6 +672,8 @@ def web_rank_metrics(record):
 
 def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
+    if 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+        return False
     if destination_certificate_failure(record):
         return False
     if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
@@ -882,6 +944,7 @@ def main():
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
+                  'early_upload_precheck': True,
                   'historical_candidates': historical,
                   'input_count': input_count, 'rejected': rejected, 'services': service_status(),
                   'mobile_rejections': mobile_rejections,
@@ -889,7 +952,7 @@ def main():
                   'prepared_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
         bundle['id'] = hashlib.sha256(json.dumps(bundle, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
         bundle_path.write_text(json.dumps(bundle, ensure_ascii=False))
-        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备分阶段流水线输入，最后进行 1 MB 快速下载', flush=True)
+        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备204→TCP→1MB上行预检→网站/TLS→下载；合并后进行两轮上行及稳定性', flush=True)
         if args.phase == 'prepare':
             return
     else:
@@ -901,21 +964,30 @@ def main():
     if args.phase == 'probe':
         subset = shard_nodes(nodes, args.shard_index, args.shard_count)
         print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)} 节点，TCP 与网站同时检测', flush=True)
-        records, endpoint_count = probe_pipeline(subset, binary, root, interval=.25 * args.shard_count)
+        controls = {}
+        try:
+            records, endpoint_count = probe_pipeline(subset, binary, root,
+                interval=.25 * args.shard_count, upload_controls=controls)
+        finally:
+            (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
         result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
-                  'records': records, 'endpoint_count': endpoint_count}
+                  'records': records, 'endpoint_count': endpoint_count, 'upload_precheck_controls': controls}
         (root / f'shard-{args.shard_index}.json').write_text(json.dumps(result, ensure_ascii=False))
         return
     if args.phase == 'publish':
         parts = [json.loads(p.read_text()) for p in Path(args.results_dir).glob('shard-*.json')]
         records, endpoint_count = merge_shards(bundle, parts, args.shard_count)
     elif args.phase not in repair_modes:
-        records, endpoint_count = probe_pipeline(nodes, binary, root)
+        controls = {}
+        try:
+            records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls)
+        finally:
+            (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
     if args.phase == 'medium-recheck':
         medium_rechecked_count = recheck_medium_download(records, mapping, binary, root)
     if args.phase == 'web-recheck':
         website_rechecked_count = recheck_websites(records, mapping, binary, root)
-    reachable = [r for r in records if r['entry']['status'] == 'passed']
+    reachable = [r for r in records if r['entry']['status'] == 'passed' and r.get('websites')]
     if args.phase not in repair_modes:
         ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
         for record in records:
@@ -935,7 +1007,8 @@ def main():
         upload_candidates = [r for r in records if r['id'] in mapping
             and r['entry']['status'] == 'passed' and (r.get('download') or {}).get('status') == 'passed'
             and (web_quality_eligible(r) or regional_eligible(r))]
-        upload_diagnostic = upload_speed.recheck(upload_candidates, mapping, binary, root)
+        upload_diagnostic = upload_speed.recheck(upload_candidates, mapping, binary, root,
+            reuse_precheck=args.phase in ('all', 'publish'))
     stability_diagnostic = None
     if args.phase in ('all', 'publish', 'stability-recheck', 'uplink-recheck'):
         candidates = [r for r in records if r['id'] in mapping
@@ -967,7 +1040,13 @@ def main():
     repairing = args.phase in repair_modes
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 18,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 19,
+              'upload_precheck_policy': upload_speed.precheck_settings(),
+              'early_upload_precheck_enabled': previous.get('early_upload_precheck_enabled', False) if repairing else bool(bundle.get('early_upload_precheck')),
+              'upload_precheck_counts': {v: sum((r.get('upload_precheck') or {}).get('status', 'unmeasured') == v for r in records)
+                                         for v in ('passed', 'failed', 'skipped', 'unmeasured')},
+              'upload_precheck_controls': (previous.get('upload_precheck_controls') if repairing else
+                  {str(p['index']): p.get('upload_precheck_controls') for p in parts} if args.phase == 'publish' else {'0': controls}),
               'upload_policy': upload_speed.settings(),
               'upload_recheck': upload_speed.recheck_summary(records, upload_diagnostic,
                   previous.get('upload_recheck') if repairing else None),
@@ -1015,7 +1094,7 @@ def main():
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(DAILY_SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': [], 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'time_spaced_stability'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', '1MB_upload_precheck', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'time_spaced_stability'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,

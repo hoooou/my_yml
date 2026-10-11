@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from upload_fixture import verified_upload_precheck
 from medium_speed_fixture import verified_medium
 import high_speed
 from high_speed_fixture import verified_high
@@ -48,7 +49,7 @@ class DoubleDownloadTests(unittest.TestCase):
             records, _ = a.probe_pipeline([node], 'unused', Path('.'),
                 precheck=lambda port: {'status': 'passed'}, probe=lambda key, pace: {'status': 'passed'},
                 site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
-                download=lambda port: {'status': 'passed'})
+                download=lambda port: {'status': 'passed'}, upload_precheck=verified_upload_precheck)
         self.assertEqual([call.args for call in measure.call_args_list],
             [(1234, 100_000_000, 20, url) for url in high_speed.URLS])
         self.assertTrue(a.high_speed_eligible(records[0]))

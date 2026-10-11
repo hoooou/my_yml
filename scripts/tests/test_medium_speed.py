@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from upload_fixture import verified_upload_precheck
 import medium_speed as m
 from medium_speed_fixture import verified_medium
 from high_speed_fixture import verified_high
@@ -65,7 +66,7 @@ class MediumDownloadTests(unittest.TestCase):
                     download=lambda p: calls.append('1MB') or {'status': 'passed' if quick_ok else 'failed',
                         'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
                     medium_download=lambda p: calls.append('5MB') or {**verified_medium(), 'status': 'failed'},
-                    large_download=lambda p: calls.append('100MB') or verified_high())
+                    large_download=lambda p: calls.append('100MB') or verified_high(), upload_precheck=verified_upload_precheck)
             self.assertEqual(calls, ['1MB', '5MB', '100MB'] if quick_ok else ['1MB'])
             part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': 1, 'records': rows}
             bundle = {'id': 'batch', 'nodes': [node]}
@@ -130,6 +131,10 @@ class MediumDownloadTests(unittest.TestCase):
     def test_pipeline_caps_medium_downloads_at_four_per_shard(self):
         nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': '8.8.8.8', 'port': 443} for i in range(8)]
         barrier, lock = threading.Barrier(4), threading.Lock()
+        websites_ready = threading.Barrier(8)
+        def websites(port):
+            websites_ready.wait(2)
+            return {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES}
         state = {'active': 0, 'peak': 0}
         def medium(port):
             with lock:
@@ -145,9 +150,9 @@ class MediumDownloadTests(unittest.TestCase):
              patch.object(a.app_tls, 'check', return_value=verified_tls()):
             rows, _ = a.probe_pipeline(nodes, 'unused', Path('.'), precheck=lambda p: {'status': 'passed'},
                 probe=lambda key, pace: {'status': 'passed'},
-                site_check=lambda p: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
+                site_check=websites,
                 download=lambda p: {'status': 'passed'}, medium_download=medium,
-                large_download=lambda p: verified_high())
+                large_download=lambda p: verified_high(), upload_precheck=verified_upload_precheck)
         self.assertEqual(state['peak'], 4)
         self.assertEqual(sum(m.passed(r['medium_speed_download']) for r in rows), 8)
 

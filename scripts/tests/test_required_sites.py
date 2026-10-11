@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from upload_fixture import verified_upload_precheck
 from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
 from attempt_report import write_attempt
@@ -73,7 +74,7 @@ class RequiredSiteTests(unittest.TestCase):
             rows, _ = a.probe_pipeline([node], 'unused', Path('.'), precheck=lambda port: pre,
                 probe=lambda key, pace: {'status': 'passed'}, site_check=lambda port: pages,
                 download=lambda port: self.fail('blocked required page must stop downloads'),
-                large_download=lambda port: self.fail('blocked required page must stop large downloads'))
+                large_download=lambda port: self.fail('blocked required page must stop large downloads'), upload_precheck=verified_upload_precheck)
         self.assertEqual(rows[0]['download']['status'], 'skipped')
         self.assertEqual(rows[0]['websites']['ClaudeTrace']['status'], 'failed')
         bundle = {'id': 'batch', 'nodes': [node]}
@@ -94,7 +95,7 @@ class RequiredSiteTests(unittest.TestCase):
             calls = []
             rows, _ = a.probe_pipeline([node], 'unused', Path('.'), precheck=lambda port: pre,
                 probe=lambda key, pace: {'status': 'passed'},
-                download=lambda port: calls.append(port) or {'status': 'failed'})
+                download=lambda port: calls.append(port) or {'status': 'failed'}, upload_precheck=verified_upload_precheck)
         self.assertEqual(calls, [1234])
         self.assertNotIn('Claude', rows[0]['websites'])
         self.assertEqual(rows[0]['websites']['ClaudeTrace']['round_count'], 1)

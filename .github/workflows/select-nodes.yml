@@ -73,7 +73,7 @@ jobs:
           overwrite: true
 
   probe:
-    name: 204 → TCP → 网站 → TLS → 1MB → 5MB → 100MB双轮（分片 ${{ matrix.shard }}）
+    name: 204 → TCP → 上行预检 → 网站 → TLS → 下载（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
     timeout-minutes: 90
@@ -113,6 +113,16 @@ jobs:
           retention-days: 1
           if-no-files-found: error
           overwrite: true
+
+      - name: 保存前置上行对照
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: upload-precheck-controls-${{ matrix.shard }}
+          path: .node-work/availability/upload-precheck-controls.json
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: warn
 
   publish:
     name: 合并校验并更新原订阅
