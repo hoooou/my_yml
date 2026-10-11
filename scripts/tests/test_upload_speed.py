@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import upload_speed as up
 from tls_fixture import verified_tls
 import availability as a
+import mobile_pilot
 
 
 def sample(byte_count=up.BYTES, budget=up.BUDGET, elapsed=1000):
@@ -30,6 +31,17 @@ def evidence():
 
 
 class UploadTests(unittest.TestCase):
+    def test_optional_website_certificate_error_is_not_hidden_by_other_successes(self):
+        from test_medium_speed import record
+        row = record()
+        row['websites']['Netflix']['attempts'] = [{'status': 'failed',
+            'tls_error_kind': 'certificate_verification_failed'}]
+        self.assertFalse(a.web_quality_eligible(row))
+        row['exit']['country_code'] = 'SG'; self.assertFalse(a.regional_eligible(row))
+        wrapped = a.s.requests.exceptions.SSLError('[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: private data')
+        self.assertTrue(mobile_pilot.certificate_failure(wrapped))
+        self.assertFalse(mobile_pilot.certificate_failure(a.s.requests.exceptions.SSLError('TLS EOF')))
+
     def test_full_publication_runs_upload_before_final_stability_and_persists_gate(self):
         from test_medium_speed import record
         from test_stability import evidence as stable_evidence

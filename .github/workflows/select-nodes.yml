@@ -163,13 +163,8 @@ jobs:
           include-hidden-files: true
           retention-days: 7
           if-no-files-found: warn
-      - name: 展示本次全量检测结果
-        if: always()
-        run: |
-          if [ -f .node-work/availability/full-test-report.md ]; then
-            cat .node-work/availability/full-test-report.md >> "$GITHUB_STEP_SUMMARY"
-          fi
       - name: 更新配置和报告
+        id: publish_subscription
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -181,9 +176,14 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
       - name: 发布本次摘要
+        if: always()
+        env:
+          PUBLISH_OUTCOME: ${{ steps.publish_subscription.outcome }}
         run: |
-          if [ -f .node-work/availability/selected.yaml ]; then
+          if [ "$PUBLISH_OUTCOME" = "success" ] && [ -f .node-work/availability/selected.yaml ]; then
             cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
+          elif [ -f .node-work/availability/full-test-report.md ]; then
+            cat .node-work/availability/full-test-report.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
   repair:

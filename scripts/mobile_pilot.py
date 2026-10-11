@@ -191,6 +191,29 @@ def classify_response(label, status, final_url, headers, body):
     return result
 
 
+def certificate_failure(error):
+    """Classify a local TLS error without publishing its message or URL."""
+    if not isinstance(error, s.requests.exceptions.SSLError):
+        return False
+    # requests/urllib3 can wrap the original ssl exception inside a reason or
+    # an argument; the local verification marker is also retained as text.
+    pending, seen = [error], set()
+    for _ in range(16):
+        if not pending:
+            break
+        current = pending.pop()
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
+        if isinstance(current, BaseException):
+            text = str(current).lower()
+            if 'certificate_verify_failed' in text or 'certificate verify failed' in text:
+                return True
+            pending.extend(x for x in (*current.args, current.__cause__, current.__context__,
+                                        getattr(current, 'reason', None)) if isinstance(x, BaseException))
+    return False
+
+
 def check_site(port, label, url, timeout=(3, 2)):
     sample_limit = PAGE_SAMPLE_LIMITS.get(label, PAGE_SAMPLE_BYTES)
     with s.session() as client:
@@ -231,6 +254,7 @@ def check_site(port, label, url, timeout=(3, 2)):
         except s.requests.RequestException as error:
             return {'status': 'failed', 'reason': '连接、TLS 或读取失败',
                     'error_type': type(error).__name__,
+                    **({'tls_error_kind': 'certificate_verification_failed'} if certificate_failure(error) else {}),
                     'elapsed_ms': round((time.perf_counter() - started) * 1000, 1)}
 
 
