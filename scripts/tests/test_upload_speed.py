@@ -20,7 +20,8 @@ def sample(byte_count=up.BYTES, budget=up.BUDGET, elapsed=1000):
             'uploaded_bytes': byte_count, 'budget_seconds': budget, 'elapsed_ms': elapsed,
             'speed_mbps': byte_count * 8 / (elapsed / 1000) / 1_000_000,
             'curl_exit_code': 0, 'http_status': 200, 'redirect_count': 0,
-            'ssl_verify_result': 0, 'tls_verification_enabled': True, 'http_completed': True}
+            'ssl_verify_result': 0, 'tls_verification_enabled': True, 'http_completed': True,
+            'loaded_204': [{'status': 'passed', 'elapsed_ms': 100}]}
 
 
 def evidence():
@@ -116,6 +117,10 @@ class UploadTests(unittest.TestCase):
         bad = copy.deepcopy(good); bad['idle_seconds'] = 0; self.assertFalse(up.passed(bad))
         bad = copy.deepcopy(good); bad['attempts'].pop(); self.assertFalse(up.passed(bad))
         bad = copy.deepcopy(good); bad['speed_mbps'] = 100; self.assertFalse(up.passed(bad))
+        bad = copy.deepcopy(good); bad['attempts'][1]['loaded_204'][0]['status'] = 'failed'
+        self.assertFalse(up.passed(bad))
+        bad = copy.deepcopy(good); bad['attempts'][1]['loaded_204'] = []
+        self.assertFalse(up.passed(bad))
 
     def test_real_curl_caller_checks_full_post_and_never_disables_certificate_validation(self):
         def run(command, **kwargs):

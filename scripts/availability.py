@@ -1156,7 +1156,7 @@ def main():
         rows[6:6] = [f'间隔稳定性复测：{temporal["updated_at"]}；检测{temporal["node_count"]}，通过{temporal["passed_count"]}，未通过{temporal["failed_count"]}。5轮各检查204、Google、YouTube、ChatGPT trace和Android域名证书握手；轮间至少空闲30秒，4节点并发，每节点串行请求。5轮全部通过才发布，出口IP变化不淘汰，所有分组仍手动选择。这是数分钟的云端观察，不证明手机移动/Wi-Fi或登录后的ChatGPT持续对话可用。原始下载及网页时间保持原样。', '']
     uplink = report.get('upload_recheck')
     if uplink:
-        rows[6:6] = [f'上行复测：{uplink["updated_at"]}；检测{uplink["node_count"]}，完整两轮通过{uplink["passed_count"]}。1MB预检后5MB两轮，每轮10秒、轮间空闲20秒，4节点并发；两轮均完成且上传后4个应用域名证书正常才具备入选资格，仍需最终五轮稳定性通过。上传阶段与下载阶段错开。HTTP完成不等于服务端逐字节回执，云端数据不代表中国移动上行。', '']
+        rows[6:6] = [f'上行复测：{uplink["updated_at"]}；检测{uplink["node_count"]}，完整两轮通过{uplink["passed_count"]}。1MB预检后5MB两轮，每轮10秒、轮间空闲20秒，4节点并发；两轮均完成、上传中204全部通过且上传后4个应用域名证书正常才具备入选资格，仍需最终五轮稳定性通过。上传阶段与下载阶段错开。HTTP完成不等于服务端逐字节回执，云端数据不代表中国移动上行。', '']
         rows += ['', '## 上行与负载后证书', '',
                  '| 节点编号 | 上传两轮 | 较低上行Mbps | 两轮较低/较高速率 | 上传中204通过/检测 | 上传后证书 |',
                  '|---|---|---:|---:|---|---|']
