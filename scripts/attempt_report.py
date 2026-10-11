@@ -3,6 +3,7 @@ from collections import Counter
 import json
 import app_tls
 import high_speed
+import medium_speed
 
 
 def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=()):
@@ -31,6 +32,8 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'precheck_counts': dict(Counter((r.get('precheck') or {}).get('status', 'missing') for r in records)),
         'entry_counts': dict(Counter(r['entry']['status'] for r in records)),
         'download_counts': dict(Counter((r.get('download') or {}).get('status', 'missing') for r in records)),
+        'medium_speed_download_counts': medium_speed.counts(records),
+        'medium_speed_download_settings': medium_speed.settings(),
         'high_speed_download_counts': high_speed.result_counts(records),
         'high_speed_download_settings': high_speed.settings(),
         'high_speed_target_counts': {url: high_speed.status_counts(records, i) for i, url in enumerate(high_speed.URLS)},
@@ -42,6 +45,7 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'Claude首页不检测，仅检查Claude trace；trace不证明登录或对话可用。', '',
         '必过应用TLS：' + '、'.join(app_tls.TARGETS) + '；每个域名两次独立握手，校验可信证书链、域名和有效期。', '',
         '应用TLS结果：' + str(report['app_tls_counts']) + '。云端标准TLS检查不模拟Android证书固定，也不证明手机Wi-Fi路径正常。', '',
+        '中速下载：1 MB通过后进行Cloudflare完整5 MB快测，预算10秒，仅真实通过进入中速组。', '',
         '高速下载：Cloudflare和DataPacket各完整100 MB，每轮20秒；两轮都通过才进入高速组，按两轮中较慢的速度排序。', '',
         '两轮均通过：' + str(report['high_speed_download_counts']) + '；逐目标结果：' + str(report['high_speed_target_counts']) + '。', '',
         '抖音不检测；其国内直连规则保留。', '',

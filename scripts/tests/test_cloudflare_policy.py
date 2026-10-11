@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
+from medium_speed_fixture import verified_medium
 import mobile_pilot as pilot
 from tls_fixture import verified_tls
 
@@ -21,6 +22,10 @@ def summarize(label, attempts):
 
 
 class CloudflarePolicyTests(unittest.TestCase):
+    def setUp(self):
+        medium = patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium())
+        medium.start(); self.addCleanup(medium.stop)
+
     def record(self):
         return {'app_tls': verified_tls(), 'websites': {
             **{label: {'status': 'passed', 'passed_count': 3, 'round_count': 3,

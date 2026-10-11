@@ -12,11 +12,16 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import app_tls
 import availability as a
+from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
 from high_speed_fixture import verified_high
 
 
 class AppTLSGateTests(unittest.TestCase):
+    def setUp(self):
+        medium = patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium())
+        medium.start(); self.addCleanup(medium.stop)
+
     def test_failed_app_certificate_blocks_download_at_real_pipeline_caller(self):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         failed = verified_tls()
