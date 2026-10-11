@@ -39,6 +39,7 @@ def settings():
             'minimum_idle_seconds_between_rounds': GAP_SECONDS, 'workers': WORKERS,
             'payload': 'random_synthetic_bytes', 'strict_destination_tls': True,
             'redirects_allowed': False, 'includes_handshake': True,
+            'requires_loaded_204_each_round': True, 'loaded_204_budget_ms': 5000,
             'speed_aggregation': 'minimum_of_completed_rounds',
             'server_byte_receipt_available': False, 'china_mobile_uplink_measured': False}
 
@@ -130,12 +131,20 @@ def loaded_sample(port, directory=None):
 def summarize(precheck, attempts, idle):
     complete = sample_passed(precheck, PRECHECK_BYTES, PRECHECK_BUDGET) and len(attempts) == ROUNDS
     complete = complete and finite(idle) and idle >= GAP_SECONDS and all(sample_passed(x) for x in attempts)
+    complete = complete and all(x.get('loaded_204') and all(
+        p.get('status') == 'passed' and finite(p.get('elapsed_ms')) and 0 <= p['elapsed_ms'] <= 5000
+        for p in x['loaded_204']) for x in attempts)
     speeds = [x['speed_mbps'] for x in attempts if sample_passed(x)]
+    probes = [p for x in attempts for p in x.get('loaded_204', [])]
     return {'version': VERSION, 'status': 'passed' if complete else 'failed',
             'precheck': precheck, 'attempts': attempts, 'idle_seconds': idle,
             'round_count': len(attempts), 'passed_count': sum(sample_passed(x) for x in attempts),
             'speed_mbps': min(speeds) if complete else None,
             'speed_ratio': min(speeds) / max(speeds) if len(speeds) == ROUNDS else None,
+            'loaded_204_count': len(probes),
+            'loaded_204_failure_count': sum(p.get('status') != 'passed' or not finite(p.get('elapsed_ms'))
+                or not 0 <= p['elapsed_ms'] <= 5000 for p in probes),
+            'loaded_204_max_ms': max((p['elapsed_ms'] for p in probes if finite(p.get('elapsed_ms'))), default=None),
             'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
 
 
