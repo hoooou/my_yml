@@ -12,6 +12,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import app_tls
 import availability as a
+from upload_fixture import verified_upload_precheck
 from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
 from high_speed_fixture import verified_high
@@ -35,7 +36,7 @@ class AppTLSGateTests(unittest.TestCase):
             rows, _ = a.probe_pipeline([node], 'unused', Path('.'),
                 precheck=lambda port: {'status': 'passed'}, probe=lambda key, pace: {'status': 'passed'},
                 site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
-                download=lambda port: self.fail('certificate-invalid node reached download'))
+                download=lambda port: self.fail('certificate-invalid node reached download'), upload_precheck=verified_upload_precheck)
         self.assertEqual(rows[0]['app_tls']['status'], 'failed')
         self.assertEqual(rows[0]['download']['status'], 'skipped')
         self.assertFalse(a.web_quality_eligible(rows[0]))
@@ -79,7 +80,7 @@ class AppTLSGateTests(unittest.TestCase):
                 precheck=lambda port: pre, probe=lambda key, pace: {'status': 'passed'},
                 site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
                 download=lambda port: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
-                large_download=lambda port: verified_high(50))
+                large_download=lambda port: verified_high(50), upload_precheck=verified_upload_precheck)
         bundle = {'id': 'batch', 'nodes': [node]}
         part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': count, 'records': rows}
         a.merge_shards(bundle, [part], 1)

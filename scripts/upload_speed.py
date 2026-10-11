@@ -26,6 +26,15 @@ BUDGET = 10
 ROUNDS = 2
 GAP_SECONDS = 20
 WORKERS = 4
+PRECHECK_WORKERS_PER_SHARD = 1
+
+
+def precheck_settings():
+    return {'url': url(PRECHECK_BYTES), 'bytes': PRECHECK_BYTES,
+            'budget_seconds': PRECHECK_BUDGET, 'placement': 'after_domestic_TCP_before_websites',
+            'workers_per_shard': PRECHECK_WORKERS_PER_SHARD, 'strict_destination_tls': True,
+            'overlaps_downloads_on_same_runner': False,
+            'reused_by_final_upload': True, 'failed_skips_websites_and_downloads': True}
 
 
 def url(byte_count):
@@ -176,8 +185,9 @@ def recheck_summary(records, diagnostic=None, previous=None):
     return info
 
 
-def check(port, directory=None):
-    precheck = sample(port, PRECHECK_BYTES, PRECHECK_BUDGET, directory)
+def check(port, directory=None, precheck=None):
+    if precheck is None:
+        precheck = sample(port, PRECHECK_BYTES, PRECHECK_BUDGET, directory)
     if not sample_passed(precheck, PRECHECK_BYTES, PRECHECK_BUDGET):
         return summarize(precheck, [], None)
     first = loaded_sample(port, directory)
@@ -188,7 +198,7 @@ def check(port, directory=None):
     return summarize(precheck, [first, second], idle)
 
 
-def recheck(records, mapping, binary, root):
+def recheck(records, mapping, binary, root, reuse_precheck=False):
     root = Path(root); root.mkdir(parents=True, exist_ok=True)
     if not records:
         return {'settings': settings(), 'node_count': 0, 'nodes': []}
@@ -196,7 +206,8 @@ def recheck(records, mapping, binary, root):
     with s.Core(binary, root, [mapping[r['id']] for r in records], listeners) as core:
         control_before = check(None, root)
         def measure(row):
-            result = check(ports[row['id']], root)
+            result = check(ports[row['id']], root,
+                precheck=row.get('upload_precheck') if reuse_precheck else None)
             tls = app_tls.check(ports[row['id']])
             return result, tls
         with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
