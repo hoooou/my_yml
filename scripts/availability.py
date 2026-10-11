@@ -901,8 +901,10 @@ def main():
             and (r.get('download') or {}).get('status') == 'passed'
             and (web_quality_eligible(r) or regional_eligible(r))]
         stability_diagnostic = stability.recheck(candidates, mapping, binary, root)
-    config = render_comparison(base, records, mapping,
-        require_stability=args.phase in ('all', 'publish', 'stability-recheck'))
+    requires_stability = (args.phase in ('all', 'publish', 'stability-recheck')
+        or (args.phase in ('repair', 'web-recheck', 'medium-recheck')
+            and previous.get('node_selection_policy', {}).get('requires_time_spaced_stability') is True))
+    config = render_comparison(base, records, mapping, require_stability=requires_stability)
     if args.phase in ('all', 'publish'):
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES)
@@ -987,7 +989,7 @@ def main():
                   if previous.get('high_speed_download_settings') else None) if repairing else high_speed.settings(),
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
-                  'requires_time_spaced_stability': args.phase in ('all', 'publish', 'stability-recheck') or bool(previous.get('node_selection_policy', {}).get('requires_time_spaced_stability')) if repairing else True,
+                  'requires_time_spaced_stability': requires_stability,
                   'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
                   'rejected_proxy_definitions': 'omitted',
                   'regional_exception': {'group': REGIONAL_GROUP, 'country_codes': list(REGIONAL_COUNTRIES),
