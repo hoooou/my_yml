@@ -24,6 +24,7 @@ import app_tls
 import published_history
 import high_speed
 import medium_speed
+import stability
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
 
@@ -562,6 +563,8 @@ def required_websites_passed(record):
 
 
 def web_quality_eligible(record):
+    if 'stability' in record and not stability.quality_passed(record['stability'], CORE_MEDIAN_MS, CORE_TAIL_MS, CORE_JITTER_MS):
+        return False
     if not required_websites_passed(record) or not app_tls.passed(record.get('app_tls')):
         return False
     sites = record.get('websites') or {}
@@ -592,6 +595,8 @@ def web_rank_metrics(record):
 
 def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
+    if 'stability' in record and not stability.quality_passed(record['stability'], REGIONAL_MEDIAN_MS, REGIONAL_TAIL_MS, REGIONAL_JITTER_MS):
+        return False
     if (not required_websites_passed(record)
             or not app_tls.passed(record.get('app_tls'))
             or (record.get('exit') or {}).get('country_code') not in REGIONAL_COUNTRIES
@@ -617,8 +622,12 @@ def regional_eligible(record):
 
 def rank_key(record):
     pre = record.get('precheck') or {}
+    temporal = record.get('stability') or {}
+    values = [x['sites'][label]['elapsed_ms'] for x in temporal.get('attempts', [])
+        for label in CORE_SITES if isinstance(x.get('sites', {}).get(label, {}).get('elapsed_ms'), (int, float))]
+    temporal_tail = max(values) if values else math.inf
     downloaded = record.get('download') or {}
-    return (downloaded.get('status') != 'passed', not web_quality_eligible(record),
+    return (downloaded.get('status') != 'passed', not web_quality_eligible(record), temporal_tail,
             *web_rank_metrics(record), -website_count(record), -connectivity_count(record),
             pre.get('median_elapsed_ms') if pre.get('median_elapsed_ms') is not None else math.inf,
             -(downloaded.get('speed_mib_s') or 0), record['entry'].get('latency_ms', math.inf), record['id'])
@@ -695,14 +704,20 @@ def limit_hong_kong(records):
     return selected
 
 
-def render_comparison(base, records, mapping):
+def render_comparison(base, records, mapping, require_stability=False):
     """Publish the strict pool and an explicitly authorized regional exception."""
+    # Clear former publication names before renumbering. Otherwise an excluded
+    # node can collide with a retained node's new name in report membership.
+    for record in records:
+        if record['id'] in mapping:
+            record.pop('name', None)
     config = {key: copy.deepcopy(base[key]) for key in (
         'mixed-port', 'allow-lan', 'mode', 'log-level', 'external-controller', 'dns', 'rules', 'rule-providers') if key in base}
     optimize_routing(config)
     proxies = []
     # The slower regional pool is selectable only in its own group.
     ranked = limit_hong_kong(sorted((r for r in records if r['id'] in mapping
+        and (stability.passed(r.get('stability')) if require_stability or 'stability' in r else True)
         and r['entry']['status'] == 'passed'
         and (r.get('download') or {}).get('status') == 'passed'
         and (web_quality_eligible(r) or regional_eligible(r))), key=rank_key))
@@ -715,6 +730,8 @@ def render_comparison(base, records, mapping):
         region = s.COUNTRIES.get(region_code, region_code) if region_code else '地区未确认'
         pre = record.get('precheck') or {}
         core_latencies = [(record.get('websites') or {}).get(label, {}).get('median_elapsed_ms') for label in CORE_SITES]
+        if stability.passed(record.get('stability')):
+            core_latencies = [stability.core_metrics(record['stability'])[label]['median_ms'] for label in CORE_SITES]
         latency = max(core_latencies) if all(isinstance(v, (float, int)) and math.isfinite(v) for v in core_latencies) else None
         if latency is None:
             latency = pre.get('median_elapsed_ms') if pre.get('status') == 'passed' else None
@@ -736,7 +753,7 @@ def render_comparison(base, records, mapping):
         region_numbers[region] = region_numbers.get(region, 0) + 1
         name = '|'.join([f'{region}{region_numbers[region]:02d}', delay, bandwidth, housing, purity_text])
         record['name'] = name
-        record['name_latency_source'] = 'Google_YouTube_slower_median' if all(isinstance(v, (float, int)) and math.isfinite(v) for v in core_latencies) else 'HTTPS204_median'
+        record['name_latency_source'] = ('time_spaced_Google_YouTube_slower_median' if stability.passed(record.get('stability')) else 'Google_YouTube_slower_median') if all(isinstance(v, (float, int)) and math.isfinite(v) for v in core_latencies) else 'HTTPS204_median'
         record['name_bandwidth_source'] = ('100MB_double_minimum' if high_speed_eligible(record) else
             '5MB' if medium_speed.passed(record.get('medium_speed_download') or {}) else '1MB')
         node = copy.deepcopy(mapping[record['id']]); node['name'] = name; proxies.append(node)
@@ -771,7 +788,7 @@ def render_comparison(base, records, mapping):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
-    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair', 'web-recheck', 'medium-recheck'), default='all')
+    parser.add_argument('--phase', choices=('all', 'prepare', 'probe', 'publish', 'repair', 'web-recheck', 'medium-recheck', 'stability-recheck'), default='all')
     parser.add_argument('--sample', help='Optional fixture; default pulls ALL subscriptions')
     parser.add_argument('--work-dir', default='.node-work/availability')
     parser.add_argument('--shard-index', type=int, default=0)
@@ -782,7 +799,7 @@ def main():
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     binary = str(Path(args.mihomo).resolve())
     bundle_path = root / 'bundle.json'
-    if args.phase in ('repair', 'web-recheck', 'medium-recheck'):
+    if args.phase in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck'):
         previous = json.loads(Path('连通性报告.json').read_text())
         published = yaml.safe_load(Path('优选配置.yaml').read_text())
         by_name = {n['name']: n for n in published['proxies']}
@@ -856,20 +873,20 @@ def main():
     if args.phase == 'publish':
         parts = [json.loads(p.read_text()) for p in Path(args.results_dir).glob('shard-*.json')]
         records, endpoint_count = merge_shards(bundle, parts, args.shard_count)
-    elif args.phase not in ('repair', 'web-recheck', 'medium-recheck'):
+    elif args.phase not in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck'):
         records, endpoint_count = probe_pipeline(nodes, binary, root)
     if args.phase == 'medium-recheck':
         medium_rechecked_count = recheck_medium_download(records, mapping, binary, root)
     if args.phase == 'web-recheck':
         website_rechecked_count = recheck_websites(records, mapping, binary, root)
     reachable = [r for r in records if r['entry']['status'] == 'passed']
-    if args.phase not in ('repair', 'web-recheck', 'medium-recheck'):
+    if args.phase not in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck'):
         ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
         for record in records:
             record['sources'] = metadata.get(record['id'], {}).get('sources', [])
             record['candidate_origin'] = metadata.get(record['id'], {}).get('candidate_origin', 'latest_subscriptions')
             record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
-    if args.phase not in ('repair', 'web-recheck', 'medium-recheck') or args.refresh_ip_reputation:
+    if args.phase not in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck') or args.refresh_ip_reputation:
         eligible_ips = [(r.get('exit') or {}).get('exit_ip') for r in records
                         if (r.get('download') or {}).get('status') == 'passed'
                         and r.get('exit_consistent') is not False]
@@ -877,7 +894,15 @@ def main():
         for record in records:
             record['ip_reputation'] = reputations.get((record.get('exit') or {}).get('exit_ip'),
                 {'status': 'unknown', 'provider': 'ipapi.is', 'reason': 'not_eligible'})
-    config = render_comparison(base, records, mapping)
+    stability_diagnostic = None
+    if args.phase in ('all', 'publish', 'stability-recheck'):
+        candidates = [r for r in records if r['id'] in mapping
+            and r['entry']['status'] == 'passed'
+            and (r.get('download') or {}).get('status') == 'passed'
+            and (web_quality_eligible(r) or regional_eligible(r))]
+        stability_diagnostic = stability.recheck(candidates, mapping, binary, root)
+    config = render_comparison(base, records, mapping,
+        require_stability=args.phase in ('all', 'publish', 'stability-recheck'))
     if args.phase in ('all', 'publish'):
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES)
@@ -892,11 +917,19 @@ def main():
         raise RuntimeError('最终订阅校验失败，不发布')
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
-    repairing = args.phase in ('repair', 'web-recheck', 'medium-recheck')
+    repairing = args.phase in ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 16,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 17,
               'historical_candidates': bundle.get('historical_candidates', {}),
+              'stability_policy': stability.settings(),
+              'stability_recheck': ({'updated_at': stability_diagnostic['updated_at'],
+                  'node_count': stability_diagnostic['node_count'], 'controls_valid': stability_diagnostic['controls_valid'],
+                  'scope': 'eligible_pool_after_downloads',
+                  'passed_count': sum(stability.passed(r.get('stability')) for r in records),
+                  'quality_eligible_count': sum(stability.passed(r.get('stability')) and (web_quality_eligible(r) or regional_eligible(r)) for r in records),
+                  'failed_count': sum((r.get('stability') or {}).get('status') == 'failed' for r in records)}
+                  if stability_diagnostic and stability_diagnostic['node_count'] else previous.get('stability_recheck') if repairing else None),
               'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
                   'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
                   'requires_trusted_chain_hostname_validity': True, 'android_certificate_pinning_emulated': False},
@@ -934,7 +967,7 @@ def main():
               'test_targets': previous.get('test_targets', {k: SITES[k] for k in PAGE_SITES}) if repairing else dict(SITES),
               'target_categories': previous.get('target_categories', {'overseas': list((previous.get('test_targets') or {})), 'domestic': []}) if repairing else {'overseas': list(OVERSEAS_SITES), 'domestic': list(DOMESTIC_SITES), 'connectivity': list(CONNECTIVITY_SITES)},
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
-              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download'],
+              'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'time_spaced_stability'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
@@ -954,6 +987,7 @@ def main():
                   if previous.get('high_speed_download_settings') else None) if repairing else high_speed.settings(),
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
+                  'requires_time_spaced_stability': args.phase in ('all', 'publish', 'stability-recheck') or bool(previous.get('node_selection_policy', {}).get('requires_time_spaced_stability')) if repairing else True,
                   'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
                   'rejected_proxy_definitions': 'omitted',
                   'regional_exception': {'group': REGIONAL_GROUP, 'country_codes': list(REGIONAL_COUNTRIES),
@@ -1076,6 +1110,9 @@ def main():
         rows.append(f'| {display_name} | {record["id"][2:]} | {record["server"]}:{record["port"]} | {LABELS[record["entry"]["status"]]} | {s.COUNTRIES.get(country, country) or "未确认"} | ' + ' | '.join(scores) + ' |')
     if rejected:
         rows += ['', '内核或手机兼容性校验未通过的节点未写入订阅，编号：' + '、'.join(rejected)]
+    temporal = report.get('stability_recheck')
+    if temporal:
+        rows[6:6] = [f'间隔稳定性复测：{temporal["updated_at"]}；检测{temporal["node_count"]}，通过{temporal["passed_count"]}，未通过{temporal["failed_count"]}。5轮各检查204、Google、YouTube、ChatGPT trace和Android域名证书握手；轮间至少空闲30秒，4节点并发，每节点串行请求。5轮全部通过才发布，出口IP变化不淘汰，所有分组仍手动选择。这是数分钟的云端观察，不证明手机移动/Wi-Fi或登录后的ChatGPT持续对话可用。原始下载及网页时间保持原样。', '']
     Path('连通性报告.md').write_text('\n'.join(rows) + '\n')
     print(f'分阶段分类完成，配置校验通过；204 {report["precheck_counts"]}；TCP {counts}；下载 {report["download_counts"]}', flush=True)
 

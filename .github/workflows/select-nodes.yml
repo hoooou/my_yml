@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 全量检测、重建、网站复测、5MB补测或Claude诊断
+        description: 全量检测、重建、网站复测、5MB补测、间隔稳定性复测或Claude诊断
         type: choice
         required: true
         default: full
-        options: [full, repair, web-recheck, medium-recheck, claude-diagnostics]
+        options: [full, repair, web-recheck, medium-recheck, stability-recheck, claude-diagnostics]
       diagnostic_run_id:
         description: Claude诊断使用的已完成全量检测运行编号（仅诊断模式使用）
         type: string
@@ -156,7 +156,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: full-test-report
-          path: .node-work/availability/full-test-report.*
+          path: |
+            .node-work/availability/full-test-report.*
+            .node-work/availability/stability-results.json
           include-hidden-files: true
           retention-days: 7
           if-no-files-found: warn
@@ -185,7 +187,7 @@ jobs:
 
   repair:
     name: 补测或重建并更新原订阅
-    if: github.event_name == 'workflow_dispatch' && (inputs.mode == 'repair' || inputs.mode == 'web-recheck' || inputs.mode == 'medium-recheck')
+    if: github.event_name == 'workflow_dispatch' && (inputs.mode == 'repair' || inputs.mode == 'web-recheck' || inputs.mode == 'medium-recheck' || inputs.mode == 'stability-recheck')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -216,6 +218,8 @@ jobs:
             python scripts/availability.py --mihomo .node-work/bin/mihomo --phase web-recheck
           elif [ "$UPDATE_MODE" = "medium-recheck" ]; then
             python scripts/availability.py --mihomo .node-work/bin/mihomo --phase medium-recheck
+          elif [ "$UPDATE_MODE" = "stability-recheck" ]; then
+            python scripts/availability.py --mihomo .node-work/bin/mihomo --phase stability-recheck
           else
             python scripts/availability.py --mihomo .node-work/bin/mihomo --phase repair --refresh-ip-reputation
           fi
@@ -238,6 +242,15 @@ jobs:
           path: .node-work/availability/web-recheck-results.json
           include-hidden-files: true
           retention-days: 1
+          if-no-files-found: warn
+      - name: 保存间隔稳定性复测记录
+        if: always() && inputs.mode == 'stability-recheck'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: stability-recheck
+          path: .node-work/availability/stability-results.json
+          include-hidden-files: true
+          retention-days: 7
           if-no-files-found: warn
       - name: 发布修复摘要
         run: cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
