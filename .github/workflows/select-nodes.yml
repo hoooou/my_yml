@@ -13,7 +13,7 @@ on:
         default: full
         options: [full, repair, web-recheck, medium-recheck, stability-recheck, uplink-recheck, stability-diagnostics, upload-diagnostics, claude-diagnostics]
       diagnostic_run_id:
-        description: Claude诊断使用的已完成全量检测运行编号（仅诊断模式使用）
+        description: Claude或稳定性诊断使用的已完成全量检测运行编号（仅诊断模式使用）
         type: string
         required: false
         default: '38040178745'
@@ -319,6 +319,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
+      actions: read
     steps:
       - name: 读取仓库及历史定义
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -335,8 +336,22 @@ jobs:
           python -m pip install -r scripts/requirements.txt
           python scripts/install_tools.py --mihomo-only
           python -m unittest discover -s scripts/tests -v
-      - name: 小样本原内核与重启对照
-        run: python scripts/stability_diagnostics.py --mihomo .node-work/bin/mihomo
+      - name: 读取指定全量批次的输入和结果
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DIAGNOSTIC_RUN_ID: ${{ inputs.diagnostic_run_id }}
+        run: |
+          if ! [[ "$DIAGNOSTIC_RUN_ID" =~ ^[0-9]+$ ]]; then
+            exit 1
+          fi
+          gh run download "$DIAGNOSTIC_RUN_ID" -n availability-input -D .node-work/diagnostic-input
+          gh run download "$DIAGNOSTIC_RUN_ID" -n full-test-report -D .node-work/diagnostic-report
+      - name: 小样本原内核、冷启动和建连预算对照
+        run: |
+          python scripts/stability_diagnostics.py --mihomo .node-work/bin/mihomo \
+            --bundle .node-work/diagnostic-input/bundle.json \
+            --report .node-work/diagnostic-report/full-test-report.json
       - name: 保存脱敏诊断记录
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
