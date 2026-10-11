@@ -194,7 +194,8 @@ def classify_response(label, status, final_url, headers, body):
 def check_site(port, label, url, timeout=(3, 2)):
     sample_limit = PAGE_SAMPLE_LIMITS.get(label, PAGE_SAMPLE_BYTES)
     with s.session() as client:
-        client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
+        if port is not None:
+            client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:
             started = time.perf_counter()
             current_url = url
