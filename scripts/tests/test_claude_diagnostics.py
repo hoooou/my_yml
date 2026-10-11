@@ -20,7 +20,7 @@ class ClaudeDiagnosticsTests(unittest.TestCase):
         result = d.evidence(403, 'https://claude.ai/?secret=token#fragment',
             {'Content-Type': 'text/html', 'cf-mitigated': 'challenge', 'Set-Cookie': 'private'},
             b'<title>Just a moment...</title><html>Claude cf-chl-platform</html>')
-        self.assertEqual(result['classification']['status'], 'needs_review')
+        self.assertEqual(result['classification']['status'], 'verification_required')
         self.assertTrue(result['challenge_signals']['cf_mitigated'])
         self.assertTrue(result['challenge_signals']['cf_chl'])
         self.assertEqual(result['url'], 'https://claude.ai/')

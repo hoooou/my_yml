@@ -160,13 +160,27 @@ def classify_page(label, status, final_url, content_type, body):
             'reason': '网页入口正常；实际功能仍需本地测试' if passed else '未返回预期网页'}
 
 
+def confirmed_cloudflare_challenge(label, attempt):
+    """Accept only captured Cloudflare page evidence on the expected HTTPS host."""
+    target = urlparse(attempt.get('final_url', ''))
+    return (label in PAGE_HOSTS and target.scheme == 'https'
+            and target.hostname in PAGE_HOSTS[label]
+            and attempt.get('http_status') in (200, 403, 503)
+            and attempt.get('restriction') == 'cloudflare_challenge'
+            and (attempt.get('cf_mitigated') == 'challenge'
+                 or attempt.get('classification_source') == 'recorded_cloudflare_challenge'))
+
+
 def classify_response(label, status, final_url, headers, body):
-    """Distinguish captured access restrictions without treating them as success."""
+    """Keep confirmed Cloudflare challenges separate from normal page success."""
     headers = {k.lower(): v for k, v in headers.items()}
     result = classify_page(label, status, final_url, headers.get('content-type', ''), body)
     if headers.get('cf-mitigated', '').strip().lower() == 'challenge':
         result.update(status='needs_review', restriction='cloudflare_challenge',
-                      reason='Cloudflare 人机验证页，无法自动确认网页可用')
+                      cf_mitigated='challenge', reason='Cloudflare 验证拦截；未取得预期检测内容')
+        if confirmed_cloudflare_challenge(label, result):
+            result.update(status='verification_required',
+                          reason='明确 Cloudflare 人机验证；按用户策略认可网站可达，实际页面未验证')
     if label == 'Claude':
         target = urlparse(urljoin(final_url, headers.get('location', '')))
         if (target.scheme == 'https' and target.hostname in ('claude.com', 'www.claude.com')
@@ -336,7 +350,7 @@ def main():
               'candidate_ids': candidates, 'nodes': records}
     Path('优选配置.yaml').write_text(f'# 移动网络对照小测；{now}；{len(records)} 个样本\n' + candidate.read_text())
     Path('移动小测报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    labels = {'passed': '通过', 'failed': '未通过', 'unknown': '未验证', 'unstable': '不稳定', 'needs_review': '需人工复核'}
+    labels = {'passed': '通过', 'failed': '未通过', 'unknown': '未验证', 'unstable': '不稳定', 'needs_review': '需人工复核', 'verification_required': 'CF需验证'}
     rows = ['# 中国移动小规模对照报告', '', f'更新时间：{now}', '',
             f'{len(records)} 个固定样本；移动 TCP 入口通过 {report["mobile_passed"]} 个，云端下载通过 {report["download_passed"]} 个，入口候选 {len(candidates)} 个。', '',
             f'下载地址：[{s.DOWNLOAD_URL}]({s.DOWNLOAD_URL})，每次采样 10 MB，工具测速后再校验完整采样内容。', '',
