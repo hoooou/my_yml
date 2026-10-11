@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-10-12T01:24:49+08:00",
+  "updated_at": "2026-10-12T01:47:33+08:00",
   "scope": "all_subscriptions",
-  "schema_version": 15,
+  "schema_version": 16,
   "historical_candidates": {
     "snapshot_limit": 2,
     "refs": [
@@ -79,11 +79,11 @@
     "skipped": 5382
   },
   "measurements_updated_at": "2026-10-12T01:01:57+08:00",
-  "publication_mode": "repair",
+  "publication_mode": "medium-recheck",
   "website_recheck": null,
   "cloudflare_classification_update": {
-    "updated_at": "2026-10-12T01:24:49+08:00",
-    "reclassified_attempts": 1018,
+    "updated_at": "2026-10-12T01:47:33+08:00",
+    "reclassified_attempts": 0,
     "new_measurements": false,
     "source": "captured_cloudflare_challenge_restriction"
   },
@@ -243,7 +243,7 @@
     "domestic": "DIRECT",
     "overseas": "🚀 全局选择",
     "unmatched": "🚀 全局选择",
-    "group_count": 5,
+    "group_count": 6,
     "version": 2
   },
   "stages": [
@@ -268,6 +268,45 @@
     "includes_handshake": true
   },
   "web_user_agent": "my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/2.32.5",
+  "medium_speed_download_settings": {
+    "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+    "bytes": 5000000,
+    "budget_seconds": 10,
+    "rounds": 1,
+    "workers_per_shard": 4,
+    "read_timeout_seconds": 1,
+    "includes_handshake": true,
+    "selection_limit": null,
+    "requires_1mb_pass": true,
+    "failure_blocks_high_speed_test": false
+  },
+  "medium_speed_download_counts": {
+    "passed": 56,
+    "failed": 10,
+    "skipped": 5389,
+    "unverified": 0
+  },
+  "medium_speed_selection_policy": {
+    "group": "🚄 中速下载",
+    "requires_5mb_pass": true,
+    "requires_strict_pool": true,
+    "hong_kong_limit": 30,
+    "other_regions_limit": null,
+    "selected_count": 55
+  },
+  "medium_speed_recheck": {
+    "updated_at": "2026-10-12T01:47:33+08:00",
+    "node_count": 66,
+    "scope": "published_1mb_passed",
+    "preserved_measurements": [
+      "204",
+      "TCP",
+      "websites",
+      "app_TLS",
+      "1MB",
+      "100MB_double"
+    ]
+  },
   "high_speed_download_test": true,
   "high_speed_download_settings": {
     "version": 1,
@@ -410,6 +449,17 @@
     "n-102537efe01a",
     "n-98d7677b796a"
   ],
+  "node_naming_policy": {
+    "format": "地区编号|延迟ms|带宽Mbps|住宅类型|纯净度百分比",
+    "numbering": "ranked_per_region_starting_01",
+    "speed_source_priority": [
+      "100MB_double_minimum",
+      "5MB",
+      "1MB"
+    ],
+    "residential_label": "ipapi_isp_and_not_datacenter",
+    "unknown_fields_remain_unknown": true
+  },
   "ip_reputation_policy": {
     "provider": "ipapi.is",
     "scope": "quick_download_passed_unique_exits",
@@ -88779,7 +88829,27 @@
         "network_abuser_ratio": 0.002,
         "network_purity_score": 99.8
       },
-      "name": "美国·87b045 | 网页389.8ms | 1.9Mbps | 非机房 | 网段纯净99.80/有滥用"
+      "name": "美国03|390ms|2Mbps|住宅未知|纯净度99.8%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "未在时间预算内完整下载 5 MB",
+        "received_bytes": 1072448,
+        "elapsed_ms": 10018.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:05+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "1MB"
     },
     {
       "id": "n-4326cd25b31e",
@@ -125299,7 +125369,27 @@
         "network_abuser_ratio": 0.1406,
         "network_purity_score": 85.94
       },
-      "name": "泰国·2e26cd | 网页1343.6ms | 2.2Mbps | 机房 | 网段纯净85.94"
+      "name": "泰国01|1344ms|11Mbps|非住宅|纯净度85.9%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.305,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 3653.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:46:59+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-d77e5ebc7fb8",
@@ -131145,7 +131235,19 @@
         "network_abuser_ratio": 0.0211,
         "network_purity_score": 97.89
       },
-      "name": "法国·72c499 | 网页1169ms | 3.9Mbps | 机房 | 网段纯净97.89"
+      "name": "法国08|1169ms|4Mbps|非住宅|纯净度97.9%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:46:56+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "1MB"
     },
     {
       "id": "n-57ec7e6498a5",
@@ -133404,7 +133506,26 @@
         "network_abuser_ratio": 0.0493,
         "network_purity_score": 95.07
       },
-      "name": "法国·ad52e2 | 网页642.6ms | 153.2Mbps | 机房 | 网段纯净95.07"
+      "name": "法国01|643ms|153Mbps|非住宅|纯净度95.1%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 4925952
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:02+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-ebd2ca906c26",
@@ -135500,7 +135621,19 @@
         "network_abuser_ratio": 0.0134,
         "network_purity_score": 98.66
       },
-      "name": "法国·ebd2ca | 网页791.5ms | 3.5Mbps | 机房 | 网段纯净98.66/有滥用"
+      "name": "法国05|792ms|4Mbps|非住宅|纯净度98.7%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:46:58+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "1MB"
     },
     {
       "id": "n-4d8b61c02e52",
@@ -139363,7 +139496,19 @@
         "network_abuser_ratio": 0.0211,
         "network_purity_score": 97.89
       },
-      "name": "法国·e2f948 | 网页795.5ms | 138.8Mbps | 机房 | 网段纯净97.89"
+      "name": "法国04|796ms|139Mbps|非住宅|纯净度97.9%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:00+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-30bee69c91f9",
@@ -145298,7 +145443,27 @@
         "network_abuser_ratio": 0.0519,
         "network_purity_score": 94.81
       },
-      "name": "荷兰·0bb780 | 网页669.1ms | 143.4Mbps | 机房 | 网段纯净94.81"
+      "name": "荷兰02|669ms|143Mbps|非住宅|纯净度94.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 3.29,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1449.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:00+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-33270aae2779",
@@ -152638,7 +152803,27 @@
         "network_abuser_ratio": 0.0352,
         "network_purity_score": 96.48
       },
-      "name": "波兰·017e48 | 网页953.3ms | 4.5Mbps | 机房 | 网段纯净96.48"
+      "name": "波兰02|953ms|20Mbps|非住宅|纯净度96.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.396,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1990.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:02+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-a6b03ce864b2",
@@ -154732,7 +154917,27 @@
         "network_abuser_ratio": 0.0039,
         "network_purity_score": 99.61
       },
-      "name": "法国·a6b03c | 网页880.2ms | 204.3Mbps | 机房 | 网段纯净99.61"
+      "name": "法国09|880ms|204Mbps|非住宅|纯净度99.6%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.851,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1672.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:02+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-49fb3e53a1a1",
@@ -156805,7 +157010,27 @@
         "network_abuser_ratio": 0.0352,
         "network_purity_score": 96.48
       },
-      "name": "波兰·49fb3e | 网页1115.1ms | 3.8Mbps | 机房 | 网段纯净96.48/有滥用"
+      "name": "波兰03|1115ms|20Mbps|非住宅|纯净度96.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.391,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1994.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:04+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-32e7639f03ce",
@@ -162616,7 +162841,27 @@
         "network_abuser_ratio": 0.0508,
         "network_purity_score": 94.92
       },
-      "name": "捷克·7361d8 | 网页854.2ms | 4.6Mbps | 机房 | 网段纯净94.92"
+      "name": "捷克01|854ms|20Mbps|非住宅|纯净度94.9%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.343,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2035.1
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:04+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-fb78c1f64e0e",
@@ -168435,7 +168680,19 @@
         "network_abuser_ratio": 0.0781,
         "network_purity_score": 92.19
       },
-      "name": "BG·9bc63f | 网页1257.1ms | 3.7Mbps | 机房 | 网段纯净92.19"
+      "name": "BG02|1257ms|4Mbps|非住宅|纯净度92.2%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:04+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "1MB"
     },
     {
       "id": "n-34b23d00634e",
@@ -170503,7 +170760,27 @@
         "network_abuser_ratio": 0.0365,
         "network_purity_score": 96.35
       },
-      "name": "意大利·34b23d | 网页1002.1ms | 196.2Mbps | 机房 | 网段纯净96.35"
+      "name": "意大利01|1002ms|196Mbps|非住宅|纯净度96.3%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.145,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2222.8
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:06+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-ecb813a09c51",
@@ -172572,7 +172849,27 @@
         "network_abuser_ratio": 0.3125,
         "network_purity_score": 68.75
       },
-      "name": "英国·ecb813 | 网页726.7ms | 244.9Mbps | 机房 | 网段纯净68.75"
+      "name": "英国01|727ms|245Mbps|非住宅|纯净度68.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.818,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1692.0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:06+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-92bf9804b19c",
@@ -174666,7 +174963,27 @@
         "network_abuser_ratio": 0.0234,
         "network_purity_score": 97.66
       },
-      "name": "奥地利·92bf98 | 网页847.3ms | 176.8Mbps | 机房 | 网段纯净97.66"
+      "name": "奥地利01|847ms|177Mbps|非住宅|纯净度97.7%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.088,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2283.6
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:06+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-2ab35ee061d7",
@@ -176739,7 +177056,27 @@
         "network_abuser_ratio": 0.0547,
         "network_purity_score": 94.53
       },
-      "name": "西班牙·2ab35e | 网页1010.9ms | 4.3Mbps | 机房 | 网段纯净94.53"
+      "name": "西班牙01|1011ms|21Mbps|非住宅|纯净度94.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.483,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1920.5
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:07+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-247166e2defb",
@@ -180672,7 +181009,27 @@
         "network_abuser_ratio": 0.0003,
         "network_purity_score": 99.97
       },
-      "name": "美国·95a0dc | 网页411.2ms | 370.0Mbps | 住宅候选 | 网段纯净99.97"
+      "name": "美国05|411ms|370Mbps|住宅|纯净度100.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 19.761,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 241.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:06+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-f849cb8ba604",
@@ -182742,7 +183099,27 @@
         "network_abuser_ratio": 0.1016,
         "network_purity_score": 89.84
       },
-      "name": "瑞士·f849cb | 网页1171.8ms | 191.1Mbps | 机房 | 网段纯净89.84"
+      "name": "瑞士03|1172ms|191Mbps|非住宅|纯净度89.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.542,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1876.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:08+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-77fbeae1d3ca",
@@ -372644,7 +373021,27 @@
         "network_abuser_ratio": 1.0,
         "network_purity_score": 0.0
       },
-      "name": "美国·38e72b | 网页246.1ms | 477.6Mbps | 机房 | 网段纯净0.00/有滥用"
+      "name": "美国01|246ms|478Mbps|非住宅|纯净度0.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 8.455,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 564.0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:07+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-7b7d253b6d68",
@@ -426069,7 +426466,19 @@
         "network_abuser_ratio": 0.0066,
         "network_purity_score": 99.34
       },
-      "name": "台湾·3cfc5a | 网页1227.8ms | 3.1Mbps | 住宅候选 | 网段纯净99.34"
+      "name": "台湾01|1228ms|3Mbps|住宅|纯净度99.3%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:08+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "1MB"
     },
     {
       "id": "n-525c5e95d043",
@@ -444298,7 +444707,19 @@
         "network_abuser_ratio": 0.0781,
         "network_purity_score": 92.19
       },
-      "name": "波兰·16e061 | 网页964.4ms | 111.2Mbps | 机房 | 网段纯净92.19"
+      "name": "波兰01|964ms|111Mbps|非住宅|纯净度92.2%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:09+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-3809a7b83819",
@@ -459448,7 +459869,27 @@
         "network_abuser_ratio": 0.0211,
         "network_purity_score": 97.89
       },
-      "name": "法国·4d447b | 网页774.9ms | 137.0Mbps | 机房 | 网段纯净97.89"
+      "name": "法国03|775ms|137Mbps|非住宅|纯净度97.9%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.462,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 3261.8
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:10+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-a8f80b438004",
@@ -596910,7 +597351,27 @@
         "network_abuser_ratio": 0.1211,
         "network_purity_score": 87.89
       },
-      "name": "DK·3045e6 | 网页1099.3ms | 189.4Mbps | 机房 | 网段纯净87.89"
+      "name": "DK01|1099ms|189Mbps|非住宅|纯净度87.9%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.474,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1927.6
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:10+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-b7fcd414f39c",
@@ -615709,7 +616170,27 @@
         "network_abuser_ratio": 0.0427,
         "network_purity_score": 95.73
       },
-      "name": "美国·688201 | 网页1060.9ms | 170.8Mbps | 机房 | 网段纯净95.73/有滥用"
+      "name": "美国08|1061ms|171Mbps|非住宅|纯净度95.7%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.907,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2500.0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:11+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-df9d1455d90d",
@@ -625172,7 +625653,27 @@
         "network_abuser_ratio": 0.0079,
         "network_purity_score": 99.21
       },
-      "name": "美国·515d6e | 网页1451.4ms | 530.4Mbps | 机房 | 网段纯净99.21/有滥用"
+      "name": "美国09|1451ms|530Mbps|非住宅|纯净度99.2%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 4.459,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1069.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:10+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-1ad741401f55",
@@ -627263,7 +627764,27 @@
         "network_abuser_ratio": 0.0232,
         "network_purity_score": 97.68
       },
-      "name": "加拿大·1ad741 | 网页430.4ms | 526.7Mbps | 机房 | 网段纯净97.68"
+      "name": "加拿大01|430ms|527Mbps|非住宅|纯净度97.7%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 16.778,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 284.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:10+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-66591e67e528",
@@ -631380,7 +631901,19 @@
         "network_abuser_ratio": 0.001,
         "network_purity_score": 99.9
       },
-      "name": "韩国·797785 | 网页988.4ms | 62.8Mbps | 住宅候选 | 网段纯净99.90/有滥用"
+      "name": "韩国02|988ms|63Mbps|住宅|纯净度99.9%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:12+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-e1811b682ddc",
@@ -633441,7 +633974,26 @@
         "network_abuser_ratio": 0.001,
         "network_purity_score": 99.9
       },
-      "name": "韩国·e1811b | 网页882.5ms | 125.5Mbps | 住宅候选 | 网段纯净99.90/有滥用"
+      "name": "韩国01|882ms|125Mbps|住宅|纯净度99.9%",
+      "medium_speed_download": {
+        "status": "failed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": null,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 下载连接、TLS 或读取失败",
+        "received_bytes": 331456
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:19+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-94eb495c188f",
@@ -637457,7 +638009,27 @@
         "network_abuser_ratio": 0.0352,
         "network_purity_score": 96.48
       },
-      "name": "印度尼西亚·dac8c5 | 网页1089.2ms | 3.2Mbps | 住宅候选 | 网段纯净96.48/有滥用"
+      "name": "印度尼西亚02|1089ms|10Mbps|住宅|纯净度96.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.17,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 4076.8
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:14+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-d0b2eb5e2308",
@@ -639543,7 +640115,27 @@
         "network_abuser_ratio": 0.0352,
         "network_purity_score": 96.48
       },
-      "name": "印度尼西亚·d0b2eb | 网页1275ms | 3.3Mbps | 住宅候选 | 网段纯净96.48/有滥用"
+      "name": "印度尼西亚01|1275ms|10Mbps|住宅|纯净度96.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.158,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 4116.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:15+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-f3500d59c321",
@@ -641683,7 +642275,27 @@
         "network_abuser_ratio": 0.1758,
         "network_purity_score": 82.42
       },
-      "name": "法国·87860e | 网页746.5ms | 230.9Mbps | 机房 | 网段纯净82.42"
+      "name": "法国02|746ms|231Mbps|非住宅|纯净度82.4%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.866,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1663.7
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:14+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-61779d53f067",
@@ -643745,7 +644357,27 @@
         "network_abuser_ratio": 0.0898,
         "network_purity_score": 91.02
       },
-      "name": "瑞典·61779d | 网页1058.9ms | 195.3Mbps | 机房 | 网段纯净91.02"
+      "name": "瑞典02|1059ms|195Mbps|非住宅|纯净度91.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.207,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2160.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:16+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-ba16d5517402",
@@ -647800,7 +648432,27 @@
         "network_abuser_ratio": 0.0625,
         "network_purity_score": 93.75
       },
-      "name": "美国·7b754a | 网页436.3ms | 434.4Mbps | 机房 | 网段纯净93.75"
+      "name": "美国06|436ms|434Mbps|非住宅|纯净度93.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 5.802,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 821.9
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:15+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-0b8baf8b29a7",
@@ -649892,7 +650544,27 @@
         "network_abuser_ratio": 0.0,
         "network_purity_score": 100.0
       },
-      "name": "加拿大·0b8baf | 网页644.2ms | 390.0Mbps | 非机房 | 网段纯净100.00"
+      "name": "加拿大04|644ms|390Mbps|住宅未知|纯净度100.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 15.512,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 307.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:15+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-4ec7b2d00b2f",
@@ -651978,7 +652650,27 @@
         "network_abuser_ratio": 0.0,
         "network_purity_score": 100.0
       },
-      "name": "法国·4ec7b2 | 网页966ms | 131.7Mbps | 住宅候选 | 网段纯净100.00"
+      "name": "法国07|966ms|132Mbps|住宅|纯净度100.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.434,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1959.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:17+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-e6f43095a573",
@@ -654040,7 +654732,27 @@
         "network_abuser_ratio": 0.0626,
         "network_purity_score": 93.74
       },
-      "name": "瑞典·e6f430 | 网页961.6ms | 198.3Mbps | 机房 | 网段纯净93.74/有滥用"
+      "name": "瑞典01|962ms|198Mbps|非住宅|纯净度93.7%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.295,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2077.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:17+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-ea902185c380",
@@ -656121,7 +656833,27 @@
         "network_abuser_ratio": 0.0781,
         "network_purity_score": 92.19
       },
-      "name": "BG·ea9021 | 网页1169.4ms | 3.4Mbps | 机房 | 网段纯净92.19"
+      "name": "BG01|1169ms|17Mbps|非住宅|纯净度92.2%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.084,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2288.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:19+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-9bfab8a0502e",
@@ -658207,7 +658939,27 @@
         "network_abuser_ratio": 0.1133,
         "network_purity_score": 88.67
       },
-      "name": "爱沙尼亚·9bfab8 | 网页1196.1ms | 186.5Mbps | 机房 | 网段纯净88.67/有滥用"
+      "name": "爱沙尼亚01|1196ms|186Mbps|非住宅|纯净度88.7%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.204,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2163.7
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:19+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-7bcba9424a41",
@@ -660285,7 +661037,27 @@
         "network_abuser_ratio": 0.0039,
         "network_purity_score": 99.61
       },
-      "name": "荷兰·7bcba9 | 网页888.6ms | 192.3Mbps | 机房 | 网段纯净99.61"
+      "name": "荷兰04|889ms|192Mbps|非住宅|纯净度99.6%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.904,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1642.1
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:19+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-298dea4d214d",
@@ -662324,7 +663096,27 @@
         "network_abuser_ratio": 0.0015,
         "network_purity_score": 99.85
       },
-      "name": "印度·298dea | 网页1362.6ms | 2.9Mbps | 机房 | 网段纯净99.85"
+      "name": "印度01|1363ms|11Mbps|非住宅|纯净度99.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.273,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 3745.6
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:22+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-08af633a1174",
@@ -666490,7 +667282,27 @@
         "network_abuser_ratio": 0.25,
         "network_purity_score": 75.0
       },
-      "name": "AL·6273c6 | 网页1429ms | 3.6Mbps | 机房 | 网段纯净75.00"
+      "name": "AL01|1429ms|17Mbps|非住宅|纯净度75.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.987,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2399.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:21+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-d20e617ce500",
@@ -670385,7 +671197,27 @@
         "network_abuser_ratio": 0.0859,
         "network_purity_score": 91.41
       },
-      "name": "罗马尼亚·515947 | 网页1230.2ms | 184.9Mbps | 机房 | 网段纯净91.41"
+      "name": "罗马尼亚01|1230ms|185Mbps|非住宅|纯净度91.4%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.04,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2337.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:21+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-ba6a24c37870",
@@ -672470,7 +673302,27 @@
         "network_abuser_ratio": 0.1055,
         "network_purity_score": 89.45
       },
-      "name": "NO·ba6a24 | 网页1100.5ms | 203.9Mbps | 机房 | 网段纯净89.45"
+      "name": "NO01|1100ms|204Mbps|非住宅|纯净度89.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.938,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2461.0
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:22+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-43f20a7e5bd1",
@@ -674531,7 +675383,27 @@
         "network_abuser_ratio": 0.0469,
         "network_purity_score": 95.31
       },
-      "name": "瑞士·43f20a | 网页971.4ms | 222.7Mbps | 机房 | 网段纯净95.31"
+      "name": "瑞士01|971ms|223Mbps|非住宅|纯净度95.3%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.495,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1910.9
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:23+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-1c83bac96dc4",
@@ -676595,7 +677467,27 @@
         "network_abuser_ratio": 0.0547,
         "network_purity_score": 94.53
       },
-      "name": "罗马尼亚·1c83ba | 网页1145.8ms | 3.9Mbps | 机房 | 网段纯净94.53"
+      "name": "罗马尼亚02|1146ms|18Mbps|非住宅|纯净度94.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.177,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2190.1
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:24+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-dfa90b95ed1c",
@@ -678686,7 +679578,27 @@
         "network_abuser_ratio": 0.0,
         "network_purity_score": 100.0
       },
-      "name": "美国·dfa90b | 网页291.5ms | 609.0Mbps | 住宅候选 | 网段纯净100.00"
+      "name": "美国02|292ms|609Mbps|住宅|纯净度100.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 10.09,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 472.6
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:22+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-6f8cc1aa23d4",
@@ -680769,7 +681681,27 @@
         "network_abuser_ratio": 0.0232,
         "network_purity_score": 97.68
       },
-      "name": "加拿大·6f8cc1 | 网页491.5ms | 342.1Mbps | 机房 | 网段纯净97.68"
+      "name": "加拿大02|492ms|342Mbps|非住宅|纯净度97.7%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 16.007,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 297.9
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:23+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-20e2cce2d6f6",
@@ -682850,7 +683782,27 @@
         "network_abuser_ratio": 0.0664,
         "network_purity_score": 93.36
       },
-      "name": "卢森堡·20e2cc | 网页1068.8ms | 4.3Mbps | 机房 | 网段纯净93.36"
+      "name": "卢森堡01|1069ms|14Mbps|非住宅|纯净度93.4%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.711,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2786.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:25+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-02240da374bd",
@@ -684941,7 +685893,27 @@
         "network_abuser_ratio": 0.0547,
         "network_purity_score": 94.53
       },
-      "name": "美国·02240d | 网页378ms | 508.6Mbps | 机房 | 网段纯净94.53"
+      "name": "美国04|378ms|509Mbps|非住宅|纯净度94.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 12.668,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 376.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:23+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-7f7d62a90830",
@@ -686984,7 +687956,27 @@
         "network_abuser_ratio": 0.2148,
         "network_purity_score": 78.52
       },
-      "name": "英国·7f7d62 | 网页873.7ms | 216.1Mbps | 机房 | 网段纯净78.52"
+      "name": "英国02|874ms|216Mbps|非住宅|纯净度78.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.934,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1625.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:25+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-89f02711b268",
@@ -689075,7 +690067,27 @@
         "network_abuser_ratio": 0.0,
         "network_purity_score": 100.0
       },
-      "name": "加拿大·89f027 | 网页568.9ms | 343.6Mbps | 非机房 | 网段纯净100.00"
+      "name": "加拿大03|569ms|344Mbps|住宅未知|纯净度100.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 13.632,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 349.8
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:24+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-f54a60ffd49e",
@@ -691115,7 +692127,27 @@
         "network_abuser_ratio": 0.0391,
         "network_purity_score": 96.09
       },
-      "name": "PT·f54a60 | 网页1308.7ms | 3.2Mbps | 机房 | 网段纯净96.09/有滥用"
+      "name": "PT01|1309ms|13Mbps|非住宅|纯净度96.1%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.541,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 3095.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:27+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-a2483722f716",
@@ -693184,7 +694216,27 @@
         "network_abuser_ratio": 0.1289,
         "network_purity_score": 87.11
       },
-      "name": "荷兰·a24837 | 网页851.3ms | 209.2Mbps | 机房 | 网段纯净87.11"
+      "name": "荷兰05|851ms|209Mbps|非住宅|纯净度87.1%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.746,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1736.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:25+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-09a158e93e4b",
@@ -695256,7 +696308,27 @@
         "network_abuser_ratio": 0.0508,
         "network_purity_score": 94.92
       },
-      "name": "捷克·09a158 | 网页869.9ms | 4.8Mbps | 机房 | 网段纯净94.92"
+      "name": "捷克02|870ms|19Mbps|非住宅|纯净度94.9%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.319,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2056.4
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:27+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-7c75dfc73d1b",
@@ -699426,7 +700498,27 @@
         "network_abuser_ratio": 0.0002,
         "network_purity_score": 99.98
       },
-      "name": "美国·bd504a | 网页548.2ms | 328.5Mbps | 机房 | 网段纯净99.98/有滥用"
+      "name": "美国07|548ms|328Mbps|非住宅|纯净度100.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 4.424,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1077.9
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:26+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-f717097b76f9",
@@ -701511,7 +702603,27 @@
         "network_abuser_ratio": 0.0519,
         "network_purity_score": 94.81
       },
-      "name": "荷兰·f71709 | 网页868.3ms | 104.5Mbps | 机房 | 网段纯净94.81"
+      "name": "荷兰03|868ms|104Mbps|非住宅|纯净度94.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.832,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1683.9
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:27+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-1111faba5e5b",
@@ -703537,7 +704649,27 @@
         "network_abuser_ratio": 0.0244,
         "network_purity_score": 97.56
       },
-      "name": "新加坡·1111fa | 网页1752.9ms | 2.6Mbps | 机房 | 网段纯净97.56/有滥用"
+      "name": "新加坡01|1753ms|10Mbps|非住宅|纯净度97.6%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.155,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 4128.1
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:30+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-afc9b367a477",
@@ -705583,7 +706715,27 @@
         "network_abuser_ratio": 0.0017,
         "network_purity_score": 99.83
       },
-      "name": "印度·afc9b3 | 网页1336.4ms | 2.8Mbps | 机房 | 网段纯净99.83"
+      "name": "印度02|1336ms|12Mbps|非住宅|纯净度99.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 1.467,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 3250.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:30+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-85cf9ef2f382",
@@ -711522,7 +712674,27 @@
         "network_abuser_ratio": 0.0752,
         "network_purity_score": 92.48
       },
-      "name": "克罗地亚·abdbdb | 网页1144.3ms | 189.4Mbps | 机房 | 网段纯净92.48"
+      "name": "克罗地亚01|1144ms|189Mbps|非住宅|纯净度92.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.432,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1960.9
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:29+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-217f5af0a330",
@@ -715466,7 +716638,27 @@
         "network_abuser_ratio": 0.0313,
         "network_purity_score": 96.87
       },
-      "name": "塞尔维亚·c3b9a6 | 网页1157ms | 3.6Mbps | 机房 | 网段纯净96.87"
+      "name": "塞尔维亚01|1157ms|18Mbps|非住宅|纯净度96.9%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.126,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2242.6
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:29+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-5bd035495376",
@@ -717537,7 +718729,27 @@
         "network_abuser_ratio": 0.0469,
         "network_purity_score": 95.31
       },
-      "name": "意大利·5bd035 | 网页1375.1ms | 3.7Mbps | 机房 | 网段纯净95.31"
+      "name": "意大利03|1375ms|20Mbps|非住宅|纯净度95.3%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.421,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1969.7
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:31+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     },
     {
       "id": "n-89dff00d48fd",
@@ -719607,7 +720819,27 @@
         "network_abuser_ratio": 0.0352,
         "network_purity_score": 96.48
       },
-      "name": "德国·89dff0 | 网页864.7ms | 178.4Mbps | 机房 | 网段纯净96.48"
+      "name": "德国01|865ms|178Mbps|非住宅|纯净度96.5%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.721,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1752.6
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:31+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-5d6090f7fbcf",
@@ -721692,7 +722924,27 @@
         "network_abuser_ratio": 0.0023,
         "network_purity_score": 99.77
       },
-      "name": "法国·5d6090 | 网页874.5ms | 117.8Mbps | 住宅候选 | 网段纯净99.77"
+      "name": "法国06|874ms|118Mbps|住宅|纯净度99.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.535,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1880.8
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:32+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-29d1e75057d4",
@@ -729410,7 +730662,27 @@
         "network_abuser_ratio": 0.0898,
         "network_purity_score": 91.02
       },
-      "name": "瑞士·9b1671 | 网页980.4ms | 196.5Mbps | 机房 | 网段纯净91.02"
+      "name": "瑞士02|980ms|197Mbps|非住宅|纯净度91.0%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.519,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1893.2
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:32+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-102537efe01a",
@@ -731495,7 +732767,27 @@
         "network_abuser_ratio": 0.0519,
         "network_purity_score": 94.81
       },
-      "name": "荷兰·102537 | 网页717.4ms | 115.3Mbps | 机房 | 网段纯净94.81"
+      "name": "荷兰01|717ms|115Mbps|非住宅|纯净度94.8%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.656,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 1795.3
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:32+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "100MB_double_minimum"
     },
     {
       "id": "n-98d7677b796a",
@@ -733565,7 +734857,27 @@
         "network_abuser_ratio": 0.0007,
         "network_purity_score": 99.93
       },
-      "name": "意大利·98d767 | 网页1157.1ms | 3.6Mbps | 住宅候选 | 网段纯净99.93/有滥用"
+      "name": "意大利02|1157ms|19Mbps|住宅|纯净度99.9%",
+      "medium_speed_download": {
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__down?bytes=5000000",
+        "requested_bytes": 5000000,
+        "budget_seconds": 10,
+        "speed_mib_s": 2.293,
+        "http_status": 200,
+        "response_length": "5000000",
+        "response_type": "application/octet-stream",
+        "response_encoding": "identity",
+        "request_headers": {
+          "Referer": "https://speed.cloudflare.com/"
+        },
+        "reason": "5 MB 完整下载；速度包含建连耗时",
+        "received_bytes": 5000000,
+        "elapsed_ms": 2079.9
+      },
+      "medium_speed_updated_at": "2026-10-12T01:47:33+08:00",
+      "name_latency_source": "Google_YouTube_slower_median",
+      "name_bandwidth_source": "5MB"
     }
   ]
 }
