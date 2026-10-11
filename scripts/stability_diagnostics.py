@@ -67,20 +67,7 @@ def main():
                 by_id[jobs[job]]['samples'][label] = job.result()
         print(label, {kind: sum(st.round_passed(by_id[r['id']]['samples'][label]) for r, k in chosen if k == kind)
                       for kind in sorted({k for _, k in chosen})}, flush=True)
-        health = {'process_alive': core.process.poll() is None}
-        try:
-            health['open_connections'] = len(core.get('/connections').get('connections') or [])
-            health['api_available'] = True
-        except Exception as error:
-            health['api_available'] = False
-            health['api_error_type'] = type(error).__name__
-        fd_path = Path('/proc') / str(core.process.pid) / 'fd'
-        if fd_path.exists():
-            health['open_file_descriptors'] = len(list(fd_path.iterdir()))
-        # Never expose raw core logs, which can include sensitive node details.
-        log = (root / 'core.log').read_text(errors='replace')
-        health['file_limit_errors'] = log.lower().count('too many open files')
-        output['core_health'][label] = health
+        output['core_health'][label] = st.core_health(core, root)
         (root / 'results.json').write_text(json.dumps(output, ensure_ascii=False, indent=2) + '\n')
     with s.Core(binary, root, [mapping[r['id']] for r in records], listeners) as core:
         measure('initial_core', 1, core)
