@@ -29,7 +29,7 @@ class MobilePilotTests(unittest.TestCase):
                 response = Response(); response.status_code = status
                 session.return_value.__enter__.return_value.get.return_value = response
                 result = pilot.check_site(1234, 'Claude', pilot.CLAUDE_PAGE_URL)
-                self.assertEqual(result['status'], 'needs_review')
+                self.assertEqual(result['status'], 'verification_required')
                 self.assertEqual(result.get('restriction'), 'cloudflare_challenge')
 
     def test_claude_region_redirect_is_explicit_without_following_or_exposing_query(self):

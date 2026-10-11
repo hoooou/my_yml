@@ -24,11 +24,11 @@ import app_tls
 import published_history
 import high_speed
 from attempt_report import write_attempt
-from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS
+from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
-          'unstable': '波动', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
+          'unstable': '波动', 'verification_required': 'CF需验证', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
 WEBSITE_ROUNDS = 3
 CORE_SITES = ('Google', 'YouTube')
 REQUIRED_SITES = ('Google', 'YouTube', 'ChatGPT', 'Gemini', 'GitHub',
@@ -332,7 +332,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         else:
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
-                        record['download']['reason'] = '12个必过页面未全部三轮通过或Claude trace未通过，跳过下载'
+                        record['download']['reason'] = '12个必过页面未满足三轮访问条件或Claude trace未通过，跳过下载'
             with lock:
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
@@ -385,9 +385,13 @@ def merge_shards(bundle, parts, count):
                 raise ValueError('通过节点缺少海外三轮或国内/trace 单轮检测')
             if record.get('websites'):
                 for label, item in record['websites'].items():
+                    if any(a.get('status') == 'verification_required'
+                           and not confirmed_cloudflare_challenge(label, a) for a in item['attempts']):
+                        raise ValueError('Cloudflare 验证标记缺少可靠响应证据')
                     expected = summarize_rounds([{label: attempt} for attempt in item['attempts']], (label,))[label]
                     if any(item.get(key) != expected[key] for key in ('status', 'passed_count', 'median_elapsed_ms',
-                            'p95_elapsed_ms', 'jitter_ms', 'median_ttfb_ms', 'failure_count', 'slow_count')):
+                            'p95_elapsed_ms', 'jitter_ms', 'median_ttfb_ms', 'failure_count', 'slow_count',
+                            'accepted_count', 'verification_required_count')):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
             if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
                 raise ValueError('节点未按阶段筛选')
@@ -434,12 +438,19 @@ def summarize_rounds(rounds, labels=SITES):
     for label in labels:
         attempts = [row[label] for row in rounds]
         passed = sum(a['status'] == 'passed' for a in attempts)
-        status = ('passed' if passed == len(rounds) else 'needs_review' if any(a['status'] == 'needs_review' for a in attempts)
-                  else 'unstable' if passed else 'slow' if any(a['status'] == 'slow' for a in attempts) else 'failed')
+        verified = sum(a.get('status') == 'verification_required'
+                       and confirmed_cloudflare_challenge(label, a) for a in attempts)
+        accepted = passed + verified
+        status = ('passed' if passed == len(rounds)
+                  else 'verification_required' if accepted == len(rounds)
+                  else 'needs_review' if any(a['status'] == 'needs_review' for a in attempts)
+                  else 'unstable' if accepted
+                  else 'slow' if any(a['status'] == 'slow' for a in attempts) else 'failed')
         delays = [a['elapsed_ms'] for a in attempts if a.get('elapsed_ms') is not None and a['status'] == 'passed']
         all_delays = sorted(a['elapsed_ms'] for a in attempts if a.get('elapsed_ms') is not None)
         headers = [a['ttfb_ms'] for a in attempts if a.get('ttfb_ms') is not None]
         summarized[label] = {'status': status, 'passed_count': passed, 'round_count': len(rounds),
+                              'verification_required_count': verified, 'accepted_count': accepted,
                               'median_elapsed_ms': round(statistics.median(delays), 1) if delays else None,
                               'max_elapsed_ms': max(delays) if delays else None,
                               'p95_elapsed_ms': all_delays[math.ceil(.95 * len(all_delays)) - 1] if all_delays else None,
@@ -475,10 +486,48 @@ def connectivity_count(record):
         results.get(label, {}).get('status') == 'passed' for label in ('ChatGPTTrace', 'ClaudeTrace'))
 
 
+def page_rounds_accepted(label, item, rounds=WEBSITE_ROUNDS):
+    if item.get('round_count') != rounds:
+        return False
+    if item.get('status') == 'passed':
+        return item.get('passed_count') == rounds
+    attempts = item.get('attempts') or []
+    return (item.get('status') == 'verification_required' and len(attempts) == rounds
+            and all(a.get('status') == 'passed' or
+                    (a.get('status') == 'verification_required'
+                     and confirmed_cloudflare_challenge(label, a)) for a in attempts))
+
+
+def website_access_count(record):
+    sites = record.get('websites') or {}
+    return sum(page_rounds_accepted(label, sites.get(label) or {}) for label in OVERSEAS_SITES)
+
+
+def reclassify_cloudflare_records(records):
+    """Reinterpret existing explicit header observations; never invent a new probe."""
+    changed = 0
+    for record in records:
+        for label, item in (record.get('websites') or {}).items():
+            attempts = copy.deepcopy(item.get('attempts') or [])
+            affected = False
+            for attempt in attempts:
+                # Legacy restriction was emitted exclusively for cf-mitigated: challenge.
+                if attempt.get('status') != 'needs_review' or attempt.get('restriction') != 'cloudflare_challenge':
+                    continue
+                candidate = {**attempt, 'classification_source': 'recorded_cloudflare_challenge'}
+                if confirmed_cloudflare_challenge(label, candidate):
+                    attempt.update(classification_source='recorded_cloudflare_challenge',
+                        status='verification_required',
+                        reason='明确 Cloudflare 人机验证；按用户策略认可网站可达，实际页面未验证')
+                    changed += 1
+                    affected = True
+            if affected:
+                record['websites'][label] = summarize_rounds([{label: a} for a in attempts], (label,))[label]
+    return changed
+
+
 def required_websites_passed(record):
-    return all((record.get('websites') or {}).get(label, {}).get('status') == 'passed'
-        and (record['websites'][label].get('round_count') == WEBSITE_ROUNDS)
-        and (record['websites'][label].get('passed_count') == WEBSITE_ROUNDS)
+    return all(page_rounds_accepted(label, (record.get('websites') or {}).get(label) or {})
         for label in REQUIRED_SITES) and all(
         (record.get('websites') or {}).get(label, {}).get('status') == 'passed'
         and record['websites'][label].get('round_count') == 1
@@ -500,9 +549,7 @@ def web_quality_eligible(record):
             value = item.get(field)
             if not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= limit:
                 return False
-    return sum((sites.get(label) or {}).get('status') == 'passed'
-               and (sites.get(label) or {}).get('round_count') == WEBSITE_ROUNDS
-               for label in OVERSEAS_SITES) >= math.ceil(len(OVERSEAS_SITES) / 2)
+    return website_access_count(record) >= math.ceil(len(OVERSEAS_SITES) / 2)
 
 
 def web_rank_metrics(record):
@@ -691,11 +738,13 @@ def main():
                  if r.get('name') in by_name]
         nodes, mobile_rejections = filter_mobile_nodes(nodes)
         records = [r for r in previous['nodes'] if r['id'] not in mobile_rejections]
+        reclassified_count = reclassify_cloudflare_records(records)
         if not nodes:
             raise RuntimeError('没有手机可安全读取的节点；保留旧订阅')
         bundle = {'base': yaml.safe_load(Path('聚合配置.yaml').read_text()), 'nodes': nodes,
                   'metadata': {r['id']: {'sources': r.get('sources', [])} for r in records},
                   'sources': previous['sources'], 'input_count': previous['input_unique_count'],
+                  'historical_candidates': previous.get('historical_candidates', {}),
                   'rejected': sorted(set(previous['invalid_node_ids']) | set(mobile_rejections)),
                   'mobile_rejections': {**previous.get('mobile_rejections', {}), **mobile_rejections},
                   'services': previous['services'], 'scope': previous['scope'],
@@ -791,7 +840,7 @@ def main():
     repairing = args.phase in ('repair', 'web-recheck')
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 14,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 15,
               'historical_candidates': bundle.get('historical_candidates', {}),
               'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
                   'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
@@ -805,7 +854,13 @@ def main():
                   'workers': 8, 'jobs': 1,
                   'preserved_measurements': ['HTTPS204', 'domestic_TCP', 'domestic_pages', 'trace', '1MB_download', 'high_speed_download']}
                   if args.phase == 'web-recheck' else previous.get('website_recheck') if repairing else None),
-              'website_measurement_policy': {'version': 4, 'overseas_rounds': WEBSITE_ROUNDS,
+              'cloudflare_classification_update': ({'updated_at': now, 'reclassified_attempts': reclassified_count,
+                  'new_measurements': False, 'source': 'captured_cloudflare_challenge_restriction'}
+                  if repairing else None),
+              'website_measurement_policy': {'version': 5,
+                  'confirmed_cloudflare_challenge': 'accepted_access_verification_required',
+                  'challenge_in_page_speed_ranking': False,
+                  'challenge_can_replace_204_or_trace': False, 'overseas_rounds': WEBSITE_ROUNDS,
                   'domestic_and_trace_rounds': 1, 'sample_bytes': 16384,
                   'sample_bytes_overrides': PAGE_SAMPLE_LIMITS,
                   'max_ttfb_ms': MAX_TTFB_MS, 'max_sample_ms': MAX_SAMPLE_MS,
@@ -815,7 +870,7 @@ def main():
                   'claude_validation': 'trace_only', 'claude_homepage_tested': False,
                   'core_median_limit_ms': CORE_MEDIAN_MS,
                   'core_p95_limit_ms': CORE_TAIL_MS, 'core_jitter_limit_ms': CORE_JITTER_MS,
-                  'min_stable_overseas_sites': math.ceil(len(OVERSEAS_SITES) / 2),
+                  'min_accepted_overseas_sites': math.ceil(len(OVERSEAS_SITES) / 2),
                   'eligible_count': sum(web_quality_eligible(r) and (r.get('download') or {}).get('status') == 'passed' for r in records)},
               'mobile_rejections': bundle.get('mobile_rejections', {}),
               'pipeline': True, 'parallel_shards': bundle.get('parallel_shards', args.shard_count if args.phase == 'publish' else 1),
@@ -886,28 +941,30 @@ def main():
             f'本轮 {report["parallel_shards"]} 个并行 Actions 分片，每片最多同时检测 16 个节点。同一节点按顺序过关，不同节点可同时处于不同阶段；海外网页各请求三轮，国内及 trace 各一次，每节点最多五个请求并发；新增网站不会增加并发连接上限。', '',
             '海外网页目标：' + '、'.join(OVERSEAS_SITES) + '；另测 ChatGPT、Claude 两个 trace。', '',
             '国内网页目标：' + '、'.join(DOMESTIC_SITES) + '。这些检测由 GitHub 通过当前节点访问国内站点，仅供出口回国访问对照；手机规则将国内站点直连，因此不代表手机直连、移动线路延迟或地区解锁。国内结果不参与海外排名，也不能单独触发下载阶段。', '',
-            '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；403、验证码或风控记为需人工复核。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
-            'TCP通且指定12个海外网站各三轮均通过且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
+            '网页Amazon最多读取64 KB，其余最多16 KB，分别记录响应头与样本接收耗时、字节数。响应头>3000ms或样本>5000ms记为响应慢；明确cf-mitigated: challenge且来自预期HTTPS网站的验证页单列CF需验证，认可网站可达，不记访问失败；普通403、其他验证码或风控仍需复核。CF验证响应不作为真实页面速度，不替代204、trace或应用TLS。trace 必须返回预期域名、公网出口 IP、地区和 HTTPS 标识，只表示域名连通，不证明登录、对话或视频播放可用。', '',
+            'TCP通且指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过后，使用 Cloudflare 官方 __down?bytes=1000000 下载 1 MB 一次，读取超时 1 秒、采样预算 6 秒；完整长度、类型和响应状态匹配才通过。到预算即停止读取，单次底层连接/读取可能再等待其自身超时。速度包含 TLS 和首字节等待，是小文件快速采样速度，不能代表峰值带宽。', '',
             f'仅1 MB快测通过的节点继续依次测试Cloudflare（{high_speed.URLS[0]}）和DataPacket（{high_speed.URLS[1]}），每次完整100,000,000字节、各自{HIGH_DOWNLOAD_BUDGET}秒，读取超时1秒，每分片最多同时测试2个节点。两次都通过才进入高速组，按较慢一次速度排序和命名；历史单轮结果不冒充双轮通过。本批数据的实际设置：{report["high_speed_download_settings"]}；重建配置不改写历史采样。香港最多30个，其他地区不限，本次高速组{report["high_speed_selection_policy"]["selected_count"]}个。未通过1 MB的节点不消耗大文件流量。', '',
             f'逐目标100 MB结果：{report["high_speed_target_counts"]}。', '',
-            '综合优选要求1 MB通过、指定12个海外网站各三轮均通过且Claude trace单轮通过；Google/YouTube、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
+            '综合优选要求1 MB通过、指定12个海外网站各三轮均正常响应或明确CF验证且Claude trace单轮通过；Google/YouTube三轮真实页面、中位耗时≤1500ms、最慢一轮≤3000ms、极差≤1500ms；必过网站不由其他站或trace替代；按网站尾延迟、中位耗时和波动优先排序，再比较覆盖与下载。不用下载速度掩盖网页响应差。综合、高速和非机房组仅香港最多 30 个，其他地区不限数量。非机房组仍按出口 IP 去重，且必须明确 hosting=false。', '',
             '手机显示五个分组：全局选择、综合优选、高速下载、非机房 IP、台湾／新加坡。前三类节点组共用严格合格池，地区组使用用户授权的较宽响应门槛；不满足任何入选门槛的节点定义和凭据不写入订阅，记录保留在报告。每天重新获取全部来源，可让恢复的节点重新入选。网站延迟及速度来自 GitHub 云端，国内 TCP 分类已由用户本地对照。', '',
-            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮访问和Claude trace单轮均须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过，Claude仅检测trace；不允许其他页面或trace替代12站，不放行验证码、错误页面或未测项目。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
+            f'台湾／新加坡按已确认出口地区入选，不按来源名称猜测：204三轮、国内TCP、1 MB下载、指定12站各三轮正常响应或明确CF验证，Claude trace单轮须通过；核心网页中位耗时≤{REGIONAL_MEDIAN_MS}ms、最慢≤{REGIONAL_TAIL_MS}ms、极差≤{REGIONAL_JITTER_MS}ms。12个指定页面必过（明确CF验证认可可达），Claude仅检测trace；不允许其他页面或trace替代12站，其他验证码、错误页面或未测项目不放行。Google/YouTube响应质量仍要求三轮真实页面，验证页速度不参与质量判定。仅满足地区门槛的节点只进入地区组，不进入综合、高速或非机房组。本次地区数量：{report["regional_selection"]["country_counts"]}。无节点则显示REJECT，不补入失败节点。', '',
             '节点名称：地区·唯一短标识｜网页响应中位耗时（无数据时明确标204）｜下载换算 Mbps｜住宅类型｜网段纯净度。住宅候选表示 ISP 网络且非机房；非机房不能直接等同住宅。纯净度 = 100 × (1 − ipapi.is company.abuser_score 的数值比例)，是网段未标记滥用比例，不是单个 IP 的综合风控分。缺少数据显示未知，已知滥用单独标注。', '',
             '分流：局域网直连，保留广告拦截；明确的海外 AI、社交、影音、开发服务及相关资源域名优先走全局选择，国内站点直连，随后保留个人域名例外与维护中的规则集，未匹配流量走全局选择。Cursor 改走代理，移除 Tencent/元宝关键词直连，补上 GFW 规则；不增加应用策略组。节点域名和国内 DNS 用国内解析器，海外 DNS 随全局选择走代理，移除绑定旧局域网的引导 DNS。', '',
             '## 服务状态', '', '| 服务 | 当前接入 | 状态说明 |', '|---|---|---|']
     for name, service in services.items():
         rows.append(f'| [{name}]({service["url"]}) | {service["mode"]} | {service.get("reason", "公开 TCPing API，最多 5 次请求/秒")} |')
     rows += ['', '表格仅展示进入海外网站检测的节点；全部节点及跳过原因见 [JSON 完整报告](连通性报告.json)。', '']
-    rows += ['## 网站覆盖', '', '| 网站 | 分类 | 通过 | 不通过 | 响应慢 | 波动 | 需复核 | 未测 |', '|---|---|---:|---:|---:|---:|---:|---:|']
+    if repairing:
+        rows += ['', f'本次按新策略重新分类{reclassified_count}次已记录的明确CF验证响应；保留原HTTP状态、采样耗时和测量时间，没有重新测速。', '']
+    rows += ['## 网站覆盖', '', '| 网站 | 分类 | 通过 | 不通过 | 响应慢 | 波动 | CF需验证 | 需复核 | 未测 |', '|---|---|---:|---:|---:|---:|---:|---:|---:|']
     for label, url in report['test_targets'].items():
         if label == 'Google204':
             continue
         measured = [(record.get('websites') or {}).get(label) for record in reachable]
         tallies = {status: sum(item is not None and item['status'] == status for item in measured)
-                   for status in ('passed', 'failed', 'slow', 'unstable', 'needs_review')}
+                   for status in ('passed', 'failed', 'slow', 'unstable', 'verification_required', 'needs_review')}
         kind = '国内（经节点）' if label in DOMESTIC_SITES else 'trace' if label in CONNECTIVITY_SITES else '海外'
-        rows.append(f'| [{label}]({url}) | {kind} | {tallies["passed"]} | {tallies["failed"]} | {tallies["slow"]} | {tallies["unstable"]} | {tallies["needs_review"]} | {sum(item is None for item in measured)} |')
+        rows.append(f'| [{label}]({url}) | {kind} | {tallies["passed"]} | {tallies["failed"]} | {tallies["slow"]} | {tallies["unstable"]} | {tallies["verification_required"]} | {tallies["needs_review"]} | {sum(item is None for item in measured)} |')
     rechecked = report.get('website_recheck')
     if rechecked:
         rows += ['', f'海外网站专项复测：{rechecked["updated_at"]}；{rechecked["node_count"]} 个旧下载通过节点，单作业8节点并发。未复测的旧网站结果保持原轮数；TCP、204、下载、国内网页和trace仍使用原测量时间。', '']
