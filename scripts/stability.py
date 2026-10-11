@@ -166,6 +166,36 @@ def core_healthy(result):
     return result.get('process_alive') is True and result.get('api_available') is True and result.get('file_limit_errors', 0) == 0
 
 
+def recheck_summary(records, diagnostic=None, previous=None, quality=None):
+    """Do not mix older observations into this recheck's counts."""
+    previous = previous or {}
+    if diagnostic and diagnostic.get('node_count'):
+        ids = {x['id'] for x in diagnostic['nodes']}
+        info = {'updated_at': diagnostic['updated_at'], 'node_count': len(ids),
+                'controls_valid': diagnostic['controls_valid'], 'scope': 'eligible_pool_after_downloads'}
+    elif previous:
+        info = dict(previous)
+        ids = set(previous.get('node_ids') or [])
+        if not ids:
+            # Older schema-17 rechecks omitted IDs. Recover only an exact-size
+            # measurement cohort, using the per-node timestamp (not publication).
+            updated = s.datetime.fromisoformat(previous['updated_at'])
+            ids = {r['id'] for r in records if (r.get('stability') or {}).get('updated_at')
+                and 0 <= (updated - s.datetime.fromisoformat(r['stability']['updated_at'])).total_seconds() <= 3}
+            if len(ids) != previous['node_count']:
+                return previous
+    else:
+        return None
+    cohort = [r for r in records if r['id'] in ids]
+    if len(cohort) != len(ids):
+        raise ValueError('稳定性复测摘要缺少对应节点记录')
+    info.update(node_ids=sorted(ids),
+        passed_count=sum(passed(r.get('stability')) for r in cohort),
+        failed_count=sum((r.get('stability') or {}).get('status') == 'failed' for r in cohort),
+        quality_eligible_count=sum(passed(r.get('stability')) and quality(r) for r in cohort))
+    return info
+
+
 def recheck(records, mapping, binary, root):
     """Only callers' eligible candidates; reports contain no node credentials."""
     if not records:
