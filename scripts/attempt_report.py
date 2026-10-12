@@ -6,6 +6,7 @@ import high_speed
 import medium_speed
 import stability
 import upload_speed
+import service_probes
 
 
 def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None):
@@ -55,6 +56,8 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'website_counts': coverage, 'sources': sources, 'nodes': records}
     from detection_report import write_report, website_access_summary
     report['website_access_summary'] = website_access_summary(records)
+    report['service_checks_policy'] = service_probes.settings()
+    report['service_checks_summary'] = service_probes.summary(records)
     names = {n['name'] for n in config['proxies']}
     report.update(publication_mode='full', published_node_count=selected,
                   published_node_ids=[r['id'] for r in records if r.get('name') in names])

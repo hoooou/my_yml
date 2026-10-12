@@ -130,6 +130,14 @@ FlClash 需使用规则模式，并让这些应用的流量进入其 VPN；在�
 
 ## 修改检测方式
 
+### 补充服务请求
+
+完整检测在现有1MB下载通过后，并行执行三个补充目标：ChatGPT `https://api.openai.com/compliance/cookie_requirements`、FAST测速API、TikTok `https://www.tiktok.com/cdn-cgi/trace`。每个接口限5秒、正文最多64KiB、禁止自动跳转并严格校验证书。ChatGPT要求200、JSON且`cookie_consent_required`为布尔值；明确`unsupported_country`记录地区限制，不因缺少该错误就判通过。TikTok要求有效纯文本trace、正确域名、HTTPS、公共IP和两位大写地区码；404、HTML或缺字段记录接口不可用，原首页检测独立保留。
+
+FAST API使用公开浏览器测速token获取一个目标，仅接受HTTPS、443端口、`*.nflxvideo.net`且符合`/speedtest/range/0-N`的地址，然后请求1,000,000字节，6秒内完整下载才算Netflix CDN小样本通过。与上行共享流量调度，接口阶段与下载阶段分别记录；不把API返回当作带宽或Netflix解锁。CDN地区是服务器所在地，不替代节点出口地区。签名查询、Cookie和原始响应正文不写入报告。
+
+这些结果位于JSON的`service_checks`及独立汇总、MD的“补充服务检测”，不计入原网站覆盖率、不替代Cloudflare/DataPacket下载、不修改节点名称或分组。普通接口限制、接口不可用、下载失败不新增淘汰条件；任何明确证书校验错误仍淘汰。历史重建保留原始证据，不补写未测通过；新检测随下一轮全量实际运行。工作流“补充服务小样本验证”可只读验证最多4个当前节点和前后直连对照，保留脱敏结果7天，不更新订阅。
+
 入口和分阶段检测位于 `scripts/availability.py`，网页及 trace 的响应校验位于 `scripts/mobile_pilot.py`。工作流只安装 Mihomo，使用独立节点监听端口，不打开 TUN、不修改系统代理。旧下载测速脚本仅用于历史复现，当前工作流使用直接 HTTP 的1 MB、5 MB快速采样及通过节点的100 MB双目标复测。
 
 综合、高速和非机房组均仅香港最多30个，其他地区不限制数量。高速组要求Cloudflare和DataPacket两次均完整通过100 MB，每次各限20秒；非机房组仍按独立出口去重。完整样本与各阶段分类继续保留在报告。定时触发可能延迟；GitHub长时间无活动可能暂停定时任务。
