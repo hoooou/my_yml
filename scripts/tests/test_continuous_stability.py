@@ -72,7 +72,7 @@ class EvidenceTests(unittest.TestCase):
         for fault in ('missing', 'rushed', 'overlap', 'no_peer', 'late_peer', 'nan', 'bad_round', 'missing_site'):
             item = evidence()
             if fault == 'missing': item['attempts'].clear()
-            elif fault == 'rushed': item['attempts'][1]['started_offset_seconds'] = 14
+            elif fault == 'rushed': item['attempts'][1]['started_offset_seconds'] = 1
             elif fault == 'overlap': item['attempts'][0]['finished_offset_seconds'] = 31
             elif fault == 'no_peer': item['peer_completed_offset_seconds'] = None
             elif fault == 'late_peer': item['peer_completed_offset_seconds'] = 571
@@ -86,7 +86,8 @@ class EvidenceTests(unittest.TestCase):
         current = cs.summarize(attempts, cutoff=20)
         self.assertTrue(st.passed(current))
         self.assertIsNone(cs.settings()['minimum_rounds'])
-        self.assertEqual(cs.settings()['minimum_start_interval_seconds'], 15)
+        self.assertEqual(cs.settings()['random_idle_seconds_range'], [3, 10])
+        self.assertEqual(cs.settings(3)['minimum_start_interval_seconds'], 15)
         old = copy.deepcopy(current); old['version'] = 2
         self.assertFalse(st.passed(old))
         old = evidence(); old['version'] = 2
@@ -94,6 +95,15 @@ class EvidenceTests(unittest.TestCase):
         old['attempts'].pop()
         self.assertFalse(st.passed(old))
         self.assertEqual(st.settings([{'stability': {'version': 2}}])['minimum_start_interval_seconds'], 30)
+
+    def test_random_policy_does_not_reinterpret_historical_fixed_interval(self):
+        attempts = [sample(1, 0), sample(2, 5)]
+        current = cs.summarize(attempts, cutoff=4)
+        self.assertTrue(cs.passed(current))
+        historical = copy.deepcopy(current); historical['version'] = 3
+        self.assertFalse(cs.passed(historical))
+        rushed = copy.deepcopy(current); rushed['attempts'][1]['started_offset_seconds'] = 3
+        self.assertFalse(cs.passed(rushed))
 
     def test_successful_percentiles_ignore_failed_short_elapsed_and_do_not_pool_targets(self):
         item = evidence(1)
@@ -160,7 +170,10 @@ class ScheduleTests(unittest.TestCase):
         for item in results.values():
             self.assertTrue(cs.passed(item)); self.assertGreater(item['round_count'], 20)
             self.assertGreaterEqual(item['attempts'][-1]['started_offset_seconds'], item['peer_completed_offset_seconds'])
-            self.assertTrue(all(b['started_offset_seconds']-a['started_offset_seconds'] >= 14.999
+            self.assertTrue(all(3 <= a['next_idle_seconds'] <= 10 for a in item['attempts'][:-1]))
+            self.assertTrue(all(b['started_offset_seconds'] >= a['finished_offset_seconds'] + a['next_idle_seconds'] - .001
+                for a,b in zip(item['attempts'], item['attempts'][1:])))
+            self.assertTrue(all(b['started_offset_seconds']-a['finished_offset_seconds'] >= 2.999
                 and b['started_offset_seconds'] >= a['finished_offset_seconds']
                 for a,b in zip(item['attempts'], item['attempts'][1:])))
 
@@ -185,7 +198,7 @@ class ScheduleTests(unittest.TestCase):
             item = sample(number, started); item['finished_offset_seconds'] = time.monotonic()-origin
             with lock: active.remove(id)
             return item
-        with patch.object(cs, 'INTERVAL', .03), patch.object(cs, 'PEER_POLL_SECONDS', .03):
+        with patch.object(cs.random, 'uniform', return_value=.03), patch.object(cs, 'PEER_POLL_SECONDS', .03):
             origin = time.monotonic()
             result = cs.schedule(['a','b','c','d'], probe, lambda: time.monotonic()-origin >= .04,
                 lambda *_: None, lambda attempts, cutoff, complete: attempts, workers=2)
@@ -258,7 +271,7 @@ class MergeTests(unittest.TestCase):
         report['stability_policy'] = cs.settings(); report['publication_mode'] = 'full'
         text = render(report, config)
         self.assertIn('18/20 / 90.0%', text); self.assertIn('P95 / P99', text)
-        self.assertIn('启动间隔至少15秒', text); self.assertIn('不设固定轮数', text); self.assertNotIn('| 五轮间隔稳定性 |', text)
+        self.assertIn('每轮结束后随机等待3～10秒', text); self.assertIn('不设固定轮数', text); self.assertNotIn('| 五轮间隔稳定性 |', text)
         self.assertIn('JSON', text)
 
 

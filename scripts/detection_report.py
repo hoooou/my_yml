@@ -165,7 +165,7 @@ def upload_failure(row):
 
 def stability_details(nodes):
     """Explain the latest real rounds without trusting cached pass counts."""
-    continuous = [r['stability'] for r in nodes if (r.get('stability') or {}).get('version') in (2, cs.VERSION)]
+    continuous = [r['stability'] for r in nodes if (r.get('stability') or {}).get('version') in (2, 3, cs.VERSION)]
     if continuous:
         stats = [cs.metrics(x) for x in continuous]
         good = sum(stability.passed(x) for x in continuous)
@@ -203,10 +203,12 @@ def stability_details(nodes):
 
 def write_report(report, config, path, candidate=False, website_gate=None):
     nodes = report.get('nodes', [])
-    continuous = (report.get('stability_policy') or {}).get('version') in (2, cs.VERSION) or any((r.get('stability') or {}).get('version') in (2, cs.VERSION) for r in nodes)
+    continuous = (report.get('stability_policy') or {}).get('version') in (2, 3, cs.VERSION) or any((r.get('stability') or {}).get('version') in (2, 3, cs.VERSION) for r in nodes)
     policy = report.get('stability_policy') or stability.settings(nodes)
     interval = policy.get('minimum_start_interval_seconds', 15)
     minimum_rounds = policy.get('minimum_rounds')
+    random_idle = policy.get('random_idle_seconds_range')
+    interval_text = (f'每轮结束后随机等待{random_idle[0]}～{random_idle[1]}秒' if random_idle else f'启动间隔至少{interval}秒')
     stable_label = '持续并行稳定性' if continuous else '最终间隔稳定性'
     selected_ids = set(report.get('published_node_ids', []))
     names = {n['name'] for n in config.get('proxies', [])}
@@ -266,7 +268,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         upload = row.get('upload') or {}
         good_upload = upload_speed.passed(upload)
         probes = [p for a in upload.get('attempts', []) for p in a.get('loaded_204', [])]
-        success = cs.metrics(stable) if stable.get('version') in (2, cs.VERSION) else {}
+        success = cs.metrics(stable) if stable.get('version') in (2, 3, cs.VERSION) else {}
         stability_text = (f'{success["passed_count"]}/{success["round_count"]} / {success["success_rate"]:.1%}' if success and good_stable else '5/5' if good_stable else '未验证／需复核')
         delay_text = (f'{number(max((x["p95_ms"] for x in metrics.values()), default=None))} / {number(max((x["p99_ms"] for x in metrics.values()), default=None))} / {number(jitter)}' if continuous else f'{number(latency)} / {number(jitter)}')
         rows.append(f'| {cell(row["name"].split("|")[0])} | {delay_text} | '
@@ -321,7 +323,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '| 8 | 双100MB下载 | Cloudflare和DataPacket各20秒内完成才进入高速组 |',
              '| 9 | 上行及负载 | 复用本轮3MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',
              '| 10 | 负载后SSL | 再检查四个应用域名，各两次 |',
-             (f'| 并行 | 持续稳定性 | TCP与3MB上传通过即启动独立观察；{"每节点至少" + str(minimum_rounds) + "轮" if minimum_rounds else "不设固定轮数"}，启动间隔至少{interval}秒，成功率≥90%；持续到两轮上行及负载后SSL结束，再补每节点一轮；明确证书错误淘汰 |' if continuous else '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |'), '']
+             (f'| 并行 | 持续稳定性 | TCP与3MB上传通过即启动独立观察；{"每节点至少" + str(minimum_rounds) + "轮" if minimum_rounds else "不设固定轮数"}，{interval_text}，成功率≥90%；持续到两轮上行及负载后SSL结束，再补每节点一轮；明确证书错误淘汰 |' if continuous else '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |'), '']
     required = (report.get('website_measurement_policy') or {}).get('required_websites', report.get('required_websites', []))
     if required:
         rows += ['必过网站：' + '、'.join(required) + '。明确的Cloudflare人机验证及Reddit明确登录提示认可可达，但不当作真实页面速度；任何已检测网站出现明确证书校验错误均不放行。', '']
