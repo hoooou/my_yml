@@ -696,7 +696,7 @@ jobs:
         run: |
           python scripts/website_diagnostics.py --mihomo .node-work/bin/mihomo \
             --bundle .node-work/diagnostic-input/bundle.json \
-            --report .node-work/diagnostic-report/full-test-report.json
+            --report .node-work/diagnostic-report/full-test-report.json --samples 2
       - name: 保存诊断结果
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
