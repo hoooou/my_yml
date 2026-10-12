@@ -17,7 +17,7 @@ on:
         type: choice
         required: false
         default: all
-        options: [all, Reddit, Meta]
+        options: [all, Reddit, Meta, Headers]
       diagnostic_run_id:
         description: 发布恢复或诊断使用的已完成全量检测运行编号
         type: string
@@ -700,6 +700,12 @@ jobs:
         env:
           DIAGNOSTIC_SITE: ${{ inputs.diagnostic_site }}
         run: |
+          if [[ "$DIAGNOSTIC_SITE" == Headers ]]; then
+            python scripts/header_diagnostics.py --mihomo .node-work/bin/mihomo \
+              --bundle .node-work/diagnostic-input/bundle.json \
+              --report .node-work/diagnostic-report/full-test-report.json
+            exit 0
+          fi
           diagnostic_args=()
           if [[ "$DIAGNOSTIC_SITE" == Reddit ]]; then
             diagnostic_args=(--sites Reddit)

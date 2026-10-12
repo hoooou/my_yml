@@ -43,6 +43,14 @@ def render(report, config, **kwargs):
 
 
 class CleanReportTests(unittest.TestCase):
+    def test_http400_is_separate_from_slow_pages_without_changing_acceptance(self):
+        failed = {'status': 'failed', 'http_status': 400}
+        timeout = {'status': 'failed', 'error_type': 'ReadTimeout'}
+        row = {'websites': {'Facebook': {'status': 'failed', 'attempts': [failed, timeout, failed]}}}
+        result = d.website_access_summary([row])['Facebook']
+        self.assertEqual((result['accepted'], result['http_error'], result['transport_error'],
+                          result['page_or_speed_error']), (0, 1, 1, 0))
+
     def test_offline_refresh_preserves_measurements_selection_and_subscription(self):
         from refresh_detection_report import refresh
         report, config = fixture()
@@ -75,9 +83,9 @@ class CleanReportTests(unittest.TestCase):
             {'websites': {}}]
         counts = d.website_access_summary(rows)['Reddit']
         self.assertEqual(counts, {'measured': 5, 'accepted': 2, 'cloudflare_challenge': 1, 'login_required': 0,
-            'restricted': 2, 'transport_error': 1, 'page_or_speed_error': 0, 'unmeasured': 1})
+            'restricted': 2, 'transport_error': 1, 'http_error': 0, 'page_or_speed_error': 0, 'unmeasured': 1})
         table = '\n'.join(d.website_access_table(rows, {'Reddit'}))
-        self.assertIn('| ★ Reddit | 5 | 2 | 1 | 0 | 2 | 1 | 0 |', table)
+        self.assertIn('| ★ Reddit | 5 | 2 | 1 | 0 | 2 | 1 | 0 | 0 |', table)
         self.assertIn('未测节点不算失败', table)
 
     def test_repair_site_table_only_counts_latest_cohort(self):
@@ -86,7 +94,7 @@ class CleanReportTests(unittest.TestCase):
             row['websites'] = {'Reddit': {'status': 'needs_review',
                 'attempts': [{'status': 'needs_review', 'http_status': 403}] * 3}}
         text = render(report, config)
-        self.assertIn('| Reddit | 2 | 0 | 0 | 0 | 2 | 0 | 0 |', text)
+        self.assertIn('| Reddit | 2 | 0 | 0 | 0 | 2 | 0 | 0 | 0 |', text)
         self.assertNotIn('| Reddit | 3 |', text)
 
     def test_latest_cohort_excludes_historical_failures_and_private_fields(self):

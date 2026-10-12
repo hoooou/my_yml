@@ -304,7 +304,24 @@ def certificate_failure(error):
     return False
 
 
-def check_site(port, label, url, timeout=(3, 2)):
+def navigation_headers():
+    return {'User-Agent': WEB_USER_AGENT,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9', 'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document', 'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none', 'Sec-Fetch-User': '?1'}
+
+
+def website_headers(label):
+    headers = {'User-Agent': WEB_USER_AGENT}
+    # Meta rejects our Chrome UA with requests' wildcard-only navigation headers.
+    # Same-node cloud controls confirmed ordinary document headers return genuine HTML.
+    if label in ('Facebook', 'WhatsApp'):
+        headers.update(navigation_headers())
+    return headers
+
+
+def check_site(port, label, url, timeout=(3, 2), request_headers=None):
     sample_limit = PAGE_SAMPLE_LIMITS.get(label, PAGE_SAMPLE_BYTES)
     with s.session() as client:
         if port is not None:
@@ -318,7 +335,7 @@ def check_site(port, label, url, timeout=(3, 2)):
                 request_started = time.perf_counter()
                 with client.get(current_url, stream=True, timeout=timeout, allow_redirects=False,
                                 verify=True,
-                                headers={'User-Agent': WEB_USER_AGENT}) as response:
+                                headers=website_headers(label) if request_headers is None else request_headers) as response:
                     location = response.headers.get('Location')
                     if 300 <= response.status_code < 400:
                         redirect_chain.append({'http_status': response.status_code,
