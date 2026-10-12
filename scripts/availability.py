@@ -30,11 +30,11 @@ import upload_speed
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report, website_access_summary, latest_cohort
 from attempt_report import write_attempt
-from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
+from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
-          'unstable': '波动', 'verification_required': 'CF需验证', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
+          'unstable': '波动', 'verification_required': 'CF需验证', 'login_required': '登录提示通过', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
 WEBSITE_ROUNDS = 3
 CORE_SITES = ('Google', 'YouTube')
 REQUIRED_SITES = ('Google', 'YouTube', 'ChatGPT', 'Gemini', 'GitHub',
@@ -493,11 +493,15 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                     if any(a.get('status') == 'verification_required'
                            and not confirmed_cloudflare_challenge(label, a) for a in item['attempts']):
                         raise ValueError('Cloudflare 验证标记缺少可靠响应证据')
+                    if any(a.get('status') == 'login_required' and not confirmed_reddit_login(label, a) for a in item['attempts']):
+                        raise ValueError('Reddit登录标记缺少可靠响应证据')
                     expected = summarize_rounds([{label: attempt} for attempt in item['attempts']], (label,))[label]
                     if any(item.get(key) != expected[key] for key in ('status', 'passed_count', 'median_elapsed_ms',
                             'p95_elapsed_ms', 'jitter_ms', 'median_ttfb_ms', 'failure_count', 'slow_count',
                             'accepted_count', 'verification_required_count')):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
+                    if item.get('login_required_count', 0) != expected['login_required_count']:
+                        raise ValueError('Reddit登录汇总与逐轮响应结果不一致')
             if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
                 raise ValueError('节点未按阶段筛选')
             should_tls = should_web and required_websites_passed(record)
@@ -555,9 +559,10 @@ def summarize_rounds(rounds, labels=SITES):
         passed = sum(a['status'] == 'passed' for a in attempts)
         verified = sum(a.get('status') == 'verification_required'
                        and confirmed_cloudflare_challenge(label, a) for a in attempts)
-        accepted = passed + verified
+        login = sum(a.get('status') == 'login_required' and confirmed_reddit_login(label, a) for a in attempts)
+        accepted = passed + verified + login
         status = ('passed' if passed == len(rounds)
-                  else 'verification_required' if accepted == len(rounds)
+                  else ('login_required' if login else 'verification_required') if accepted == len(rounds)
                   else 'needs_review' if any(a['status'] == 'needs_review' for a in attempts)
                   else 'unstable' if accepted
                   else 'slow' if any(a['status'] == 'slow' for a in attempts) else 'failed')
@@ -565,7 +570,7 @@ def summarize_rounds(rounds, labels=SITES):
         all_delays = sorted(a['elapsed_ms'] for a in attempts if a.get('elapsed_ms') is not None)
         headers = [a['ttfb_ms'] for a in attempts if a.get('ttfb_ms') is not None]
         summarized[label] = {'status': status, 'passed_count': passed, 'round_count': len(rounds),
-                              'verification_required_count': verified, 'accepted_count': accepted,
+                              'verification_required_count': verified, 'login_required_count': login, 'accepted_count': accepted,
                               'median_elapsed_ms': round(statistics.median(delays), 1) if delays else None,
                               'max_elapsed_ms': max(delays) if delays else None,
                               'p95_elapsed_ms': all_delays[math.ceil(.95 * len(all_delays)) - 1] if all_delays else None,
@@ -607,10 +612,8 @@ def page_rounds_accepted(label, item, rounds=WEBSITE_ROUNDS):
     if item.get('status') == 'passed':
         return item.get('passed_count') == rounds
     attempts = item.get('attempts') or []
-    return (item.get('status') == 'verification_required' and len(attempts) == rounds
-            and all(a.get('status') == 'passed' or
-                    (a.get('status') == 'verification_required'
-                     and confirmed_cloudflare_challenge(label, a)) for a in attempts))
+    return (item.get('status') in ('verification_required', 'login_required') and len(attempts) == rounds
+            and all(a.get('status') == 'passed' or confirmed_page_exception(label, a) for a in attempts))
 
 
 def website_access_count(record):
@@ -1239,6 +1242,7 @@ def main():
                   if repairing else None),
               'website_measurement_policy': {'version': 6,
                   'confirmed_cloudflare_challenge': 'accepted_access_verification_required',
+                  'confirmed_reddit_login_prompt': 'accepted_access_login_required',
                   'challenge_in_page_speed_ranking': False,
                   'challenge_can_replace_204_or_trace': False, 'overseas_rounds': WEBSITE_ROUNDS,
                   'domestic_pages_probed_daily': False, 'trace_rounds': 1, 'sample_bytes': 16384,

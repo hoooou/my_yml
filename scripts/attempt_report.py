@@ -27,6 +27,7 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'selection_outcome': 'candidate_ready' if selected else 'no_eligible_nodes_previous_subscription_retained',
         'required_websites': list(required_sites), 'required_rounds': 3,
         'confirmed_cloudflare_challenge': 'accepted_access_verification_required',
+        'confirmed_reddit_login_prompt': 'accepted_access_login_required',
         'challenge_in_page_speed_ranking': False,
         'required_traces': list(required_traces), 'required_trace_rounds': 1,
         'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),

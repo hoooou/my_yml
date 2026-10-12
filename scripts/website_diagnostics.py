@@ -26,10 +26,10 @@ def evidence(label, status, url, headers, body):
     return item
 
 
-def choose_samples(bundle, report, limit=4):
+def choose_samples(bundle, report, limit=4, labels=LABELS):
     available = {n['name'] for n in bundle['nodes']}
     tasks = []
-    for label in LABELS:
+    for label in labels:
         groups = {}
         for row in report['nodes']:
             page = (row.get('websites') or {}).get(label) or {}
@@ -143,10 +143,11 @@ def main():
     parser.add_argument('--report', required=True)
     parser.add_argument('--work-dir', default='.node-work/website-diagnostics')
     parser.add_argument('--samples', type=int, choices=range(1, 5), default=4)
+    parser.add_argument('--sites', nargs='+', choices=LABELS, default=LABELS)
     args = parser.parse_args()
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     bundle = json.loads(Path(args.bundle).read_text()); report = json.loads(Path(args.report).read_text())
-    tasks = choose_samples(bundle, report, args.samples)
+    tasks = choose_samples(bundle, report, args.samples, args.sites)
     if not tasks:
         raise RuntimeError('No mapped website samples')
     rows = {task['row']['id']: task['row'] for task in tasks}
@@ -156,7 +157,7 @@ def main():
         with ThreadPoolExecutor(max_workers=3) as pool:
             results = list(pool.map(lambda task: inspect(ports[task['row']['id']], task), tasks))
     results += [inspect(None, {'row': {'id': 'github-direct'}, 'label': label,
-                             'group': 'direct_control', 'browser': True}) for label in LABELS]
+                             'group': 'direct_control', 'browser': True}) for label in args.sites]
     output = {'scope': 'diagnostic_only', 'source_report_updated_at': report['updated_at'], 'results': results}
     (root / 'summary.json').write_text(json.dumps(output, ensure_ascii=False, indent=2) + '\n')
     for item in results:
