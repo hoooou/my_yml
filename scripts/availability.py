@@ -1259,7 +1259,9 @@ def main():
               'cloudflare_classification_update': ({'updated_at': now, 'reclassified_attempts': reclassified_count,
                   'new_measurements': False, 'source': 'captured_cloudflare_challenge_restriction'}
                   if repairing else None),
-              'website_measurement_policy': {'version': 8,
+              'website_measurement_policy': {'version': 9,
+                  'navigation_header_sites': ['Facebook', 'WhatsApp'],
+                  'headers_audit_run': '38226619641',
                   'chatgpt_api_validation': 'three_rounds_expected_boolean_json',
                   'confirmed_cloudflare_challenge': 'accepted_access_verification_required',
                   'confirmed_reddit_login_prompt': 'accepted_access_login_required',
