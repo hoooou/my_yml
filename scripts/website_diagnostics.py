@@ -142,10 +142,11 @@ def main():
     parser.add_argument('--mihomo', required=True); parser.add_argument('--bundle', required=True)
     parser.add_argument('--report', required=True)
     parser.add_argument('--work-dir', default='.node-work/website-diagnostics')
+    parser.add_argument('--samples', type=int, choices=range(1, 5), default=4)
     args = parser.parse_args()
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     bundle = json.loads(Path(args.bundle).read_text()); report = json.loads(Path(args.report).read_text())
-    tasks = choose_samples(bundle, report)
+    tasks = choose_samples(bundle, report, args.samples)
     if not tasks:
         raise RuntimeError('No mapped website samples')
     rows = {task['row']['id']: task['row'] for task in tasks}

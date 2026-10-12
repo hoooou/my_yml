@@ -260,6 +260,7 @@ def check_site(port, label, url, timeout=(3, 2)):
             redirect_chain = []
             max_hops = 4 if label == 'Gemini' else 2
             for hop in range(max_hops + 1):
+                request_started = time.perf_counter()
                 with client.get(current_url, stream=True, timeout=timeout, allow_redirects=False,
                                 verify=True,
                                 headers={'User-Agent': WEB_USER_AGENT}) as response:
@@ -277,7 +278,9 @@ def check_site(port, label, url, timeout=(3, 2)):
                             current_url = target
                             continue
                     # Headers include DNS, handshake, redirects and server wait.
-                    headers_ms = round((time.perf_counter() - started) * 1000, 1)
+                    header_received = time.perf_counter()
+                    headers_ms = round((header_received - started) * 1000, 1)
+                    final_headers_ms = round((header_received - request_started) * 1000, 1)
                     body = bytearray()
                     for chunk in response.iter_content(1024):
                         body.extend(chunk[:sample_limit - len(body)])
@@ -289,8 +292,12 @@ def check_site(port, label, url, timeout=(3, 2)):
                     result['ttfb_ms'] = headers_ms
                     result['sample_bytes'] = len(body)
                     result['sample_limit_bytes'] = sample_limit
+                    result['final_request_ttfb_ms'] = final_headers_ms
+                    resolved_google_redirect = (label == 'Gemini' and any(
+                        x.get('target') == 'https://www.google.com/sorry/index' for x in redirect_chain))
+                    speed_ttfb_ms = final_headers_ms if resolved_google_redirect else headers_ms
                     if label in PAGE_HOSTS and result['status'] == 'passed' and (
-                            headers_ms > MAX_TTFB_MS or result['elapsed_ms'] > MAX_SAMPLE_MS):
+                            speed_ttfb_ms > MAX_TTFB_MS or result['elapsed_ms'] > MAX_SAMPLE_MS):
                         result.update(status='slow', reason='HTTP 和网页特征正常，但请求响应超过速度预算')
                     result['redirect_hops'] = hop
                     result['redirect_chain'] = redirect_chain

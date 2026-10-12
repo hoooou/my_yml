@@ -196,3 +196,7 @@ JSON记录逐目标响应、各轮时间、证书错误和成功率，Actions保
 ## 网站拦截与跳转诊断
 
 2026-10-12对TikTok／Reddit／Gemini使用原全量输入做云端小样本对照，发现检测Bot请求头可能触发TikTok 403；Gemini `/sorry/index` 跳转在普通Chrome中可返回正常Gemini页面。后续网页检测使用浏览器兼容请求头；Gemini只额外允许HTTPS `www.google.com/sorry/index` 的有限跳转，仍需返回Gemini正常页面和满足时间预算，Google风控页本身、未知跳转和普通403均不能直接放行。每次记录去掉参数的跳转目标、跳转链、安全响应头和固定拦截特征，避免以后只看到笼统302／403。只读 `website-diagnostics` 模式覆盖原拒绝、跳转与正常对照，进行原Bot、浏览器请求头和普通Chrome比较，不修改订阅，也不登录或解验证码。
+
+[查看TikTok／Reddit／Gemini原始拦截、跳转及云端对照证据](docs/website-restriction-audit-2026-10-12.md)。
+
+Gemini经确认的Google风控入口自动返回正常页面时，单次最终请求首响应仍限3秒，包含完整跳转的总页面采样仍限5秒；同时记录原累计TTFB和 `final_request_ttfb_ms`，不把多次握手的累计时间误当成一次请求，也不隐藏冷启动成本。

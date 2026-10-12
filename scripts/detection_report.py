@@ -55,7 +55,7 @@ def website_access_table(nodes, required=()):
         rows.append('| ' + ('★ ' if label in required else '') + cell(label) + ' | ' +
                     ' | '.join(str(item[k]) for k in ('measured', 'accepted', 'cloudflare_challenge',
                         'restricted', 'transport_error', 'page_or_speed_error')) + ' |')
-    rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证；普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '']
+    rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证；普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '', '[TikTok／Reddit／Gemini拦截与跳转核查](docs/website-restriction-audit-2026-10-12.md)。', '']
     return rows
 
 

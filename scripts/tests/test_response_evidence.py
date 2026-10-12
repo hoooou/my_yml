@@ -68,3 +68,36 @@ class BrowserProfileTests(unittest.TestCase):
         item=p.classify_response('Gemini',200,'https://www.google.com/sorry/index',
                                 {'content-type':'text/html'},b'<html>Gemini unusual traffic</html>')
         self.assertEqual(item['status'],'needs_review')
+
+class RedirectTimingTests(unittest.TestCase):
+    def test_resolved_google_cookie_redirect_separates_final_ttfb_and_total_budget(self):
+        from unittest.mock import patch
+        now=[0.0]
+        class Response:
+            headers={'content-type':'text/html'}
+            def __init__(self,status,url,target=None):
+                self.status_code=status;self.url=url
+                self.headers={**self.headers,**({'Location':target} if target else {})}
+            def __enter__(self):now[0]+=.9;return self
+            def __exit__(self,*args):pass
+            def iter_content(self,size):return iter([b'<html>Gemini</html>'])
+        with patch.object(p.s,'session') as session,patch.object(p.time,'perf_counter',side_effect=lambda:now[0]):
+            session.return_value.__enter__.return_value.get.side_effect=[
+                Response(302,p.SITES['Gemini'],'https://www.google.com/sorry/index'),
+                Response(302,'https://www.google.com/sorry/index',p.SITES['Gemini']),
+                Response(302,p.SITES['Gemini'],p.SITES['Gemini']),Response(200,p.SITES['Gemini'])]
+            item=p.check_site(1234,'Gemini',p.SITES['Gemini'])
+        self.assertEqual(item['status'],'passed')
+        self.assertEqual(item['ttfb_ms'],3600)
+        self.assertEqual(item['final_request_ttfb_ms'],900)
+        self.assertEqual(item['elapsed_ms'],3600)
+    def test_direct_slow_gemini_page_is_not_exempt(self):
+        from unittest.mock import patch
+        class Response:
+            status_code=200;url=p.SITES['Gemini'];headers={'content-type':'text/html'}
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+            def iter_content(self,size):return iter([b'<html>Gemini</html>'])
+        with patch.object(p.s,'session') as session,patch.object(p.time,'perf_counter',side_effect=[0,0]+[3.1]*20):
+            session.return_value.__enter__.return_value.get.return_value=Response()
+            self.assertEqual(p.check_site(1234,'Gemini',p.SITES['Gemini'])['status'],'slow')
