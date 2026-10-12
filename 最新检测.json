@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-12T19:20:40+08:00",
+  "updated_at": "2026-10-12T19:44:32+08:00",
   "scope": "all_subscriptions",
   "schema_version": 21,
   "website_tls_policy": {
@@ -620,16 +620,25 @@
     "passed": 84,
     "failed": 1
   },
-  "measurements_updated_at": "2026-10-12T19:20:40+08:00",
+  "measurements_updated_at": "2026-10-12T19:20:31+08:00",
   "publication_mode": "full",
-  "measurement_recovery": null,
+  "measurement_recovery": {
+    "source_run": "38238413178",
+    "measurements_updated_at": "2026-10-12T19:20:31+08:00",
+    "new_probes": false
+  },
   "group_latency_policy": {
     "url": "https://connectivitycheck.gstatic.com/generate_204",
     "interval_seconds": 300,
     "timeout_ms": 5000,
     "expected_status": 204,
     "manual_selection": true,
-    "lazy": false
+    "lazy": false,
+    "global_type": "select",
+    "default_global_selection": "⭐ 综合优选",
+    "other_group_type": "url-test",
+    "automatic_selection": true,
+    "tolerance_ms": 50
   },
   "website_recheck": null,
   "cloudflare_classification_update": null,
@@ -989,7 +998,7 @@
   "ip_reputation_policy": {
     "provider": "ipapi.is",
     "scope": "quick_download_passed_unique_exits",
-    "configured": true,
+    "configured": false,
     "lookup_budget_per_run": 900,
     "purity_formula": "100 * (1 - company.abuser_score_numeric_ratio)",
     "score_scope": "company_network_not_individual_ip",
@@ -2305,7 +2314,7 @@
     }
   ],
   "record_count": 5650,
-  "source_run": "38238413178",
+  "source_run": "38244515148",
   "source_run_attempt": "1",
   "configuration_validation": "passed",
   "report_kind": "latest_attempt",
