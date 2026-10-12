@@ -670,6 +670,8 @@ def web_quality_eligible(record):
     sites = record.get('websites') or {}
     for label in CORE_SITES:
         item = sites.get(label) or {}
+        if item.get('status') == 'verification_required' and page_rounds_accepted(label, item):
+            continue
         if (item.get('status') != 'passed' or item.get('round_count') != WEBSITE_ROUNDS
                 or item.get('passed_count') != WEBSITE_ROUNDS):
             return False
@@ -715,6 +717,8 @@ def regional_eligible(record):
         return False
     for label in CORE_SITES:
         item = (record.get('websites') or {}).get(label) or {}
+        if item.get('status') == 'verification_required' and page_rounds_accepted(label, item):
+            continue
         if (item.get('status') != 'passed' or item.get('round_count') != WEBSITE_ROUNDS
                 or item.get('passed_count') != WEBSITE_ROUNDS):
             return False
