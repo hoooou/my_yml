@@ -11,7 +11,7 @@ import statistics
 import time
 
 import app_tls
-from mobile_pilot import check_site, SITES
+from mobile_pilot import check_site, SITES, confirmed_cloudflare_challenge
 import select_nodes as s
 
 VERSION = 1
@@ -46,11 +46,16 @@ def tls_passed(item):
             and finite(item.get('elapsed_ms')) and 0 <= item['elapsed_ms'] <= app_tls.BUDGET_SECONDS * 1000)
 
 
+def page_probe_passed(label, item):
+    return ((item.get('status') == 'passed' or (item.get('status') == 'verification_required'
+            and confirmed_cloudflare_challenge(label, item)))
+        and finite(item.get('elapsed_ms')) and 0 <= item['elapsed_ms'] <= 5000)
+
+
 def round_passed(sample):
     sites = sample.get('sites') or {}
     return (set(sites) == set(TARGETS) and all(
-        sites[label].get('status') == 'passed' and finite(sites[label].get('elapsed_ms'))
-        and 0 <= sites[label]['elapsed_ms'] <= 5000 for label in TARGETS)
+        page_probe_passed(label, sites[label]) for label in TARGETS)
         and tls_passed(sample.get('android_tls')))
 
 
@@ -83,7 +88,9 @@ def core_metrics(result):
     if result.get('version') in (2, 3):
         import continuous_stability
         return continuous_stability.core_metrics(result)
-    values = {label: [x['sites'][label]['elapsed_ms'] for x in result['attempts']] for label in ('Google', 'YouTube')}
+    values = {label: [x['sites'][label]['elapsed_ms'] for x in result['attempts']
+        if x['sites'][label].get('status') == 'passed'] for label in ('Google', 'YouTube')}
+    values = {label: items for label, items in values.items() if items}
     return {label: {'median_ms': statistics.median(items), 'tail_ms': max(items),
                     'jitter_ms': max(items) - min(items)} for label, items in values.items()}
 
@@ -106,9 +113,7 @@ def summarize(attempts):
         'status': sample['sites'][label].get('status'),
         'reason': sample['sites'][label].get('reason')}
         for sample in attempts for label in TARGETS
-        if sample['sites'][label].get('status') != 'skipped' and (sample['sites'][label].get('status') != 'passed'
-        or not finite(sample['sites'][label].get('elapsed_ms'))
-        or not 0 <= sample['sites'][label]['elapsed_ms'] <= 5000)]
+        if sample['sites'][label].get('status') != 'skipped' and (not page_probe_passed(label, sample['sites'][label]))]
     result['failures'] += [{'round': sample['round'], 'target': TLS_HOST,
         'status': sample['android_tls'].get('status'),
         'reason': sample['android_tls'].get('error_type', 'unverified_or_late_TLS')}
@@ -133,7 +138,7 @@ def sample_node(port, number, origin):
         sites[label] = ({'status': 'skipped', 'reason': '本轮前置请求失败，下一轮重新检查'} if stopped
                         else check_site(port, label, SITES[label]))
         item = sites[label]
-        stopped = stopped or item.get('status') != 'passed' or not finite(item.get('elapsed_ms')) or not 0 <= item['elapsed_ms'] <= 5000
+        stopped = stopped or not page_probe_passed(label, item)
     tls = ({'status': 'skipped', 'hostname': TLS_HOST, 'reason': '本轮前置请求失败，下一轮重新检查'}
            if stopped else app_tls.probe(port, TLS_HOST))
     return {'round': number, 'started_at': started_at,

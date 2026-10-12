@@ -113,7 +113,7 @@ def summarize(attempts, cutoff=None, version=VERSION):
         'status': item.get('status'), 'reason': item.get('reason', item.get('error_type'))}
         for x in attempts for k, item in list((x.get('sites') or {}).items()) + [('Android SSL', x.get('android_tls') or {})]
         if item.get('status') != 'skipped' and (not legacy.tls_passed(item) if k == 'Android SSL' else
-            item.get('status') != 'passed' or not legacy.finite(item.get('elapsed_ms')) or not 0 <= item['elapsed_ms'] <= 5000)]
+            not legacy.page_probe_passed(k, item))]
     result['window_seconds'] = attempts[-1]['finished_offset_seconds'] - attempts[0]['started_offset_seconds'] if attempts else 0
     return result
 

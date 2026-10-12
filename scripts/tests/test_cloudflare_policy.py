@@ -64,7 +64,8 @@ class CloudflarePolicyTests(unittest.TestCase):
         good = self.record()
         good['websites']['Google'] = summarize('Google', [challenge('Google')] * 3)
         self.assertTrue(a.required_websites_passed(good))
-        self.assertFalse(a.web_quality_eligible(good))  # No real-page timing evidence.
+        self.assertTrue(a.web_quality_eligible(good))  # User exempts CF on every page target.
+        self.assertIsNone(good['websites']['Google']['median_elapsed_ms'])
 
     def test_expected_https_host_and_header_required_trace_never_exempt(self):
         for label, url, headers in (
@@ -76,6 +77,26 @@ class CloudflarePolicyTests(unittest.TestCase):
             item = pilot.classify_response(label, 403, url, headers, b'Just a moment Cloudflare')
             self.assertNotEqual(item['status'], 'verification_required', (label, url, headers))
             self.assertNotEqual(item['status'], 'passed')
+
+    def test_stability_accepts_confirmed_page_challenge_but_not_trace_or_204(self):
+        import stability as st
+        from test_stability import sample
+        item = sample(1)
+        item['sites']['Google'] = {**challenge('Google'), 'elapsed_ms': 80}
+        self.assertTrue(st.round_passed(item))
+        item['sites']['Google']['cf_mitigated'] = ''
+        self.assertFalse(st.round_passed(item))
+        for label in ('Google204', 'ChatGPTTrace'):
+            item = sample(1)
+            item['sites'][label] = {**challenge('Google'), 'elapsed_ms': 80}
+            self.assertFalse(st.round_passed(item))
+        with patch.object(st, 'check_site', side_effect=lambda port, label, url:
+            {**challenge(label), 'elapsed_ms': 80} if label in ('Google', 'YouTube')
+            else {'status': 'passed', 'elapsed_ms': 80}), \
+            patch.object(st.app_tls, 'probe', return_value=sample(1)['android_tls']) as tls:
+            result = st.sample_node(1234, 1, 0)
+            self.assertTrue(st.round_passed(result))
+            tls.assert_called_once()
 
     def test_real_pipeline_continues_tls_and_download_then_merge_validates_evidence(self):
         pages = {label: {'status': 'passed', 'elapsed_ms': 100} for label in a.POST_SITES}

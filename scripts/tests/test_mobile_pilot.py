@@ -146,7 +146,7 @@ class MobilePilotTests(unittest.TestCase):
             result = pilot.check_site(1234,'Claude',pilot.CLAUDE_PAGE_URL)
             self.assertEqual(result['status'],'passed')
             self.assertEqual(result['redirect_hops'],1)
-            self.assertIn('github.com/hoooou/my_yml',client.get.call_args.kwargs['headers']['User-Agent'])
+            self.assertIn('Mozilla/5.0',client.get.call_args.kwargs['headers']['User-Agent'])
             self.assertEqual(client.get.call_args.args[0],'https://claude.ai/login')
         for label, location in [('Claude','https://unrelated.example/'),('Claude','http://claude.ai/login'),
                                 ('ClaudeTrace','/login'),('Google204','/other')]:

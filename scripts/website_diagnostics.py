@@ -107,7 +107,12 @@ def browser_probe(port, label):
                 page.wait_for_timeout(1500)
                 headers = chain[-1]['headers'] if chain else (response.headers if response else {})
                 status = chain[-1]['http_status'] if chain else (response.status if response else 0)
-                return {**evidence(label, status, page.url, headers, page.content().encode()[:c.BODY_LIMIT]),
+                visible = page.locator('body').inner_text(timeout=2000).encode()[:16384]
+                result = evidence(label, status, page.url, headers, page.content().encode()[:c.BODY_LIMIT])
+                result['visible_text_signals'] = {phrase: phrase in visible.decode('utf-8', errors='replace').lower()
+                    for phrase in DENIAL_PHRASES}
+                result['rendered_title'] = page.title()[:160]
+                return {**result,
                     'redirect_chain': chain, 'elapsed_ms': round((time.monotonic() - started) * 1000, 1)}
             finally:
                 browser.close()
@@ -122,8 +127,9 @@ def inspect(port, task):
             'country': (row.get('exit') or {}).get('country_code'),
             'original_attempts': [{k: a[k] for k in ('status', 'http_status', 'restriction') if k in a}
                 for a in ((row.get('websites') or {}).get(label) or {}).get('attempts', [])],
-            'bot': requests_probe(port, label, p.WEB_USER_AGENT),
+            'bot': requests_probe(port, label, p.LEGACY_WEB_USER_AGENT),
             'browser_ua': requests_probe(port, label, c.BROWSER_UA)}
+    item['production_rounds'] = [p.check_site(port, label, p.SITES[label]) for _ in range(3)]
     if label == 'Reddit':
         item['old_reddit'] = requests_probe(port, label, c.BROWSER_UA, 'https://old.reddit.com/')
     if task['browser']:

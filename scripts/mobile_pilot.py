@@ -27,7 +27,9 @@ PAGE_SITES = tuple(SITES)
 OVERSEAS_SITES = tuple(label for label in OVERSEAS if label in SITES)
 DOMESTIC_SITES = tuple(label for label in DOMESTIC if label in SITES)
 SITE_WORKERS = 5
-WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
+LEGACY_WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
+WEB_USER_AGENT = ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
+                  '(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36')
 MAX_TTFB_MS = 3000
 MAX_SAMPLE_MS = 5000
 PAGE_SAMPLE_BYTES = 16384
@@ -171,10 +173,43 @@ def confirmed_cloudflare_challenge(label, attempt):
                  or attempt.get('classification_source') == 'recorded_cloudflare_challenge'))
 
 
+def allowed_page_redirect(label, target):
+    parsed = urlparse(target)
+    return parsed.scheme == 'https' and (parsed.hostname in PAGE_HOSTS.get(label, set())
+        or (label == 'Gemini' and parsed.hostname == 'www.google.com'
+            and parsed.path == '/sorry/index'))
+
+
+def safe_response_url(url):
+    target = urlparse(url)
+    return f'{target.scheme}://{target.hostname or ""}{target.path[:240]}'
+
+
+def response_evidence(label, status, final_url, headers, body):
+    """Bounded public signals; never keep cookies, query strings or raw bodies."""
+    text = re.sub(r'<(?:script|style)\b[^>]*>.*?(?:</(?:script|style)>|$)', '',
+                  body.decode('utf-8', errors='replace').lower(), flags=re.S)
+    signals = [phrase for phrase in ('blocked by network security', 'access denied',
+        'unsupported country', 'not available in your country', 'not available in your region',
+        'unusual traffic', 'verify you are human', 'just a moment') if phrase in text]
+    result = {'response_headers': {k: headers[k][:160] for k in ('server', 'content-type', 'cf-mitigated')
+                                  if k in headers}, 'response_signals': signals}
+    if 300 <= status < 400 and headers.get('location'):
+        result.update(restriction='http_redirect',
+                      redirect_target=safe_response_url(urljoin(final_url, headers['location'])))
+        if label == 'Gemini' and result['redirect_target'] == 'https://www.google.com/sorry/index':
+            result['restriction'] = 'google_unusual_traffic'
+    elif status in (401, 403, 412, 418, 429, 444, 451):
+        result['restriction'] = ('reddit_network_security' if label == 'Reddit'
+            and 'blocked by network security' in signals else 'http_access_denied')
+    return result
+
+
 def classify_response(label, status, final_url, headers, body):
     """Keep confirmed Cloudflare challenges separate from normal page success."""
     headers = {k.lower(): v for k, v in headers.items()}
     result = classify_page(label, status, final_url, headers.get('content-type', ''), body)
+    result.update(response_evidence(label, status, final_url, headers, body))
     if headers.get('cf-mitigated', '').strip().lower() == 'challenge':
         result.update(status='needs_review', restriction='cloudflare_challenge',
                       cf_mitigated='challenge', reason='Cloudflare 验证拦截；未取得预期检测内容')
@@ -222,15 +257,23 @@ def check_site(port, label, url, timeout=(3, 2)):
         try:
             started = time.perf_counter()
             current_url = url
-            for hop in range(3):
+            redirect_chain = []
+            max_hops = 4 if label == 'Gemini' else 2
+            for hop in range(max_hops + 1):
                 with client.get(current_url, stream=True, timeout=timeout, allow_redirects=False,
                                 verify=True,
                                 headers={'User-Agent': WEB_USER_AGENT}) as response:
                     location = response.headers.get('Location')
+                    if 300 <= response.status_code < 400:
+                        redirect_chain.append({'http_status': response.status_code,
+                            'url': safe_response_url(current_url),
+                            'target': safe_response_url(urljoin(current_url, location)) if location else None})
                     if label in PAGE_HOSTS and 300 <= response.status_code < 400 and location:
                         target = urljoin(current_url, location)
-                        # Follow up to two HTTPS redirects on the same website only.
-                        if hop < 2 and urlparse(target).scheme == 'https' and urlparse(target).hostname in PAGE_HOSTS[label]:
+                        # Gemini may set cookies at Google's exact /sorry/index endpoint.
+                        # A redirect is never itself success: the final page must match Gemini.
+                        if (hop < max_hops and allowed_page_redirect(label, target)
+                                and (time.perf_counter() - started) * 1000 < MAX_SAMPLE_MS):
                             current_url = target
                             continue
                     # Headers include DNS, handshake, redirects and server wait.
@@ -250,6 +293,8 @@ def check_site(port, label, url, timeout=(3, 2)):
                             headers_ms > MAX_TTFB_MS or result['elapsed_ms'] > MAX_SAMPLE_MS):
                         result.update(status='slow', reason='HTTP 和网页特征正常，但请求响应超过速度预算')
                     result['redirect_hops'] = hop
+                    result['redirect_chain'] = redirect_chain
+                    result['final_url'] = safe_response_url(result['final_url'])
                     return result
         except s.requests.RequestException as error:
             return {'status': 'failed', 'reason': '连接、TLS 或读取失败',
