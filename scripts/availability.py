@@ -1246,8 +1246,10 @@ def main():
         or (args.phase in repair_modes and previous.get('node_selection_policy', {}).get('requires_uplink_pass') is True))
     config = render_comparison(base, records, mapping, require_stability=requires_stability, require_upload=requires_upload)
     if args.phase in ('all', 'publish'):
+        measurement_end = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+        bundle.setdefault('measurements_updated_at', measurement_end)
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
-                      s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES,
+                      measurement_end, required_traces=REQUIRED_TRACES,
                       required_gate=required_websites_passed,
                       stability_policy=(stability_diagnostic or {}).get('settings') or stability.settings(records),
                       measurement_recovery=recovery, publication_root=Path('.'))
