@@ -1,4 +1,3 @@
-# 分阶段检测；2026-10-12T18:03:05+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -903,8 +902,9 @@ proxy-groups:
   lazy: false
   timeout: 5000
   expected-status: 204
+  default-selected: ⭐ 综合优选
 - name: ⭐ 综合优选
-  type: select
+  type: url-test
   proxies:
   - 美国01|246ms|193Mbps|非住宅|纯净度未知
   - 美国02|239ms|2044Mbps|非住宅|纯净度99.6%
@@ -960,8 +960,9 @@ proxy-groups:
   lazy: false
   timeout: 5000
   expected-status: 204
+  tolerance: 50
 - name: 🚄 中速下载
-  type: select
+  type: url-test
   proxies:
   - 美国02|239ms|2044Mbps|非住宅|纯净度99.6%
   - 美国09|607ms|235Mbps|非住宅|纯净度86.1%
@@ -1017,8 +1018,9 @@ proxy-groups:
   lazy: false
   timeout: 5000
   expected-status: 204
+  tolerance: 50
 - name: ⚡ 高速下载
-  type: select
+  type: url-test
   proxies:
   - 美国02|239ms|2044Mbps|非住宅|纯净度99.6%
   - 美国06|391ms|372Mbps|非住宅|纯净度100.0%
@@ -1058,8 +1060,9 @@ proxy-groups:
   lazy: false
   timeout: 5000
   expected-status: 204
+  tolerance: 50
 - name: 🏠 非机房 IP
-  type: select
+  type: url-test
   proxies:
   - 美国06|391ms|372Mbps|非住宅|纯净度100.0%
   - 法国01|782ms|136Mbps|住宅|纯净度99.8%
@@ -1071,8 +1074,9 @@ proxy-groups:
   lazy: false
   timeout: 5000
   expected-status: 204
+  tolerance: 50
 - name: 🌏 台湾／新加坡
-  type: select
+  type: url-test
   proxies:
   - 新加坡01|1307ms|10Mbps|非住宅|纯净度97.6%
   url: https://connectivitycheck.gstatic.com/generate_204
@@ -1080,3 +1084,4 @@ proxy-groups:
   lazy: false
   timeout: 5000
   expected-status: 204
+  tolerance: 50

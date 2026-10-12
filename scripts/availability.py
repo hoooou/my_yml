@@ -963,13 +963,12 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
     recommended = [r['name'] for r in strict]
     regional = [r['name'] for r in ranked if regional_eligible(r)]
     def group(name, names):
-        return {'name': name, 'type': 'select', 'proxies': names or ['REJECT'],
+        return {'name': name, 'type': 'select' if name == '🚀 全局选择' else 'url-test', 'proxies': names or ['REJECT'],
                 'url': SITES['Google204'], 'interval': 300, 'lazy': False,
-                'timeout': 5000, 'expected-status': 204}
+                'timeout': 5000, 'expected-status': 204,
+                **({'default-selected': '⭐ 综合优选'} if name == '🚀 全局选择' else {'tolerance': 50})}
     config['proxies'] = proxies
     choices = ['⭐ 综合优选', medium_speed.GROUP, '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
-    if not recommended and regional:
-        choices.remove(REGIONAL_GROUP); choices.insert(0, REGIONAL_GROUP)
     config['proxy-groups'] = [
         group('🚀 全局选择', choices),
         group('⭐ 综合优选', recommended), group(medium_speed.GROUP, medium),
@@ -1302,7 +1301,9 @@ def main():
               'publication_mode': args.phase if repairing else 'full',
               'measurement_recovery': recovery,
               'group_latency_policy': {'url': SITES['Google204'], 'interval_seconds': 300,
-                  'timeout_ms': 5000, 'expected_status': 204, 'manual_selection': True, 'lazy': False},
+                  'timeout_ms': 5000, 'expected_status': 204, 'manual_selection': True, 'lazy': False,
+                  'global_type': 'select', 'default_global_selection': '⭐ 综合优选',
+                  'other_group_type': 'url-test', 'automatic_selection': True, 'tolerance_ms': 50},
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
                   'scope': 'available_published_quick_download_passed', 'overseas_rounds': WEBSITE_ROUNDS,
                   'workers': 8, 'jobs': 1,

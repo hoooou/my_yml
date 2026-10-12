@@ -44,7 +44,7 @@ class PublicationStabilityTests(unittest.TestCase):
         row['stability'] = st.summarize([sample(i, i) for i in range(1, 6)])
         self.assertEqual(len(a.render_comparison({}, [row], mapping, require_stability=True)['proxies']), 0)
 
-    def test_rejected_former_name_is_cleared_and_all_groups_remain_manual(self):
+    def test_rejected_former_name_is_cleared_and_group_types_match_policy(self):
         rows = [record('n-a'), record('n-b')]
         rows[0]['stability'] = evidence()
         rows[1]['stability'] = {'status': 'failed'}
@@ -53,7 +53,7 @@ class PublicationStabilityTests(unittest.TestCase):
         cfg = a.render_comparison({}, rows, mapping, require_stability=True)
         self.assertEqual(len(cfg['proxies']), 1)
         self.assertNotIn('name', rows[1])
-        self.assertTrue(all(g['type'] == 'select' for g in cfg['proxy-groups']))
+        self.assertTrue(all(g['type'] == ('select' if g['name'] == '🚀 全局选择' else 'url-test') for g in cfg['proxy-groups']))
 
 
 class StabilityProbeTests(unittest.TestCase):

@@ -488,7 +488,8 @@ class AvailabilityTests(unittest.TestCase):
         for group in (g for g in config['proxy-groups'] if g['name'] in ('⭐ 综合优选', '⚡ 高速下载', '🏠 非机房 IP')):
             self.assertEqual(group['proxies'], ['REJECT'])
         self.assertEqual(next(g['proxies'] for g in config['proxy-groups'] if g['name'] == a.REGIONAL_GROUP), [record['name']])
-        self.assertEqual(config['proxy-groups'][0]['proxies'][0], a.REGIONAL_GROUP)
+        self.assertEqual(config['proxy-groups'][0]['proxies'][0], '⭐ 综合优选')
+        self.assertEqual(config['proxy-groups'][0]['default-selected'], '⭐ 综合优选')
         for country in ('TW', 'SG'):
             record['exit']['country_code'] = country
             self.assertTrue(a.regional_eligible(record))
