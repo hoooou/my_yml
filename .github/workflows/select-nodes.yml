@@ -340,6 +340,7 @@ jobs:
       - name: 检查全量结果并生成订阅
         env:
           IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
+          UNTESTED_SUBSCRIPTION_URL: ${{ secrets.UNTESTED_SUBSCRIPTION_URL }}
         run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 4
       - name: 保存本次全量检测报告
         if: always()
@@ -418,6 +419,7 @@ jobs:
       - name: 验证原始证据并生成全局手动与其余自动分组
         env:
           SOURCE_RUN: ${{ inputs.diagnostic_run_id }}
+          UNTESTED_SUBSCRIPTION_URL: ${{ secrets.UNTESTED_SUBSCRIPTION_URL }}
         run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 4 --reuse-report .node-work/original-report/full-test-report.json --source-run "$SOURCE_RUN"
       - name: 保存本次全量检测报告
         if: always()
@@ -471,6 +473,7 @@ jobs:
       - name: 补测或重建已有结果并验证订阅
         env:
           IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
+          UNTESTED_SUBSCRIPTION_URL: ${{ secrets.UNTESTED_SUBSCRIPTION_URL }}
           UPDATE_MODE: ${{ inputs.mode }}
         run: |
           if [ "$UPDATE_MODE" = "web-recheck" ]; then

@@ -29,6 +29,7 @@ import continuous_stability
 import upload_speed
 import service_probes
 from v2rayn_subscription import render as render_v2rayn
+from untested_subscription import append_from_env as append_untested
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report, website_access_summary, latest_cohort
 from attempt_report import write_attempt
@@ -1246,6 +1247,10 @@ def main():
     requires_upload = (args.phase in ('all', 'publish', 'uplink-recheck')
         or (args.phase in repair_modes and previous.get('node_selection_policy', {}).get('requires_uplink_pass') is True))
     config = render_comparison(base, records, mapping, require_stability=requires_stability, require_upload=requires_upload)
+    tested_selected_count = len(config['proxies'])
+    config, untested_info = append_untested(config)
+    if mobile_control_paths(config):
+        raise ValueError('追加后的配置包含控制字符，拒绝发布')
     if args.phase in ('all', 'publish'):
         measurement_end = s.datetime.now(s.TZ).isoformat(timespec='seconds')
         bundle.setdefault('measurements_updated_at', measurement_end)
@@ -1253,7 +1258,8 @@ def main():
                       measurement_end, required_traces=REQUIRED_TRACES,
                       required_gate=required_websites_passed,
                       stability_policy=(stability_diagnostic or {}).get('settings') or stability.settings(records),
-                      measurement_recovery=recovery, publication_root=Path('.'))
+                      measurement_recovery=recovery, publication_root=Path('.'),
+                      untested_subscription=untested_info, tested_selected_count=tested_selected_count)
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
             print('全量检测完成：无符合页面、trace及应用TLS门槛的节点，报告已保存；原订阅未更新', flush=True)
@@ -1283,7 +1289,9 @@ def main():
     repairing = args.phase in repair_modes
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 21, 'website_tls_policy': {'any_tls_error_eliminates': True, 'includes_optional_sites': True},
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 21,
+              'untested_subscription': untested_info, 'tested_selected_node_count': tested_selected_count,
+              'website_tls_policy': {'any_tls_error_eliminates': True, 'includes_optional_sites': True},
               'upload_precheck_policy': upload_speed.precheck_settings(),
               'early_upload_precheck_enabled': previous.get('early_upload_precheck_enabled', False) if repairing else bool(bundle.get('early_upload_precheck')),
               'upload_precheck_counts': {v: sum((r.get('upload_precheck') or {}).get('status', 'unmeasured') == v for r in records)

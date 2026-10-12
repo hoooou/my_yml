@@ -10,7 +10,7 @@ import upload_speed
 import service_probes
 
 
-def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None, publication_root=None):
+def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None, publication_root=None, untested_subscription=None, tested_selected_count=None):
     coverage = {}
     labels = {label for record in records for label in (record.get('websites') or {})}
     for label in sorted(labels):
@@ -23,6 +23,8 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
             'attempt_reason_counts': dict(Counter(a.get('reason', 'unknown') for a in attempts))}
     selected = len(config['proxies'])
     report = {'updated_at': now, 'scope': 'all_subscriptions', 'input_unique_count': input_count,
+        'untested_subscription': untested_subscription or {},
+        'tested_selected_node_count': selected if tested_selected_count is None else tested_selected_count,
         'measurement_recovery': measurement_recovery,
         'measurements_updated_at': (measurement_recovery or {}).get('measurements_updated_at', now),
         'parseable_count': len(records), 'selected_node_count': selected,
