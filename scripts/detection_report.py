@@ -10,6 +10,7 @@ from select_nodes import COUNTRIES
 import stability
 import continuous_stability as cs
 import upload_speed
+import service_probes
 from mobile_pilot import confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 
@@ -64,6 +65,23 @@ def cell(value):
     return str(value).replace('|', '\\|').replace('\n', ' ').replace('\r', ' ')
 
 
+def service_checks_table(nodes):
+    counts = service_probes.summary(nodes)
+    if not any(x['measured'] for x in counts.values()):
+        return []
+    rows = ['## 补充服务检测', '',
+        '1MB下载通过后检测；独立于网站覆盖率和下载分组，普通接口异常不淘汰节点，明确证书校验错误仍淘汰。', '',
+        '| 检测 | 实测 | 通过 | 限制 | CF验证 | 接口不可用／未知 | 连接／下载失败 | 证书错误 |',
+        '|---|---:|---:|---:|---:|---:|---:|---:|']
+    for label, title in (('ChatGPTAPI', 'ChatGPT API'), ('FASTAPI', 'FAST测速API'),
+                         ('FAST', 'Netflix CDN 1MB'), ('TikTokTrace', 'TikTok trace')):
+        x = counts[label]
+        rows.append(f'| {title} | {x["measured"]} | {x["passed"]} | {x["restricted"]} | '
+            f'{x["verification_required"]} | {x["unavailable"] + x["unknown"]} | {x["failed"]} | {x["certificate_error"]} |')
+    rows += ['', 'API通过表示取得预期响应；trace通过表示取得有效域名连通与地区信息；FAST通过要求取得可信目标并在6秒内完整下载1MB。均不代表登录、对话、视频播放或内容解锁成功。FAST API失败时CDN下载未测；JSON分别记录接口和下载结果。证书错误列可能与其他原因重叠。', '']
+    return rows
+
+
 def number(value, digits=0):
     return f'{value:.{digits}f}' if type(value) in (int, float) and math.isfinite(value) else '—'
 
@@ -113,7 +131,7 @@ def download(row):
 def ssl_passed(row):
     explicit_error = any(a.get('tls_error_kind') == 'certificate_verification_failed'
         for item in (row.get('websites') or {}).values() for a in item.get('attempts', [item]))
-    return (not explicit_error and app_tls.passed(row.get('app_tls'))
+    return (not explicit_error and not service_probes.certificate_errors(row.get('service_checks')) and app_tls.passed(row.get('app_tls'))
             and app_tls.passed(row.get('post_upload_tls')))
 
 
@@ -293,6 +311,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     required_targets = set(policy.get('required_websites', report.get('required_websites', [])))
     required_targets.update(policy.get('required_traces', report.get('required_traces', [])))
     rows += website_access_table(nodes if mode == 'full' else cohort, required_targets)
+    rows += service_checks_table(nodes if mode == 'full' else cohort)
     if 'Reddit' in required_targets and not (policy.get('confirmed_reddit_login_prompt') or report.get('confirmed_reddit_login_prompt')):
         rows += ['Reddit明确登录提示已改为认可通过；本表沿用旧版短正文采样，没有相应证据的旧403不会批量追认，下一轮全量按新规则实际检测。', '']
     if mode != 'full' and any(r.get('websites') for r in cohort):
@@ -304,6 +323,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '| 4 | 海外网站及trace | 指定12站各三轮；Claude仅测trace |',
              '| 5 | 应用SSL | 四个域名各两次，严格校验证书链、域名和有效期 |',
              '| 6 | 1MB下载 | 6秒内完整下载，所有入选节点必过 |',
+             '| 补充 | 服务API／trace／CDN | 1MB通过后并行检查ChatGPT API、TikTok trace、FAST API及Netflix CDN 1MB；仅明确证书错误影响淘汰 |',
              '| 7 | 5MB下载 | 10秒内完成才进入中速组 |',
              '| 8 | 双100MB下载 | Cloudflare和DataPacket各20秒内完成才进入高速组 |',
              '| 9 | 上行及负载 | 复用本轮3MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',

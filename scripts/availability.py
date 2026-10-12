@@ -27,6 +27,7 @@ import medium_speed
 import stability
 import continuous_stability
 import upload_speed
+import service_probes
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report, website_access_summary, latest_cohort
 from attempt_report import write_attempt
@@ -292,7 +293,7 @@ def high_speed_download(port):
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
                    site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
                    medium_download=None, upload_precheck=None, upload_controls=None,
-                   preflight_only=False, initial_records=None):
+                   preflight_only=False, initial_records=None, service_check=None):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
     upload_precheck = upload_precheck or (lambda port: upload_speed.sample(
@@ -392,6 +393,8 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             with bandwidth.download():
                                 record['download'] = download(port)
                             if record['download']['status'] == 'passed':
+                                if service_check is not None:
+                                    record['service_checks'] = service_check(port, bandwidth)
                                 with medium_slots:
                                     with bandwidth.download():
                                         record['medium_speed_download'] = medium_download(port)
@@ -488,6 +491,10 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                     len(record['websites'].get(site, {}).get('attempts', [])) != (WEBSITE_ROUNDS if site in OVERSEAS_SITES else 1)
                     for site in DAILY_POST_SITES)):
                 raise ValueError('通过节点缺少海外三轮或trace 单轮检测')
+            if (not preflight_only and bundle.get('service_checks_enabled')
+                    and (record.get('download') or {}).get('status') == 'passed'
+                    and not service_probes.complete(record.get('service_checks'))):
+                raise ValueError('1MB通过节点缺少本轮补充服务检测')
             if record.get('websites'):
                 for label, item in record['websites'].items():
                     if any(a.get('status') == 'verification_required'
@@ -654,7 +661,7 @@ def required_websites_passed(record):
 
 
 def destination_certificate_failure(record):
-    return any(attempt.get('tls_error_kind') == 'certificate_verification_failed'
+    return bool(service_probes.certificate_errors(record.get('service_checks'))) or any(attempt.get('tls_error_kind') == 'certificate_verification_failed'
         for item in (record.get('websites') or {}).values()
         for attempt in item.get('attempts', [item]))
 
@@ -976,7 +983,7 @@ def reuse_measurements(bundle, records, cached, source_run):
     s.datetime.fromisoformat(original_time)
     keys = ('server', 'port', 'protocol', 'precheck', 'entry', 'upload_precheck',
             'websites', 'exit', 'exit_consistent', 'app_tls', 'download',
-            'medium_speed_download', 'high_speed_download', 'upload', 'post_upload_tls')
+            'medium_speed_download', 'high_speed_download', 'upload', 'post_upload_tls', 'service_checks')
     for row in records:
         old = by_id[row['id']]
         if any(row.get(key) != old.get(key) for key in keys):
@@ -1063,7 +1070,7 @@ def main():
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
-                  'early_upload_precheck': True,
+                  'early_upload_precheck': True, 'service_checks_enabled': True,
                   'parallel_observation': args.phase == 'prepare',
                   'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
                   'historical_candidates': historical,
@@ -1105,7 +1112,8 @@ def main():
         try:
             records, endpoint_count = probe_pipeline(subset, binary, root,
                 interval=.25 * args.shard_count, upload_controls=controls,
-                preflight_only=args.phase == 'preflight', initial_records=seed)
+                preflight_only=args.phase == 'preflight', initial_records=seed,
+                service_check=service_probes.check)
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
         result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
@@ -1118,7 +1126,8 @@ def main():
     elif args.phase not in repair_modes:
         controls = {}
         try:
-            records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls)
+            records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls,
+                                                     service_check=service_probes.check)
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
     upload_diagnostic = stability_diagnostic = None
@@ -1331,6 +1340,8 @@ def main():
                                   for v in ('passed', 'failed', 'skipped')},
               'services': services, 'sources': sources, 'nodes': records}
     report['website_access_summary'] = website_access_summary(latest_cohort(report))
+    report['service_checks_policy'] = previous.get('service_checks_policy') if repairing else service_probes.settings()
+    report['service_checks_summary'] = service_probes.summary(latest_cohort(report))
     Path('优选配置.yaml').write_text(f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text())
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     write_report(report, config, Path('连通性报告.md'), website_gate=required_websites_passed)
