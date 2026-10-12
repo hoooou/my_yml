@@ -1,0 +1,58 @@
+name: Google与Cloudflare 204对照
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 最近完成的全量运行编号（仅测国内TCP通过节点）
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: compare-204
+  cancel-in-progress: false
+jobs:
+  compare:
+    name: 国内TCP通过节点，两个204各三轮（不发布订阅）
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: 准备检测环境
+        run: |
+          python -m pip install -r scripts/requirements.txt
+          python scripts/install_tools.py --mihomo-only
+          python -m unittest discover -s scripts/tests -q
+      - name: 读取指定全量的原始输入与结果
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+        run: |
+          [[ "$SOURCE_RUN" =~ ^[0-9]+$ ]] || exit 1
+          gh run download "$SOURCE_RUN" -n availability-input -D .node-work/compare-input
+          gh run download "$SOURCE_RUN" -n full-test-report -D .node-work/compare-report
+      - name: 同批节点交替对照与前后直连检查
+        env:
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+        run: |
+          python scripts/compare_204.py --mihomo .node-work/bin/mihomo --source-run "$SOURCE_RUN" \
+            --bundle .node-work/compare-input/bundle.json --report .node-work/compare-report/full-test-report.json
+      - name: 保存对照报告
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: compare-204
+          path: .node-work/compare-204/summary.*
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: warn
+      - name: 展示统计与逐节点差异
+        if: always()
+        run: |
+          if [ -f .node-work/compare-204/summary.md ]; then
+            cat .node-work/compare-204/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi

@@ -210,6 +210,10 @@ GitHub测量代表云端到节点再到网站的路径；国内TCP只补入口�
 | [LittleRey/clash-yaml / rules/CN-App.list](https://github.com/LittleRey/clash-yaml/blob/b9d754ddc5f5228abf33a7aded9b9dfb0d322f9e/rules/CN-App.list) | 2025-12-13 | 向日葵 Android 包名；微信等已注释 |
 | [ghfree123/freedom / Twitter.list](https://github.com/ghfree123/freedom/blob/99edbac1f1bcac6d35a676e97bc242cd197c7221/Twitter.list) | 2026-02-05 | X/Twitter Android 包名；不自动补充 Lite/TV 等未指定版本 |
 
+### Google／Cloudflare 204独立对照
+
+手动运行“Google与Cloudflare 204对照”，指定最近完成的全量运行编号。读取该轮全部国内TCP通过节点，包括后续上行、网站或下载失败的节点；不更新订阅或生产筛选。Google使用`https://connectivitycheck.gstatic.com/generate_204`，Cloudflare使用`https://cp.cloudflare.com/generate_204`。每节点每目标三轮，交替先后顺序；同请求头、严格TLS、连接／读取超时2／3秒，三轮均返回无正文204才通过。16节点并行，两个目标在单节点内依次测，前后各三轮直连对照；直连异常时标记结果需复核。统计两者都过、仅Google过、仅Cloudflare过、两者都不过及逐节点延迟，报告只放Actions摘要和`compare-204`附件（7天）。这批节点已通过原Google204和国内TCP，不代表所有来源节点的无偏对照。
+
 <!-- latest-detection:start -->
 ## 节点检测报告
 
