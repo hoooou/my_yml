@@ -432,7 +432,7 @@ class AvailabilityTests(unittest.TestCase):
             for index in range(35):
                 records.append({'app_tls': verified_tls(), 'id': f'n-{country}-{index}', 'entry': {'status': 'passed'},
                     'websites': {label: {'status': 'passed', 'round_count': 3, 'passed_count': 3,
-                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.PAGE_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
+                        'median_elapsed_ms': 100, 'p95_elapsed_ms': 110, 'jitter_ms': 10} for label in a.OVERSEAS_SITES} | {'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}},
                     'precheck': {'status': 'passed', 'median_elapsed_ms': index + 1},
                     'exit': {'country_code': country, 'exit_ip': f'8.8.{country == "JP"}.{index}'},
                     'download': {'status': 'passed', 'speed_mib_s': 1}})

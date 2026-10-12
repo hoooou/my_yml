@@ -70,15 +70,17 @@ def service_checks_table(nodes):
     if not any(x['measured'] for x in counts.values()):
         return []
     rows = ['## 补充服务检测', '',
-        '1MB下载通过后检测；独立于网站覆盖率和下载分组，普通接口异常不淘汰节点，明确证书校验错误仍淘汰。', '',
+        'FAST在1MB下载通过后检测；独立于网站覆盖率和下载分组，普通接口异常不淘汰节点，明确证书校验错误仍淘汰。', '',
         '| 检测 | 实测 | 通过 | 限制 | CF验证 | 接口不可用／未知 | 连接／下载失败 | 证书错误 |',
         '|---|---:|---:|---:|---:|---:|---:|---:|']
     for label, title in (('ChatGPTAPI', 'ChatGPT API'), ('FASTAPI', 'FAST测速API'),
-                         ('FAST', 'Netflix CDN 1MB'), ('TikTokTrace', 'TikTok trace')):
+                         ('FAST', 'Netflix CDN 1MB')):
         x = counts[label]
+        if label == 'ChatGPTAPI' and not x['measured']:
+            continue
         rows.append(f'| {title} | {x["measured"]} | {x["passed"]} | {x["restricted"]} | '
             f'{x["verification_required"]} | {x["unavailable"] + x["unknown"]} | {x["failed"]} | {x["certificate_error"]} |')
-    rows += ['', 'API通过表示取得预期响应；trace通过表示取得有效域名连通与地区信息；FAST通过要求取得可信目标并在6秒内完整下载1MB。均不代表登录、对话、视频播放或内容解锁成功。FAST API失败时CDN下载未测；JSON分别记录接口和下载结果。证书错误列可能与其他原因重叠。', '']
+    rows += ['', 'API通过表示取得预期响应；FAST通过要求取得可信目标并在6秒内完整下载1MB。均不代表登录、对话、视频播放或内容解锁成功。FAST API失败时CDN下载未测；JSON分别记录接口和下载结果。证书错误列可能与其他原因重叠。', '']
     return rows
 
 
@@ -287,7 +289,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         if website_gate:
             measured = [r for r in nodes if r.get('websites')]
             good = sum(website_gate(r) for r in measured)
-            rows.append(f'| 12站＋Claude trace | {good} | {len(measured)-good} | {len(nodes)-len(measured)} |')
+            label = '12站＋ChatGPT API＋必过trace' if any('ChatGPTAPI' in (r.get('websites') or {}) for r in measured) else '12站＋Claude trace'
+            rows.append(f'| {label} | {good} | {len(measured)-good} | {len(nodes)-len(measured)} |')
         for key, label, validator in (
                 ('precheck', '204三轮', lambda x: x.get('status') == 'passed'),
                 ('entry', '国内入口TCP', lambda x: x.get('status') == 'passed'),
@@ -320,10 +323,10 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '| 1 | HTTPS 204 | 三轮全部通过 |',
              '| 2 | 国内入口TCP | 国内探测点连接成功；未验证不放行 |',
              '| 3 | 3MB上行预检 | 6秒内完整上传（含建连及响应，约4Mbps下限）；失败跳过网站和下载，每分片同时一个，与下载错开 |',
-             '| 4 | 海外网站及trace | 指定12站各三轮；Claude仅测trace |',
+             '| 4 | 海外网站及API／trace | 指定12站及ChatGPT API各三轮；必过trace单轮 |',
              '| 5 | 应用SSL | 四个域名各两次，严格校验证书链、域名和有效期 |',
              '| 6 | 1MB下载 | 6秒内完整下载，所有入选节点必过 |',
-             '| 补充 | 服务API／trace／CDN | 1MB通过后并行检查ChatGPT API、TikTok trace、FAST API及Netflix CDN 1MB；仅明确证书错误影响淘汰 |',
+             '| 补充 | FAST API／Netflix CDN | 1MB通过后获取FAST目标并完整下载1MB（6秒）；仅明确证书错误影响淘汰 |',
              '| 7 | 5MB下载 | 10秒内完成才进入中速组 |',
              '| 8 | 双100MB下载 | Cloudflare和DataPacket各20秒内完成才进入高速组 |',
              '| 9 | 上行及负载 | 复用本轮3MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',

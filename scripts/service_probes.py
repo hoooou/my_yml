@@ -1,7 +1,6 @@
 """Supplementary service requests; only certificate failures affect selection."""
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
-import ipaddress
 import json
 import re
 import time
@@ -10,13 +9,12 @@ from urllib.parse import urljoin, urlparse, urlunparse
 import select_nodes as s
 from mobile_pilot import WEB_USER_AGENT, certificate_failure
 
-VERSION = 1
+VERSION = 2
 CHATGPT_API = 'https://api.openai.com/compliance/cookie_requirements'
-TIKTOK_TRACE = 'https://www.tiktok.com/cdn-cgi/trace'
 # Public browser token from FAST, not an account credential. Never publish its query.
 FAST_API = ('https://api.fast.com/netflix/speedtest/v2?https=true&'
             'token=YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=1')
-TARGETS = ('ChatGPTAPI', 'FAST', 'TikTokTrace')
+TARGETS = ('ChatGPTAPI', 'FAST')
 API_BUDGET = 5
 BODY_LIMIT = 65536
 DOWNLOAD_BYTES = 1_000_000
@@ -25,10 +23,10 @@ DOWNLOAD_BUDGET = 6
 
 def settings():
     return {'version': VERSION, 'scope': 'after_passed_1MB_download',
-        'targets': {'ChatGPTAPI': CHATGPT_API, 'FAST': public_url(FAST_API), 'TikTokTrace': TIKTOK_TRACE},
+        'targets': {'FAST': public_url(FAST_API)},
         'api_budget_seconds': API_BUDGET, 'api_body_limit_bytes': BODY_LIMIT,
         'fast_download_bytes': DOWNLOAD_BYTES, 'fast_download_budget_seconds': DOWNLOAD_BUDGET,
-        'parallel_targets': 3, 'tls_verification': True, 'affects_selection': 'certificate_errors_only',
+        'parallel_targets': 1, 'tls_verification': True, 'affects_selection': 'certificate_errors_only',
         'counts_as_website_coverage': False, 'replaces_existing_download_tests': False}
 
 
@@ -103,23 +101,6 @@ def chatgpt_api(port):
     return {**result, 'status': 'unknown', 'reason': 'API响应格式或预期字段不匹配'}
 
 
-def tiktok_trace(port):
-    result, body = fetch(port, TIKTOK_TRACE)
-    if result['status'] != 'response_received':
-        return result
-    fields = dict(line.split('=', 1) for line in body.decode('utf-8', errors='replace').splitlines() if '=' in line)
-    try:
-        valid_ip = ipaddress.ip_address(fields.get('ip', '')).is_global
-    except ValueError:
-        valid_ip = False
-    if (result.get('content_type', '').lower().startswith('text/plain') and valid_ip
-            and fields.get('h') == 'www.tiktok.com' and fields.get('visit_scheme') == 'https'
-            and re.fullmatch('[A-Z]{2}', fields.get('loc', ''))):
-        return {**result, 'status': 'passed', 'country_code': fields['loc'],
-                'colo': fields.get('colo'), 'reason': '有效TikTok trace；未验证视频或登录'}
-    return {**result, 'status': 'unavailable', 'reason': 'TikTok未提供预期trace；首页检测结果独立保留'}
-
-
 def fast_target(data):
     """Allow only HTTPS Netflix CDN range URLs; never arbitrary API-supplied hosts."""
     targets = data if isinstance(data, list) else data.get('targets') if isinstance(data, dict) else None
@@ -133,7 +114,7 @@ def fast_target(data):
             valid = (parsed.scheme == 'https' and parsed.hostname is not None
                 and parsed.hostname.endswith('.nflxvideo.net') and parsed.port in (None, 443)
                 and not parsed.username and not parsed.password and not parsed.fragment
-                and re.fullmatch(r'/speedtest/range/0-\d+', parsed.path))
+                and re.fullmatch(r'/speedtest(?:/range/0-\d+)?', parsed.path))
         except ValueError:
             valid = False
         if valid:
@@ -215,11 +196,15 @@ def fast(port, download_gate=None):
 
 
 def check(port, download_gate=None):
-    with ThreadPoolExecutor(max_workers=3) as pool:
-        jobs = {'ChatGPTAPI': pool.submit(chatgpt_api, port), 'FAST': pool.submit(fast, port, download_gate),
-                'TikTokTrace': pool.submit(tiktok_trace, port)}
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        jobs = {'ChatGPTAPI': pool.submit(chatgpt_api, port), 'FAST': pool.submit(fast, port, download_gate)}
         return {'version': VERSION, 'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
                 'targets': {name: job.result() for name, job in jobs.items()}}
+
+
+def check_fast(port, download_gate=None):
+    return {'version': VERSION, 'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
+            'targets': {'FAST': fast(port, download_gate)}}
 
 
 def certificate_errors(checks):
@@ -235,7 +220,7 @@ def complete(checks):
     if not isinstance(checks, dict) or checks.get('version') != VERSION:
         return False
     targets = checks.get('targets')
-    return (isinstance(targets, dict) and set(targets) == set(TARGETS)
+    return (isinstance(targets, dict) and set(targets) in (set(TARGETS), {'FAST'})
         and all(isinstance(x, dict) and x.get('status') in
                 ('passed', 'restricted', 'verification_required', 'unavailable', 'unknown', 'failed')
                 for x in targets.values()))

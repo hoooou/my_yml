@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import availability as a
 import detection_report as d
 import service_probes as p
+import mobile_pilot as m
 from test_medium_speed import record
 from tls_fixture import verified_tls
 from upload_fixture import verified_upload_precheck
@@ -39,6 +40,29 @@ def checks(status='unknown'):
 
 
 class ServiceProbeTests(unittest.TestCase):
+    def test_production_chatgpt_api_rejects_invalid_payload_host_or_status(self):
+        for status, url, body, expected in (
+                (200, p.CHATGPT_API, b'{"cookie_consent_required":false}', 'passed'),
+                (200, p.CHATGPT_API, b'{"cookie_consent_required":true}', 'passed'),
+                (200, p.CHATGPT_API, b'{}', 'failed'),
+                (200, p.CHATGPT_API, b'{"cookie_consent_required":"false"}', 'failed'),
+                (403, p.CHATGPT_API, b'{"error":{"code":"unsupported_country"}}', 'needs_review'),
+                (200, 'https://evil.example/', b'{"cookie_consent_required":false}', 'needs_review'),
+                (404, p.CHATGPT_API, b'{"cookie_consent_required":false}', 'failed')):
+            with self.subTest(status=status, url=url, body=body):
+                self.assertEqual(m.classify_response('ChatGPTAPI', status, url,
+                    {'Content-Type': 'application/json'}, body)['status'], expected)
+        self.assertIn('ChatGPTAPI', a.REQUIRED_SITES)
+        good = record()
+        self.assertTrue(a.required_websites_passed(good))
+        good['websites']['ChatGPTAPI'].update(round_count=1, passed_count=1)
+        self.assertFalse(a.required_websites_passed(good))
+
+    def test_tiktok_keeps_original_homepage_policy_without_trace(self):
+        self.assertEqual(m.SITES['TikTok'], 'https://www.tiktok.com/')
+        self.assertNotIn('TikTokTrace', m.SITES)
+        self.assertNotIn('TikTok', a.REQUIRED_SITES)
+
     def test_chatgpt_requires_expected_boolean_json_not_absence_of_denial(self):
         for data, status in (({'cookie_consent_required': False}, 'passed'),
                 ({'cookie_consent_required': True}, 'passed'), ({}, 'unknown'),
@@ -55,22 +79,12 @@ class ServiceProbeTests(unittest.TestCase):
             with patch.object(p, 'fetch', return_value=({**api_result(), 'status': status}, b'{"cookie_consent_required":false}')):
                 self.assertEqual(p.chatgpt_api(1)['status'], status)
 
-    def test_trace_requires_ip_host_scheme_and_plain_text(self):
-        valid = b'h=www.tiktok.com\nip=8.8.8.8\nvisit_scheme=https\nloc=US\ncolo=LAX\n'
-        result = {**api_result(p.TIKTOK_TRACE), 'content_type': 'text/plain'}
-        for body, status in ((valid, 'passed'), (valid.replace(b'8.8.8.8', b'127.0.0.1'), 'unavailable'),
-                (valid.replace(b'www.tiktok.com', b'evil.example'), 'unavailable'),
-                (valid.replace(b'loc=US', b'loc=us'), 'unavailable'),
-                (valid.replace(b'https', b'http'), 'unavailable'), (b'<html>TikTok</html>', 'unavailable')):
-            with self.subTest(body=body), patch.object(p, 'fetch', return_value=(result, body)):
-                self.assertEqual(p.tiktok_trace(1)['status'], status)
-        with patch.object(p, 'fetch', return_value=({**result, 'content_type': 'text/html'}, valid)):
-            self.assertEqual(p.tiktok_trace(1)['status'], 'unavailable')
-
     def test_fast_target_is_restricted_and_uses_exact_1mb_range(self):
         original = 'https://ipv4-c001.example.nflxvideo.net/speedtest/range/0-0?o=PRIVATE_SIGNED_QUERY'
         target = p.fast_target({'targets': [{'url': original, 'location': {'country': 'US'}}]})
         self.assertEqual(target, (original.replace('0-0?', '0-999999?'), 'US'))
+        self.assertEqual(p.fast_target({'targets': [{'url': 'https://a.nflxvideo.net/speedtest?o=PRIVATE'}]})[0],
+                         'https://a.nflxvideo.net/speedtest/range/0-999999?o=PRIVATE')
         for bad in ('http://example.nflxvideo.net/speedtest/range/0-0',
                 'https://127.0.0.1/speedtest/range/0-0', 'https://nflxvideo.net.evil.com/speedtest/range/0-0',
                 'https://x.nflxvideo.net@evil.com/speedtest/range/0-0',
@@ -139,7 +153,7 @@ class ServiceProbeTests(unittest.TestCase):
         row['service_checks'] = checks('restricted')
         self.assertTrue(a.web_quality_eligible(row))
         self.assertFalse(a.destination_certificate_failure(row))
-        for label, component in (('ChatGPTAPI', None), ('TikTokTrace', None), ('FAST', 'api'), ('FAST', 'download')):
+        for label, component in (('ChatGPTAPI', None), ('FAST', 'api'), ('FAST', 'download')):
             broken = copy.deepcopy(row)
             item = broken['service_checks']['targets'][label]
             if component:

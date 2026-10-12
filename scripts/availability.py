@@ -39,7 +39,7 @@ LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
 WEBSITE_ROUNDS = 3
 CORE_SITES = ('Google', 'YouTube')
 REQUIRED_SITES = ('Google', 'YouTube', 'ChatGPT', 'Gemini', 'GitHub',
-                  'Wikipedia', 'Reddit', 'X', 'Instagram', 'Telegram', 'Discord', 'Facebook')
+                  'Wikipedia', 'Reddit', 'X', 'Instagram', 'Telegram', 'Discord', 'Facebook', 'ChatGPTAPI')
 REQUIRED_TRACES = ('ClaudeTrace',)
 CORE_MEDIAN_MS = 1500
 CORE_TAIL_MS = 3000
@@ -405,7 +405,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         else:
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
-                        record['download']['reason'] = '12个必过页面未满足三轮访问条件或Claude trace未通过，跳过下载'
+                        record['download']['reason'] = '必过网页/API未满足三轮访问条件或必过trace未通过，跳过下载'
             with lock:
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
@@ -1113,7 +1113,7 @@ def main():
             records, endpoint_count = probe_pipeline(subset, binary, root,
                 interval=.25 * args.shard_count, upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
-                service_check=service_probes.check)
+                service_check=service_probes.check_fast)
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
         result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
@@ -1127,7 +1127,7 @@ def main():
         controls = {}
         try:
             records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls,
-                                                     service_check=service_probes.check)
+                                                     service_check=service_probes.check_fast)
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
     upload_diagnostic = stability_diagnostic = None
@@ -1249,7 +1249,8 @@ def main():
               'cloudflare_classification_update': ({'updated_at': now, 'reclassified_attempts': reclassified_count,
                   'new_measurements': False, 'source': 'captured_cloudflare_challenge_restriction'}
                   if repairing else None),
-              'website_measurement_policy': {'version': 7,
+              'website_measurement_policy': {'version': 8,
+                  'chatgpt_api_validation': 'three_rounds_expected_boolean_json',
                   'confirmed_cloudflare_challenge': 'accepted_access_verification_required',
                   'confirmed_reddit_login_prompt': 'accepted_access_login_required',
                   'challenge_in_page_speed_ranking': False,

@@ -152,7 +152,7 @@ class CleanReportTests(unittest.TestCase):
         self.assertIn('待发布候选：0', text)
         self.assertIn('本轮无合格节点，保留原订阅', text)
         self.assertIn('去重 **5555**', text)
-        self.assertIn('12站＋Claude trace', text)
+        self.assertIn('12站＋ChatGPT API＋必过trace', text)
 
     def test_upload_summary_recomputes_current_cohort_without_old_failures(self):
         report, _ = fixture()
