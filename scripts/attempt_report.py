@@ -52,7 +52,8 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'high_speed_download_settings': high_speed.settings(),
         'high_speed_target_counts': {url: high_speed.status_counts(records, i) for i, url in enumerate(high_speed.URLS)},
         'website_counts': coverage, 'sources': sources, 'nodes': records}
-    from detection_report import write_report
+    from detection_report import write_report, website_access_summary
+    report['website_access_summary'] = website_access_summary(records)
     names = {n['name'] for n in config['proxies']}
     report.update(publication_mode='full', published_node_count=selected,
                   published_node_ids=[r['id'] for r in records if r.get('name') in names])

@@ -10,6 +10,53 @@ from select_nodes import COUNTRIES
 import stability
 import continuous_stability as cs
 import upload_speed
+from mobile_pilot import confirmed_cloudflare_challenge
+
+
+def website_access_summary(nodes):
+    """Count affected nodes, never confuse three attempts with three nodes."""
+    labels = {label for row in nodes for label in (row.get('websites') or {}) if label != 'Google204'}
+    result = {}
+    for label in sorted(labels):
+        stats = dict.fromkeys(('measured', 'accepted', 'cloudflare_challenge', 'restricted',
+                              'transport_error', 'page_or_speed_error', 'unmeasured'), 0)
+        for row in nodes:
+            item = (row.get('websites') or {}).get(label) or {}
+            if item.get('status', 'missing') in ('missing', 'skipped', 'unknown', 'not_candidate'):
+                stats['unmeasured'] += 1
+                continue
+            stats['measured'] += 1
+            attempts = item.get('attempts') or [item]
+            cf = [x.get('status') == 'verification_required' and confirmed_cloudflare_challenge(label, x)
+                  for x in attempts]
+            accepted = item.get('status') == 'passed' or (
+                item.get('status') == 'verification_required'
+                and all(x.get('status') == 'passed' or challenge for x, challenge in zip(attempts, cf)))
+            stats['accepted'] += accepted
+            stats['cloudflare_challenge'] += any(cf)
+            stats['restricted'] += any(x.get('status') in ('needs_review', 'verification_required')
+                                      and not challenge for x, challenge in zip(attempts, cf))
+            stats['transport_error'] += any(x.get('error_type') or x.get('tls_error_kind') for x in attempts)
+            stats['page_or_speed_error'] += any(x.get('status') in ('failed', 'slow')
+                and not x.get('error_type') and not x.get('tls_error_kind') for x in attempts)
+        result[label] = stats
+    return result
+
+
+def website_access_table(nodes, required=()):
+    counts = website_access_summary(nodes)
+    if not counts:
+        return []
+    rows = ['## 各网站拦截与异常数量', '',
+            f'统计范围 **{len(nodes)}** 个节点；仅实测节点进入各站分母。带★为必过目标，其他目标仅供诊断。', '',
+            '| 网站 | 实测 | 通过 | CF人机验证 | 其他拦截／跳转 | 连接／TLS异常 | 慢／内容异常 |',
+            '|---|---:|---:|---:|---:|---:|---:|']
+    for label, item in sorted(counts.items(), key=lambda kv: (-(kv[1]['measured'] - kv[1]['accepted']), kv[0])):
+        rows.append('| ' + ('★ ' if label in required else '') + cell(label) + ' | ' +
+                    ' | '.join(str(item[k]) for k in ('measured', 'accepted', 'cloudflare_challenge',
+                        'restricted', 'transport_error', 'page_or_speed_error')) + ' |')
+    rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证；普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '']
+    return rows
 
 
 def cell(value):
@@ -241,6 +288,12 @@ def write_report(report, config, path, candidate=False, website_gate=None):
             rows += ['', '稳定性在国内TCP与3MB上传通过后独立并行检测，覆盖范围大于后续下载、上行复测；持续检测行不是最后一道串行统计。']
         rows += ['', '各阶段仅检测满足前置条件的候选；同一节点可能在多项中失败，不能把失败数相加。逐网站及逐节点失败明细保存在JSON。', '']
         rows += stability_details(nodes)
+    policy = report.get('website_measurement_policy') or {}
+    required_targets = set(policy.get('required_websites', report.get('required_websites', [])))
+    required_targets.update(policy.get('required_traces', report.get('required_traces', [])))
+    rows += website_access_table(nodes if mode == 'full' else cohort, required_targets)
+    if mode != 'full' and any(r.get('websites') for r in cohort):
+        rows += ['上表只统计当前补测／重建范围的节点；未重新检测的网页沿用原测量时间。', '']
     rows += ['', '## 最新筛选流程', '', '| 顺序 | 检查 | 要求 |', '|---:|---|---|',
              '| 1 | HTTPS 204 | 三轮全部通过 |',
              '| 2 | 国内入口TCP | 国内探测点连接成功；未验证不放行 |',

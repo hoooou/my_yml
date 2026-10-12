@@ -4,6 +4,7 @@ This entry point runs only in an ephemeral GitHub Actions checkout. The local
 library tests use disposable repositories; the shared user checkout is untouched.
 """
 from datetime import datetime
+import argparse
 import json
 import os
 from pathlib import Path
@@ -28,13 +29,13 @@ def measurement_time(report):
     return value
 
 
-def publish(root, attempts=3):
+def publish(root, attempts=3, files=FILES):
     root = Path(root).resolve()
     candidate = json.loads((root / '连通性报告.json').read_text())
     measured = measurement_time(candidate)
     with tempfile.TemporaryDirectory(prefix='clash-publication-') as folder:
         saved = Path(folder)
-        for name in FILES:
+        for name in files:
             shutil.copyfile(root / name, saved / name)
         # Only generated files may be dirty in this ephemeral checkout.
         git(root, 'restore', '--', *FILES)
@@ -49,9 +50,9 @@ def publish(root, attempts=3):
             if measurement_time(remote) > measured:
                 print('远端已有更新测量，保留最新订阅', flush=True)
                 return False
-            for name in FILES:
+            for name in files:
                 shutil.copyfile(saved / name, root / name)
-            git(root, 'add', '--', *FILES)
+            git(root, 'add', '--', *files)
             if git(root, 'diff', '--cached', '--quiet', check=False).returncode == 0:
                 print('订阅与报告没有变化', flush=True)
                 return False
@@ -67,10 +68,13 @@ def publish(root, attempts=3):
 def main():
     if os.environ.get('GITHUB_ACTIONS') != 'true':
         raise RuntimeError('仅支持GitHub Actions临时工作目录')
-    if not Path('.node-work/availability/selected.yaml').exists():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--report-only', action='store_true')
+    args = parser.parse_args()
+    if not args.report_only and not Path('.node-work/availability/selected.yaml').exists():
         print('本轮没有通过校验的新配置，保留原订阅', flush=True)
         return
-    publish(Path('.'))
+    publish(Path('.'), files=FILES[1:] if args.report_only else FILES)
 
 
 if __name__ == '__main__':

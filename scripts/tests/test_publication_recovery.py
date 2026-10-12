@@ -93,6 +93,10 @@ class PublicationGitTests(unittest.TestCase):
             self.assertEqual((old/'code.txt').read_text(), 'new code')
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
             self.assertEqual(self.command(old, 'log', '-1', '--format=%an'), 'github-actions[bot]')
+            # Report refresh must not overwrite the current subscription YAML.
+            self.write_outputs(old, '2026-10-12T09:00:00+08:00', 'report-refresh')
+            self.assertTrue(pub.publish(old, files=pub.FILES[1:]))
+            self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
             # Recovering older observations must not overwrite a newer subscription.
             self.write_outputs(old, '2026-10-12T07:30:00+08:00', 'older-candidate')
             self.assertFalse(pub.publish(old))
