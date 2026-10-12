@@ -586,7 +586,7 @@ jobs:
         run: |
           python scripts/stability_diagnostics.py --mihomo .node-work/bin/mihomo \
             --bundle .node-work/diagnostic-input/bundle.json \
-            --report .node-work/diagnostic-report/full-test-report.json
+            --report .node-work/diagnostic-report/full-test-report.json --observe-seconds 180
       - name: 保存脱敏诊断记录
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
