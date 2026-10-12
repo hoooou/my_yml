@@ -308,9 +308,11 @@ class AvailabilityTests(unittest.TestCase):
         self.assertNotIn(('100MB', 3), events)
 
     def test_three_204_rounds_are_independent_and_all_required(self):
-        with patch.object(a, 'check_site', side_effect=[{'status': 'passed', 'elapsed_ms': 5}, {'status': 'failed'}, {'status': 'passed', 'elapsed_ms': 10}]) as check:
+        with patch.object(a, 'check_site', side_effect=[{'status': 'passed', 'elapsed_ms': 5}, {'status': 'passed', 'elapsed_ms': 6}, {'status': 'failed'}, {'status': 'passed', 'elapsed_ms': 7}, {'status': 'passed', 'elapsed_ms': 10}, {'status': 'passed', 'elapsed_ms': 8}]) as check:
             result = a.precheck_204(1234)
-        self.assertEqual(check.call_count, 3)
+        self.assertEqual(check.call_count, 6)
+        self.assertEqual(result['targets']['Google204']['passed_count'], 3)
+        self.assertEqual(result['targets']['Cloudflare204']['passed_count'], 2)
         self.assertEqual(result['status'], 'unstable')
         self.assertEqual(result['passed_count'], 2)
 

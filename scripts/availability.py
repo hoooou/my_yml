@@ -31,7 +31,7 @@ import service_probes
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report, website_access_summary, latest_cohort
 from attempt_report import write_attempt
-from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, REDDIT_LOGIN_SAMPLE_BYTES, confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
+from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, CLOUDFLARE_204_URL, PAGE_SAMPLE_LIMITS, REDDIT_LOGIN_SAMPLE_BYTES, confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
@@ -224,10 +224,30 @@ HIGH_DOWNLOAD_WORKERS = high_speed.WORKERS
 HIGH_DOWNLOAD_URL = high_speed.URLS[0]
 
 
+PRECHECK_URLS = {'Google204': SITES['Google204'], 'Cloudflare204': CLOUDFLARE_204_URL}
+
+
+def combine_204(targets):
+    rounds = []
+    for index in range(3):
+        g, c = (targets[label]['attempts'][index] for label in PRECHECK_URLS)
+        item = copy.deepcopy(g)  # Preserve Google latency naming, not the sum of two requests.
+        if g['status'] != 'passed' or c['status'] != 'passed':
+            item.update(status='failed', reason='；'.join(
+                label + '：' + str(sample.get('reason') or sample.get('error_type') or sample['status'])
+                for label, sample in (('Google204', g), ('Cloudflare204', c)) if sample['status'] != 'passed'))
+        rounds.append({'Google204': item})
+    combined = summarize_rounds(rounds, ('Google204',))['Google204']
+    combined.update(version=2, targets=targets)
+    return combined
+
+
 def precheck_204(port):
-    outcomes = [{'Google204': check_site(port, 'Google204', SITES['Google204'], timeout=(2, 3))}
-                for _ in range(3)]
-    return summarize_rounds(outcomes, labels=('Google204',))['Google204']
+    rounds = []
+    for index in range(3):
+        order = list(PRECHECK_URLS) if index % 2 == 0 else list(reversed(PRECHECK_URLS))
+        rounds.append({label: check_site(port, label, PRECHECK_URLS[label], timeout=(2, 3)) for label in order})
+    return combine_204(summarize_rounds(rounds, tuple(PRECHECK_URLS)))
 
 
 def download_sample(port, byte_count, budget, url=None):
@@ -465,6 +485,20 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             if bundle.get('parallel_observation') and any(record.get(key) != node[field] for key, field in (('server', 'server'), ('port', 'port'), ('protocol', 'type'))):
                 raise ValueError('节点与本轮定义不一致')
             pre = record.get('precheck', {})
+            if bundle.get('dual_204'):
+                if pre.get('version') != 2 or set(pre.get('targets') or {}) != set(PRECHECK_URLS):
+                    raise ValueError('节点缺少双目标204证据')
+                for label, item in pre['targets'].items():
+                    if item.get('round_count') != 3 or len(item.get('attempts', [])) != 3:
+                        raise ValueError('双目标204缺少三轮证据')
+                    expected = summarize_rounds([{label: a} for a in item['attempts']], (label,))[label]
+                    if item != expected:
+                        raise ValueError('双目标204汇总与原始证据不一致')
+                    if any(a['status'] == 'passed' and (a.get('http_status') != 204 or a.get('sample_bytes') != 0
+                           or a.get('final_url') != PRECHECK_URLS[label]) for a in item['attempts']):
+                        raise ValueError('双目标204通过证据不是原地址无正文204')
+                if pre != combine_204(pre['targets']):
+                    raise ValueError('双目标204联合门槛被绕过')
             if pre.get('round_count') != 3 or len(pre.get('attempts', [])) != 3:
                 raise ValueError('节点缺少三轮 204 检测')
             passed = sum(a.get('status') == 'passed' for a in pre['attempts'])
@@ -1070,7 +1104,7 @@ def main():
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
-                  'early_upload_precheck': True, 'service_checks_enabled': True,
+                  'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True,
                   'parallel_observation': args.phase == 'prepare',
                   'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
                   'historical_candidates': historical,
@@ -1288,6 +1322,9 @@ def main():
               'routing_policy': {'domestic': 'DIRECT', 'overseas': '🚀 全局选择', 'unmatched': '🚀 全局选择', 'group_count': len(config['proxy-groups']), 'version': 2},
               'stages': previous.get('stages', ['TCP', 'websites']) if repairing else ['HTTPS204', 'domestic_TCP', '3MB_upload_precheck', 'websites_and_trace', 'application_TLS', 'quick_download', '5MB_quick_download', '100MB_Cloudflare_download', '100MB_DataPacket_download', 'upload_double', 'post_upload_TLS', 'parallel_continuous_stability' if parallel_publish else 'time_spaced_stability'],
               'precheck_rounds': previous.get('precheck_rounds', 0) if repairing else 3,
+              'precheck_policy': previous.get('precheck_policy') if repairing else
+                  {'version': 2, 'targets': PRECHECK_URLS, 'rounds_per_target': 3, 'requires_both': True}
+                  if bundle.get('dual_204') else {'version': 1, 'targets': {'Google204': SITES['Google204']}, 'rounds_per_target': 3},
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
               'download_test': previous.get('download_test', False) if repairing else True,

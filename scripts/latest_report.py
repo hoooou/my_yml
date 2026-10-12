@@ -88,7 +88,12 @@ def stage_summary(report, website_gate=None):
         'passed': parseable, 'failed': max(0, inputs - parseable), 'unverified': 0, 'skipped': 0,
         'reason_counts': ([{'status': 'failed', 'reason': '内核不支持或非法控制字符；不写入订阅',
                            'count': inputs - parseable}] if inputs > parseable else [])})
-    add('204', '204三轮', 'precheck', passed, '未进行204检测')
+    dual_204 = any((r.get('precheck') or {}).get('version') == 2 for r in nodes)
+    add('204', '双204各三轮（均必过）' if dual_204 else '204三轮', 'precheck', passed, '未进行204检测')
+    if dual_204:
+        for label in ('Google204', 'Cloudflare204'):
+            rows.append(counts('204_' + label, label + '三轮',
+                ((r.get('precheck') or {}).get('targets', {}).get(label) for r in nodes), passed, '未进行该目标204检测'))
     add('tcp', '国内入口TCP', 'entry', passed, '204未通过或UDP不适用；未提交TCP探测')
     add('upload_precheck', '3MB上行预检', 'upload_precheck',
         lambda x: upload_speed.sample_passed(x, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET),

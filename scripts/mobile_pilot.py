@@ -44,6 +44,7 @@ for label in (*PAGE_SITES, 'Claude'):
     host = urlparse(PAGES[label]['url']).hostname
     PAGE_HOSTS[label] = {host, host[4:] if host.startswith('www.') else 'www.' + host}
 PAGE_HOSTS.update({label: {urlparse(url).hostname} for label, url in API_SITES.items()})
+CLOUDFLARE_204_URL = 'https://cp.cloudflare.com/generate_204'
 CONNECTIVITY_SITES = {
     'Google204': 'https://connectivitycheck.gstatic.com/generate_204',
     'ChatGPTTrace': 'https://chatgpt.com/cdn-cgi/trace',
@@ -121,6 +122,10 @@ def check_mobile(node):
 
 def classify_page(label, status, final_url, content_type, body):
     result = {'http_status': status, 'final_url': final_url}
+    if label == 'Cloudflare204':
+        passed = final_url == CLOUDFLARE_204_URL and status == 204 and not body
+        return {**result, 'status': 'passed' if passed else 'failed',
+                'reason': 'HTTPS 204 连通正常' if passed else '未返回原地址无正文204'}
     if label in API_SITES:
         try:
             data = json.loads(body)
