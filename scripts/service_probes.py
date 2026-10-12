@@ -5,7 +5,7 @@ import ipaddress
 import json
 import re
 import time
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urljoin, urlparse, urlunparse
 
 import select_nodes as s
 from mobile_pilot import WEB_USER_AGENT, certificate_failure
@@ -61,6 +61,8 @@ def fetch(port, url):
                     result['reason'] = '接口响应超过正文或时间预算'
                 elif response.url != url or 300 <= response.status_code < 400:
                     result.update(status='restricted', reason='接口发生跳转，未确认预期响应')
+                    if response.headers.get('Location'):
+                        result['redirect_target'] = public_url(urljoin(url, response.headers['Location']))
                 elif response.headers.get('cf-mitigated', '').strip().lower() == 'challenge':
                     result.update(status='verification_required', reason='明确CF人机验证，认可可达；接口内容未验证')
                 elif response.status_code in (401, 403, 429, 451):
@@ -120,9 +122,10 @@ def tiktok_trace(port):
 
 def fast_target(data):
     """Allow only HTTPS Netflix CDN range URLs; never arbitrary API-supplied hosts."""
-    if not isinstance(data, dict) or not isinstance(data.get('targets'), list):
+    targets = data if isinstance(data, list) else data.get('targets') if isinstance(data, dict) else None
+    if not isinstance(targets, list):
         return None
-    for target in data['targets']:
+    for target in targets:
         if not isinstance(target, dict) or not isinstance(target.get('url'), str):
             continue
         parsed = urlparse(target['url'])
@@ -191,7 +194,13 @@ def fast(port, download_gate=None):
     if api['status'] != 'response_received':
         return result
     try:
-        target = fast_target(json.loads(body)) if 'json' in api.get('content_type', '').lower() else None
+        data = json.loads(body) if 'json' in api.get('content_type', '').lower() else None
+        targets = data if isinstance(data, list) else data.get('targets') if isinstance(data, dict) else None
+        api['target_shape'] = {'payload_type': type(data).__name__,
+            'target_count': len(targets) if isinstance(targets, list) else None,
+            'url_shapes': [public_url(x['url']) for x in (targets or [])[:1]
+                           if isinstance(x, dict) and isinstance(x.get('url'), str)] if isinstance(targets, list) else []}
+        target = fast_target(data)
     except (ValueError, UnicodeError):
         target = None
     if target is None:
