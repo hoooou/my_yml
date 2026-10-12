@@ -3,17 +3,19 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
 import json
 import re
+import statistics
 import time
 from urllib.parse import urljoin, urlparse, urlunparse
 
 import select_nodes as s
 from mobile_pilot import WEB_USER_AGENT, certificate_failure
 
-VERSION = 2
+VERSION = 3
 CHATGPT_API = 'https://api.openai.com/compliance/cookie_requirements'
 # Public browser token from FAST, not an account credential. Never publish its query.
 FAST_API = ('https://api.fast.com/netflix/speedtest/v2?https=true&'
-            'token=YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=1')
+            'token=YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=3')
+FAST_TARGET_COUNT = 3
 TARGETS = ('ChatGPTAPI', 'FAST')
 API_BUDGET = 5
 BODY_LIMIT = 65536
@@ -26,6 +28,7 @@ def settings():
         'targets': {'FAST': public_url(FAST_API)},
         'api_budget_seconds': API_BUDGET, 'api_body_limit_bytes': BODY_LIMIT,
         'fast_download_bytes': DOWNLOAD_BYTES, 'fast_download_budget_seconds': DOWNLOAD_BUDGET,
+        'fast_target_count': FAST_TARGET_COUNT, 'fast_target_order': 'sequential_distinct_hosts',
         'parallel_targets': 1, 'tls_verification': True, 'affects_selection': 'certificate_errors_only',
         'counts_as_website_coverage': False, 'replaces_existing_download_tests': False}
 
@@ -101,28 +104,55 @@ def chatgpt_api(port):
     return {**result, 'status': 'unknown', 'reason': 'API响应格式或预期字段不匹配'}
 
 
-def fast_target(data):
+def fast_targets(data):
     """Allow only HTTPS Netflix CDN range URLs; never arbitrary API-supplied hosts."""
     targets = data if isinstance(data, list) else data.get('targets') if isinstance(data, dict) else None
     if not isinstance(targets, list):
-        return None
+        return []
+    selected, hosts = [], set()
     for target in targets:
         if not isinstance(target, dict) or not isinstance(target.get('url'), str):
             continue
-        parsed = urlparse(target['url'])
         try:
+            parsed = urlparse(target['url'])
             valid = (parsed.scheme == 'https' and parsed.hostname is not None
                 and parsed.hostname.endswith('.nflxvideo.net') and parsed.port in (None, 443)
                 and not parsed.username and not parsed.password and not parsed.fragment
                 and re.fullmatch(r'/speedtest(?:/range/0-\d+)?', parsed.path))
         except ValueError:
             valid = False
-        if valid:
+        if valid and parsed.hostname not in hosts:
             location = target.get('location') or {}
             cc = location.get('country') if isinstance(location, dict) else None
-            return (urlunparse(parsed._replace(path=f'/speedtest/range/0-{DOWNLOAD_BYTES - 1}')),
-                    cc if isinstance(cc, str) and re.fullmatch('[A-Z]{2}', cc) else None)
-    return None
+            selected.append((urlunparse(parsed._replace(path=f'/speedtest/range/0-{DOWNLOAD_BYTES - 1}')),
+                             cc if isinstance(cc, str) and re.fullmatch('[A-Z]{2}', cc) else None))
+            hosts.add(parsed.hostname)
+            if len(selected) == FAST_TARGET_COUNT:
+                break
+    return selected
+
+
+def fast_target(data):
+    """Compatibility helper for callers requesting a single validated target."""
+    return next(iter(fast_targets(data)), None)
+
+
+def aggregate_downloads(downloads):
+    successful = [x for x in downloads if x.get('status') == 'passed']
+    speeds = [x['speed_mbps'] for x in successful if isinstance(x.get('speed_mbps'), (int, float))]
+    passed = len(downloads) == FAST_TARGET_COUNT and len(successful) == FAST_TARGET_COUNT
+    result = {'status': 'passed' if passed else 'failed' if len(downloads) == FAST_TARGET_COUNT else 'unknown',
+        'requested_target_count': FAST_TARGET_COUNT, 'measured_target_count': len(downloads),
+        'passed_target_count': len(successful), 'budget_seconds_per_target': DOWNLOAD_BUDGET,
+        'requested_bytes_per_target': DOWNLOAD_BYTES,
+        'received_bytes': sum(x.get('received_bytes', 0) for x in downloads),
+        'speed_mbps': round(statistics.median(speeds), 2) if speeds else None,
+        'min_speed_mbps': min(speeds) if speeds else None,
+        'max_speed_mbps': max(speeds) if speeds else None,
+        'reason': f'Netflix CDN通过{len(successful)}/{FAST_TARGET_COUNT}个；每个1MB、6秒，速度为成功样本中位数'}
+    if any(x.get('tls_error_kind') == 'certificate_verification_failed' for x in downloads):
+        result['tls_error_kind'] = 'certificate_verification_failed'
+    return result
 
 
 def fast_download(port, url):
@@ -177,22 +207,24 @@ def fast(port, download_gate=None):
     try:
         data = json.loads(body) if 'json' in api.get('content_type', '').lower() else None
         targets = data if isinstance(data, list) else data.get('targets') if isinstance(data, dict) else None
+        selected = fast_targets(data)
         api['target_shape'] = {'payload_type': type(data).__name__,
             'target_count': len(targets) if isinstance(targets, list) else None,
-            'url_shapes': [public_url(x['url']) for x in (targets or [])[:1]
-                           if isinstance(x, dict) and isinstance(x.get('url'), str)] if isinstance(targets, list) else []}
-        target = fast_target(data)
+            'url_shapes': [public_url(url) for url, _ in selected]}
     except (ValueError, UnicodeError):
-        target = None
-    if target is None:
+        selected = []
+    if not selected:
         api.update(status='unknown', reason='FAST API未返回可信测速目标')
         return {**result, 'status': 'unknown', 'reason': api['reason']}
-    url, cc = target
-    api.update(status='passed', reason='FAST API返回有效Netflix CDN测速目标')
-    with download_gate.download() if download_gate is not None else nullcontext():
-        downloaded = fast_download(port, url)
+    api.update(status='passed', reason='FAST API返回有效Netflix CDN测速目标',
+               selected_target_count=len(selected))
+    downloads = []
+    for url, cc in selected:
+        with download_gate.download() if download_gate is not None else nullcontext():
+            downloads.append({**fast_download(port, url), 'cdn_country_code': cc})
+    downloaded = aggregate_downloads(downloads)
     return {**result, 'status': downloaded['status'], 'reason': downloaded['reason'],
-            'cdn_country_code': cc, 'download': downloaded}
+            'downloads': downloads, 'download': downloaded}
 
 
 def check(port, download_gate=None):
@@ -211,7 +243,7 @@ def certificate_errors(checks):
     result = []
     for label, item in (checks or {}).get('targets', {}).items():
         if any(x.get('tls_error_kind') == 'certificate_verification_failed'
-               for x in (item, item.get('api') or {}, item.get('download') or {})):
+               for x in (item, item.get('api') or {}, item.get('download') or {}, *item.get('downloads', []))):
             result.append(label)
     return result
 
@@ -220,10 +252,24 @@ def complete(checks):
     if not isinstance(checks, dict) or checks.get('version') != VERSION:
         return False
     targets = checks.get('targets')
-    return (isinstance(targets, dict) and set(targets) in (set(TARGETS), {'FAST'})
+    basic = (isinstance(targets, dict) and set(targets) in (set(TARGETS), {'FAST'})
         and all(isinstance(x, dict) and x.get('status') in
                 ('passed', 'restricted', 'verification_required', 'unavailable', 'unknown', 'failed')
                 for x in targets.values()))
+    if not basic:
+        return False
+    fast_result = targets['FAST']
+    if (fast_result.get('api') or {}).get('status') != 'passed':
+        return True
+    downloads = fast_result.get('downloads')
+    if (not isinstance(downloads, list) or not 1 <= len(downloads) <= FAST_TARGET_COUNT
+            or any(not isinstance(x, dict) or x.get('status') not in ('passed', 'failed') for x in downloads)
+            or any(not isinstance(x.get('cdn_host'), str) for x in downloads)
+            or len({x['cdn_host'] for x in downloads}) != len(downloads)):
+        return False
+    aggregated = aggregate_downloads(downloads)
+    return (fast_result['api'].get('selected_target_count') == len(downloads)
+            and fast_result.get('download') == aggregated and fast_result.get('status') == aggregated['status'])
 
 
 def summary(nodes):
@@ -247,3 +293,16 @@ def summary(nodes):
             counts['certificate_error'] += item.get('tls_error_kind') == 'certificate_verification_failed'
         result[label] = counts
     return result
+
+
+def cdn_summary(nodes):
+    """Count actual target downloads, including historical single-target records."""
+    counts = {'measured': 0, 'passed': 0, 'failed': 0, 'certificate_error': 0}
+    for row in nodes:
+        item = (row.get('service_checks') or {}).get('targets', {}).get('FAST') or {}
+        for sample in item.get('downloads', [item['download']] if item.get('download') else []):
+            counts['measured'] += 1
+            counts['passed'] += sample.get('status') == 'passed'
+            counts['failed'] += sample.get('status') != 'passed'
+            counts['certificate_error'] += sample.get('tls_error_kind') == 'certificate_verification_failed'
+    return counts

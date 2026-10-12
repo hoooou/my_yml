@@ -121,7 +121,8 @@ class ServiceProbeTests(unittest.TestCase):
             self.assertEqual(result['tls_error_kind'], 'certificate_verification_failed')
 
     def test_fast_api_success_alone_does_not_claim_bandwidth_or_unlock(self):
-        body = json.dumps({'targets': [{'url': 'https://a.nflxvideo.net/speedtest/range/0-0?o=PRIVATE'}]}).encode()
+        body = json.dumps({'targets': [{'url': f'https://{host}.nflxvideo.net/speedtest/range/0-0?o=PRIVATE'}
+                                        for host in ('a', 'b', 'c')]}).encode()
         with patch.object(p, 'fetch', return_value=(api_result(), body)), \
                 patch.object(p, 'fast_download', return_value={'status': 'failed', 'reason': 'partial'}) as download:
             result = p.fast(1)
@@ -129,10 +130,93 @@ class ServiceProbeTests(unittest.TestCase):
         self.assertEqual(result['status'], 'failed')
         self.assertNotIn('PRIVATE', json.dumps(result))
         self.assertTrue(download.call_args.args[1].endswith('0-999999?o=PRIVATE'))
+        self.assertEqual(download.call_count, 3)
         with patch.object(p, 'fetch', return_value=({'status': 'restricted', 'reason': '403'}, b'')), \
                 patch.object(p, 'fast_download') as download:
             p.fast(1)
             download.assert_not_called()
+
+    def test_fast_uses_three_distinct_safe_hosts_and_preserves_signatures_in_memory(self):
+        data = {'targets': [{'url': url} for url in (
+            'https://[bad/speedtest', 'https://evil.example/speedtest',
+            'https://A.nflxvideo.net/speedtest?o=ONE', 'https://a.nflxvideo.net/speedtest?o=TWO',
+            'https://b.nflxvideo.net/speedtest?o=THREE', 'https://c.nflxvideo.net/speedtest?o=FOUR',
+            'https://d.nflxvideo.net/speedtest?o=FIVE')]}
+        targets = p.fast_targets(data)
+        self.assertEqual(len(targets), 3)
+        self.assertEqual([p.urlparse(url).hostname for url, _ in targets],
+                         ['a.nflxvideo.net', 'b.nflxvideo.net', 'c.nflxvideo.net'])
+        self.assertTrue(targets[0][0].endswith('0-999999?o=ONE'))
+        self.assertIn('urlCount=3', p.FAST_API)
+
+    def test_fast_three_results_include_failure_certificate_and_speed_range(self):
+        body = json.dumps({'targets': [{'url': f'https://{host}.nflxvideo.net/speedtest?o=PRIVATE'}
+                                        for host in ('a', 'b', 'c')]}).encode()
+        samples = [{'status': 'passed', 'speed_mbps': 12, 'received_bytes': p.DOWNLOAD_BYTES},
+                   {'status': 'failed', 'tls_error_kind': 'certificate_verification_failed'},
+                   {'status': 'passed', 'speed_mbps': 4, 'received_bytes': p.DOWNLOAD_BYTES}]
+        def downloaded(port, url):
+            return {**samples.pop(0), 'cdn_host': p.urlparse(url).hostname}
+        with patch.object(p, 'fetch', return_value=(api_result(), body)), \
+                patch.object(p, 'fast_download', side_effect=downloaded) as download:
+            result = p.fast(1)
+        self.assertEqual(download.call_count, 3)
+        self.assertEqual(result['download']['passed_target_count'], 2)
+        self.assertEqual(result['download']['speed_mbps'], 8)
+        self.assertEqual(result['download']['min_speed_mbps'], 4)
+        self.assertEqual(result['download']['max_speed_mbps'], 12)
+        self.assertEqual(result['status'], 'failed')
+        value = {'version': p.VERSION, 'targets': {'FAST': result}}
+        self.assertTrue(p.complete(value))
+        self.assertEqual(p.certificate_errors(value), ['FAST'])
+        self.assertNotIn('PRIVATE', json.dumps(value))
+        self.assertEqual(p.cdn_summary([{'service_checks': value}]),
+                         {'measured': 3, 'passed': 2, 'failed': 1, 'certificate_error': 1})
+        del result['downloads'][1]
+        self.assertFalse(p.complete(value))
+
+    def test_fast_fewer_than_three_hosts_is_not_a_three_target_pass(self):
+        body = json.dumps({'targets': [{'url': 'https://a.nflxvideo.net/speedtest?o=PRIVATE'}] * 3}).encode()
+        with patch.object(p, 'fetch', return_value=(api_result(), body)), \
+                patch.object(p, 'fast_download', return_value={'status': 'passed', 'speed_mbps': 9,
+                    'cdn_host': 'a.nflxvideo.net', 'received_bytes': p.DOWNLOAD_BYTES}) as download:
+            result = p.fast(1)
+        self.assertEqual(download.call_count, 1)
+        self.assertEqual(result['status'], 'unknown')
+        self.assertEqual(result['download']['measured_target_count'], 1)
+        self.assertEqual(result['download']['passed_target_count'], 1)
+        self.assertTrue(p.complete({'version': p.VERSION, 'targets': {'FAST': result}}))
+
+    def test_fast_all_three_pass_and_hold_download_gate_for_each_sample(self):
+        from contextlib import contextmanager
+        events = []
+        class Gate:
+            @contextmanager
+            def download(self):
+                events.append('start')
+                yield
+                events.append('end')
+        def downloaded(port, url):
+            events.append('download')
+            return {'status': 'passed', 'speed_mbps': 9, 'cdn_host': p.urlparse(url).hostname,
+                    'received_bytes': p.DOWNLOAD_BYTES}
+        body = json.dumps({'targets': [{'url': f'https://{host}.nflxvideo.net/speedtest'}
+                                        for host in ('a', 'b', 'c')]}).encode()
+        with patch.object(p, 'fetch', return_value=(api_result(), body)), \
+                patch.object(p, 'fast_download', side_effect=downloaded):
+            result = p.fast(1, Gate())
+        self.assertEqual(events, ['start', 'download', 'end'] * 3)
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['download']['received_bytes'], 3 * p.DOWNLOAD_BYTES)
+
+    def test_historical_single_cdn_report_is_not_reclassified_as_three_target_test(self):
+        row = {'service_checks': {'version': 2, 'targets': {'FAST': {
+            'status': 'passed', 'api': {'status': 'passed'}, 'download': {'status': 'passed'}}}}}
+        self.assertEqual(p.cdn_summary([row])['measured'], 1)
+        self.assertFalse(p.complete(row['service_checks']))
+        text = '\n'.join(d.service_checks_table([row]))
+        self.assertNotIn('请求3个', text)
+        self.assertIn('CDN文件实测1次', text)
 
     def test_fast_download_requires_complete_correct_file(self):
         url = 'https://a.nflxvideo.net/speedtest/range/0-999999?o=PRIVATE'
