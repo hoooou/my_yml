@@ -30,6 +30,20 @@ def measurement_time(report):
     return value
 
 
+def validated_same_run_rebuild(candidate, remote_latest):
+    recovery = candidate.get('measurement_recovery') or {}
+    remote_recovery = remote_latest.get('measurement_recovery') or {}
+    source = recovery.get('source_run')
+    remote_source = remote_recovery.get('source_run') or remote_latest.get('source_run')
+    # A verified same-run rebuild can change policy/configuration, not measurements.
+    # The source-run check remains strict even if validation made the published
+    # timestamp a few seconds newer than the raw measurement artifact.
+    return (source is not None and remote_source is not None and str(source) == str(remote_source)
+            and recovery.get('new_probes') is False
+            and candidate.get('configuration_validation') == 'passed'
+            and datetime.fromisoformat(candidate['updated_at']) > datetime.fromisoformat(remote_latest['updated_at']))
+
+
 def publish(root, attempts=3, files=FILES):
     root = Path(root).resolve()
     report_name = '最新检测.json' if '最新检测.json' in files else '连通性报告.json'
@@ -48,9 +62,12 @@ def publish(root, attempts=3, files=FILES):
         for attempt in range(attempts):
             git(root, 'fetch', 'origin', 'main')
             git(root, 'checkout', '-B', 'main', 'origin/main')
-            remote_times = [measurement_time(json.loads((root / name).read_text()))
-                            for name in ('最新检测.json', '连通性报告.json') if (root / name).exists()]
-            if max(remote_times, default=measured) > measured:
+            remote_reports = {name: json.loads((root / name).read_text())
+                              for name in ('最新检测.json', '连通性报告.json') if (root / name).exists()}
+            remote_times = [measurement_time(r) for r in remote_reports.values()]
+            same_run = ('优选配置.yaml' in files and validated_same_run_rebuild(
+                candidate, remote_reports.get('最新检测.json') or {}))
+            if max(remote_times, default=measured) > measured and not same_run:
                 print('远端已有更新测量，保留最新订阅', flush=True)
                 return False
             for name in files:

@@ -67,6 +67,18 @@ class RecoveredEvidenceTests(unittest.TestCase):
 
 
 class PublicationGitTests(unittest.TestCase):
+    def test_same_verified_source_rebuild_can_publish_despite_validation_timestamp_drift(self):
+        candidate = {'updated_at': '2026-10-12T19:22:00+08:00', 'configuration_validation': 'passed',
+                     'measurement_recovery': {'source_run': '123', 'new_probes': False}}
+        remote = {'updated_at': '2026-10-12T19:20:40+08:00', 'source_run': '123'}
+        self.assertTrue(pub.validated_same_run_rebuild(candidate, remote))
+        for change in ({'source_run': '456'}, {'measurement_recovery': {'source_run': '456'}},
+                       {'updated_at': '2026-10-12T19:23:00+08:00'}):
+            self.assertFalse(pub.validated_same_run_rebuild(candidate, {**remote, **change}))
+        self.assertFalse(pub.validated_same_run_rebuild({**candidate, 'configuration_validation': 'failed'}, remote))
+        self.assertFalse(pub.validated_same_run_rebuild({**candidate, 'measurement_recovery': {'source_run': '123', 'new_probes': True}}, remote))
+        self.assertFalse(pub.validated_same_run_rebuild(candidate, {'updated_at': remote['updated_at']}))
+
     def test_old_report_from_checkout_is_never_republished_as_current_run(self):
         with tempfile.TemporaryDirectory() as folder:
             cwd = os.getcwd()
@@ -149,6 +161,19 @@ class PublicationGitTests(unittest.TestCase):
             self.write_outputs(old, '2026-10-12T07:30:00+08:00', 'older-candidate')
             self.assertFalse(pub.publish(old))
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
+            # A same-source policy rebuild uses the original artifact timestamp,
+            # which can precede the post-validation timestamp of its publication.
+            self.write_outputs(old, '2026-10-12T09:10:00+08:00', 'validated-full')
+            latest = json.loads((old/'最新检测.json').read_text()); latest['source_run'] = '123'
+            (old/'最新检测.json').write_text(json.dumps(latest))
+            self.assertTrue(pub.publish(old))
+            self.write_outputs(old, '2026-10-12T09:09:55+08:00', 'same-run-groups')
+            latest = json.loads((old/'最新检测.json').read_text())
+            latest.update(updated_at='2026-10-12T09:11:00+08:00', configuration_validation='passed',
+                          measurement_recovery={'source_run': '123', 'new_probes': False})
+            (old/'最新检测.json').write_text(json.dumps(latest))
+            self.assertTrue(pub.publish(old))
+            self.assertEqual((old/'优选配置.yaml').read_text(), 'same-run-groups')
 
     def test_entry_point_refuses_shared_local_checkout(self):
         with patch.dict(os.environ, {'GITHUB_ACTIONS': 'false'}):
