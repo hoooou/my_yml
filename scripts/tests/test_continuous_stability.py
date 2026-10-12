@@ -277,7 +277,7 @@ class MergeTests(unittest.TestCase):
 
 class PipelineTests(unittest.TestCase):
     def test_preflight_and_continuation_measure_each_early_stage_exactly_once(self):
-        node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
+        node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443, 'cipher': 'aes-128-gcm', 'password': 'test-password'}
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 100}}]*3, ('Google204',))['Google204']
         controls = {}
         with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1234})), \
@@ -307,7 +307,7 @@ class PipelineTests(unittest.TestCase):
 
     def test_parallel_final_publication_joins_raw_evidence_without_repeat_tests(self):
         row = record('n-a'); row.update(server='8.8.8.8', port=443, protocol='ss', upload_precheck=upload_evidence()['precheck'])
-        node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
+        node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443, 'cipher': 'aes-128-gcm', 'password': 'test-password'}
         bundle = {'nodes': [node], 'base': {}, 'metadata': {}, 'sources': [], 'input_count': 1,
                   'rejected': [], 'services': {}, 'scope': 'all_subscriptions', 'id': 'batch', 'parallel_observation': True}
         with tempfile.TemporaryDirectory() as folder:

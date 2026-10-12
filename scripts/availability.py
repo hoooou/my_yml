@@ -28,6 +28,7 @@ import stability
 import continuous_stability
 import upload_speed
 import service_probes
+from v2rayn_subscription import render as render_v2rayn
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report, website_access_summary, latest_cohort
 from attempt_report import write_attempt
@@ -1260,7 +1261,12 @@ def main():
         raise RuntimeError('没有满足综合或台湾／新加坡门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
     checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(candidate)], capture_output=True, text=True, timeout=90)
-    if checked.returncode:
+    native_error = None
+    try:
+        native_subscription = render_v2rayn(config)
+    except (ValueError, KeyError, TypeError) as error:
+        native_error = error
+    if checked.returncode or native_error is not None:
         from attempt_report import record_validation
         record_validation(root, config, 'failed', required_websites_passed)
         if (root / 'full-test-report.json').exists():
@@ -1268,7 +1274,7 @@ def main():
             failed_report = json.loads((root / 'full-test-report.json').read_text())
             write_latest(failed_report, config, website_gate=required_websites_passed,
                          candidate=True, validation='failed')
-        raise RuntimeError('最终订阅校验失败，不发布')
+        raise RuntimeError('最终订阅校验失败，不发布') from native_error
     if args.phase in ('all', 'publish'):
         from attempt_report import record_validation
         record_validation(root, config, 'passed', required_websites_passed)
@@ -1415,9 +1421,7 @@ def main():
     report['service_checks_summary'] = service_probes.summary(latest_cohort(report))
     subscription = f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text()
     Path('优选配置.yaml').write_text(subscription)
-    # v2rayN imports full Clash YAML as a custom Mihomo profile. Keeping the
-    # validated document intact preserves HTTP proxies, transports and routing.
-    Path('v2rayN.yaml').write_text(subscription)
+    Path('v2rayN.txt').write_text(native_subscription, encoding='utf-8')
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     from latest_report import write_latest
     write_latest(report, config, website_gate=required_websites_passed, validation='passed')

@@ -47,7 +47,7 @@ class UploadTests(unittest.TestCase):
         from test_stability import evidence as stable_evidence
         row = record(); row.update(server='8.8.8.8', port=443, protocol='ss')
         row['precheck'] = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 100}}]*3, ('Google204',))['Google204']
-        node = {'name': row['id'], 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
+        node = {'name': row['id'], 'type': 'ss', 'server': '8.8.8.8', 'port': 443, 'cipher': 'aes-128-gcm', 'password': 'test-password'}
         bundle = {'nodes': [node], 'base': {}, 'metadata': {}, 'sources': [], 'input_count': 1,
                   'rejected': [], 'services': {}, 'scope': 'all_subscriptions', 'id': 'batch'}
         calls = []

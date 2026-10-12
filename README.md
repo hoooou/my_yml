@@ -16,17 +16,17 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E4%BC%98%E9%80%89%E9%85%8D
 
 建议24小时刷新一次；手动任务更新后也可以立即刷新。FlClash 使用规则模式并确保流量进入 VPN/TUN；Clash Verge 的应用设置或订阅脚本可能覆盖配置，排查时以核心实际加载的配置为准。
 
-### v2rayN 订阅
+### v2rayN 原生节点订阅
 
 ```text
-https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.yaml
+https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 ```
 
-在新版v2rayN中添加订阅分组，粘贴上面的地址，不启用订阅转换，更新订阅后选中导入的自定义配置并设为活动配置。核心选择Mihomo；默认自动识别也会识别为Mihomo。订阅会显示为一个完整配置，里面的节点与分组在“Clash代理”页面选择，默认全局选择综合优选。
+适用于已核对的v2rayN 7.24.4。在订阅分组中添加上述地址，关闭订阅转换，更新订阅后每个节点独立显示在主列表，可单独选择、编辑和测速。旧的`v2rayN.yaml`是整份Custom配置，已替换；已有旧订阅的用户需要把地址改为`v2rayN.txt`。
 
-这是v2rayN支持的完整Mihomo配置订阅，与优选配置使用同一份已校验内容，每天08:00一同发布。全部合格节点、HTTP代理、特殊传输、分组、进程分流和公司DNS均保留，不把HTTP代理强转成SOCKS，也不使用第三方转换服务。它不是Xray普通节点链接订阅；如需使用Xray核心，需要另行转换并处理协议与路由差异。没有本轮合格配置时，两份订阅都保留原版本。
+使用该版本官方支持的`v2rayn://`原生节点格式（ConfigVersion=4），保留HTTP、Trojan、VLESS等节点的实际地址、端口、认证、TLS/SNI、WS、XHTTP和HTTP伪装传输。当前54个节点完整导出，49个HTTP节点仍是HTTP，不冒充SOCKS、不包成一份Custom。设置Xray核心、关闭节点Mux，其他协议将按实际支持导出；遇到不能完整转换的协议或字段会明确报错并保留旧订阅，不静默丢节点。[7.24.4官方原生格式](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/Fmt/InnerFmt.cs) · [HTTP原生导入支持](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/ConfigHandler.cs)
 
-v2rayN启动时会按应用设置改写监听端口、控制端口、日志、IPv6等字段；开启Mihomo混入配置也可能覆盖订阅。进程分流需要客户端和系统权限支持，建议使用TUN模式；公司私有DNS仍需要公司网络或内网VPN。[官方完整配置导入实现](https://github.com/2dust/v2rayN/blob/master/v2rayN/ServiceLib/Handler/Fmt/ClashFmt.cs) · [官方启动配置处理](https://github.com/2dust/v2rayN/blob/master/v2rayN/ServiceLib/Services/CoreConfig/CoreConfigClashService.cs)
+每天08:00与Clash订阅使用同一轮合格节点一同发布。原生节点订阅只携带节点参数及测量名称，不携带Clash的url-test分组、进程规则或公司DNS；v2rayN使用自己的路由和DNS设置。公司内网域名如需直连和私有DNS，应在v2rayN另行设置；不同核心的兼容性校验不能替代本地网络实测。
 
 | 分组 | 条件与用途 |
 |---|---|
