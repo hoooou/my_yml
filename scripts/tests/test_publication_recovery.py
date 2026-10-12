@@ -143,24 +143,29 @@ class PublicationGitTests(unittest.TestCase):
             self.assertEqual(self.command(old, 'rev-parse', 'HEAD^'), upstream)
             self.assertEqual((old/'code.txt').read_text(), 'new code')
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
+            self.assertEqual((old/'v2rayN.yaml').read_text(), 'latest-candidate')
             self.assertIn('Manual documentation: earlier-pipeline', (old/'README.md').read_text())
             self.assertEqual(pub.readme_fragment((old/'README.md').read_text()), 'latest-candidate')
             self.assertEqual(self.command(old, 'log', '-1', '--format=%an'), 'github-actions[bot]')
             # Report refresh must not overwrite the current subscription YAML.
             self.write_outputs(old, '2026-10-12T09:00:00+08:00', 'report-refresh')
-            self.assertTrue(pub.publish(old, files=pub.FILES[1:]))
+            self.assertTrue(pub.publish(old, files=tuple(name for name in pub.FILES
+                if name not in ('优选配置.yaml', 'v2rayN.yaml'))))
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
+            self.assertEqual((old/'v2rayN.yaml').read_text(), 'latest-candidate')
             # Zero-candidate reports update independently of the published measurements.
             saved_measurements = (old/'连通性报告.json').read_bytes()
             self.write_outputs(old, '2026-10-12T09:05:00+08:00', 'zero-candidate')
             self.assertTrue(pub.publish(old, files=pub.REPORT_FILES))
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
             self.assertEqual((old/'连通性报告.json').read_bytes(), saved_measurements)
+            self.assertEqual((old/'v2rayN.yaml').read_text(), 'latest-candidate')
             self.assertEqual(json.loads((old/'最新检测.json').read_text())['label'], 'zero-candidate')
             # Recovering older observations must not overwrite a newer subscription.
             self.write_outputs(old, '2026-10-12T07:30:00+08:00', 'older-candidate')
             self.assertFalse(pub.publish(old))
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
+            self.assertEqual((old/'v2rayN.yaml').read_text(), 'latest-candidate')
             # A same-source policy rebuild uses the original artifact timestamp,
             # which can precede the post-validation timestamp of its publication.
             self.write_outputs(old, '2026-10-12T09:10:00+08:00', 'validated-full')

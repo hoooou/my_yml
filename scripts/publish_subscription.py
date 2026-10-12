@@ -13,7 +13,7 @@ import subprocess
 import tempfile
 from latest_report import REPORT_FILES, readme_fragment, replace_fragment
 
-FILES = ('优选配置.yaml', '连通性报告.json', *REPORT_FILES)
+FILES = ('优选配置.yaml', 'v2rayN.yaml', '连通性报告.json', *REPORT_FILES)
 
 
 def git(root, *args, check=True):

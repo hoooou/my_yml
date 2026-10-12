@@ -1,0 +1,1134 @@
+# 分阶段检测；2026-10-12T19:44:32+08:00；检测轮数和下载设置见连通性报告
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+dns:
+  enable: true
+  ipv6: true
+  default-nameserver:
+  - 223.5.5.5
+  - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: false
+  nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  fallback:
+  - https://1.1.1.1/dns-query#🚀 全局选择
+  - https://8.8.8.8/dns-query#🚀 全局选择
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+    - 240.0.0.0/4
+    - 0.0.0.0/32
+  proxy-server-nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  direct-nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  nameserver-policy:
+    +.tech.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.yiche.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitautotech.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    rule-set:company-internal:
+    - 192.168.70.49
+    - 192.168.70.1
+    rule-set:app-proxy-domains:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:app-direct-domains:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:overseas-services:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:proxy:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:gfw:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:domestic-services:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:direct:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:private:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  fake-ip-filter:
+  - '*.lan'
+  - '*.local'
+  - +.msftconnecttest.com
+  - +.msftncsi.com
+  - +.tech.bitauto.com
+  - +.yiche.com
+  - +.bitauto.com
+  - +.bitautotech.com
+  - rule-set:company-internal
+  direct-nameserver-follow-policy: true
+rules:
+- RULE-SET,company-internal,DIRECT
+- RULE-SET,private,DIRECT
+- RULE-SET,lancidr,DIRECT,no-resolve
+- GEOIP,LAN,DIRECT,no-resolve
+- RULE-SET,reject,REJECT
+- RULE-SET,app-proxy,🚀 全局选择
+- RULE-SET,app-direct,DIRECT
+- RULE-SET,app-proxy-domains,🚀 全局选择
+- RULE-SET,app-direct-domains,DIRECT
+- RULE-SET,overseas-services,🚀 全局选择
+- RULE-SET,domestic-services,DIRECT
+- DOMAIN-SUFFIX,zijieapi.com,DIRECT
+- DOMAIN-SUFFIX,office.com,DIRECT
+- DOMAIN-SUFFIX,outlook.com,DIRECT
+- DOMAIN-SUFFIX,jiuse3.cloud,DIRECT
+- DOMAIN-SUFFIX,onenote.com,DIRECT
+- DOMAIN-SUFFIX,clarivate.cn,DIRECT
+- DOMAIN-SUFFIX,onedrive.com,DIRECT
+- DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+- DOMAIN-SUFFIX,sharepoint.com,DIRECT
+- DOMAIN-SUFFIX,azure.com,DIRECT
+- DOMAIN-SUFFIX,qq.com,DIRECT
+- DOMAIN-SUFFIX,immersivetranslate.com,🚀 全局选择
+- DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
+- DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
+- DOMAIN-SUFFIX,yiche.com,DIRECT
+- DOMAIN-SUFFIX,bitautotech.com,DIRECT
+- DOMAIN-SUFFIX,live.com,🚀 全局选择
+- DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
+- DOMAIN-SUFFIX,microsoft.com,DIRECT
+- DOMAIN,clash.razord.top,DIRECT
+- DOMAIN,yacd.haishan.me,DIRECT
+- DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
+- DOMAIN-SUFFIX,gitee.com,DIRECT
+- DOMAIN,free886.herokuapp.com,DIRECT
+- RULE-SET,applications,DIRECT
+- RULE-SET,icloud,DIRECT
+- RULE-SET,apple,DIRECT
+- RULE-SET,google,🚀 全局选择
+- RULE-SET,proxy,🚀 全局选择
+- RULE-SET,gfw,🚀 全局选择
+- RULE-SET,direct,DIRECT
+- RULE-SET,telegramcidr,🚀 全局选择,no-resolve
+- RULE-SET,cncidr,DIRECT
+- GEOIP,CN,DIRECT
+- MATCH,🚀 全局选择
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
+    path: ./ruleset/reject_rule.yaml
+    interval: 86400
+  icloud:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+  apple:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
+    path: ./ruleset/apple.yaml
+    interval: 86400
+  google:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
+    path: ./ruleset/google.yaml
+    interval: 86400
+  proxy:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+  direct:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
+    path: ./ruleset/direct.yaml
+    interval: 86400
+  private:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
+    path: ./ruleset/private.yaml
+    interval: 86400
+  gfw:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+  applications:
+    type: http
+    behavior: classical
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
+    path: ./ruleset/applications.yaml
+    interval: 86400
+  overseas-services:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.aiv-cdn.net
+    - +.amazon.com
+    - +.amazonvideo.com
+    - +.anthropic.com
+    - +.bamgrid.com
+    - +.bing.com
+    - +.cdninstagram.com
+    - +.chatgpt.com
+    - +.claude.ai
+    - +.copilot.microsoft.com
+    - +.cursor.com
+    - +.cursor.sh
+    - +.cursorapi.com
+    - +.discord.com
+    - +.discord.gg
+    - +.discordapp.com
+    - +.discordapp.net
+    - +.disneyplus.com
+    - +.dssott.com
+    - +.facebook.com
+    - +.fb.com
+    - +.fbcdn.net
+    - +.gemini.google.com
+    - +.github.com
+    - +.github.io
+    - +.githubassets.com
+    - +.githubusercontent.com
+    - +.google.com
+    - +.googleapis.cn
+    - +.googleapis.com
+    - +.googleusercontent.com
+    - +.googlevideo.com
+    - +.gstatic.com
+    - +.hf.co
+    - +.huggingface.co
+    - +.instagram.com
+    - +.jtvnw.net
+    - +.messenger.com
+    - +.netflix.com
+    - +.nflxext.com
+    - +.nflximg.com
+    - +.nflximg.net
+    - +.nflxso.net
+    - +.nflxvideo.net
+    - +.oaistatic.com
+    - +.oaiusercontent.com
+    - +.openai.com
+    - +.perplexity.ai
+    - +.primevideo.com
+    - +.redd.it
+    - +.reddit.com
+    - +.redditmedia.com
+    - +.redditstatic.com
+    - +.scdn.co
+    - +.spotify.com
+    - +.spotifycdn.com
+    - +.sstatic.net
+    - +.stackexchange.com
+    - +.stackoverflow.com
+    - +.steamcommunity.com
+    - +.steampowered.com
+    - +.steamstatic.com
+    - +.t.co
+    - +.t.me
+    - +.telegra.ph
+    - +.telegram.me
+    - +.telegram.org
+    - +.tiktok.com
+    - +.tiktokcdn.com
+    - +.tiktokv.com
+    - +.ttvnw.net
+    - +.twimg.com
+    - +.twitch.tv
+    - +.twitter.com
+    - +.wa.me
+    - +.whatsapp.com
+    - +.whatsapp.net
+    - +.wikimedia.org
+    - +.wikipedia.org
+    - +.x.com
+    - +.youtu.be
+    - +.youtube-nocookie.com
+    - +.youtube.com
+    - +.ytimg.com
+  domestic-services:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.126.net
+    - +.163.com
+    - +.360buyimg.com
+    - +.alicdn.com
+    - +.alipay.com
+    - +.baidu.com
+    - +.bdimg.com
+    - +.bdstatic.com
+    - +.bilibili.cn
+    - +.bilibili.com
+    - +.bilivideo.com
+    - +.deepseek.com
+    - +.douyin.com
+    - +.douyincdn.com
+    - +.douyinpic.com
+    - +.douyinvod.com
+    - +.gitee.cn
+    - +.gitee.com
+    - +.hdslb.com
+    - +.iqiyi.com
+    - +.iqiyipic.com
+    - +.jd.com
+    - +.jdcloud.com
+    - +.music.126.net
+    - +.qiyipic.com
+    - +.qlogo.cn
+    - +.qpic.cn
+    - +.qq.com
+    - +.sinaimg.cn
+    - +.taobao.com
+    - +.tencent.com
+    - +.tmall.com
+    - +.ugurl.cn
+    - +.video.qq.com
+    - +.wechat.com
+    - +.weibo.cn
+    - +.weibo.com
+    - +.xhscdn.com
+    - +.xiaohongshu.com
+    - +.zhihu.com
+    - +.zhimg.com
+    - +.zijieapi.com
+  company-internal:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.tech.bitauto.com
+    - +.yiche.com
+    - +.bitauto.com
+    - +.bitautotech.com
+  app-direct:
+    type: inline
+    behavior: classical
+    format: yaml
+    payload:
+    - PROCESS-NAME,Bilibili
+    - PROCESS-NAME,Meituan
+    - PROCESS-NAME,NeteaseMusic
+    - PROCESS-NAME,QQ
+    - PROCESS-NAME,QQ.exe
+    - PROCESS-NAME,SunloginClient
+    - PROCESS-NAME,SunloginClient.exe
+    - PROCESS-NAME,SunloginClient_Desktop
+    - PROCESS-NAME,SunloginClient_Desktop.exe
+    - PROCESS-NAME,SunloginClient_Helper
+    - PROCESS-NAME,SunloginClient_Service.exe
+    - PROCESS-NAME,TIM
+    - PROCESS-NAME,TIM.exe
+    - PROCESS-NAME,TencentMeeting
+    - PROCESS-NAME,WXWork.exe
+    - PROCESS-NAME,WeChat
+    - PROCESS-NAME,WeChat.exe
+    - PROCESS-NAME,WeChatAppEx
+    - PROCESS-NAME,WeChatAppEx.exe
+    - PROCESS-NAME,WeCom
+    - PROCESS-NAME,Weixin
+    - PROCESS-NAME,Weixin.exe
+    - PROCESS-NAME,cloudmusic.exe
+    - PROCESS-NAME,com.autonavi.minimap
+    - PROCESS-NAME,com.dianping.v1
+    - PROCESS-NAME,com.eg.android.AlipayGphone
+    - PROCESS-NAME,com.jingdong.app.mall
+    - PROCESS-NAME,com.netease.cloudmusic
+    - PROCESS-NAME,com.oray.sunlogin
+    - PROCESS-NAME,com.sankuai.meituan
+    - PROCESS-NAME,com.sina.weibo
+    - PROCESS-NAME,com.ss.android.ugc.aweme
+    - PROCESS-NAME,com.taobao.taobao
+    - PROCESS-NAME,com.tencent.mm
+    - PROCESS-NAME,com.tencent.mobileqq
+    - PROCESS-NAME,com.tencent.wemeet.app
+    - PROCESS-NAME,com.tencent.wework
+    - PROCESS-NAME,com.xingin.xhs
+    - PROCESS-NAME,com.xunmeng.pinduoduo
+    - PROCESS-NAME,sunloginclient
+    - PROCESS-NAME,tv.danmaku.bili
+    - PROCESS-NAME,wemeetapp
+    - PROCESS-NAME,wemeetapp.exe
+    - PROCESS-NAME,企业微信
+    - PROCESS-NAME,哔哩哔哩
+  app-direct-domains:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.360buyimg.com
+    - +.alicdn.com
+    - +.alipay.com
+    - +.alipayobjects.com
+    - +.amap.com
+    - +.autonavi.com
+    - +.bilibili.com
+    - +.bilivideo.com
+    - +.dianping.com
+    - +.douyin.com
+    - +.douyinvod.com
+    - +.hdslb.com
+    - +.jd.com
+    - +.meeting.tencent.com
+    - +.meituan.com
+    - +.meituan.net
+    - +.music.126.net
+    - +.music.163.com
+    - +.oray.com
+    - +.oray.net
+    - +.pddpic.com
+    - +.pinduoduo.com
+    - +.qlogo.cn
+    - +.qpic.cn
+    - +.qq.com
+    - +.sankuai.com
+    - +.servicewechat.com
+    - +.sinaimg.cn
+    - +.taobao.com
+    - +.tbcdn.cn
+    - +.tenpay.com
+    - +.wechat.com
+    - +.weibo.cn
+    - +.weibo.com
+    - +.weibocdn.com
+    - +.weixin.com
+    - +.weixin.qq.com
+    - +.weixinbridge.com
+    - +.wemeet.qq.com
+    - +.work.weixin.qq.com
+    - +.xhscdn.com
+    - +.xiaohongshu.com
+    - +.yangkeduo.com
+  app-proxy:
+    type: inline
+    behavior: classical
+    format: yaml
+    payload:
+    - PROCESS-NAME,ChatGPT
+    - PROCESS-NAME,ChatGPT.exe
+    - PROCESS-NAME,Claude
+    - PROCESS-NAME,Claude Helper
+    - PROCESS-NAME,Claude Helper (GPU)
+    - PROCESS-NAME,Claude Helper (Plugin)
+    - PROCESS-NAME,Claude Helper (Renderer)
+    - PROCESS-NAME,Claude.exe
+    - PROCESS-NAME,Cursor
+    - PROCESS-NAME,Cursor Helper
+    - PROCESS-NAME,Cursor Helper (GPU)
+    - PROCESS-NAME,Cursor Helper (Plugin)
+    - PROCESS-NAME,Cursor Helper (Renderer)
+    - PROCESS-NAME,Cursor.exe
+    - PROCESS-NAME,Discord
+    - PROCESS-NAME,Discord.exe
+    - PROCESS-NAME,Telegram
+    - PROCESS-NAME,Telegram.exe
+    - PROCESS-NAME,com.android.vending
+    - PROCESS-NAME,com.anthropic.claude
+    - PROCESS-NAME,com.discord
+    - PROCESS-NAME,com.google.android.apps.bard
+    - PROCESS-NAME,com.google.android.gms
+    - PROCESS-NAME,com.google.android.gsf
+    - PROCESS-NAME,com.google.android.youtube
+    - PROCESS-NAME,com.instagram.android
+    - PROCESS-NAME,com.instagram.barcelona
+    - PROCESS-NAME,com.openai.chatgpt
+    - PROCESS-NAME,com.twitter.android
+    - PROCESS-NAME,org.telegram.messenger
+  app-proxy-domains:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.anthropic.com
+    - +.cdninstagram.com
+    - +.chatgpt.com
+    - +.claude.ai
+    - +.cursor.com
+    - +.cursor.sh
+    - +.discord.com
+    - +.discord.gg
+    - +.discordapp.com
+    - +.discordapp.net
+    - +.gemini.google.com
+    - +.generativelanguage.googleapis.com
+    - +.ggpht.com
+    - +.googleplay.com
+    - +.googlevideo.com
+    - +.gvt1.com
+    - +.gvt2.com
+    - +.instagram.com
+    - +.oaistatic.com
+    - +.oaiusercontent.com
+    - +.openai.com
+    - +.play.google.com
+    - +.t.co
+    - +.t.me
+    - +.telegram.me
+    - +.telegram.org
+    - +.threads.com
+    - +.threads.net
+    - +.twimg.com
+    - +.twitter.com
+    - +.x.com
+    - +.youtu.be
+    - +.youtube.com
+    - +.ytimg.com
+find-process-mode: strict
+proxies:
+- port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国01|209ms|476Mbps|非住宅|纯净度99.6%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 147.182.216.4
+  sni: 93b6d804.acsnet.co
+  tls: true
+  type: http
+  username: testuser1
+  name: 美国02|190ms|191Mbps|非住宅|纯净度86.1%
+- port: 8443
+  server: 44.248.167.117
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国03|269ms|231Mbps|非住宅|纯净度99.2%
+- password: None
+  port: 443
+  server: 52.55.81.168
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国04|406ms|212Mbps|非住宅|纯净度未知
+- port: 443
+  server: 64.98.50.100
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国05|451ms|267Mbps|非住宅|纯净度100.0%
+- password: None
+  port: 443
+  server: purposebydesig.club
+  tls: true
+  type: http
+  udp: true
+  name: 美国06|571ms|879Mbps|非住宅|纯净度99.6%
+- http-opts:
+    headers:
+      Host:
+      - appmetrica.yandex.net
+    method: GET
+    path:
+    - /
+  network: http
+  port: 443
+  server: 188.166.173.38
+  tls: false
+  type: vless
+  udp: true
+  uuid: 40992c2a-513e-4837-9594-23411fd42afd
+  name: 英国01|540ms|130Mbps|非住宅|纯净度100.0%
+- server: 84.17.47.149
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 1037
+  name: 荷兰01|648ms|121Mbps|非住宅|纯净度74.1%
+- port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰02|654ms|125Mbps|非住宅|纯净度74.1%
+- port: 443
+  server: 44.239.226.15
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国07|635ms|244Mbps|非住宅|纯净度未知
+- alpn:
+  - http/1.1
+  network: ws
+  password: humanity
+  port: 443
+  server: 172.66.40.99
+  skip-cert-verify: true
+  sni: www.trusteeforward.com
+  type: trojan
+  ws-opts:
+    headers:
+      Host: www.trusteeforward.com
+    path: /assignment
+  name: 荷兰03|728ms|131Mbps|非住宅|纯净度94.8%
+- password: None
+  port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰04|822ms|129Mbps|非住宅|纯净度74.1%
+- port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰05|820ms|127Mbps|非住宅|纯净度74.1%
+- server: 84.17.47.125
+  port: 9002
+  type: http
+  password: None
+  tls: true
+  skip-cert-verify: true
+  delay: 1941
+  name: 荷兰06|825ms|130Mbps|非住宅|纯净度74.1%
+- type: vless
+  server: whuiy.xyz
+  port: 443
+  uuid: c64992bd-54aa-4d3d-8527-42da7d7e520a
+  network: ws
+  servername: whuiy.xyz
+  tls: true
+  client-fingerprint: chrome
+  ws-opts:
+    path: /vless-cdn
+    headers:
+      Host: whuiy.xyz
+  skip-cert-verify: true
+  udp: true
+  name: 美国08|770ms|224Mbps|非住宅|纯净度97.6%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 荷兰07|914ms|132Mbps|非住宅|纯净度74.1%
+- port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰08|912ms|135Mbps|非住宅|纯净度74.1%
+- port: 443
+  server: 213.109.163.119
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 德国01|955ms|203Mbps|非住宅|纯净度97.8%
+- port: 21384
+  server: 51.158.204.46
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰09|1005ms|103Mbps|非住宅|纯净度99.6%
+- type: http
+  server: 51.158.202.56
+  port: 14287
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰10|1003ms|116Mbps|非住宅|纯净度94.8%
+- port: 443
+  server: 82.65.162.76
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 法国01|994ms|131Mbps|住宅|纯净度99.8%
+- port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰11|1005ms|148Mbps|非住宅|纯净度74.1%
+- port: 9002
+  server: 193.176.84.30
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚01|954ms|8Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰12|1012ms|127Mbps|非住宅|纯净度74.1%
+- password: None
+  port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰13|1014ms|129Mbps|非住宅|纯净度74.1%
+- port: 9002
+  server: 193.176.84.18
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 罗马尼亚02|1148ms|15Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.17
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚03|1168ms|5Mbps|非住宅|纯净度86.7%
+- type: http
+  server: 193.176.84.19
+  port: 9002
+  tls: true
+  sni: www.bing.com
+  skip-cert-verify: true
+  name: 罗马尼亚04|1123ms|3Mbps|非住宅|纯净度86.7%
+- type: http
+  server: 103.86.117.202
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 印度尼西亚01|1163ms|10Mbps|住宅|纯净度96.5%
+- port: 9002
+  server: 193.176.84.29
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 罗马尼亚05|963ms|10Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.25
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚06|1191ms|14Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.32
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚07|1226ms|55Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.20
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚08|1202ms|7Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.35
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚09|1306ms|73Mbps|非住宅|纯净度86.7%
+- password: None
+  port: 9002
+  server: 193.176.84.23
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚10|1327ms|52Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.27
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚11|1319ms|19Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.35
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚12|1309ms|18Mbps|非住宅|纯净度86.7%
+- port: 443
+  server: 148.135.10.80
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国09|1256ms|529Mbps|非住宅|纯净度99.2%
+- port: 9002
+  server: 193.176.84.39
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚13|1298ms|18Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.23
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  name: 罗马尼亚14|1353ms|18Mbps|非住宅|纯净度86.7%
+- port: 443
+  server: 154.26.139.24
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 新加坡01|1385ms|9Mbps|非住宅|纯净度97.6%
+- type: http
+  server: purecambogiasl.live
+  port: 443
+  tls: true
+  name: 美国10|455ms|394Mbps|非住宅|纯净度99.6%
+- port: 9002
+  server: 84.17.47.150
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰14|912ms|129Mbps|非住宅|纯净度74.1%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.16
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 罗马尼亚15|1236ms|9Mbps|非住宅|纯净度86.7%
+- password: None
+  port: 9002
+  server: 193.176.84.34
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 罗马尼亚16|956ms|10Mbps|非住宅|纯净度86.7%
+- client-fingerprint: random
+  encryption: none
+  network: xhttp
+  port: 443
+  server: 95.140.158.168
+  servername: fi.bootless.ru
+  tls: true
+  type: vless
+  udp: true
+  uuid: a96ad3ea-4820-43d2-bbf3-27c6bf19d652
+  xhttp-opts:
+    mode: auto
+    path: /api/v2/stream
+  xudp: true
+  name: 芬兰01|980ms|190Mbps|非住宅|纯净度91.8%
+- port: 443
+  server: 103.82.101.44
+  skip-cert-verify: true
+  sni: f3a61d8406d537345747f99f8a281007-3f754ed5da1bba09.apache-iv.com
+  tls: true
+  type: http
+  name: 法国02|981ms|42Mbps|非住宅|纯净度98.8%
+- type: http
+  server: 193.176.84.31
+  port: 9002
+  username: 'null'
+  password: None
+  tls: true
+  skip-cert-verify: true
+  name: 罗马尼亚17|1305ms|12Mbps|非住宅|纯净度86.7%
+- port: 9002
+  server: 193.176.84.39
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚18|1300ms|47Mbps|非住宅|纯净度86.7%
+- type: http
+  server: 193.176.84.38
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 罗马尼亚19|1321ms|18Mbps|非住宅|纯净度86.7%
+- password: None
+  port: 9002
+  server: 193.176.84.31
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚20|1295ms|60Mbps|非住宅|纯净度86.7%
+- type: http
+  server: 151.115.54.133
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 波兰01|1040ms|104Mbps|非住宅|纯净度97.3%
+- server: kr.tronsg.com
+  port: 443
+  type: trojan
+  password: Trojan@82164024
+  sni: kr.tronsg.com
+  skip-cert-verify: true
+  udp: true
+  name: 韩国01|898ms|17Mbps|非住宅|纯净度98.2%
+- type: http
+  server: 103.86.116.118
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 印度尼西亚02|1541ms|12Mbps|住宅|纯净度96.5%
+proxy-groups:
+- name: 🚀 全局选择
+  type: select
+  proxies:
+  - ⭐ 综合优选
+  - 🚄 中速下载
+  - ⚡ 高速下载
+  - 🏠 非机房 IP
+  - 🌏 台湾／新加坡
+  - DIRECT
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
+  default-selected: ⭐ 综合优选
+- name: ⭐ 综合优选
+  type: url-test
+  proxies:
+  - 美国01|209ms|476Mbps|非住宅|纯净度99.6%
+  - 美国02|190ms|191Mbps|非住宅|纯净度86.1%
+  - 美国03|269ms|231Mbps|非住宅|纯净度99.2%
+  - 美国04|406ms|212Mbps|非住宅|纯净度未知
+  - 美国05|451ms|267Mbps|非住宅|纯净度100.0%
+  - 美国06|571ms|879Mbps|非住宅|纯净度99.6%
+  - 英国01|540ms|130Mbps|非住宅|纯净度100.0%
+  - 荷兰01|648ms|121Mbps|非住宅|纯净度74.1%
+  - 荷兰02|654ms|125Mbps|非住宅|纯净度74.1%
+  - 美国07|635ms|244Mbps|非住宅|纯净度未知
+  - 荷兰03|728ms|131Mbps|非住宅|纯净度94.8%
+  - 荷兰04|822ms|129Mbps|非住宅|纯净度74.1%
+  - 荷兰05|820ms|127Mbps|非住宅|纯净度74.1%
+  - 荷兰06|825ms|130Mbps|非住宅|纯净度74.1%
+  - 美国08|770ms|224Mbps|非住宅|纯净度97.6%
+  - 荷兰07|914ms|132Mbps|非住宅|纯净度74.1%
+  - 荷兰08|912ms|135Mbps|非住宅|纯净度74.1%
+  - 德国01|955ms|203Mbps|非住宅|纯净度97.8%
+  - 荷兰09|1005ms|103Mbps|非住宅|纯净度99.6%
+  - 荷兰10|1003ms|116Mbps|非住宅|纯净度94.8%
+  - 法国01|994ms|131Mbps|住宅|纯净度99.8%
+  - 荷兰11|1005ms|148Mbps|非住宅|纯净度74.1%
+  - 罗马尼亚01|954ms|8Mbps|非住宅|纯净度86.7%
+  - 荷兰12|1012ms|127Mbps|非住宅|纯净度74.1%
+  - 荷兰13|1014ms|129Mbps|非住宅|纯净度74.1%
+  - 罗马尼亚02|1148ms|15Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚03|1168ms|5Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚04|1123ms|3Mbps|非住宅|纯净度86.7%
+  - 印度尼西亚01|1163ms|10Mbps|住宅|纯净度96.5%
+  - 罗马尼亚05|963ms|10Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚06|1191ms|14Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚07|1226ms|55Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚08|1202ms|7Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚09|1306ms|73Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚10|1327ms|52Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚11|1319ms|19Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚12|1309ms|18Mbps|非住宅|纯净度86.7%
+  - 美国09|1256ms|529Mbps|非住宅|纯净度99.2%
+  - 罗马尼亚13|1298ms|18Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚14|1353ms|18Mbps|非住宅|纯净度86.7%
+  - 美国10|455ms|394Mbps|非住宅|纯净度99.6%
+  - 荷兰14|912ms|129Mbps|非住宅|纯净度74.1%
+  - 罗马尼亚15|1236ms|9Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚16|956ms|10Mbps|非住宅|纯净度86.7%
+  - 芬兰01|980ms|190Mbps|非住宅|纯净度91.8%
+  - 法国02|981ms|42Mbps|非住宅|纯净度98.8%
+  - 罗马尼亚17|1305ms|12Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚18|1300ms|47Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚19|1321ms|18Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚20|1295ms|60Mbps|非住宅|纯净度86.7%
+  - 波兰01|1040ms|104Mbps|非住宅|纯净度97.3%
+  - 韩国01|898ms|17Mbps|非住宅|纯净度98.2%
+  - 印度尼西亚02|1541ms|12Mbps|住宅|纯净度96.5%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
+- name: 🚄 中速下载
+  type: url-test
+  proxies:
+  - 美国09|1256ms|529Mbps|非住宅|纯净度99.2%
+  - 美国06|571ms|879Mbps|非住宅|纯净度99.6%
+  - 美国01|209ms|476Mbps|非住宅|纯净度99.6%
+  - 美国04|406ms|212Mbps|非住宅|纯净度未知
+  - 美国08|770ms|224Mbps|非住宅|纯净度97.6%
+  - 美国07|635ms|244Mbps|非住宅|纯净度未知
+  - 美国10|455ms|394Mbps|非住宅|纯净度99.6%
+  - 美国05|451ms|267Mbps|非住宅|纯净度100.0%
+  - 美国02|190ms|191Mbps|非住宅|纯净度86.1%
+  - 英国01|540ms|130Mbps|非住宅|纯净度100.0%
+  - 荷兰03|728ms|131Mbps|非住宅|纯净度94.8%
+  - 荷兰07|914ms|132Mbps|非住宅|纯净度74.1%
+  - 荷兰08|912ms|135Mbps|非住宅|纯净度74.1%
+  - 芬兰01|980ms|190Mbps|非住宅|纯净度91.8%
+  - 荷兰10|1003ms|116Mbps|非住宅|纯净度94.8%
+  - 荷兰13|1014ms|129Mbps|非住宅|纯净度74.1%
+  - 荷兰14|912ms|129Mbps|非住宅|纯净度74.1%
+  - 法国01|994ms|131Mbps|住宅|纯净度99.8%
+  - 荷兰12|1012ms|127Mbps|非住宅|纯净度74.1%
+  - 荷兰11|1005ms|148Mbps|非住宅|纯净度74.1%
+  - 美国03|269ms|231Mbps|非住宅|纯净度99.2%
+  - 荷兰09|1005ms|103Mbps|非住宅|纯净度99.6%
+  - 德国01|955ms|203Mbps|非住宅|纯净度97.8%
+  - 波兰01|1040ms|104Mbps|非住宅|纯净度97.3%
+  - 罗马尼亚11|1319ms|19Mbps|非住宅|纯净度86.7%
+  - 荷兰05|820ms|127Mbps|非住宅|纯净度74.1%
+  - 荷兰06|825ms|130Mbps|非住宅|纯净度74.1%
+  - 荷兰04|822ms|129Mbps|非住宅|纯净度74.1%
+  - 罗马尼亚13|1298ms|18Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚12|1309ms|18Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚14|1353ms|18Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚19|1321ms|18Mbps|非住宅|纯净度86.7%
+  - 韩国01|898ms|17Mbps|非住宅|纯净度98.2%
+  - 荷兰01|648ms|121Mbps|非住宅|纯净度74.1%
+  - 罗马尼亚07|1226ms|55Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚02|1148ms|15Mbps|非住宅|纯净度86.7%
+  - 荷兰02|654ms|125Mbps|非住宅|纯净度74.1%
+  - 罗马尼亚06|1191ms|14Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚20|1295ms|60Mbps|非住宅|纯净度86.7%
+  - 印度尼西亚02|1541ms|12Mbps|住宅|纯净度96.5%
+  - 罗马尼亚17|1305ms|12Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚09|1306ms|73Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚16|956ms|10Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚05|963ms|10Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚10|1327ms|52Mbps|非住宅|纯净度86.7%
+  - 印度尼西亚01|1163ms|10Mbps|住宅|纯净度96.5%
+  - 罗马尼亚18|1300ms|47Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚15|1236ms|9Mbps|非住宅|纯净度86.7%
+  - 新加坡01|1385ms|9Mbps|非住宅|纯净度97.6%
+  - 罗马尼亚01|954ms|8Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚08|1202ms|7Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚03|1168ms|5Mbps|非住宅|纯净度86.7%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
+- name: ⚡ 高速下载
+  type: url-test
+  proxies:
+  - 美国06|571ms|879Mbps|非住宅|纯净度99.6%
+  - 美国09|1256ms|529Mbps|非住宅|纯净度99.2%
+  - 美国01|209ms|476Mbps|非住宅|纯净度99.6%
+  - 美国10|455ms|394Mbps|非住宅|纯净度99.6%
+  - 美国05|451ms|267Mbps|非住宅|纯净度100.0%
+  - 美国07|635ms|244Mbps|非住宅|纯净度未知
+  - 美国03|269ms|231Mbps|非住宅|纯净度99.2%
+  - 美国08|770ms|224Mbps|非住宅|纯净度97.6%
+  - 美国04|406ms|212Mbps|非住宅|纯净度未知
+  - 德国01|955ms|203Mbps|非住宅|纯净度97.8%
+  - 美国02|190ms|191Mbps|非住宅|纯净度86.1%
+  - 芬兰01|980ms|190Mbps|非住宅|纯净度91.8%
+  - 荷兰11|1005ms|148Mbps|非住宅|纯净度74.1%
+  - 荷兰08|912ms|135Mbps|非住宅|纯净度74.1%
+  - 荷兰07|914ms|132Mbps|非住宅|纯净度74.1%
+  - 荷兰03|728ms|131Mbps|非住宅|纯净度94.8%
+  - 法国01|994ms|131Mbps|住宅|纯净度99.8%
+  - 荷兰06|825ms|130Mbps|非住宅|纯净度74.1%
+  - 英国01|540ms|130Mbps|非住宅|纯净度100.0%
+  - 荷兰14|912ms|129Mbps|非住宅|纯净度74.1%
+  - 荷兰13|1014ms|129Mbps|非住宅|纯净度74.1%
+  - 荷兰04|822ms|129Mbps|非住宅|纯净度74.1%
+  - 荷兰05|820ms|127Mbps|非住宅|纯净度74.1%
+  - 荷兰12|1012ms|127Mbps|非住宅|纯净度74.1%
+  - 荷兰02|654ms|125Mbps|非住宅|纯净度74.1%
+  - 荷兰01|648ms|121Mbps|非住宅|纯净度74.1%
+  - 荷兰10|1003ms|116Mbps|非住宅|纯净度94.8%
+  - 波兰01|1040ms|104Mbps|非住宅|纯净度97.3%
+  - 荷兰09|1005ms|103Mbps|非住宅|纯净度99.6%
+  - 罗马尼亚09|1306ms|73Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚20|1295ms|60Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚07|1226ms|55Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚10|1327ms|52Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚18|1300ms|47Mbps|非住宅|纯净度86.7%
+  - 法国02|981ms|42Mbps|非住宅|纯净度98.8%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
+- name: 🏠 非机房 IP
+  type: url-test
+  proxies:
+  - 美国05|451ms|267Mbps|非住宅|纯净度100.0%
+  - 法国01|994ms|131Mbps|住宅|纯净度99.8%
+  - 印度尼西亚01|1163ms|10Mbps|住宅|纯净度96.5%
+  - 美国09|1256ms|529Mbps|非住宅|纯净度99.2%
+  - 法国02|981ms|42Mbps|非住宅|纯净度98.8%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
+- name: 🌏 台湾／新加坡
+  type: url-test
+  proxies:
+  - 新加坡01|1385ms|9Mbps|非住宅|纯净度97.6%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
