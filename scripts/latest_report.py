@@ -176,9 +176,10 @@ def stage_table(report, website_gate=None):
 
 def write_latest(report, config, root=Path('.'), website_gate=None, candidate=False, validation=None):
     """Publish compact metadata and a README section, preserving manual prose."""
-    from detection_report import write_report
+    from detection_report import write_report, latest_cohort, website_access_summary
     root = Path(root)
     summary = {k: v for k, v in report.items() if k != 'nodes'}
+    summary['website_access_summary'] = website_access_summary(latest_cohort(report))
     validation = validation or report.get('configuration_validation') or 'not_checked'
     summary.update(stage_summary=stage_summary({**report, 'configuration_validation': validation}, website_gate),
                    record_count=len(report.get('nodes', [])),

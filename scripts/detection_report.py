@@ -20,7 +20,7 @@ def website_access_summary(nodes):
     result = {}
     for label in sorted(labels):
         stats = dict.fromkeys(('measured', 'accepted', 'cloudflare_challenge', 'login_required', 'restricted',
-                              'transport_error', 'page_or_speed_error', 'unmeasured'), 0)
+                              'transport_error', 'http_error', 'page_or_speed_error', 'unmeasured'), 0)
         for row in nodes:
             item = (row.get('websites') or {}).get(label) or {}
             if item.get('status', 'missing') in ('missing', 'skipped', 'unknown', 'not_candidate'):
@@ -39,8 +39,11 @@ def website_access_summary(nodes):
             stats['restricted'] += any(x.get('status') in ('needs_review', 'verification_required', 'login_required')
                                       and not confirmed_page_exception(label, x) for x in attempts)
             stats['transport_error'] += any(x.get('error_type') or x.get('tls_error_kind') for x in attempts)
+            stats['http_error'] += any(x.get('status') in ('failed', 'slow')
+                and (x.get('http_status') or 0) >= 400 for x in attempts)
             stats['page_or_speed_error'] += any(x.get('status') in ('failed', 'slow')
-                and not x.get('error_type') and not x.get('tls_error_kind') for x in attempts)
+                and not x.get('error_type') and not x.get('tls_error_kind')
+                and (x.get('http_status') or 0) < 400 for x in attempts)
         result[label] = stats
     return result
 
@@ -51,12 +54,12 @@ def website_access_table(nodes, required=()):
         return []
     rows = ['## 各网站拦截与异常数量', '',
             f'统计范围 **{len(nodes)}** 个节点；仅实测节点进入各站分母。带★为逐站必过目标，其余目标仍参与整体覆盖率和证书校验。', '',
-            '| 网站 | 实测 | 通过 | CF人机验证 | 登录提示（通过） | 其他拦截／跳转 | 连接／TLS异常 | 慢／内容异常 |',
-            '|---|---:|---:|---:|---:|---:|---:|---:|']
+            '| 网站 | 实测 | 通过 | CF人机验证 | 登录提示（通过） | 其他拦截／跳转 | 连接／TLS异常 | HTTP错误 | 慢／内容异常 |',
+            '|---|---:|---:|---:|---:|---:|---:|---:|---:|']
     for label, item in sorted(counts.items(), key=lambda kv: (-(kv[1]['measured'] - kv[1]['accepted']), kv[0])):
         rows.append('| ' + ('★ ' if label in required else '') + cell(label) + ' | ' +
                     ' | '.join(str(item[k]) for k in ('measured', 'accepted', 'cloudflare_challenge', 'login_required',
-                        'restricted', 'transport_error', 'page_or_speed_error')) + ' |')
+                        'restricted', 'transport_error', 'http_error', 'page_or_speed_error')) + ' |')
     rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证及Reddit明确登录提示；没有这两类证据的普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '']
     anomalies = [label for label, x in counts.items() if label in required and x['measured'] >= 10 and not x['accepted']]
     if anomalies:

@@ -1,11 +1,33 @@
 import sys
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import website_diagnostics as d
 import mobile_pilot as p
 
 class WebsiteDiagnosticTests(unittest.TestCase):
+    def test_meta_production_caller_sends_navigation_headers_and_preserves_tls_and_budgets(self):
+        class Response:
+            status_code = 200
+            headers = {'Content-Type': 'text/html'}
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def iter_content(self, size): return iter([b'<html><title>Facebook WhatsApp</title></html>'])
+        for label in ('Facebook', 'WhatsApp'):
+            with self.subTest(label=label), patch.object(p.s, 'session') as session:
+                client = session.return_value.__enter__.return_value
+                def get(url, **kwargs):
+                    self.assertTrue(kwargs['verify'])
+                    self.assertIn('text/html', kwargs['headers']['Accept'])
+                    self.assertEqual(kwargs['headers']['Sec-Fetch-Mode'], 'navigate')
+                    self.assertEqual(kwargs['timeout'], (3, 2))
+                    result = Response(); result.url = url
+                    return result
+                client.get.side_effect = get
+                self.assertEqual(p.check_site(1234, label, p.SITES[label])['status'], 'passed')
+        self.assertEqual(p.website_headers('Google'), {'User-Agent': p.WEB_USER_AGENT})
+
     def test_meta_http400_failures_are_selected_for_diagnosis_not_silently_skipped(self):
         rows = [{'id': str(i), 'exit': {'exit_ip': str(i)}, 'websites': {
             label: {'status': 'failed', 'attempts': [{'status': 'failed', 'http_status': 400}] * 3}
