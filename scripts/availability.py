@@ -28,7 +28,7 @@ import stability
 import continuous_stability
 import upload_speed
 from bandwidth_gate import BandwidthGate
-from detection_report import write_report
+from detection_report import write_report, website_access_summary, latest_cohort
 from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge
 
@@ -1321,6 +1321,7 @@ def main():
               'download_counts': {v: sum((r.get('download') or {}).get('status') == v for r in records)
                                   for v in ('passed', 'failed', 'skipped')},
               'services': services, 'sources': sources, 'nodes': records}
+    report['website_access_summary'] = website_access_summary(latest_cohort(report))
     Path('优选配置.yaml').write_text(f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text())
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     write_report(report, config, Path('连通性报告.md'), website_gate=required_websites_passed)

@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: select-nodes-main
+  group: ${{ github.event_name == 'workflow_dispatch' && endsWith(inputs.mode, '-diagnostics') && format('select-nodes-{0}', inputs.mode) || 'select-nodes-main' }}
   cancel-in-progress: false
 
 jobs:

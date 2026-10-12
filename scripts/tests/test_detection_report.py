@@ -1,8 +1,10 @@
 import copy
+import json
 from pathlib import Path
 import sys
 import tempfile
 import unittest
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import detection_report as d
@@ -41,6 +43,52 @@ def render(report, config, **kwargs):
 
 
 class CleanReportTests(unittest.TestCase):
+    def test_offline_refresh_preserves_measurements_selection_and_subscription(self):
+        from refresh_detection_report import refresh
+        report, config = fixture()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root/'连通性报告.json').write_text(json.dumps(report))
+            original_yaml = yaml.safe_dump(config)
+            (root/'优选配置.yaml').write_text(original_yaml)
+            refresh(root)
+            refreshed = json.loads((root/'连通性报告.json').read_text())
+            self.assertIn('website_access_summary', refreshed)
+            refreshed.pop('website_access_summary')
+            self.assertEqual(refreshed, report)
+            self.assertEqual((root/'优选配置.yaml').read_text(), original_yaml)
+            self.assertIn('各网站拦截与异常数量', (root/'连通性报告.md').read_text())
+
+    def test_site_summary_counts_nodes_and_separates_confirmed_challenges(self):
+        passed = {'status': 'passed', 'http_status': 200}
+        challenge = {'status': 'verification_required', 'http_status': 403,
+                     'final_url': 'https://www.reddit.com/', 'restriction': 'cloudflare_challenge',
+                     'cf_mitigated': 'challenge'}
+        restricted = {'status': 'needs_review', 'http_status': 403}
+        timeout = {'status': 'failed', 'error_type': 'ReadTimeout'}
+        rows = [
+            {'websites': {'Reddit': {'status': 'passed', 'attempts': [passed] * 3}}},
+            {'websites': {'Reddit': {'status': 'verification_required', 'attempts': [passed, challenge, passed]}}},
+            {'websites': {'Reddit': {'status': 'needs_review', 'attempts': [restricted] * 3}}},
+            {'websites': {'Reddit': {'status': 'unstable', 'attempts': [passed, timeout, passed]}}},
+            {'websites': {'Reddit': {'status': 'verification_required', 'attempts': [restricted] * 3}}},
+            {'websites': {}}]
+        counts = d.website_access_summary(rows)['Reddit']
+        self.assertEqual(counts, {'measured': 5, 'accepted': 2, 'cloudflare_challenge': 1,
+            'restricted': 2, 'transport_error': 1, 'page_or_speed_error': 0, 'unmeasured': 1})
+        table = '\n'.join(d.website_access_table(rows, {'Reddit'}))
+        self.assertIn('| ★ Reddit | 5 | 2 | 1 | 2 | 1 | 0 |', table)
+        self.assertIn('未测节点不算失败', table)
+
+    def test_repair_site_table_only_counts_latest_cohort(self):
+        report, config = fixture()
+        for row in report['nodes']:
+            row['websites'] = {'Reddit': {'status': 'needs_review',
+                'attempts': [{'status': 'needs_review', 'http_status': 403}] * 3}}
+        text = render(report, config)
+        self.assertIn('| Reddit | 2 | 0 | 0 | 2 | 0 | 0 |', text)
+        self.assertNotIn('| Reddit | 3 |', text)
+
     def test_latest_cohort_excludes_historical_failures_and_private_fields(self):
         report, config = fixture(); text = render(report, config)
         self.assertIn('覆盖 **2** 个节点', text)
