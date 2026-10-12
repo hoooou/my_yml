@@ -62,7 +62,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 | 补充 | FAST API／Netflix CDN | 1MB通过后通过urlCount=3取得最多三个不同CDN主机，依次各下载1MB、各限6秒。普通失败只报告；明确证书错误淘汰 |
 | 7 | Cloudflare 5MB快测 | `https://speed.cloudflare.com/__down?bytes=5000000`，10秒完整接收，每片最多4个并发；通过才进中速组，失败仍可继续100MB |
 | 8a | Cloudflare 100MB | `https://speed.cloudflare.com/__down?bytes=100000000`，20秒完整接收，带Referer: https://speed.cloudflare.com/ |
-| 8b | DataPacket 100MB | `http://lax.download.datapacket.com/100mb.bin`，20秒完整接收；同节点两目标顺序测试，首轮失败也测第二轮，每片最多2节点同时测。两目标都过才进高速组 |
+| 8b | DataPacket 100MB | `http://hkg.download.datapacket.com/100mb.bin`，20秒完整接收；同节点两目标顺序测试，首轮失败也测第二轮，每片最多2节点同时测。两目标都过才进高速组 |
 | 9 | 最终上行及负载 | 复用3MB预检，再对Cloudflare上传5MB两轮、各10秒、间隔20秒，取较慢速度；上传中204均须通过 |
 | 10 | 上传后SSL | 四个应用域名再次各两轮严格TLS检查 |
 | 并行 | 持续稳定性 | TCP及3MB通过后独立观察；每节点每轮结束后随机等待3～10秒再检查，不重叠、不限定20轮，每片最多8节点；并发排队可能延后实际检查时间；持续到网站／下载／上传／上传后SSL结束，再完成每节点一轮 |

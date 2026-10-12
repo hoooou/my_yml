@@ -1,13 +1,13 @@
 """Two complete downloads from independent targets qualify the high-speed pool."""
 import math
 
-VERSION = 1
+VERSION = 2
 BYTES = 100_000_000
 BUDGET = 20
 WORKERS = 2
 URLS = (
     'https://speed.cloudflare.com/__down?bytes=100000000',
-    'http://lax.download.datapacket.com/100mb.bin',
+    'http://hkg.download.datapacket.com/100mb.bin',
 )
 
 
