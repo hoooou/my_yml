@@ -8,7 +8,7 @@ import stability
 import upload_speed
 
 
-def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None):
+def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None):
     coverage = {}
     labels = {label for record in records for label in (record.get('websites') or {})}
     for label in sorted(labels):
@@ -21,6 +21,8 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
             'attempt_reason_counts': dict(Counter(a.get('reason', 'unknown') for a in attempts))}
     selected = len(config['proxies'])
     report = {'updated_at': now, 'scope': 'all_subscriptions', 'input_unique_count': input_count,
+        'measurement_recovery': measurement_recovery,
+        'measurements_updated_at': (measurement_recovery or {}).get('measurements_updated_at', now),
         'parseable_count': len(records), 'selected_node_count': selected,
         'selection_outcome': 'candidate_ready' if selected else 'no_eligible_nodes_previous_subscription_retained',
         'required_websites': list(required_sites), 'required_rounds': 3,
