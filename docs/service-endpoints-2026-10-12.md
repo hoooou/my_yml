@@ -4,7 +4,7 @@
 
 - 网站阶段：原12个必过页面加ChatGPT API，每个目标三轮；Claude trace单轮。ChatGPT API正常响应须为正确HTTPS地址、HTTP200、JSON且`cookie_consent_required`为布尔值，记录响应头及正文耗时。沿用明确CF验证的可达例外，普通错误页、跳转和无预期字段不判正常通过。未通过跳过应用TLS和下载。
 - TikTok保持原首页检测与筛选逻辑，不增加trace目标或必过条件。
-- 现有Cloudflare 1MB下载通过后：FAST API获取一个可信Netflix CDN目标，拼接1MB范围并在6秒内完整下载。FAST API及CDN结果单独统计，普通失败不新增淘汰条件、不替代原下载分组标准；明确证书校验错误仍淘汰。
+- 现有Cloudflare 1MB下载通过后：FAST API通过`urlCount=3`获取最多三个可信Netflix CDN目标，按主机名去重，依次拼接1MB范围，每个各限6秒完整下载。三个都通过才记为FAST通过；返回不足三个记为未知，不能重复凑数，也不保证三个主机属于不同物理服务器或地区。每个目标保留独立状态、速度、耗时，汇总成功目标的速度中位数及范围。FAST API及CDN结果单独统计，普通失败不新增淘汰条件、不替代原下载分组标准；明确证书校验错误仍淘汰。
 
 ## 地址验证及修正
 
@@ -18,7 +18,7 @@
 
 FAST拼接依据：[官方客户端](https://fast.com/app-0bffe1.js)在获取targets后将`speedtest`替换为`speedtest/range/`，下载时附加范围。仅API返回不构成带宽或内容解锁证据。响应中的CDN地区不是代理出口地区。
 
-## 最终小样本结果
+## 单目标版本的小样本结果
 
 [最终验证](https://github.com/hoooou/my_yml/actions/runs/38213158100)使用提交`3fcc879`，离线205项测试及工作流检查通过。该只读任务包含四个已发布样本和前后直连对照，不更新订阅。
 

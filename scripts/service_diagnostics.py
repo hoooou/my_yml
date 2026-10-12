@@ -81,6 +81,14 @@ def main():
         api = next((r['website_checks']['ChatGPTAPI']['status'] for r in outcomes if r['id'] == label), targets['ChatGPTAPI']['status'])
         md.append(f'| {label} | {pre} | {api} | '
             f'{fast["api"]["status"]} | {(fast.get("download") or {}).get("status", "未测")} |')
+    md += ['', '## FAST三个CDN对照', '', '顺序下载；速度包含建连，每个目标独立6秒预算。目标地区是CDN所在地。', '',
+           '| 样本 | 目标 | CDN主机 | CDN地区 | 结果 | Mbps | 耗时ms |',
+           '|---|---:|---|---|---|---:|---:|']
+    for label, checked in [*(('对照' + key, value) for key, value in controls.items()),
+                           *((r['id'], r['service_checks']) for r in outcomes)]:
+        for index, sample in enumerate(checked['targets']['FAST'].get('downloads', []), 1):
+            md.append(f'| {label} | {index} | {sample["cdn_host"]} | {sample.get("cdn_country_code") or "—"} | '
+                      f'{sample["status"]} | {sample.get("speed_mbps") or "—"} | {sample.get("elapsed_ms", "—")} |')
     (root / 'summary.md').write_text('\n'.join(md) + '\n')
 
 

@@ -136,7 +136,7 @@ ChatGPT `https://api.openai.com/compliance/cookie_requirements` 放在网站阶�
 
 TikTok保持原首页检测和筛选逻辑，不新增必过条件、不使用trace。在三个204通过节点及前后直连对照中，`/cdn-cgi/trace`均302到`/404`，最终是HTML错误页；按用户选择取消这个目标。证据见[云端验证](https://github.com/hoooou/my_yml/actions/runs/38212157289)。
 
-FAST在现有1MB下载通过后执行，使用公开浏览器测速token获取一个目标。接口响应预算5秒、正文最多64KiB、禁止自动跳转；仅接受HTTPS、443端口、`*.nflxvideo.net`且符合`/speedtest`或`/speedtest/range/0-N`的地址。按[FAST官方客户端](https://fast.com/app-0bffe1.js)的方式拼接下载范围，然后请求1,000,000字节，6秒内完整下载才算Netflix CDN小样本通过。与上行共享流量调度，接口阶段与下载阶段分别记录；不把API返回当作带宽或Netflix解锁。CDN地区是服务器所在地，不替代节点出口地区。签名查询、Cookie和原始响应正文不写入报告。
+FAST在现有1MB下载通过后执行，使用公开浏览器测速token、`urlCount=3`请求三个目标，按CDN主机名去重，最多测试三个不同主机。接口响应预算5秒、正文最多64KiB、禁止自动跳转；仅接受HTTPS、443端口、`*.nflxvideo.net`且符合`/speedtest`或`/speedtest/range/0-N`的地址。按[FAST官方客户端](https://fast.com/app-0bffe1.js)的方式拼接下载范围，依次对每个主机请求1,000,000字节，每个各限6秒；三个都完整通过才记为FAST通过。不足三个时仍测试返回的有效目标，整体记为未知，不以重复地址凑数。不同主机不保证不同物理服务器或地区。与上行共享流量调度；每个目标独立记录状态、耗时和速度，汇总成功目标的速度范围与中位数（包含建连，不是持续峰值带宽），接口和实际CDN下载分别统计。不把API返回当作带宽或Netflix解锁。CDN地区是服务器所在地，不替代节点出口地区。签名查询、Cookie和原始响应正文不写入报告。
 
 FAST结果位于JSON的`service_checks`及独立汇总、MD的“补充服务检测”，不计入网站覆盖率、不替代Cloudflare/DataPacket下载、不修改节点名称或分组。FAST普通接口限制、接口不可用、下载失败不新增淘汰条件；任何明确证书校验错误仍淘汰。ChatGPT API属于上述必过网站阶段，失败会跳过后续检测。历史重建不补写未测通过；采用新必过条件需要实际运行全量检测。工作流“补充服务小样本验证”只读验证最多4个当前节点和前后直连对照，包含生产方式的ChatGPT API三轮和FAST API/CDN结果，保留脱敏结果7天，不更新订阅。
 
