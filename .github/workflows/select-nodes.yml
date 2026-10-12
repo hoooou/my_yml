@@ -415,7 +415,7 @@ jobs:
           done
           gh run download "$SOURCE_RUN" -n availability-uplink -D .node-work/uplink
           gh run download "$SOURCE_RUN" -n full-test-report -D .node-work/original-report
-      - name: 验证原始证据并生成自动测延迟的手动分组
+      - name: 验证原始证据并生成全局手动与其余自动分组
         env:
           SOURCE_RUN: ${{ inputs.diagnostic_run_id }}
         run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 4 --reuse-report .node-work/original-report/full-test-report.json --source-run "$SOURCE_RUN"

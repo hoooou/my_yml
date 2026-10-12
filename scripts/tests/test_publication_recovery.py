@@ -47,12 +47,17 @@ class RecoveredEvidenceTests(unittest.TestCase):
             with self.assertRaises(ValueError, msg=fault): a.reuse_measurements(bundle, records, report, '123')
             self.assertEqual(records, original)
 
-    def test_every_group_measures_delay_without_automatic_selection(self):
+    def test_global_manual_defaults_to_recommended_and_other_groups_auto_select(self):
         row = record('n-a')
         config = a.render_comparison({}, [row], {'n-a': {'name': 'n-a', 'type': 'http', 'server': '8.8.8.8', 'port': 443}})
         self.assertEqual(len(config['proxy-groups']), 6)
         for group in config['proxy-groups']:
-            self.assertEqual(group['type'], 'select')
+            self.assertEqual(group['type'], 'select' if group['name'] == '🚀 全局选择' else 'url-test')
+            if group['name'] == '🚀 全局选择':
+                self.assertEqual(group['default-selected'], '⭐ 综合优选')
+                self.assertEqual(group['proxies'][0], '⭐ 综合优选')
+            else:
+                self.assertEqual(group['tolerance'], 50)
             self.assertEqual(group['url'], 'https://connectivitycheck.gstatic.com/generate_204')
             self.assertEqual(group['interval'], 300)
             self.assertEqual(group['timeout'], 5000)
