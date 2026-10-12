@@ -35,6 +35,7 @@ MAX_TTFB_MS = 3000
 MAX_SAMPLE_MS = 5000
 PAGE_SAMPLE_BYTES = 16384
 PAGE_SAMPLE_LIMITS = {'Amazon': 65536}
+REDDIT_LOGIN_SAMPLE_BYTES = 524288
 PAGE_MARKERS = {label: item['markers'] for label, item in PAGES.items()}
 # Permit only the entry hostname and its explicit www/non-www counterpart.
 PAGE_HOSTS = {}
@@ -315,7 +316,7 @@ def check_site(port, label, url, timeout=(3, 2)):
                     header_received = time.perf_counter()
                     headers_ms = round((header_received - started) * 1000, 1)
                     final_headers_ms = round((header_received - request_started) * 1000, 1)
-                    response_limit = (524288 if label == 'Reddit' and response.status_code in (401, 403)
+                    response_limit = (REDDIT_LOGIN_SAMPLE_BYTES if label == 'Reddit' and response.status_code in (401, 403)
                         and response.headers.get('cf-mitigated', '').lower() != 'challenge' else sample_limit)
                     body = bytearray()
                     for chunk in response.iter_content(1024):

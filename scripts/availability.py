@@ -30,7 +30,7 @@ import upload_speed
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report, website_access_summary, latest_cohort
 from attempt_report import write_attempt
-from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
+from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, PAGE_SAMPLE_LIMITS, REDDIT_LOGIN_SAMPLE_BYTES, confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
@@ -1240,13 +1240,14 @@ def main():
               'cloudflare_classification_update': ({'updated_at': now, 'reclassified_attempts': reclassified_count,
                   'new_measurements': False, 'source': 'captured_cloudflare_challenge_restriction'}
                   if repairing else None),
-              'website_measurement_policy': {'version': 6,
+              'website_measurement_policy': {'version': 7,
                   'confirmed_cloudflare_challenge': 'accepted_access_verification_required',
                   'confirmed_reddit_login_prompt': 'accepted_access_login_required',
                   'challenge_in_page_speed_ranking': False,
                   'challenge_can_replace_204_or_trace': False, 'overseas_rounds': WEBSITE_ROUNDS,
                   'domestic_pages_probed_daily': False, 'trace_rounds': 1, 'sample_bytes': 16384,
                   'sample_bytes_overrides': PAGE_SAMPLE_LIMITS,
+                  'conditional_response_sample_bytes': {'Reddit_401_403_without_cf_challenge': REDDIT_LOGIN_SAMPLE_BYTES},
                   'max_ttfb_ms': MAX_TTFB_MS, 'max_sample_ms': MAX_SAMPLE_MS,
                   'required_core_sites': list(CORE_SITES), 'required_websites': list(REQUIRED_SITES),
                   'required_websites_rounds': WEBSITE_ROUNDS, 'trace_can_replace_required_page': False,
