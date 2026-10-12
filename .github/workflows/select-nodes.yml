@@ -79,7 +79,7 @@ jobs:
           overwrite: true
 
   preflight:
-    name: 204 → TCP → 3MB上行预检（分片 ${{ matrix.shard }}）
+    name: 双204 → TCP → 3MB上行预检（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
     timeout-minutes: 90

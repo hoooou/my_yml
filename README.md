@@ -38,7 +38,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E4%BC%98%E9%80%89%E9%85%8D
 | 顺序 | 环节 | 当前要求及失败影响 |
 |---|---|---|
 | 0 | 来源获取／去重／配置解析 | 原配置11个来源加6个新增来源；按完整连接配置去重，不合并不同凭据或传输参数。剔除不支持或含非法控制字符的节点 |
-| 1 | HTTPS 204三轮 | `https://connectivitycheck.gstatic.com/generate_204`，独立三次无正文204；失败跳过后续入口检测 |
+| 1 | 双HTTPS 204各三轮 | Google `https://connectivitycheck.gstatic.com/generate_204`及Cloudflare `https://cp.cloudflare.com/generate_204`，交替顺序，各三次无正文204、严格TLS；两者全部通过才进入国内TCP。任一失败跳过后续入口检测；报告分别列两个目标和联合门槛，节点名称延迟仍取Google请求 |
 | 2 | 国内入口TCPing | 小小API，一入口一次，共享入口去重；四片总请求约≤5次/秒。明确连接失败淘汰，接口异常保持未验证；UDP不适用TCP，正式流程不凭云端204放行 |
 | 3 | 3MB上行预检 | `https://speed.cloudflare.com/__up?bytes=3000000`，随机合成3,000,000字节、6秒完整HTTP请求预算；严格证书校验。每片同时一个，与同片下载互斥；失败跳过网站及下载 |
 | 4 | 海外网页／API／trace | 25个海外页面及ChatGPT API各三轮，两个trace单轮；每节点最多5个请求并发。指定必过目标见下文 |
