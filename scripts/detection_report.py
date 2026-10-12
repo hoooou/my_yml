@@ -57,7 +57,10 @@ def website_access_table(nodes, required=()):
         rows.append('| ' + ('★ ' if label in required else '') + cell(label) + ' | ' +
                     ' | '.join(str(item[k]) for k in ('measured', 'accepted', 'cloudflare_challenge', 'login_required',
                         'restricted', 'transport_error', 'page_or_speed_error')) + ' |')
-    rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证及Reddit明确登录提示；没有这两类证据的普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '', '[TikTok／Reddit／Gemini拦截与跳转核查](docs/website-restriction-audit-2026-10-12.md)。', '']
+    rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证及Reddit明确登录提示；没有这两类证据的普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '']
+    anomalies = [label for label, x in counts.items() if label in required and x['measured'] >= 10 and not x['accepted']]
+    if anomalies:
+        rows += ['**必过站全失败，需检查检测器和服务响应：' + '、'.join(sorted(anomalies)) + '。** 不据此断言所有节点线路失效；保留原始结果，未自动放宽筛选。', '']
     return rows
 
 
@@ -234,7 +237,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         rows += [('最终发布状态以本次 Actions 的发布步骤为准。' if selected else
                   '**本轮无合格节点，保留原订阅。** 原订阅不代表通过这次页面与trace检测。'), '']
     rows += ['## 测量时间', '', '| 数据 | 完成时间（北京时间） |', '|---|---|',
-             f'| 原全量网页／TCP／1MB及100MB下载 | {clock(report.get("measurements_updated_at") or report.get("updated_at"))} |']
+             f'| 全量检测批次完成（是否执行各项见阶段表） | {clock(report.get("measurements_updated_at") or report.get("updated_at"))} |']
     for key, label in (('website_recheck', '海外网页专项复测'), ('medium_speed_recheck', '5MB下载专项补测'),
                        ('upload_recheck', '上行与负载后SSL'), ('stability_recheck', stable_label)):
         if report.get(key):
@@ -270,11 +273,10 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     if not selected:
         rows.append('| 本轮没有入选节点 | — | — | — | — | — | — |')
     explanation = ('P95／P99取Google／YouTube各自成功请求统计中较慢的一站，波动为较大的四分位距；失败由成功率和连续失败次数单独计入排名。成功样本较少时P99接近最大值，仅作参考；每站样本数见JSON。' if continuous else '延迟取最终五轮Google／YouTube中较慢的中位数，波动取较大的极差。')
-    rows += ['', explanation + '下行优先双100MB较低速度，上行取两轮5MB较低速度；名称延迟仍用中位数。', '',
-             '## 最近一轮未入选原因', '']
+    rows += ['', explanation + '下行优先双100MB较低速度，上行取两轮5MB较低速度；名称延迟仍用中位数。', '']
     excluded = [r for r in cohort if r['id'] not in selected_ids]
     if mode != 'full':
-        rows += ['| 节点 | 原因 |', '|---|---|']
+        rows += ['## 最近一轮未入选原因', '', '| 节点 | 原因 |', '|---|---|']
         for row in excluded:
             reasons = []
             if not upload_speed.passed(row.get('upload')):
@@ -289,27 +291,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         if not excluded:
             rows.append('| 无 | 本轮候选全部保留 |')
     else:
-        rows += ['| 检查阶段 | 通过 | 未通过／需复核 | 未测／跳过 |', '|---|---:|---:|---:|']
-        if website_gate:
-            measured = [r for r in nodes if r.get('websites')]
-            good = sum(website_gate(r) for r in measured)
-            label = '12站＋ChatGPT API＋必过trace' if any('ChatGPTAPI' in (r.get('websites') or {}) for r in measured) else '12站＋Claude trace'
-            rows.append(f'| {label} | {good} | {len(measured)-good} | {len(nodes)-len(measured)} |')
-        for key, label, validator in (
-                ('precheck', '204三轮', lambda x: x.get('status') == 'passed'),
-                ('entry', '国内入口TCP', lambda x: x.get('status') == 'passed'),
-                ('upload_precheck', '3MB上行预检', lambda x: upload_speed.sample_passed(x, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)),
-                ('app_tls', '应用SSL', app_tls.passed),
-                ('download', '1MB下载', lambda x: x.get('status') == 'passed'),
-                ('medium_speed_download', '5MB下载（中速组）', medium_speed.passed),
-                ('high_speed_download', '双100MB下载（高速组）', high_speed.passed),
-                ('upload', '两轮上行及上传中204', upload_speed.passed),
-                ('post_upload_tls', '上传后SSL', app_tls.passed),
-                ('stability', '持续并行稳定性' if continuous else '五轮间隔稳定性', stability.passed)):
-            items = [r.get(key) or {} for r in nodes]
-            good = sum(validator(x) for x in items)
-            untested = sum(x.get('status', 'missing') in ('missing', 'skipped', 'unknown', 'not_candidate') for x in items)
-            rows.append(f'| {label} | {good} | {len(items)-good-untested} | {untested} |')
+        from latest_report import stage_table
+        rows += stage_table(report, website_gate)
         if continuous:
             rows += ['', '稳定性在国内TCP与3MB上传通过后独立并行检测，覆盖范围大于后续下载、上行复测；持续检测行不是最后一道串行统计。']
         rows += ['', '各阶段仅检测满足前置条件的候选；同一节点可能在多项中失败，不能把失败数相加。逐网站及逐节点失败明细保存在JSON。', '']

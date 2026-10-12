@@ -62,6 +62,36 @@ class RecoveredEvidenceTests(unittest.TestCase):
 
 
 class PublicationGitTests(unittest.TestCase):
+    def test_old_report_from_checkout_is_never_republished_as_current_run(self):
+        with tempfile.TemporaryDirectory() as folder:
+            cwd = os.getcwd()
+            try:
+                os.chdir(folder)
+                Path('最新检测.json').write_text(json.dumps({'source_run': '123'}))
+                with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ID': '456'}), \
+                        patch.object(sys, 'argv', ['publish_subscription']), patch.object(pub, 'publish') as publish:
+                    pub.main()
+                publish.assert_not_called()
+            finally:
+                os.chdir(cwd)
+
+    def test_zero_candidate_still_publishes_latest_detection_without_subscription(self):
+        with tempfile.TemporaryDirectory() as folder:
+            cwd = os.getcwd()
+            try:
+                os.chdir(folder)
+                Path('最新检测.json').write_text(json.dumps({'updated_at': '2026-10-12T15:21:01+08:00',
+                    'selected_node_count': 0, 'selection_outcome': 'no_eligible_nodes_previous_subscription_retained'}))
+                Path('README.md').write_text('最新全量检测：0个候选，保留旧订阅')
+                with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}), \
+                        patch.object(sys, 'argv', ['publish_subscription']), patch.object(pub, 'publish') as publish:
+                    pub.main()
+                publish.assert_called_once()
+                self.assertNotIn('优选配置.yaml', publish.call_args.kwargs['files'])
+                self.assertNotIn('连通性报告.json', publish.call_args.kwargs['files'])
+            finally:
+                os.chdir(cwd)
+
     def command(self, root, *args):
         result = subprocess.run(['git', *args], cwd=root, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -69,7 +99,10 @@ class PublicationGitTests(unittest.TestCase):
 
     def write_outputs(self, root, time, label):
         for name in pub.FILES:
-            (root/name).write_text(json.dumps({'updated_at': time, 'measurements_updated_at': time, 'label': label}) if name.endswith('.json') else label)
+            text = json.dumps({'updated_at': time, 'measurements_updated_at': time, 'label': label}) if name.endswith('.json') else label
+            if name == 'README.md':
+                text = f'# Manual documentation: {label}\n\n' + pub.replace_fragment('', label)
+            (root/name).write_text(text)
 
     def test_stale_checkout_publishes_on_current_main_and_preserves_code_updates(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -92,11 +125,20 @@ class PublicationGitTests(unittest.TestCase):
             self.assertEqual(self.command(old, 'rev-parse', 'HEAD^'), upstream)
             self.assertEqual((old/'code.txt').read_text(), 'new code')
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
+            self.assertIn('Manual documentation: earlier-pipeline', (old/'README.md').read_text())
+            self.assertEqual(pub.readme_fragment((old/'README.md').read_text()), 'latest-candidate')
             self.assertEqual(self.command(old, 'log', '-1', '--format=%an'), 'github-actions[bot]')
             # Report refresh must not overwrite the current subscription YAML.
             self.write_outputs(old, '2026-10-12T09:00:00+08:00', 'report-refresh')
             self.assertTrue(pub.publish(old, files=pub.FILES[1:]))
             self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
+            # Zero-candidate reports update independently of the published measurements.
+            saved_measurements = (old/'连通性报告.json').read_bytes()
+            self.write_outputs(old, '2026-10-12T09:05:00+08:00', 'zero-candidate')
+            self.assertTrue(pub.publish(old, files=pub.REPORT_FILES))
+            self.assertEqual((old/'优选配置.yaml').read_text(), 'latest-candidate')
+            self.assertEqual((old/'连通性报告.json').read_bytes(), saved_measurements)
+            self.assertEqual(json.loads((old/'最新检测.json').read_text())['label'], 'zero-candidate')
             # Recovering older observations must not overwrite a newer subscription.
             self.write_outputs(old, '2026-10-12T07:30:00+08:00', 'older-candidate')
             self.assertFalse(pub.publish(old))

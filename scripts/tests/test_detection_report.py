@@ -57,7 +57,7 @@ class CleanReportTests(unittest.TestCase):
             refreshed.pop('website_access_summary')
             self.assertEqual(refreshed, report)
             self.assertEqual((root/'优选配置.yaml').read_text(), original_yaml)
-            self.assertIn('各网站拦截与异常数量', (root/'连通性报告.md').read_text())
+            self.assertIn('各网站拦截与异常数量', (root/'README.md').read_text())
 
     def test_site_summary_counts_nodes_and_separates_confirmed_challenges(self):
         passed = {'status': 'passed', 'http_status': 200}

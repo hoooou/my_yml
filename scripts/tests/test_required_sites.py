@@ -131,7 +131,7 @@ class RequiredSiteTests(unittest.TestCase):
                 root = Path('.node-work/availability'); root.mkdir(parents=True)
                 (root / 'bundle.json').write_text(json.dumps(bundle))
                 originals = {filename: b'previous published result\n'
-                    for filename in ('优选配置.yaml', '连通性报告.json', '连通性报告.md')}
+                    for filename in ('优选配置.yaml', '连通性报告.json')}
                 for filename, contents in originals.items(): Path(filename).write_bytes(contents)
                 with patch.object(sys, 'argv', ['availability', '--phase', 'publish', '--mihomo', 'unused']), \
                      patch.object(a, 'merge_shards', return_value=([record], 1)), \
@@ -141,5 +141,7 @@ class RequiredSiteTests(unittest.TestCase):
                     a.main()
                 self.assertEqual({f: Path(f).read_bytes() for f in originals}, originals)
                 self.assertTrue((root / 'full-test-report.json').exists())
+                self.assertIn('本轮无合格节点，保留原订阅', Path('README.md').read_text())
+                self.assertEqual(json.loads(Path('最新检测.json').read_text())['selected_node_count'], 0)
             finally:
                 os.chdir(old_cwd)

@@ -1,6 +1,7 @@
 """Archive each completed full measurement, including zero-qualified runs."""
 from collections import Counter
 import json
+import os
 import app_tls
 import high_speed
 import medium_speed
@@ -9,7 +10,7 @@ import upload_speed
 import service_probes
 
 
-def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None):
+def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None, publication_root=None):
     coverage = {}
     labels = {label for record in records for label in (record.get('websites') or {})}
     for label in sorted(labels):
@@ -61,6 +62,26 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
     names = {n['name'] for n in config['proxies']}
     report.update(publication_mode='full', published_node_count=selected,
                   published_node_ids=[r['id'] for r in records if r.get('name') in names])
+    from latest_report import stage_summary
+    report.update(source_run=os.environ.get('GITHUB_RUN_ID'), source_run_attempt=os.environ.get('GITHUB_RUN_ATTEMPT'),
+                  configuration_validation='not_checked' if selected else 'skipped_no_candidates')
+    report['stage_summary'] = stage_summary(report, required_gate)
     (root / 'full-test-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     write_report(report, config, root / 'full-test-report.md', candidate=True, website_gate=required_gate)
+    from latest_report import write_latest
+    write_latest(report, config, root=publication_root or root, website_gate=required_gate, candidate=True,
+                 validation='not_checked' if selected else 'skipped_no_candidates')
     print(f'本次全量检测记录已保存：可解析 {len(records)}；候选入选 {selected}', flush=True)
+
+
+def record_validation(root, config, validation, required_gate):
+    from detection_report import write_report
+    from latest_report import stage_summary
+    path = root / 'full-test-report.json'
+    if not path.exists():
+        return
+    report = json.loads(path.read_text())
+    report['configuration_validation'] = validation
+    report['stage_summary'] = stage_summary(report, required_gate)
+    path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+    write_report(report, config, root / 'full-test-report.md', candidate=True, website_gate=required_gate)

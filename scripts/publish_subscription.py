@@ -11,8 +11,9 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+from latest_report import REPORT_FILES, readme_fragment, replace_fragment
 
-FILES = ('优选配置.yaml', '连通性报告.json', '连通性报告.md')
+FILES = ('优选配置.yaml', '连通性报告.json', *REPORT_FILES)
 
 
 def git(root, *args, check=True):
@@ -31,7 +32,8 @@ def measurement_time(report):
 
 def publish(root, attempts=3, files=FILES):
     root = Path(root).resolve()
-    candidate = json.loads((root / '连通性报告.json').read_text())
+    report_name = '最新检测.json' if '最新检测.json' in files else '连通性报告.json'
+    candidate = json.loads((root / report_name).read_text())
     measured = measurement_time(candidate)
     with tempfile.TemporaryDirectory(prefix='clash-publication-') as folder:
         saved = Path(folder)
@@ -46,12 +48,18 @@ def publish(root, attempts=3, files=FILES):
         for attempt in range(attempts):
             git(root, 'fetch', 'origin', 'main')
             git(root, 'checkout', '-B', 'main', 'origin/main')
-            remote = json.loads((root / '连通性报告.json').read_text())
-            if measurement_time(remote) > measured:
+            remote_times = [measurement_time(json.loads((root / name).read_text()))
+                            for name in ('最新检测.json', '连通性报告.json') if (root / name).exists()]
+            if max(remote_times, default=measured) > measured:
                 print('远端已有更新测量，保留最新订阅', flush=True)
                 return False
             for name in files:
-                shutil.copyfile(saved / name, root / name)
+                if name == 'README.md' and readme_fragment((saved / name).read_text()) is not None:
+                    # Preserve documentation edits made after this run checked out main.
+                    (root / name).write_text(replace_fragment((root / name).read_text(),
+                                              readme_fragment((saved / name).read_text())))
+                else:
+                    shutil.copyfile(saved / name, root / name)
             git(root, 'add', '--', *files)
             if git(root, 'diff', '--cached', '--quiet', check=False).returncode == 0:
                 print('订阅与报告没有变化', flush=True)
@@ -71,10 +79,20 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--report-only', action='store_true')
     args = parser.parse_args()
-    if not args.report_only and not Path('.node-work/availability/selected.yaml').exists():
-        print('本轮没有通过校验的新配置，保留原订阅', flush=True)
+    latest = Path('最新检测.json')
+    if not latest.exists():
+        print('没有本轮检测摘要；保留原订阅和原报告', flush=True)
         return
-    publish(Path('.'), files=FILES[1:] if args.report_only else FILES)
+    latest_data = json.loads(latest.read_text())
+    if os.environ.get('GITHUB_RUN_ID') and str(latest_data.get('source_run')) != os.environ['GITHUB_RUN_ID']:
+        print('本次运行尚未生成新报告，保留原订阅及原记录', flush=True)
+        return
+    checked = latest_data.get('configuration_validation') == 'passed'
+    ready = Path('.node-work/availability/selected.yaml').exists() and checked
+    report_only = args.report_only or not ready
+    if report_only:
+        print('只发布最新检测记录；原订阅及其测量不变', flush=True)
+    publish(Path('.'), files=REPORT_FILES if report_only else FILES)
 
 
 if __name__ == '__main__':

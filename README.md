@@ -1,218 +1,299 @@
-# Clash 节点优选
+# Clash 节点优选与检测说明
 
-检测报告新增“各网站拦截与异常数量”：按涉及节点展示实测数、通过数、明确Cloudflare人机验证、其他拦截／跳转、连接／TLS异常及响应慢／内容异常。必过目标标★，其他已测网站也逐一列出；同一节点三次失败只计一个，未测不计失败，原因列可能重叠。JSON同时保存 `website_access_summary`，补测只汇总本次候选范围，避免混入历史淘汰节点。只读诊断可以独立运行，写订阅的任务仍串行；[本轮三个阶段原因核查](docs/marked-stage-audit-2026-10-12.md)记录具体数量与证据边界。
+每天北京时间 **08:00**，使用免费 GitHub Actions 获取全部订阅，去重后检测，生成适用于 FlClash、Clash Meta / Mihomo 的完整配置。目标是入口可达、请求响应快、稳定且上下行良好的节点。所有组保持手动选择，自动延迟测试不自动切换节点；出口IP变化本身不作为淘汰理由。
 
-`聚合配置.yaml` 是原订阅源和分流规则的输入，`节点来源.yaml` 是新增的公开免费来源清单；`优选配置.yaml` 是自动筛选后可直接导入的完整配置，适用于 Clash Meta / Mihomo 客户端。
+本文件是唯一维护的 Markdown：使用方法、当前规则、来源、诊断结论及最新检测结果均集中在这里。历史方案、已被替代的门槛和重复报告已经合并清理；原记录仍可从 Git 历史追溯。
 
-## 持续稳定性（2026-10-12更新）
+[最新检测摘要](#节点检测报告) · [最新阶段及网站统计JSON](最新检测.json) · [当前订阅原始测量JSON](连通性报告.json) · [GitHub Actions](https://github.com/hoooou/my_yml/actions)
 
-全量流程先分片执行204三轮、国内TCP、3MB上行预检（6秒）；随后网站/TLS/下载与持续稳定性在不同GitHub运行环境并行。稳定性观察所有通过TCP和3MB上传的候选，不设最低或最高轮数，每节点按15秒启动间隔持续检测，同节点不重叠，每分片同时最多8个节点。观察持续到网站/下载及两轮5MB上行、负载后SSL任务完成，每个节点再完成一轮后才发布。
+## 使用与分组
 
-成功率至少90%（按实际轮数计算，例如20轮允许失败2轮），任何明确目标证书校验错误仍淘汰。连续观察的最慢延迟或极差改用于排名，不再额外套用原来五轮全过和最大延迟门槛；网页三轮、必过网站、上传/下载及SSL要求保留。按成功率、最长连续失败、成功请求P95、四分位距、上下行表现排序。P95/P99按每个网站分别统计成功响应，不把超时当快速请求；失败通过成功率独立处罚。小样本P99近似最大值，只作参考，JSON包含每站样本数量。环境对照异常、任务失败或观察未完整完成时不发布，保留原订阅。独立运行环境避免测速机器上的下载争抢，但仍可能观察到节点自身承载负载时的波动。
+在客户端添加远程配置，继续使用原订阅链接：
 
-每日08:00与原订阅链接不变。历史五轮结果保留原版本；重建保留历史策略版本和实际间隔。手动稳定性或上行专项复测没有并行主任务，使用5分钟观察窗口、15秒间隔和90%门槛，不限制轮数。最新MD只展示入选节点和本轮摘要，原始记录保留JSON。任务状态使用[GitHub官方作业接口](https://docs.github.com/en/rest/actions/workflow-jobs#list-jobs-for-a-workflow-run-attempt)查询同一次运行尝试，避免等待旧批次或误用重跑结果。
-
-
-## 使用
-
-在客户端中添加远程配置：
-
-```
+```text
 https://raw.githubusercontent.com/hoooou/my_yml/main/%E4%BC%98%E9%80%89%E9%85%8D%E7%BD%AE.yaml
 ```
 
-将客户端的远程配置刷新间隔设为 24 小时。GitHub 更新文件后，客户端仍需要刷新才能加载新节点。
+建议24小时刷新一次；手动任务更新后也可以立即刷新。FlClash 使用规则模式并确保流量进入 VPN/TUN；Clash Verge 的应用设置或订阅脚本可能覆盖配置，排查时以核心实际加载的配置为准。
 
-手机保留 **6 个分组**，默认在“🚀 全局选择”使用“⭐ 综合优选”；需要台湾或新加坡时改选“🌏 台湾／新加坡”。刷新原订阅即可生效。
-
-| 分组 | 用途 |
+| 分组 | 条件与用途 |
 |---|---|
-| 🚀 全局选择 | 选择当前使用哪类节点，默认综合优选 |
-| ⭐ 综合优选 | 完整通过 1 MB，且满足三轮海外响应质量门槛；按网站响应耗时和稳定性排序，不回退到失败节点 |
-| 🚄 中速下载 | 已发布合格池中（含台湾／新加坡较宽网页门槛），Cloudflare完整5 MB在10秒内完成；按5 MB速度排序 |
-| ⚡ 高速下载 | 综合合格池中，Cloudflare与DataPacket各完整下载100 MB、各限20秒，两轮都通过；按较慢一次速度排序 |
-| 🏠 非机房 IP | 综合合格池中明确不是机房的独立出口，按出口 IP 去重 |
-| 🌏 台湾／新加坡 | 已确认出口在 TW/SG，保留访问和下载必过条件，允许较慢网页响应，不限数量 |
+| 🚀 全局选择 | 选择使用哪类节点；默认综合优选，只有地区组可用时默认地区组 |
+| ⭐ 综合优选 | 完整通过入口、网站/API、应用SSL、1MB、上传和稳定性门槛，按响应与稳定性排序 |
+| 🚄 中速下载 | 已入选合格池内完整通过5MB快测的节点，包含台湾／新加坡地区池 |
+| ⚡ 高速下载 | 综合合格池内Cloudflare和DataPacket双100MB都完整通过；取较慢一次速度排序 |
+| 🏠 非机房 IP | 综合合格池内明确hosting=false、没有已发现的出口矛盾；按独立出口IP去重 |
+| 🌏 台湾／新加坡 | trace确认TW/SG，网页响应允许稍慢；入口、必过网站/API、SSL、1MB、上传和稳定性仍须通过 |
 
-综合、高速和非机房共用国内 TCP 明确通过、1 MB 完整通过、海外网站响应合格的严格节点池。台湾／新加坡组使用单独的地区门槛；仅满足地区门槛的节点进入地区组，完整5 MB通过时也进入中速组，不放进综合、高速或非机房组。达不到任一入选门槛的节点定义和凭据不写入订阅，仅在报告保留检测结果；每日重新获取全部来源，恢复的节点仍可入选。香港整体最多 30 个，其他地区不限数量；数量政策不减少任何节点的检测。筛选依据、当前门槛及后续建议见 [面向中国移动的筛选方案](docs/node-selection-plan.md)。
+香港整体最多30个，非香港不限数量；所有输入节点仍按阶段接受检测。中速／高速组保留所有满足对应条件的已入选节点，不另外取前30。组间可重叠，数量不能相加；空组显示REJECT，不用失败节点补足。TCP通／不通／未验证、全部节点、按地区选择等诊断组已移除。淘汰节点的定义和凭据不写入订阅。
 
-地区组仍要求 **204 三轮、国内 TCP、指定12个海外网页与ChatGPT API各三轮访问、Claude trace单轮、1 MB 下载全部通过**，且没有已发现的出口地区/IP矛盾。Google/YouTube 中位耗时放宽到 **3 秒**，最慢一轮到 **5 秒**，极差到 **3 秒**；12个指定页面、ChatGPT API和Claude trace均必过，其他trace不能替代12站。普通403、其他验证码、慢响应状态、失败或未测不放行；明确CF验证适用网站可达例外，不按节点原名猜地区。100 MB 不是地区组入选条件。没有合格节点时显示 `REJECT`，不补入失败节点；若只有地区组有节点，全局默认选地区组。
+所有分组使用select手动选择，HTTPS 204自动延迟检查每300秒一次、5秒超时、期望204、关闭lazy。此检查更新延迟显示，保持手动选择。[Mihomo分组字段](https://wiki.metacubex.one/config/proxy-groups/)
 
-六个分组保留 `select` 手动选择，同时配置HTTPS 204自动延迟检测：300秒间隔、5秒超时、期望204、关闭懒检测。测速刷新客户端延迟数值，保持手动选中的节点；不增加自动切换。依据[Mihomo通用分组字段](https://wiki.metacubex.one/config/proxy-groups/)。
+节点名称：`美国01|120ms|85Mbps|住宅|纯净度99.2%`。延迟使用实际请求中位数；带宽优先双100MB较低值，再用通过的5MB或1MB。未确认的住宅／信誉信息显示未知。非机房不等同住宅，住宅也不保证快速或稳定。
 
-移除按地区选择、TCP通、TCP不通、TCP未验证及全部节点分组，节点名称仍保留国家标签。[最新检测报告](连通性报告.md)只展示当前结果、测量时间、入选节点的响应波动／上下行／SSL／稳定性，以及最近一轮未入选原因和最新流程。补测不会把历史失败节点混入本轮统计；原网页和下载的测量时间与上行、稳定性补测分别标清。全部来源、逐节点、逐网站结果及TCP分类保留在JSON。Actions摘要复用同一格式，每轮仅显示一份；全量无合格节点时明确保留旧订阅。检测与域名分流共用审核后的清单，见 `scripts/site_catalog.py`。
+## 当前筛选流程
 
-## 每日更新
+四个免费标准Actions分片并行，每片最多处理16个节点；同一节点按前置条件顺序检测，不同节点处于不同阶段。网站、下载与持续稳定性使用不同运行机器，避免同一测速机器上的带宽争抢。每天重新参测，不永久拉黑某协议或某地区。
 
-订阅换单保护：获取17个来源后，再把最近两次成功发布中存在、但本轮来源未包含的节点作为候选。按连接配置去重，保留原凭据；不复用历史204、TCP、网页、TLS或下载结果，全部重新执行本轮流程。未通过仍不出现在手机订阅；来源全部失败时继续保留旧订阅，不借历史候选掩盖来源故障。历史来源与候选身份单独记入报告。
+| 顺序 | 环节 | 当前要求及失败影响 |
+|---|---|---|
+| 0 | 来源获取／去重／配置解析 | 原配置11个来源加6个新增来源；按完整连接配置去重，不合并不同凭据或传输参数。剔除不支持或含非法控制字符的节点 |
+| 1 | HTTPS 204三轮 | `https://connectivitycheck.gstatic.com/generate_204`，独立三次无正文204；失败跳过后续入口检测 |
+| 2 | 国内入口TCPing | 小小API，一入口一次，共享入口去重；四片总请求约≤5次/秒。明确连接失败淘汰，接口异常保持未验证；UDP不适用TCP，正式流程不凭云端204放行 |
+| 3 | 3MB上行预检 | `https://speed.cloudflare.com/__up?bytes=3000000`，随机合成3,000,000字节、6秒完整HTTP请求预算；严格证书校验。每片同时一个，与同片下载互斥；失败跳过网站及下载 |
+| 4 | 海外网页／API／trace | 25个海外页面及ChatGPT API各三轮，两个trace单轮；每节点最多5个请求并发。指定必过目标见下文 |
+| 5 | 应用SSL | chatgpt.com、android.chat.openai.com、auth.openai.com、cdn.oaistatic.com各两次独立TLS，单次5秒、TLS≥1.2，信任链、域名、有效期必须正常 |
+| 6 | Cloudflare 1MB快测 | `https://speed.cloudflare.com/__down?bytes=1000000`，6秒内完整接收；所有入选节点必过 |
+| 补充 | FAST API／Netflix CDN | 1MB通过后通过urlCount=3取得最多三个不同CDN主机，依次各下载1MB、各限6秒。普通失败只报告；明确证书错误淘汰 |
+| 7 | Cloudflare 5MB快测 | `https://speed.cloudflare.com/__down?bytes=5000000`，10秒完整接收，每片最多4个并发；通过才进中速组，失败仍可继续100MB |
+| 8a | Cloudflare 100MB | `https://speed.cloudflare.com/__down?bytes=100000000`，20秒完整接收，带Referer: https://speed.cloudflare.com/ |
+| 8b | DataPacket 100MB | `http://lax.download.datapacket.com/100mb.bin`，20秒完整接收；同节点两目标顺序测试，首轮失败也测第二轮，每片最多2节点同时测。两目标都过才进高速组 |
+| 9 | 最终上行及负载 | 复用3MB预检，再对Cloudflare上传5MB两轮、各10秒、间隔20秒，取较慢速度；上传中204均须通过 |
+| 10 | 上传后SSL | 四个应用域名再次各两轮严格TLS检查 |
+| 并行 | 持续稳定性 | TCP及3MB通过后独立观察；每节点15秒启动一次，不重叠、不限定20轮，每片最多8节点；持续到网站／下载／上传／上传后SSL结束，再完成每节点一轮 |
+| 11 | 合并／分组／配置校验 | 核对同轮、所有分片和节点覆盖、各项原始证据及轮数；缺片、漏测、对照异常拒绝更新订阅。最终Mihomo校验通过才发布配置 |
 
-2026-10-11 增加必过的应用TLS筛选：指定12页面三轮加Claude trace通过后，检查 `chatgpt.com`、`android.chat.openai.com`、`auth.openai.com`、`cdn.oaistatic.com`。每个域名经同一节点建立两次独立TLS连接，单次总预算5秒，要求TLS 1.2或以上、Mozilla根证书信任链、证书域名及有效期全部正常；失败或漏测不进入下载和任何发布组。401/403不在此阶段被当成页面可用，TLS通过仅证明握手及标准证书验证。记录错误类别、签发者、证书有效期和指纹；不固定CDN证书指纹，避免正常证书轮换误淘汰。此检测不模拟Android应用内部的证书固定或你手机Wi-Fi的链路，不能保证排除全部手机端SSL报错。依据[Python TLS证书验证文档](https://docs.python.org/3.12/library/ssl.html#ssl.PROTOCOL_TLS_CLIENT)。
+204和网站的响应时间、trace、完整上下行以及证书证据分别判断，不能相互替代。上行6秒包含建连与响应，3MB对应约4Mbps端到端采样下限；客户端完整提交且预期HTTP响应正常，不是逐字节服务器收据。下载要求HTTP200、正确目标／类型／声明长度、无压缩／跳转及完整字节数；半截下载不能当作通过。小文件速度包含握手和首字节等待，不是持续峰值带宽。[Cloudflare官方测速引擎](https://github.com/cloudflare/speedtest)
 
-GitHub Actions 的“每日节点连通性分类”每天北京时间 **08:00 开始**，也支持手动触发。四个免费标准 Actions 分片并行，每片最多同时处理 16 个节点；同一节点按下面的顺序过关，不同节点可以同时处于不同阶段，不等待全量上一阶段结束。
+稳定性成功率≥90%，排名考虑成功率、最长连续失败、每站成功请求P95／P99、四分位距和上下行表现。失败通过成功率单独处罚，不混入延迟分位数；小样本P99接近最大值，仅作参考。明确证书校验错误始终淘汰，不因偶尔恢复抹去失败，也不要求ChatGPT trace出口IP固定。旧五轮全过／额外最大延迟硬门槛已被此方案替代；不能把旧记录追认为新的持续采样。
 
-1. 获取原配置 11 个来源和新增 6 个公开来源的最新节点，按连接配置去重；不同密码、UUID、协议或传输参数保留。内核不支持或包含非法控制字符的节点在报告记录，不写入手机订阅。
-2. **先批量检查 HTTPS 204，独立请求三轮**：`https://connectivitycheck.gstatic.com/generate_204`。三次均返回无正文的 204 才继续；记录每轮延迟、中位数和最大值。不通过的节点延迟显示未知，分类及跳过原因保留在 JSON 报告，不伪造国内入口失败。
-3. **再进行国内 TCPing**：仅对 204 通过且支持 TCP 的主机/端口调用小小 API，一入口一次。共享入口只提交一次，不同凭据的节点独立检查 204 和后续访问。四片合计约不超过 5 次请求/秒。明确连接失败记为“不通”，接口限流、异常、超时或目标不匹配记为“未验证”。UDP 的 TCP 阶段不适用，仅在报告保留；当前必须有 TCP 通过证据才发布。
-4. **国内TCP通过后，先做3 MB上行预检**：Cloudflare HTTPS上传随机合成3,000,000字节，预算6秒（含建连和响应，约4Mbps端到端采样下限），严格验证证书、目标、HTTP200及完整提交。未通过则跳过网站、TLS和全部下载；国内TCP仍保留真实通过状态，上行失败单列。每分片同时一个上传预检，同分片的1/5/100 MB下载与预检互斥，原有下载并发上限保留。每片有上传候选时先后进行直连3 MB对照；接口或对照异常拒绝发布，不把它当作节点批量失效。
-5. **再检查25个海外页面及ChatGPT API各三轮，两个trace各一次**。国内普通网页不再逐节点检测，域名直连/DNS规则仍保留。每节点最多 **5 个请求并发**，地址增加时分批执行。参考 [EDT 页面](https://edt-pages.github.io/admin/) 的国内/国际覆盖思路，但验证首页 HTML 和站点标识，不把图标响应当作功能可用。Amazon读取最多64 KB、其余网站最多16 KB的响应样本，要求正确域名、200、HTML；分别记录到响应头的耗时（近似首字节时间）、样本接收耗时与字节数。响应头超过 3 秒或样本接收超过 5 秒记为响应慢，不能作为稳定通过；最多跟随两次 HTTPS 跳转，仅允许入口域名和对应 www/非 www 域名；其他跨域跳转、普通403/412/429/444/451、其他验证码或风控记为需复核；预期HTTPS网站明确返回 `cf-mitigated: challenge` 时单列“CF需验证”，认可可达。脚本的 captcha 开关不会误判为验证码。请求使用桌面Chrome User-Agent，与已验证的网站响应识别方式一致。trace 必须匹配预期域名、公网出口、地区和 HTTPS；通过只说明连通，不证明登录、对话或视频播放可用。海外覆盖及响应统计包含25个海外页面和ChatGPT API，不要求全部通过；国内站经当前节点回访，仅供对照，不代表手机直连或移动实测，不参与海外评分，也不能单独触发下载。
-6. **最后 Cloudflare 快速下载一次**：TCP 通且指定12个海外网页三轮均正常响应或明确CF验证且Claude trace单轮通过后，通过同一个节点访问 [官方 1 MB 下载地址](https://speed.cloudflare.com/__down?bytes=1000000)。请求禁止重定向和压缩，响应状态、类型、声明长度及完整字节数都匹配才通过。读取超时 1 秒，采样预算 6 秒；达到预算就停止读取，底层建连/读取还可能等待其自身超时。记录完整 1 MB 的速度及耗时，包含 TLS 与首字节等待，属于快速采样速度，不是峰值带宽。
-7. **新增5 MB中速快测，然后100 MB双目标高速下载复测**：只对第6步完整通过1 MB的节点，先访问 [Cloudflare 5 MB文件](https://speed.cloudflare.com/__down?bytes=5000000)，一次完整5,000,000字节、预算10秒、每分片最多4节点并发。要求200、正确长度/类型、无压缩/跳转且完整接收；中速组选择已入选合格池中全部真实5 MB通过者，包含仅符合台湾／新加坡较宽网页门槛的节点，香港最多30、其他地区不限，按5 MB速度降序。5 MB失败不淘汰一般合格节点，也不跳过后续100 MB。随后依次下载 [Cloudflare 100 MB文件](https://speed.cloudflare.com/__down?bytes=100000000) 和 [DataPacket洛杉矶100 MB文件](http://lax.download.datapacket.com/100mb.bin)，每个目标一次、使用独立连接，每次各自限时 **20秒**。读取超时1秒，每个Actions分片最多 **2个节点同时下载**（四片最多8个）；同节点的两次测试顺序执行。两轮均要求完整100,000,000字节、响应200、类型/声明长度正确、无跳转与压缩且在各自预算内完成；失败、半截下载、超时或漏轮均不能进入“⚡ 高速下载”。两轮结果都记录，即使第一轮失败也测第二轮；单轮大文件失败不改变综合/地区组原有入选门槛。高速组和节点名称优先采用 **两轮中较慢的速度**，不通过双轮则名称依次使用5 MB（通过时）、1 MB速度；按较慢速度降序，香港最多30个、其他地区保留全部合格节点。速度含建连和首字节等待，是GitHub云端测量；JSON保留两个目标、各轮耗时、字节数和速度。历史50 MB/单目标结果不能补作双轮证据，重建模式不改写历史测量，采用新门槛需运行完整检测。
-8. 严格合格池要求国内 TCP 明确通过、1 MB 完整下载通过，以及指定12个海外网站及ChatGPT API各三轮均正常响应或明确CF验证且Claude trace单轮通过；Google/YouTube中位样本耗时不超过 1.5 秒、最慢一轮不超过 3 秒、三轮耗时极差不超过 1.5 秒；其余海外网站保留检测结果。再比较核心站最差尾延迟、中位耗时和波动、其他海外稳定站的耗时、覆盖数量、204 延迟与下载速度。另按上述地区门槛选取台湾／新加坡节点。不满足任一门槛的节点不写入订阅或任何组；两类门槛均无合格节点时保留旧订阅，不伪造通过或回退到失败节点。高速和非机房均只从严格合格池选取。非机房组要求明确 `hosting=false`、不同 trace 未发现出口不一致，并按独立出口 IP 去重；仅香港最多 30 个，其他地区不限数量。未确认 IP 类型不进入非机房组。
-9. 四片结果全部合并，检查批次、完整覆盖、各阶段顺序和轮数、下载完整性。缺片或漏测拒绝发布。Mihomo 最终配置校验通过后，更新原订阅和 `连通性报告.json/md`。分片临时文件保留 1 天。
+综合池Google／YouTube三轮中位耗时≤1.5秒、最慢≤3秒、极差≤1.5秒；台湾／新加坡对应3／5／3秒，其余必过项相同。覆盖要求至少半数海外目标可达，CF／Reddit确认例外可以计入覆盖，真实响应速度只用正常页面。一般5MB／100MB失败不淘汰综合池，只有对应下载组要求更严格。
 
-Cloudflare 官方测速引擎使用 `https://speed.cloudflare.com/__down`，`bytes` 参数指定字节数，见[官方项目](https://github.com/cloudflare/speedtest)。本流程先用1,000,000字节（1 MB），通过后快测5,000,000字节（5 MB），再分别从Cloudflare和DataPacket完整下载100,000,000字节（100 MB），无需安装或调用clash-speedtest。Cloudflare的100 MB请求带 `Referer: https://speed.cloudflare.com/`；实际对照中缺失时返回403，补上后返回200与正确100 MB长度。请求来源信息及响应状态/长度/类型记录在每次下载结果中，避免把测速端兼容问题混同节点下载不完整。
+### 网站、API及访问限制
 
-探测服务：
+逐站必过三轮：Google、YouTube、ChatGPT、Gemini、GitHub、Wikipedia、Reddit、X、Instagram、Telegram、Discord、Facebook、ChatGPT API。Claude首页不测试，只要求`https://claude.ai/cdn-cgi/trace`单轮；ChatGPT trace为`https://chatgpt.com/cdn-cgi/trace`。trace要求预期HTTPS主机、公网IP及地区结构正确，只说明该接口可达。
 
-| 服务 | 当前用途 |
+其他页面：Amazon、Bing、Cursor、Disney+、Hugging Face、Netflix、Perplexity、Spotify、Stack Overflow、Steam、TikTok、Twitch、WhatsApp。它们参与覆盖／质量和证书检查，但单站失败不是独立的必过淘汰条件。TikTok保持首页原逻辑；`/cdn-cgi/trace`经云端验证均跳到/404，因此未接入。抖音和普通国产网页不参加每日逐节点测试；国产应用走DIRECT，经海外节点访问国产网站的成绩不能代表手机直连体验。检测与分流共用`site_catalog.py`清单，范围参考[EDT](https://edt-pages.github.io/admin/)。
+
+正常网页要求正确HTTPS主机、200、HTML及站点特征；首响应预算3秒、正文采样总预算5秒。一般正文上限16KiB，Amazon64KiB；Reddit 401/403可读取至512KiB以定位可见登录提示。使用桌面Chrome兼容请求头，不固定Bot UA；普通HTTPS跳转最多两次，限制到入口域名及对应www／非www；Gemini可有限经过Google /sorry/index后返回正常Gemini页面，最多四次，最终请求首响应仍≤3秒、累计总耗时≤5秒，不把302本身记为通过。
+
+明确的Cloudflare人机验证在所有已测网页上认可可达，依据预期HTTPS主机和`cf-mitigated: challenge`等已确认信号；普通403、server=cloudflare或脚本中出现captcha都不足以放行。Reddit明确要求登录也认可可达，保留原401/403及可见证据，不把普通安全拒绝误当登录提示。三轮不得混入真实失败或超时；这两类例外不算正常页面速度、登录／对话／播放成功。[Cloudflare验证页说明](https://developers.cloudflare.com/cloudflare-challenges/challenge-types/challenge-pages/detect-response/)
+
+ChatGPT API：`https://api.openai.com/compliance/cookie_requirements`。要求预期地址、HTTP200、JSON且cookie_consent_required为布尔值、无实际error；unsupported_country记录地区限制。这个接口不是ChatGPT会话检测，缺少地区错误也不能直接算通过。认证错误、跳转、结构变化、接口失效、超时、证书错误分别保存；解析规则不能仅从任意同名字段、country或最后HTTP200推断解锁。
+
+### FAST补测
+
+FAST官方客户端使用`api.fast.com/netflix/speedtest/v2`获取Netflix测速CDN，本项目使用公开浏览器token、HTTPS、urlCount=3。接口预算5秒、正文≤64KiB、禁止自动跳转；仅接受443端口的HTTPS `*.nflxvideo.net`及合法/speedtest基址或range路径。沿用[官方客户端](https://fast.com/app-0bffe1.js)的范围拼接方式，保留签名仅在内存，下载`/speedtest/range/0-999999`。
+
+最多三个不同主机，顺序各测1MB、各6秒；API给不足三个时仍测有效目标，整体记未知，不重复凑数。三个都完整通过才记FAST通过，分别记录目标地区、耗时、字节及Mbps，汇总成功目标中位数和范围。不同主机不保证不同物理服务器或地区。API获取和实际CDN下载分别统计，普通失败不改变综合／地区门槛，不替代Cloudflare/DataPacket，不修改节点名或分组；明确证书错误仍淘汰。[FAST官方说明](https://fast.com/)
+
+## 分流、公司DNS与IP标签
+
+公司域名tech.bitauto.com、yiche.com、bitauto.com、bitautotech.com及子域名优先DIRECT，nameserver-policy使用192.168.70.49和192.168.70.1，并排除fake-IP。开启direct-nameserver-follow-policy，防止直连解析改用公共DNS。使用精确域名后缀，不依赖模糊公司关键词；配置随订阅生成，无需Clash Verge本地覆写。私有DNS需要公司网络或可到达内网的VPN。
+
+匹配顺序：公司／局域网直连 → 广告规则 → 个人进程例外 → 应用进程 → 应用域名兜底 → 明确海外服务 → 国内服务 → 个人域名例外及维护规则集 → 中国IP直连 → 未匹配走全局。保留Office、OneDrive、SharePoint个人直连选择；Cursor及相关域名代理，取消Tencent／元宝模糊关键词直连，并使用GFW列表。没有额外应用策略组。
+
+| 路由 | 应用 |
 |---|---|
-| [小小 API](https://xxapi.cn/doc/tcping) | 国内 TCPing 自动分类；运营商未公开，不能称为移动线路实测 |
-| [ITDOG](https://www.itdog.cn/batch_tcping/) | 网页人工对照；未接入可用的全量自动接口 |
-| [TCPING.CN](https://www.tcping.cn/tcping) | 网页人工对照；自动接口要求人机验证时跳过 |
-
-每轮记录另外两家服务状态，不宣称三家都完成自动探测，不绕过人机验证。用户已经本地对照，确认 TCPing 分类有参考价值，当前将其作为入口必过条件；服务未公开运营商，报告仍标真实探测来源。海外访问和下载速度来自 GitHub 云端，网站排序可继续结合手机体验校准。
-
-发布前检查所有解码字段，剔除非法控制字符，避免 FlClash 重新生成配置后报 `control characters are not allowed`。正常中文和图标保留。手动触发选择 `repair` 重建已有配置，不重复节点测速；配置 Key 后仅补查 IP 信誉，保留原节点测量时间、原轮数和原下载设置；每日任务及默认 `full` 执行最新分阶段流程。
-
-`测速报告.*`、`移动小测报告.*` 是历史结果，以 `连通性报告.*` 为准。手机订阅地址保留；所有来源失效或配置不能校验时保留旧订阅。
-
-手动选择 `claude-diagnostics` 可对指定已完成全量测试进行小样本诊断：从实际 trace 确认的不同出口地区选择节点，对照原请求、只改变 User-Agent 的请求、curl HTTP/1.1 与 HTTP/2，以及普通无头 Chrome。前后均检查204和Claude trace；保存响应状态、验证页信号和安全的跳转信息，不保存Cookie或节点凭据。诊断模式不修改订阅，不把403、验证码或trace算成Claude首页通过。全量输入和报告的临时文件过期后，需要使用新的全量运行编号。
-
-独立工作流 **Hysteria2国内UDP诊断** 在每日全量成功完成后自动运行，也可手动指定全量运行编号；源运行缺少未过期的全量输入与报告时跳过。对最多4个不同入口做只读小样本，兼顾普通与Salamander混淆节点及已观察到国内回包的对照：先云端认证实连204三轮，再由Mihomo给每个探测点、每一轮生成独立的原生QUIC初始包，提交国内移动及电信UDP探测点，另比较QUIC版本协商请求和GitHub直发UDP对照。云端对照可校验QUIC头及连接ID，国内服务不返回原始回包。仅使用在线且具备UDP能力的探测点，DNS正对照有回应才使用该探测点；一次最多40个探测点任务、每秒最多一个服务请求，401/403/429立即暂停。工作流只上传脱敏结果，不上传载荷、节点配置或密钥。有国内回应仅记录为UDP可达证据，无回应、接口异常和目标不匹配保持未知；诊断不改变正式订阅的筛选门槛。[阶段复查与探测依据](docs/probe-audit-2026-10-10.md)
-
-## 手机分流与 DNS
-
-匹配顺序：公司域名直连 → 局域网和私有域名直连 → 保留广告拦截 → 个人进程例外 → 指定应用进程直连/代理 → 应用域名兜底 → 明确的海外服务走“🚀 全局选择” → 国内服务直连 → 个人域名例外 → 其他应用、Apple/iCloud、代理/GFW/国内维护规则集 → 中国 IP 直连 → 未匹配流量走全局选择。海外 AI、影音、社交和开发服务包含常用 API、登录、静态资源及 CDN 域名，检测和分流共用清单。保留 Office、OneDrive、SharePoint 等个人域名直连选择；Cursor 进程及服务域名代理，移除 Tencent/元宝模糊关键词直连，启用原来未引用的 GFW 列表。没有增加应用策略组。
-
-### 指定应用分流
-
-应用清单位于 `scripts/app_catalog.py`，同时生成 Android 包名、macOS/Windows 可执行文件名以及域名兜底。每日全量发布和手动 `repair` 均编译同一清单，手机继续更新原订阅即可。
-
-| 选择 | 应用 |
-|---|---|
-| 指定直连 | 微信、微博、美团/大众点评、拼多多、京东、高德地图、企业微信、向日葵、腾讯会议 |
-| 补充直连 | QQ/TIM、支付宝、淘宝、哔哩哔哩、抖音、网易云音乐、小红书 |
-| 指定代理 | X/Twitter、Google Play、YouTube、Threads |
+| 指定直连 | 微信、微博、美团／大众点评、拼多多、京东、高德地图、企业微信、向日葵、腾讯会议 |
+| 补充直连 | QQ／TIM、支付宝、淘宝、哔哩哔哩、抖音、网易云音乐、小红书 |
+| 指定代理 | X／Twitter、Google Play、YouTube、Threads |
 | 补充代理 | Telegram、Discord、Instagram、ChatGPT、Claude、Gemini、Cursor |
 
-进程规则在常规服务域名规则前：例如微信内打开的海外链接仍按微信直连选择；公司域名和局域网始终优先直连。Google Play 包含商店 `com.android.vending`、服务 `com.google.android.gms` 和框架 `com.google.android.gsf`，相关 Google 后台服务也走代理。浏览器没有整进程固定直连或代理，继续按访问域名分流。未识别进程时回退到域名规则；此时无法保证该应用使用的每个第三方域名都遵循进程选择。
+find-process-mode: strict按需识别；Android用完整包名，macOS／Windows用实际可执行名称，不使用macOS bundle ID。个人PROCESS-NAME／PATH／正则／通配符优先保留，浏览器、Python、Node、Git和通用Helper不整进程固定路由。未识别进程时回退域名规则；微信内打开海外链接仍按微信直连选择，公司和局域网优先级更高。
 
-设置 `find-process-mode: strict`，按规则需要查进程。Android 使用完整包名；macOS 使用实际可执行文件名，不使用 bundle ID。本机核对了 WeChat、QQ、TencentMeeting、Telegram、Claude、Cursor 及 Claude/Cursor 的专属 Helper 名称；没有匹配通用 `Helper`、浏览器、Python、Node 或 Git。个人直接写入的 `PROCESS-NAME`/`PROCESS-PATH` 及正则/通配符例外会保留，并优先于内置应用清单。
+Google Play包括com.android.vending、com.google.android.gms、com.google.android.gsf；服务和框架的其他Google流量也代理。采用com.tencent.wemeet.app、com.autonavi.minimap及com.oray.sunlogin等有官方商店证据的完整包名；不导入厂商前缀、不采用被注释条目，不把Surge的USER-AGENT／通配符原样当成Mihomo精确进程匹配。
 
-参考 [Clash-FX/cn-apps-direct](https://github.com/Clash-FX/cn-apps-direct) 的 macOS 进程名称清单、[Android 包名参考](https://gist.github.com/Zestinc/fa5a35a444a076214cefbe4965677d8b)及官方应用商店信息，服务域名参考 [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)。这是 2026-10-10 审核适配后的内置快照，不自动导入外部清单的全部路由选择；第三方原文中的策略字段也不会写入 classical provider 的 matcher。原有 Loyalsoldier 域名/IP 规则集仍自动更新。
+进程名称采用人工审核快照，通过GitHub代码搜索交叉核对，不自动订阅外部清单的全部路由；Loyalsoldier等域名／IP维护规则仍按原方式刷新。补充了向日葵Desktop／Helper／Service、Windows WeChatAppEx.exe及Google服务框架。macOS指定别名已用独立客户端验证核心命中；Windows／Android是名称来源核对，不宣称所有客户端和应用版本都已实机验证。手机需要连接日志确认实际包名。
 
-随后按实际代码内容搜索 `PROCESS-NAME`、Android 包名和可执行文件名，补充核对隐藏在个人配置、生成规则和辅助脚本中的清单。来源固定提交、文件更新时间及不采用的写法见 [进程规则代码搜索核对记录](docs/process-rule-sources.md)。本轮补充向日葵 Desktop/Helper/Service 别名、Windows 微信 `WeChatAppEx.exe` 以及 Google 服务框架；这是兼容名称补充，手机实际识别仍需本地连接日志确认。
+住宅／纯净度来自可选ipapi.is，GitHub Actions Secret设置IPAPI_IS_KEY，不放入聊天或文件。免费配额按服务账号当时限制使用，按独立出口去重查询，每轮预算900个IP；重建可保留既有元数据；未配置或限流保持未知。纯净度=100×(1−company.abuser_score的有效网段比例)，不是账号安全／节点可靠性的概率。无hosting／住宅证据不推断住宅，不用运营商名称替代类型判断；IP查询失败不伪造测量成功。
 
-FlClash 需使用规则模式，并让这些应用的流量进入其 VPN；在“分应用代理”中排除的应用不会经过订阅规则。Android 进程识别依赖系统支持，旧系统可能只能域名兜底。电脑进程流量需进入 Mihomo（通常使用 TUN），客户端覆写也可能改变最终规则。本次校验配置和桌面进程匹配，不宣称已经验证你手机上全部应用的实际识别。依据 [Mihomo PROCESS-NAME 文档](https://wiki.metacubex.one/config/rules/#process-name)和 [FlClash VPN 实现](https://github.com/chen08209/FlClash/blob/main/android/service/src/main/java/com/follow/clash/service/VpnService.kt)。
+## 来源与维护入口
 
-国内 DNS 和节点域名使用阿里/腾讯 DoH，引导 DNS 为 `223.5.5.5` 与 `119.29.29.29`，公司 DNS 不作为公共域名的引导解析器。海外 DNS 查询通过全局选择的节点访问加密 DNS；独立节点域名解析器避免代理与 DNS 互相依赖。保留原 IPv6 选择，加入局域网及 Windows 网络检查域名的 fake-IP 排除。依据 [Mihomo DNS 文档](https://wiki.metacubex.one/config/dns/)和[规则集合文档](https://wiki.metacubex.one/config/rule-providers/)；服务域名内置，维护规则集继续每天更新。
+`聚合配置.yaml`为原订阅／规则输入，`节点来源.yaml`为新增公开清单；每天只读取外部proxies，不导入来源脚本、规则或客户端设置。按协议、入口、凭据及传输参数去重，每个节点保留匹配来源。原a1使用Gist最新版本、a7使用GitHub原始地址。最近两次成功发布中仍有定义但本轮来源缺失的节点可以作为待测候选，凭据保留、所有测量重新执行；来源全失败不能用历史候选掩盖。
 
-公司域名 `tech.bitauto.com`、`yiche.com`、`bitauto.com`、`bitautotech.com` 及其子域名优先直连，单独使用 `192.168.70.49` 和 `192.168.70.1`，并排除 fake-IP。DNS 策略与规则随每日订阅一起生成，不依赖 Clash Verge 的本地覆写；设置 `direct-nameserver-follow-policy: true`，防止直连解析改用公共 DNS。使用精确域名后缀，避免公司关键词误匹配无关网站。这两个私有 DNS 地址需要公司网络或能够访问公司内网的 VPN；在外网无法凭此访问内网服务。
-
-## 新增公开来源
-
-以下 6 个配置在 2026-10-09 接入检查时均能下载、包含非空 YAML 节点列表，且对应配置文件最近 24 小时内有提交更新。来源的自动更新时间由各项目控制，本仓库仍在每天北京时间 08:00 拉取和重新分类。
-
-| 项目 | 最新分支配置文件 |
+| 新增来源 | 配置路径 |
 |---|---|
-| [BestClash](https://github.com/PuddinCat/BestClash) | `main/proxies.yaml` |
-| [Au1rxx/free-vpn-subscriptions](https://github.com/Au1rxx/free-vpn-subscriptions) | `main/output/clash.yaml` |
-| [anaer/Sub](https://github.com/anaer/Sub) | `main/clash.yaml` |
-| [AutoMergePublicNodes](https://github.com/chengaopan/AutoMergePublicNodes) | `master/list.yml` |
-| [V2RayAggregator](https://github.com/mahdibland/V2RayAggregator) | `master/Eternity.yml` |
-| [zhuhaiuk/free-nodes](https://github.com/zhuhaiuk/free-nodes) | `main/clash_config.yaml` |
+| [BestClash](https://github.com/PuddinCat/BestClash) | main/proxies.yaml |
+| [Au1rxx](https://github.com/Au1rxx/free-vpn-subscriptions) | main/output/clash.yaml |
+| [anaer/Sub](https://github.com/anaer/Sub) | main/clash.yaml |
+| [AutoMergePublicNodes](https://github.com/chengaopan/AutoMergePublicNodes) | master/list.yml |
+| [V2RayAggregator](https://github.com/mahdibland/V2RayAggregator) | master/Eternity.yml |
+| [zhuhaiuk](https://github.com/zhuhaiuk/free-nodes) | main/clash_config.yaml |
 
-原订阅的 a1 已从固定历史提交地址改为 Gist 最新版本地址；a7 改为 GitHub 原始配置地址。新来源的节点仍需通过本仓库的连通性与网站复测，来源自带的速度或地区标签不作为入选依据。
+来源接入时已验证可下载／节点非空，但更新由来源项目控制，本仓库不保证来源全天可用。编辑sources时id唯一、固定HTTPS配置地址，enabled=false可停用；每轮记录抓取时间、状态、下载数量、独有新增、重复、跳过及指纹。新增数按清单顺序归因，不是来源质量排名。
 
-每次报告列出各来源的下载数量、新增唯一节点、重复数、跳过数、下载状态和内容指纹；每个入选节点记录全部匹配来源。新增唯一数按清单顺序计算，不是来源有效率或速度排名。
+| 入口／代码 | 用途 |
+|---|---|
+| 每日节点连通性分类 / full | 每天08:00或手动重新获取所有来源；四片前置、四片网站／下载、独立持续观察及最终上传、合并发布 |
+| repair | 按已有原始证据重建规则／分组；不是全量重测，不伪造新时间或旧下载轮数 |
+| web／medium／stability／uplink-recheck | 已发布池相应专项复测，保留其他项原测量；独立稳定性／上行复测用5分钟观察窗口 |
+| publish-retry | 复用指定完整且仍可取得的同轮存档恢复发布，不重新测速，不复用不同节点原始记录 |
+| 补充服务小样本验证 | 最多4个当前节点、前后直连对照，验证ChatGPT API／FAST，不发布订阅 |
+| 其他只读诊断 | Claude、网站、上传、持续稳定性、已发布节点、异常阶段以及Hysteria2；不改变订阅 |
+| availability.py / mobile_pilot.py | 阶段编排、必过和地区池／网页、API、trace分类 |
+| site_catalog.py / app_catalog.py | 共享服务域名及审核后的进程清单 |
+| detection_report.py / latest_report.py | 实测展示及README最新记录；无候选也更新报告 |
+| attempt_report.py / publish_subscription.py | 存档全量原始记录及匿名发布；订阅与检测报告分别保护 |
 
-编辑 `节点来源.yaml` 的 `sources` 列表可添加来源，`id` 必须唯一，`url` 应是固定的 HTTPS YAML 地址；设 `enabled: false` 可停用。只读取来源节点，不导入外部配置的规则、分组、脚本或本地设置。长期失效、停止更新或只能提供日期文件的候选本次没有接入。
+正式节点请求只在GitHub Actions进行，内核独立端口，不开TUN、不改本机代理。提交使用github-actions[bot]或hoooou的noreply地址，避免实名。配置含非法控制字符时剔除对应节点，保留合法中文／图标，防止FlClash报control characters are not allowed。
 
-## 修改检测方式
+## 如何看报告
 
-### 补充服务请求
+本文件自动报告区只保留最新一次全量／专项检测，包含来源与解析数量、每个阶段的实测／通过／失败／未验证／跳过及主要原因、各网站拦截数、入选表现和测量时间。每个FAST目标、两个100MB目标分别列行。未执行阶段明确显示原因，不能把跳过当失败或补造成功。全失败的必过网站会突出提醒复核检测器和响应。
 
-ChatGPT `https://api.openai.com/compliance/cookie_requirements` 放在网站阶段，与原12个必过页面并行、各测三轮，三轮均通过才继续应用TLS和下载。正常响应要求正确HTTPS地址、200、JSON且`cookie_consent_required`为布尔值；明确`unsupported_country`记录地区限制，不因缺少该错误就判通过。沿用网页3秒响应头及5秒样本预算、严格证书校验、CF明确验证例外策略，API通过不代表登录或对话成功。报告的逐网站统计新增该API必过行。
+`最新检测.json`是精简阶段／网站／来源元数据，保留全部失败／跳过原因计数；每轮原始逐节点／逐请求记录是Actions的full-test-report附件，保留7天。`连通性报告.json`与`优选配置.yaml`对应当前实际订阅；本轮零候选时它们保持原值，但README及最新检测JSON仍更新，说明旧订阅未满足本轮验证。任务缺片、对照异常或配置校验失败不能发布新节点；任务未完成时应看该次Actions日志，不能把旧报告说成新测量。
 
-TikTok保持原首页检测和筛选逻辑，不新增必过条件、不使用trace。在三个204通过节点及前后直连对照中，`/cdn-cgi/trace`均302到`/404`，最终是HTML错误页；按用户选择取消这个目标。证据见[云端验证](https://github.com/hoooou/my_yml/actions/runs/38212157289)。
+发布更新基于当前main，保留期间新增的代码和README手工说明，只替换自动报告区。较旧测量不能覆盖新结果；最终配置验证通过才允许更新订阅。定时任务可能延迟，GitHub长期无活动可能暂停定时流程。
 
-FAST在现有1MB下载通过后执行，使用公开浏览器测速token、`urlCount=3`请求三个目标，按CDN主机名去重，最多测试三个不同主机。接口响应预算5秒、正文最多64KiB、禁止自动跳转；仅接受HTTPS、443端口、`*.nflxvideo.net`且符合`/speedtest`或`/speedtest/range/0-N`的地址。按[FAST官方客户端](https://fast.com/app-0bffe1.js)的方式拼接下载范围，依次对每个主机请求1,000,000字节，每个各限6秒；三个都完整通过才记为FAST通过。不足三个时仍测试返回的有效目标，整体记为未知，不以重复地址凑数。不同主机不保证不同物理服务器或地区。与上行共享流量调度；每个目标独立记录状态、耗时和速度，汇总成功目标的速度范围与中位数（包含建连，不是持续峰值带宽），接口和实际CDN下载分别统计。不把API返回当作带宽或Netflix解锁。CDN地区是服务器所在地，不替代节点出口地区。签名查询、Cookie和原始响应正文不写入报告。
+## 已核查的问题与证据
 
-FAST结果位于JSON的`service_checks`及独立汇总、MD的“补充服务检测”，不计入网站覆盖率、不替代Cloudflare/DataPacket下载、不修改节点名称或分组。FAST普通接口限制、接口不可用、下载失败不新增淘汰条件；任何明确证书校验错误仍淘汰。ChatGPT API属于上述必过网站阶段，失败会跳过后续检测。历史重建不补写未测通过；采用新必过条件需要实际运行全量检测。工作流“补充服务小样本验证”只读验证最多4个当前节点和前后直连对照，包含生产方式的ChatGPT API三轮和FAST API/CDN结果，保留脱敏结果7天，不更新订阅。
+以下保留旧文档的有效结论和云端证据，旧数量仅代表各自测量时刻，不作为当前门槛。
 
-入口和分阶段检测位于 `scripts/availability.py`，网页及 trace 的响应校验位于 `scripts/mobile_pilot.py`。工作流只安装 Mihomo，使用独立节点监听端口，不打开 TUN、不修改系统代理。旧下载测速脚本仅用于历史复现，当前工作流使用直接 HTTP 的1 MB、5 MB快速采样及通过节点的100 MB双目标复测。
+| 问题 | 已验证结论及限制 | 证据 |
+|---|---|---|
+| Claude首页零通过 | 228个网站候选／684次首页请求无正常通过；小样本含明确CF挑战和香港地区限制。已按用户要求移除首页，仅Claude trace；不把605次旧403全部追认为同一种原因 | [首页诊断](https://github.com/hoooou/my_yml/actions/runs/38041782487)、[复核](https://github.com/hoooou/my_yml/actions/runs/38042040394) |
+| 入口故障随时间变化 | 曾失败TCP样本6个中4个仍不通、2个后续恢复；接口异常由27增206不能直接断言限流。不永久拉黑，异常保持未验证 | [淘汰复查](https://github.com/hoooou/my_yml/actions/runs/38042994214) |
+| Hysteria2不能用TCPing替代 | 云端认证204与国内UDP是不同证据。原生QUIC初始包在一入口国内三轮回应，其他云端可用样本无国内回包；Salamander覆盖及国内完整协议验证不足。正式入口保持未知 | [原生包对照](https://github.com/hoooou/my_yml/actions/runs/38045518576) |
+| 来源换单导致候选消失 | 61变41个节点时，移除49个中的39个定义已不在来源。已将最近两次成功订阅缺失项加入本轮重新测试，不复用旧成绩 | [来源变化](https://github.com/hoooou/my_yml/actions/runs/38108536766)、[旧新池复测](https://github.com/hoooou/my_yml/actions/runs/38149039366) |
+| ChatGPT SSL及重连 | 四域名独立TLS对照当前41个36过、旧61个60过，无确认的证书校验错误；已加前后应用TLS。不能据此声称复现或解决手机Wi-Fi证书／应用固定问题 | [TLS对照](https://github.com/hoooou/my_yml/actions/runs/38150529771) |
+| 五轮淘汰过多及历史混计 | 66个五轮只13全过，12发布；后来12复测10保留。曾混入历史失败造成12节点摘要55失败，已按本轮ID修正；五轮规则后续替换为15秒持续观察、成功率≥90% | [五轮](https://github.com/hoooou/my_yml/actions/runs/38162604697)、[内核对照](https://github.com/hoooou/my_yml/actions/runs/38164462674)、[复测](https://github.com/hoooou/my_yml/actions/runs/38172571705) |
+| 持续观察HTTP节点集中中断 | 一轮168观察、68未过，53个HTTP样本集中开始失败。后续8个失败HTTP样本短时全过、持续后各探测均失败，冷启动及放宽建连未恢复；健康对照正常。支持当时真实中断，未证明永久故障或具体后端限额 | [阶段核查源运行](https://github.com/hoooou/my_yml/actions/runs/38183961292)、[持续对照](https://github.com/hoooou/my_yml/actions/runs/38202540313) |
+| 3MB上传失败不是都带宽不足 | 同轮48失败：28超时、18TLS握手、1空响应、1接收错误；17已发完3MB但未完成响应。curl35握手失败不等同证书校验错误；完整发送不等同成功HTTP请求 | [对应完整运行](https://github.com/hoooou/my_yml/actions/runs/38183961292) |
+| TikTok请求头／Gemini跳转误筛 | 110个TikTok403中小样本改Chrome UA可恢复；Gemini /sorry/index可以返回正常页，已受控跟随并分别计最终TTFB与累计预算；403仍不自动放行 | [原数据](https://github.com/hoooou/my_yml/actions/runs/38201527803)、[请求头及跳转对照](https://github.com/hoooou/my_yml/actions/runs/38208188024) |
+| Reddit明确登录可达 | 两个原403样本三轮都确认可见登录提示，原16KiB／128KiB截断遗漏了约190KB处的提示；现在该类401/403上限512KiB，保留403和证据认可可达，旧89个无证据的403不批量追认 | [登录提示验证](https://github.com/hoooou/my_yml/actions/runs/38209420994) |
+| 服务端点与FAST范围 | TikTok trace三个可用样本和直连均跳/404，取消该端点；FAST目标实为/speedtest基址，按官方客户端拼范围后成功；API与实际字节分别检查 | [结构核查](https://github.com/hoooou/my_yml/actions/runs/38212157289)、[单目标验证](https://github.com/hoooou/my_yml/actions/runs/38213158100) |
+| 三目标FAST | 三个可连通节点各三个不同主机、9次1MB完整通过；中位速度4.31／4.43／2.76Mbps，含建连。第四节点前置超时，前后直连API目标不可确认，未将其算下载成功 | [三目标小测](https://github.com/hoooou/my_yml/actions/runs/38215561855) |
+| 零候选时新报告缺失 | 最新运行5552去重、5549可解析，161进入网站阶段、Facebook0通过，因此后续SSL／下载／FAST均跳过。旧发布把新报告留在附件、仓库仍旧摘要；已改为报告独立更新，门槛不凭此放宽 | [本轮完整测量](https://github.com/hoooou/my_yml/actions/runs/38216070355) |
 
-综合、高速和非机房组均仅香港最多30个，其他地区不限制数量。高速组要求Cloudflare和DataPacket两次均完整通过100 MB，每次各限20秒；非机房组仍按独立出口去重。完整样本与各阶段分类继续保留在报告。定时触发可能延迟；GitHub长时间无活动可能暂停定时任务。
+Hysteria2只读诊断使用在线且有UDP能力的国内探测点，DNS正对照正常才使用；每轮／每点独立生成原生QUIC初始包及连接ID，最多4个入口、40个任务、每秒最多一次接口请求，401/403/429停止。idcd未提供国内原始回包，因此回应只证明UDP可达，无回应保持未知，不上传认证密码或原生载荷。[Hysteria2协议](https://v2.hysteria.network/docs/developers/Protocol/)、[QUIC版本协商](https://datatracker.ietf.org/doc/html/rfc9000#section-6.3)、[idcd接口](https://www.idcd.com/v1/openapi.json)
 
-## 节点名称与 IP 信誉
+国内TCP正式来源是[小小API](https://xxapi.cn/doc/tcping)，未公开运营商，不标“中国移动实测”；用户已本地对照认为有参考价值。[ITDOG](https://www.itdog.cn/batch_tcping/)和[TCPING.CN](https://www.tcping.cn/tcping)用于人工对照，未承诺全量自动、不限额或绕过验证。
 
-名称统一为 `美国01|120ms|85Mbps|住宅|纯净度99.2%`：地区从01独立编号，省略空格、哈希及延迟前缀。延迟优先取持续观察中Google/YouTube成功样本响应中位数的较慢值，旧记录使用原三轮样本；缺少两站数据时回用204中位值，报告记录来源。带宽优先双100 MB较慢速度，其次完整5 MB、最后1 MB，由MiB/s换算Mbps并取整。住宅按ipapi.is的ISP且明确非机房分类标“住宅”，机房或移动网络标“非住宅”；仅hosting=false不等同住宅，未确认显示“住宅未知”。该住宅标签是网络类型判断，不保证独享静态家庭IP。纯净度保留一位小数；缺失显示“纯净度未知”。编号用于区分本轮节点，重新筛选后可能变化；完整名称与原始节点编号的对应保存在报告。
+### 解锁规格的取舍及尚未实施项
 
-[ipapi.is 官方评分说明](https://ipapi.is/blog/abuser-score.html)提供网段滥用比例 `company.abuser_score`；显示的“网段纯净度”取 `100 × (1 − 比例)`，越高表示同网段未标记滥用的 IP 占比越高。这是明确标注的换算值，不是官方综合风控分，也不是单个 IP 的安全概率。`is_abuser=true` 及其他风控标记保留在JSON明细，节点名称仅显示这五项。标记、数据来源及查询时间保存在 JSON 报告。
+借鉴服务独立超时、有限并发、结构化证据和响应地址；不采用“403就是未解锁”“某地区字段就是解锁”“关闭SSL校验”“接口失败退回首页country就算成功”等乐观判定。参考版ChatGPT地区错误识别不足、FAST误当流媒体播放、Disney+递归找字段／地区回退、Netflix固定视频ID容易失效；这些都不能证明付费内容播放或登录后的完整会话。[参考实现](https://github.com/clash-verge-rev/clash-verge-rev/tree/27efaf3/crates/clash-verge-media-unlock)、[Netflix VPN说明](https://help.netflix.com/en/node/114701/)、[Requests证书验证](https://requests.readthedocs.io/en/stable/user/advanced/#ssl-cert-verification)
 
-ISP 网络且 `is_datacenter=false` 标为“住宅候选”；移动网单独标注，机房优先于 ISP 类型。ip-api.com 的 `hosting=false` 只标“非机房”，不能证明住宅；缺字段保持“住宅未知”。原非机房组入选要求保留。
+尚未实施：动态解析YouTube脚本／图片／视频资源与真实播放、登录后ChatGPT对话、账号或付费内容授权、跨日7天稳定评分、额外国内TCP间隔复测、晚间核心复测、完整国内HY2认证。旧六轮／五轮全过建议、50MB下载和1MB上传前置已被当前流程替换。任何扩展应先小样本／对照，不把检测器失效变成批量淘汰。
 
-[免费 ipapi.is 账号](https://ipapi.is/free-tier.html)每日 1,000 IP 查询，完整检测标记需要 Key。将 Key 添加到[本仓库 Actions Secrets](https://github.com/hoooou/my_yml/settings/secrets/actions)，名称为 **IPAPI_IS_KEY**，不要写入配置或仓库。本流程只查 1 MB 通过的去重出口，每次最多 900 个，100 个一批；批量仍按 IP 计费。只用免费额度，收到鉴权或额度错误立即停止；重复手动运行可能耗完当日额度，剩余显示未知。Key 未配置时不请求此服务，订阅仍可正常生成。每日 full 和手动 repair 都支持查询；普通本地 repair 不刷新网络，需显式 `--refresh-ip-reputation`。
+GitHub测量代表云端到节点再到网站的路径；国内TCP只补入口可达，不等于手机中国移动的上行／下行／首字节。短时高分不保证全天稳定，住宅／纯净度不替代性能。手机校准可固定8–12个节点，在同网络对Google／YouTube做三次并晚间复查，记录短名、时间与恢复情况；不用一次恢复抹去本轮失败，不开启自动切换来掩盖问题。
 
-## 请求响应质量
+## 进程规则参考
 
-网页测量侧重请求和响应速度，不启动浏览器，不把完整页面渲染作为门槛。每次使用独立连接，包含 DNS、代理建连、TLS、跳转及服务端等待；响应头耗时是近似 TTFB，不是纯服务器处理时间。收到响应头快但正文接收慢的节点也会被降级。Amazon最多读取64 KB，其余最多16 KB，实际样本字节数写入报告，不将小页面的字节/耗时算成带宽。带宽继续来自完整1 MB/5 MB/100 MB下载。底层连接/读取超时分别 3/2 秒，5 秒是采样判定预算，并非强行中断系统调用的绝对时限。
+2026-10-10使用已认证GitHub代码搜索，10组PROCESS-NAME关键词查询，针对性读取15仓库／16文件，非只按仓库名发现。固定版本链接保留溯源；镜像／相互借用不能视为独立实测，日期不保证当前应用版本已验证。只适配用户指定的精确进程名称，不自动跟随外部路由选择。
 
-三轮分别记录成功、超时、风控或慢响应；成功率、最慢/P95、延迟极差及响应头中位耗时写入 JSON。三轮样本的最近秩 P95 等于最大值，不能代表长期第 95 百分位；极差表示本轮波动，不是链路丢包率。超时的实际耗时参与尾延迟和波动，不只统计成功请求。trace仍单轮；历史国内网页测量保留原时间，新流程不逐节点检测国内网页。
+| 规则文件（固定版本） | 文件最近提交 | 参考价值与限制 |
+|---|---|---|
+| [yangchuansheng/clash-rules / Direct-Process.list](https://github.com/yangchuansheng/clash-rules/blob/35fe3ee6d4dfb65a558d2155a8033f320547c8dd/Direct-Process.list) | 2022-09-27 | Android 国内应用及 macOS 腾讯会议；文件较旧，只作历史交叉核对 |
+| [Kyreth-VPN/public-configs / mihomo/rule-sets/packages/category-cn/rule.list](https://github.com/Kyreth-VPN/public-configs/blob/f816ca42b83521813f9b65b937c214e3bbd7730f/mihomo/rule-sets/packages/category-cn/rule.list) | 2026-07-18 | 按 Android 包名分类；含待确认的腾讯会议名称，不整份导入 |
+| [Jacky-Bruse/Rules / Rules/directed.list](https://github.com/Jacky-Bruse/Rules/blob/a5e598094d56cf24199d0fab5f3b152791fcb838/Rules/directed.list) | 2026-09-29 | 京东、企业微信；微信规则已注释，不当作启用的证据 |
+| [pichuanwenzi/Clash-bypasslist / applicationlist.txt](https://github.com/pichuanwenzi/Clash-bypasslist/blob/420a45f22d42db84fe517471ab47538703cc628b/applicationlist.txt) | 2026-04-16 | Windows/Android 大清单；部分条目只写厂商前缀，不能替代完整包名 |
+| [bgpeer/rules / clash/meta.yaml](https://github.com/bgpeer/rules/blob/c5e870ed40ab848b89fdc1505d2ffe31d75a4b59/clash/meta.yaml) | 2026-10-07 | Threads/Instagram 或高德地图等完整 Android 包名 |
+| [bgpeer/rules / clash/alibaba.yaml](https://github.com/bgpeer/rules/blob/c5e870ed40ab848b89fdc1505d2ffe31d75a4b59/clash/alibaba.yaml) | 2026-10-07 | Threads/Instagram 或高德地图等完整 Android 包名 |
+| [Lbiebest/clash-config / rules/ProcessRules.list](https://github.com/Lbiebest/clash-config/blob/1fbf6a838b7911413c105adb5eda8fe962f54190/rules/ProcessRules.list) | 2025-12-26 | 微信 Windows 辅助进程、腾讯会议、向日葵等可执行文件名 |
+| [liristy/ssrules / Rule/yaml/Application_CN.yaml](https://github.com/liristy/ssrules/blob/2d0f912f0f087efb74acc4cd5ced9687f0296126/Rule/yaml/Application_CN.yaml) | 2026-04-10 | Windows 应用及辅助进程；精确名称与正则规则混合 |
+| [blackmatrix7/ios_rule_script / rule/Clash/Direct/Direct.list](https://github.com/blackmatrix7/ios_rule_script/blob/83f37120c155f67c8eef43221dabe15cc3c95fec/rule/Clash/Direct/Direct.list) | 2025-12-21 | 向日葵 macOS Desktop/Helper 名称 |
+| [SukkaW/Surge / Source/non_ip/direct.conf](https://github.com/SukkaW/Surge/blob/1c454d540ff76a50e7828a7fe95583701905e306/Source/non_ip/direct.conf) | 2026-08-29 | 向日葵 Desktop/Helper 的另一份证据；Surge 语法需适配 |
+| [IvanSolis1989/Smart-Config-Kit / rulesets/supplemental/clash/local-process-direct.list](https://github.com/IvanSolis1989/Smart-Config-Kit/blob/ada67a7579c729329707625c32311f57917e82bb/rulesets/supplemental/clash/local-process-direct.list) | 2026-07-14 | 本地补充规则，微信 AppEx 与向日葵 Windows Desktop/Service |
+| [LM-Firefly/Rules / PROXY/Google.list](https://github.com/LM-Firefly/Rules/blob/d93766fbd7d4410917186ad73a24a79722d1ba67/PROXY/Google.list) | 2026-10-08 | Google 商店、服务、框架及 YouTube 包名 |
+| [xOS/Config / RuleSet/Google.list](https://github.com/xOS/Config/blob/a9d57eb35ea7e98372a2c3a02b04e7bb0f580cdc/RuleSet/Google.list) | 2026-03-31 | Google 商店、服务、框架的交叉核对 |
+| [KannaSakura/Rule-provider / PROCESS_CN_Android.yaml](https://github.com/KannaSakura/Rule-provider/blob/b5870ee35218a0a60c5046952dfb81dd7184a0e0/PROCESS_CN_Android.yaml) | 2024-04-06 | 隐藏在通用仓库中的 Android 进程表；包含向日葵，但文件较旧 |
+| [LittleRey/clash-yaml / rules/CN-App.list](https://github.com/LittleRey/clash-yaml/blob/b9d754ddc5f5228abf33a7aded9b9dfb0d322f9e/rules/CN-App.list) | 2025-12-13 | 向日葵 Android 包名；微信等已注释 |
+| [ghfree123/freedom / Twitter.list](https://github.com/ghfree123/freedom/blob/99edbac1f1bcac6d35a676e97bc242cd197c7221/Twitter.list) | 2026-02-05 | X/Twitter Android 包名；不自动补充 Lite/TV 等未指定版本 |
 
-手动模式 **web-recheck** 只对订阅中仍有节点定义、已有 1 MB 快测通过的节点进行三轮海外请求复测，用一个 Actions 作业、8 个节点并行、每节点最多 5 个网站请求并发，不重跑 TCP、国内站、trace 或下载。逐节点海外复测时间单独记录，旧测量时间和下载结果保持原样；未复测的旧单轮样本不冒充稳定三轮结果。`repair` 同样只重建已有定义，完整历史报告不因订阅精简被删掉。重新获取被淘汰节点使用每日或手动 **full**，对全部来源按阶段检测。
+<!-- latest-detection:start -->
+## 节点检测报告
 
-## 指定网站必过与全量结果
+**待发布候选：0 个节点。** 全量检测；报告更新 10-12 15:21:01（北京时间）。
 
-必过网站：Google、YouTube、ChatGPT、Gemini、GitHub、Wikipedia、Reddit、X、Instagram、Telegram、Discord、Facebook，另要求ChatGPT API。12个页面及ChatGPT API各三轮均正常响应或明确CF验证，并且Claude trace单轮通过，才进入下载和候选选择；普通403、其他验证码、失败、慢响应、未测均不符合12个页面的要求；明确CF验证按下述例外认可网站可达。Claude首页不再检测，仅验证trace连通，不代表登录或对话可用；域名分流保留。台湾／新加坡组也须满足12个页面、ChatGPT API加Claude trace，只放宽Google/YouTube的响应耗时。Amazon继续检测但不在必过清单；抖音停止检测，直连分流保留。
+本轮获取并去重 **5552** 个节点，可解析 **5549** 个。未入选节点不写入订阅。
 
-每次完整全量测量保存 Actions 的 **full-test-report** 存档7天，包含来源、节点结果、每站状态、HTTP响应和失败原因统计。没有合格节点时检测报告仍保存，但发布步骤拒绝覆盖旧订阅；旧订阅不代表已经通过当前12个页面、ChatGPT API加Claude trace门槛。手动全量运行另保存 **amazon-page-diagnostics**，从三个已发布节点检查Amazon不同样本长度的识别结果，不能以诊断代替入选检测。
+**本轮无合格节点，保留原订阅。** 原订阅不代表通过这次页面与trace检测。
 
-Amazon诊断发现：部分云端响应为HTTP200且包含正常首页标题，但没有Content-Type头。现允许仅Amazon在类型头缺失时，凭DOCTYPE、HTML/head结构和Amazon标题确认HTML；明确非HTML类型、验证码、错误页面及超时仍不通过，不通过HTTP200本身放行。识别依据写入每次请求结果，仅Amazon采样上限扩大到64 KB，其余仍16 KB；时间预算不变。
+### 测量时间
 
-## 明确Cloudflare验证的筛选例外
+| 数据 | 完成时间（北京时间） |
+|---|---|
+| 全量检测批次完成（是否执行各项见阶段表） | 10-12 15:21:01 |
+| 上行与负载后SSL | 未测 |
+| 持续并行稳定性 | 10-12 15:20:55 |
 
-2026-10-12按用户要求：预期HTTPS网站返回 `cf-mitigated: challenge` 且状态为200/403/503时，分类为“CF需验证”，不计访问失败或普通“需复核”。三轮每轮都为正常页面或明确CF验证时，满足该网站的访问门槛；三轮中仍有超时、失败或其他限制时不放行。至少13个海外网站的访问覆盖门槛计入这种明确CF验证。普通403、Cloudflare服务器名称或页面中仅提及Cloudflare不能触发例外。保留原HTTP状态和验证证据，不将403改为200。
+### 入选节点
 
-验证页速度不参与真实页面排名；明确CF验证也适用于Google/YouTube及持续稳定性中的网页探测，不会被第二道速度门槛再次淘汰。正常页面仍保留速度门槛；只有验证页而没有真实页面时，页面速度留空，不宣布网页低延迟。204、trace、应用TLS及下载仍要求原有真实内容/证书/完整文件，CF验证不能替代这些检测。报告将“正常通过”“CF需验证”“需复核”分列。`repair`只重新分类原来明确捕获的验证标记，保留原测量时间；不会据此补造之前跳过的TLS或下载，也不会重新加入已淘汰的节点。下一次全量检测会按此规则重新检测全部来源。
+| 节点 | P95 / P99 / 波动 ms | 下行 Mbps / 样本 | 上行 Mbps | 上传中204 | SSL | 成功轮数 / 成功率 |
+|---|---:|---:|---:|---:|---|---|
+| 本轮没有入选节点 | — | — | — | — | — | — |
 
-手动模式 **medium-recheck** 只补测已发布且原1 MB通过节点的5 MB，单作业4节点并发；其余204、国内TCP、网页/trace、应用TLS、1 MB和100 MB双轮使用原测量并保留时间。5 MB时间逐节点单独记录。不用旧1 MB或100 MB成绩冒充5 MB通过；默认和每日 **full** 对全部来源按1 MB→5 MB→双100 MB顺序检测。
+P95／P99取Google／YouTube各自成功请求统计中较慢的一站，波动为较大的四分位距；失败由成功率和连续失败次数单独计入排名。成功样本较少时P99接近最大值，仅作参考；每站样本数见JSON。下行优先双100MB较低速度，上行取两轮5MB较低速度；名称延迟仍用中位数。
+
+### 每个环节的检测记录
+
+| 检查阶段 | 实测 | 通过 | 未通过 | 未验证 | 未测／跳过 | 主要失败或跳过原因 |
+|---|---:|---:|---:|---:|---:|---|
+| 订阅来源获取 | 17 | 17 | 0 | 0 | 0 | 全部通过 |
+| 去重后配置解析／字符检查 | 5552 | 5549 | 3 | 0 | 0 | 3：内核不支持或非法控制字符；不写入订阅 |
+| 204三轮 | 5549 | 1555 | 3994 | 0 | 0 | 3994：连接、TLS 或读取失败 |
+| 国内入口TCP | 1339 | 226 | 1113 | 0 | 4210 | 3994：204 未通过，未提交国内 TCP 检测；1113：该服务探测点 TCP 连接失败 |
+| 3MB上行预检 | 226 | 161 | 65 | 0 | 5323 | 5323：国内TCP未通过，未提交上行预检；65：上传未完整完成、响应异常、证书失败或超出预算 |
+| 12站＋ChatGPT API＋必过trace | 161 | 0 | 161 | 0 | 5388 | 5388：国内TCP或3MB上传未通过，未进行网站检测；161：必过网页/API或trace未全部通过；各站原因见下表 |
+| 应用SSL | 0 | 0 | 0 | 0 | 5549 | 5549：必过网站未通过，未提交应用TLS检查 |
+| 1MB下载 | 0 | 0 | 0 | 0 | 5549 | 5323：未进入下载阶段；161：必过网页/API未满足三轮访问条件或必过trace未通过，跳过下载 |
+| FAST API | 0 | 0 | 0 | 0 | 5549 | 5549：1MB未通过，未请求FAST API |
+| FAST CDN 1（1MB） | 0 | 0 | 0 | 0 | 5549 | 5549：FAST未返回该有效目标或前置1MB未通过 |
+| FAST CDN 2（1MB） | 0 | 0 | 0 | 0 | 5549 | 5549：FAST未返回该有效目标或前置1MB未通过 |
+| FAST CDN 3（1MB） | 0 | 0 | 0 | 0 | 5549 | 5549：FAST未返回该有效目标或前置1MB未通过 |
+| 5MB下载（中速组） | 0 | 0 | 0 | 0 | 5549 | 5549：1 MB快测未通过，未提交5 MB测试 |
+| Cloudflare 100MB | 0 | 0 | 0 | 0 | 5549 | 5549：1MB未通过，未进行100MB下载 |
+| DataPacket 100MB | 0 | 0 | 0 | 0 | 5549 | 5549：1MB未通过，未进行100MB下载 |
+| 双100MB下载（高速组） | 0 | 0 | 0 | 0 | 5549 | 5549：1 MB 快测未通过，未提交两轮100 MB测试 |
+| 两轮上行及上传中204 | 0 | 0 | 0 | 0 | 5549 | 5549：未进入合格候选池，未进行两轮上行检测 |
+| 5MB上行第1轮 | 0 | 0 | 0 | 0 | 5549 | 5549：未进入合格池，未执行该轮5MB上传 |
+| 5MB上行第2轮 | 0 | 0 | 0 | 0 | 5549 | 5549：未进入合格池，未执行该轮5MB上传 |
+| 上传后SSL | 0 | 0 | 0 | 0 | 5549 | 5549：未进行两轮上行，未进行上传后SSL检查 |
+| 持续并行稳定性 | 161 | 104 | 57 | 0 | 5388 | 5388：国内TCP或3MB上行未通过，未开始观察；56：持续观察成功率低于90% |
+| 出口地区确认 | 161 | 161 | 0 | 0 | 5388 | 5388：出口IP／地区未确认或未进入网站阶段 |
+| IP类型查询 | 161 | 161 | 0 | 0 | 5388 | 5388：出口未确认，不查询IP类型 |
+| 住宅／纯净度查询 | 0 | 0 | 0 | 0 | 5549 | 5549：未入选候选池，不查询住宅／纯净度 |
+| 最终配置校验 | 0 | 0 | 0 | 0 | 1 | 1：没有合格候选，保留旧订阅 |
+
+未验证与真实失败分开；未测不计失败。TCP不适用于UDP，未提交的TCP探测列为跳过。FAST、5MB与100MB用于补测或分组，普通失败不等于综合池淘汰。稳定性独立并行，阶段计数不能相加。详细原因计数保存在最新检测JSON，逐次原始请求在本次Actions附件。
 
 
-## 稳定性证据与历史兼容
+稳定性在国内TCP与3MB上传通过后独立并行检测，覆盖范围大于后续下载、上行复测；持续检测行不是最后一道串行统计。
 
-当前策略见本文开头“持续稳定性”：15秒持续检测、不限轮数、成功率90%，与网站/下载并行。原版本1的五轮全过、响应硬门槛，以及版本2的20轮／30秒间隔，仅用于读取历史测量，不是新全量规则。重建保留旧证据及版本；只有重新测量才能升级到当前版本3。手动 **stability-recheck** 对当前发布池按15秒间隔观察5分钟，其他阶段保留原测量时间。
+各阶段仅检测满足前置条件的候选；同一节点可能在多项中失败，不能把失败数相加。逐网站及逐节点失败明细保存在JSON。
 
-JSON记录逐目标响应、各轮时间、证书错误和成功率，Actions保存检查点7天。所有分组保持手动选择，出口IP变化不淘汰。观察只能反映检测窗口内的表现，不能保证全天稳定。
+持续稳定性：**161**个候选，每节点**7～9**轮；通过**104**个，成功率低于90% **57**个，明确证书错误 **1**个。原因可能重叠。
+### 各网站拦截与异常数量
 
-复查证据、异常集中现象及内核对照见[2026-10-12稳定性复查](docs/node-stability-audit-2026-10-12.md)。正式间隔复测也记录内核健康与资源计数；内核或直连对照异常时不淘汰、不发布。
+统计范围 **5549** 个节点；仅实测节点进入各站分母。带★为逐站必过目标，其余目标仍参与整体覆盖率和证书校验。
 
-## 上行、负载后证书与日常检测调整
+| 网站 | 实测 | 通过 | CF人机验证 | 登录提示（通过） | 其他拦截／跳转 | 连接／TLS异常 | 慢／内容异常 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| ★ Facebook | 161 | 0 | 0 | 0 | 0 | 7 | 158 |
+| WhatsApp | 161 | 0 | 0 | 0 | 0 | 8 | 158 |
+| Amazon | 161 | 58 | 0 | 0 | 0 | 8 | 99 |
+| Cursor | 161 | 112 | 0 | 0 | 0 | 45 | 4 |
+| ★ Discord | 161 | 120 | 0 | 0 | 33 | 8 | 0 |
+| Netflix | 161 | 138 | 0 | 0 | 0 | 17 | 8 |
+| StackOverflow | 161 | 140 | 157 | 0 | 12 | 9 | 0 |
+| ★ Gemini | 161 | 145 | 0 | 0 | 5 | 9 | 2 |
+| ★ ChatGPT | 161 | 146 | 4 | 0 | 0 | 13 | 2 |
+| ★ Google | 161 | 148 | 0 | 0 | 5 | 6 | 2 |
+| ★ ChatGPTAPI | 161 | 150 | 0 | 0 | 1 | 9 | 1 |
+| DisneyPlus | 161 | 151 | 0 | 0 | 0 | 9 | 1 |
+| Spotify | 161 | 151 | 0 | 0 | 0 | 9 | 1 |
+| TikTok | 161 | 151 | 0 | 0 | 0 | 8 | 3 |
+| Perplexity | 161 | 152 | 20 | 0 | 0 | 9 | 0 |
+| ★ X | 161 | 152 | 0 | 0 | 1 | 7 | 1 |
+| Twitch | 161 | 153 | 0 | 0 | 0 | 8 | 0 |
+| ★ YouTube | 161 | 153 | 0 | 0 | 0 | 7 | 1 |
+| ★ Reddit | 161 | 154 | 0 | 88 | 2 | 6 | 0 |
+| ★ Telegram | 161 | 154 | 0 | 0 | 0 | 7 | 0 |
+| ★ Wikipedia | 161 | 154 | 0 | 0 | 1 | 6 | 0 |
+| Bing | 161 | 155 | 0 | 0 | 0 | 6 | 0 |
+| ★ GitHub | 161 | 155 | 0 | 0 | 0 | 6 | 0 |
+| HuggingFace | 161 | 155 | 0 | 0 | 0 | 6 | 0 |
+| Steam | 161 | 155 | 0 | 0 | 0 | 6 | 0 |
+| ChatGPTTrace | 161 | 156 | 0 | 0 | 0 | 5 | 0 |
+| ★ Instagram | 161 | 156 | 0 | 0 | 0 | 5 | 0 |
+| ★ ClaudeTrace | 161 | 159 | 0 | 0 | 0 | 2 | 0 |
 
-2026-10-12新版流程先在国内TCP之后向Cloudflare的 `https://speed.cloudflare.com/__up?bytes=3000000` POST随机合成3MB（6秒），通过才检查网站及下载。全部分片下载完成后，对仍符合网页/TCP/TLS/1MB下载门槛的候选进行完整上行检查，与下载错开、全局最多4节点并发。复用同一轮的3MB预检证据，再完整POST合成5MB两轮（各10秒），两轮间空闲至少20秒；不会重复3MB上传。专项 `uplink-recheck` 和只读小测会重新测量3MB，不复用之前全量的旧预检。curl总期限覆盖连接、写入和读取；禁用个人curl配置，显式指定可信CA、HTTPS和代理，禁止跳转。两轮必须完整提交且200、可信证书、正确目标、无跳转、时间预算内请求完成；部分提交、超时、SSL错误、漏轮或伪造汇总均不能入选。5MB/10秒对应约4Mbps基本端到端采样下限，不把这个门槛称作高峰值带宽。
+数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证及Reddit明确登录提示；没有这两类证据的普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。
 
-按请求总耗时计算Mbps，两轮取较低值；同时记录上传请求进行时204延迟及失败数量，每轮至少有一个204样本，全部真实通过且不超过5秒，不能用上传完成掩盖负载下请求超时。HTTP完成是公开测速接口的完成证据，不是服务端逐字节回执；发送进度或200本身不能证明完整接收。该结果测量GitHub到节点再到Cloudflare，不代表中国移动上行；非常短的小文件采样受握手/等待影响，不能视为峰值带宽。依据[Cloudflare官方上传引擎](https://github.com/cloudflare/speedtest/blob/main/src/engines/BandwidthEngine/BandwidthEngine.ts)。
+**必过站全失败，需检查检测器和服务响应：Facebook。** 不据此断言所有节点线路失效；保留原始结果，未自动放宽筛选。
 
-每节点上传后，再对四个应用域名分别做两次严格证书握手；负载后证书失败不进入任何发布组。持续稳定性已在独立任务中并行运行，待此上行任务结束后完成每节点补测再合并发布。下载、上传、证书、重复稳定性分别记录，不以高速下载掩盖证书或连接失败。新的每日 `full` 和 `uplink-recheck` 要求上行完整双轮与负载后证书证据；后续repair或其他专项复测不能绕过已启用的门槛。直连上传/内核对照异常停止发布，保存脱敏诊断。
+当前继续保留原订阅的 **17** 个节点，原测量时间 **2026-10-12T12:13:29+08:00**；这些节点未被本轮重新验证为合格。
 
-国内普通网页不再在每日流程中逐节点请求；国内入口TCP、国内应用直连及公司DNS规则保留。通用诊断工具仍可单独测国内网页，旧报告保留原历史结果与时间。解锁规格只作设计参考：此次未新增Netflix、YouTube Premium等必须解锁条件，trace可达不宣传成登录或内容解锁。
-
-手动 `upload-diagnostics` 为只读小测，测试当前订阅上行、负载后证书与五轮稳定性，不能改订阅；`uplink-recheck` 对当前发布池补测并按新门槛更新原订阅。无需新订阅地址，不改变节点名称的五字段格式。
-
-## 发布恢复
-
-`publish-retry` 下载指定已完成批次的共同输入、四份检测分片、上行结果和四份持续观察，重新验证全部原始证据，再使用最新代码生成配置。不重新测速或查询IP信誉；恢复报告必须逐项匹配原始记录，保留测量时间与住宅/纯净度元数据。发布时以最新main为父提交写入三个生成文件，避免等待中的任务拿旧报告进行文本合并产生冲突；若远端已有更新测量则保留远端。临时输入仍只保留1天，过期不能恢复。
-
-## 网站拦截与跳转诊断
-
-2026-10-12对TikTok／Reddit／Gemini使用原全量输入做云端小样本对照，发现检测Bot请求头可能触发TikTok 403；Gemini `/sorry/index` 跳转在普通Chrome中可返回正常Gemini页面。后续网页检测使用浏览器兼容请求头；Gemini只额外允许HTTPS `www.google.com/sorry/index` 的有限跳转，仍需返回Gemini正常页面和满足时间预算，Google风控页本身、未知跳转和普通403均不能直接放行。每次记录去掉参数的跳转目标、跳转链、安全响应头和固定拦截特征，避免以后只看到笼统302／403。只读 `website-diagnostics` 模式覆盖原拒绝、跳转与正常对照，进行原Bot、浏览器请求头和普通Chrome比较，不修改订阅，也不登录或解验证码。
-
-[查看TikTok／Reddit／Gemini原始拦截、跳转及云端对照证据](docs/website-restriction-audit-2026-10-12.md)。
-
-Gemini经确认的Google风控入口自动返回正常页面时，单次最终请求首响应仍限3秒，包含完整跳转的总页面采样仍限5秒；同时记录原累计TTFB和 `final_request_ttfb_ms`，不把多次握手的累计时间误当成一次请求，也不隐藏冷启动成本。
-
-## Reddit明确登录提示认可通过
-
-按用户要求，2026-10-12起，预期HTTPS Reddit站点返回的明确登录提示认可为网站可达：HTTP200／401／403，正文可见“网络安全拦截／请求被拦截”及“Log in／Sign in”，或者明确的Reddit登录页面。每轮保存 `login_prompt_signals` 和 `reddit_visible_login_prompt` 识别来源，分类为 `login_required`；三轮全部为正常页面、明确CF验证或明确Reddit登录提示才满足Reddit必过项。原403状态保留，登录提示不当作正常网页速度，也不证明登录后全部功能。仅server名称、普通403、脚本里的登录文字、未知跳转、超时或证书错误不触发例外。
-
-Reddit拒绝响应的正文上限增至512KiB（仍保留原5秒采样预算、连接／读取超时），以越过大段样式代码读取真正提示，正常页面和其他网站保持原大小。报告新增“登录提示（通过）”列；已认可提示不会再算其他拦截。旧记录没有相应正文证据，不将过去89个403一律追认通过；下轮全量会真实重新测量，仍要求204、国内入口、TLS、上下行及稳定性达标。
+[本轮Actions及原始测量附件](https://github.com/hoooou/my_yml/actions/runs/38216070355)。原始附件保留7天。
+<!-- latest-detection:end -->

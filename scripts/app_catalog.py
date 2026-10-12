@@ -5,7 +5,7 @@ Android reference: https://gist.github.com/Zestinc/fa5a35a444a076214cefbe4965677
 Packages are also identified by official Play/store listings; local Info.plist
 confirms WeChat, QQ, TencentMeeting, Telegram, Claude and Cursor on this Mac.
 Domain reference: https://github.com/blackmatrix7/ios_rule_script
-Content-search audit and pinned evidence: docs/process-rule-sources.md
+Content-search audit and pinned evidence: README.md#进程规则参考
 These are reviewed snapshots, not unfiltered third-party process subscriptions.
 Only bare executable names belong here, never macOS bundle identifiers.
 """
