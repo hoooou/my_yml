@@ -1,4 +1,4 @@
-# Clash 节点优选与检测说明
+# Clash / v2rayN 节点优选与检测说明
 
 每天北京时间 **08:00**，使用免费 GitHub Actions 获取全部订阅，去重后检测，生成适用于 FlClash、Clash Meta / Mihomo 的完整配置。目标是入口可达、请求响应快、稳定且上下行良好的节点。全局组保留手动选择、默认综合优选，其他分组自动按延迟选择节点；出口IP变化本身不作为淘汰理由。
 
@@ -16,9 +16,21 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E4%BC%98%E9%80%89%E9%85%8D
 
 建议24小时刷新一次；手动任务更新后也可以立即刷新。FlClash 使用规则模式并确保流量进入 VPN/TUN；Clash Verge 的应用设置或订阅脚本可能覆盖配置，排查时以核心实际加载的配置为准。
 
+### v2rayN 订阅
+
+```text
+https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.yaml
+```
+
+在新版v2rayN中添加订阅分组，粘贴上面的地址，不启用订阅转换，更新订阅后选中导入的自定义配置并设为活动配置。核心选择Mihomo；默认自动识别也会识别为Mihomo。订阅会显示为一个完整配置，里面的节点与分组在“Clash代理”页面选择，默认全局选择综合优选。
+
+这是v2rayN支持的完整Mihomo配置订阅，与优选配置使用同一份已校验内容，每天08:00一同发布。全部合格节点、HTTP代理、特殊传输、分组、进程分流和公司DNS均保留，不把HTTP代理强转成SOCKS，也不使用第三方转换服务。它不是Xray普通节点链接订阅；如需使用Xray核心，需要另行转换并处理协议与路由差异。没有本轮合格配置时，两份订阅都保留原版本。
+
+v2rayN启动时会按应用设置改写监听端口、控制端口、日志、IPv6等字段；开启Mihomo混入配置也可能覆盖订阅。进程分流需要客户端和系统权限支持，建议使用TUN模式；公司私有DNS仍需要公司网络或内网VPN。[官方完整配置导入实现](https://github.com/2dust/v2rayN/blob/master/v2rayN/ServiceLib/Handler/Fmt/ClashFmt.cs) · [官方启动配置处理](https://github.com/2dust/v2rayN/blob/master/v2rayN/ServiceLib/Services/CoreConfig/CoreConfigClashService.cs)
+
 | 分组 | 条件与用途 |
 |---|---|
-| 🚀 全局选择 | 选择使用哪类节点；默认综合优选，只有地区组可用时默认地区组 |
+| 🚀 全局选择 | 选择使用哪类节点；默认综合优选 |
 | ⭐ 综合优选 | 完整通过入口、网站/API、应用SSL、1MB、上传和稳定性门槛，按响应与稳定性排序 |
 | 🚄 中速下载 | 已入选合格池内完整通过5MB快测的节点，包含台湾／新加坡地区池 |
 | ⚡ 高速下载 | 综合合格池内Cloudflare和DataPacket双100MB都完整通过；取较慢一次速度排序 |

@@ -1413,7 +1413,11 @@ def main():
     report['website_access_summary'] = website_access_summary(latest_cohort(report))
     report['service_checks_policy'] = previous.get('service_checks_policy') if repairing else service_probes.settings()
     report['service_checks_summary'] = service_probes.summary(latest_cohort(report))
-    Path('优选配置.yaml').write_text(f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text())
+    subscription = f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text()
+    Path('优选配置.yaml').write_text(subscription)
+    # v2rayN imports full Clash YAML as a custom Mihomo profile. Keeping the
+    # validated document intact preserves HTTP proxies, transports and routing.
+    Path('v2rayN.yaml').write_text(subscription)
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     from latest_report import write_latest
     write_latest(report, config, website_gate=required_websites_passed, validation='passed')
