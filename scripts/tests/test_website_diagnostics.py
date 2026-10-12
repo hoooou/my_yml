@@ -25,8 +25,12 @@ class WebsiteDiagnosticTests(unittest.TestCase):
                     result = Response(); result.url = url
                     return result
                 client.get.side_effect = get
-                self.assertEqual(p.check_site(1234, label, p.SITES[label])['status'], 'passed')
+                result = p.check_site(1234, label, p.SITES[label])
+                self.assertEqual(result['status'], 'passed')
+                self.assertEqual(result['request_header_profile'], 'browser_navigation')
         self.assertEqual(p.website_headers('Google'), {'User-Agent': p.WEB_USER_AGENT})
+        for label in (*p.API_SITES, *p.CONNECTIVITY_SITES):
+            self.assertEqual(p.website_headers(label), {'User-Agent': p.WEB_USER_AGENT})
 
     def test_meta_http400_failures_are_selected_for_diagnosis_not_silently_skipped(self):
         rows = [{'id': str(i), 'exit': {'exit_ip': str(i)}, 'websites': {

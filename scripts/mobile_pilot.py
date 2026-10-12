@@ -366,6 +366,8 @@ def check_site(port, label, url, timeout=(3, 2), request_headers=None):
                     result['ttfb_ms'] = headers_ms
                     result['sample_bytes'] = len(body)
                     result['sample_limit_bytes'] = response_limit
+                    result['request_header_profile'] = ('diagnostic_override' if request_headers is not None else
+                        'browser_navigation' if label in ('Facebook', 'WhatsApp') else 'user_agent_only')
                     result['final_request_ttfb_ms'] = final_headers_ms
                     resolved_google_redirect = (label == 'Gemini' and any(
                         x.get('target') == 'https://www.google.com/sorry/index' for x in redirect_chain))
