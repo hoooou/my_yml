@@ -897,7 +897,9 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
     recommended = [r['name'] for r in strict]
     regional = [r['name'] for r in ranked if regional_eligible(r)]
     def group(name, names):
-        return {'name': name, 'type': 'select', 'proxies': names or ['REJECT']}
+        return {'name': name, 'type': 'select', 'proxies': names or ['REJECT'],
+                'url': SITES['Google204'], 'interval': 300, 'lazy': False,
+                'timeout': 5000, 'expected-status': 204}
     config['proxies'] = proxies
     choices = ['⭐ 综合优选', medium_speed.GROUP, '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
     if not recommended and regional:
@@ -955,6 +957,38 @@ def merge_uplink(bundle, records, stage, mapping):
     return diagnostic
 
 
+def reuse_measurements(bundle, records, cached, source_run):
+    """Metadata reuse never substitutes for validated raw shard/upload/observer artifacts."""
+    rows = cached.get('nodes') or []
+    by_id = {r['id']: r for r in rows}
+    if (len(rows) != len(records) or len(by_id) != len(rows) or set(by_id) != {r['id'] for r in records}
+            or cached.get('parseable_count') != len(records)
+            or cached.get('input_unique_count') != bundle['input_count']):
+        raise ValueError('恢复报告不属于本轮完整节点集合')
+    original_time = cached.get('measurements_updated_at') or cached['updated_at']
+    s.datetime.fromisoformat(original_time)
+    keys = ('server', 'port', 'protocol', 'precheck', 'entry', 'upload_precheck',
+            'websites', 'exit', 'exit_consistent', 'app_tls', 'download',
+            'medium_speed_download', 'high_speed_download', 'upload', 'post_upload_tls')
+    for row in records:
+        old = by_id[row['id']]
+        if any(row.get(key) != old.get(key) for key in keys):
+            raise ValueError('恢复报告与原始检测证据不一致')
+        current_stable, previous_stable = row.get('stability') or {}, old.get('stability') or {}
+        if any(current_stable.get(key) != previous_stable.get(key)
+               for key in ('version', 'attempts', 'peer_completed_offset_seconds', 'status')):
+            raise ValueError('恢复报告与持续观察原始证据不一致')
+    for row in records:
+        old = by_id[row['id']]
+        for key in ('ip_type', 'ip_reputation'):
+            if key in old:
+                row[key] = copy.deepcopy(old[key])
+        if row.get('stability') and old['stability'].get('updated_at'):
+            row['stability']['updated_at'] = old['stability']['updated_at']
+    bundle['measurements_updated_at'] = original_time
+    return {'source_run': source_run, 'measurements_updated_at': original_time, 'new_probes': False}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--mihomo', required=True)
@@ -966,6 +1000,8 @@ def main():
     parser.add_argument('--results-dir', default='.node-work/shards')
     parser.add_argument('--preflight-dir', default='.node-work/preflight')
     parser.add_argument('--observations-dir', default='.node-work/observations')
+    parser.add_argument('--reuse-report', help='Validated same-run report to preserve measurement time and IP metadata without querying again')
+    parser.add_argument('--source-run', help='Source Actions run for publication recovery')
     parser.add_argument('--uplink-result', default='.node-work/uplink/uplink-stage.json')
     parser.add_argument('--refresh-ip-reputation', action='store_true', help='Refresh optional IP metadata in repair mode')
     args = parser.parse_args()
@@ -1093,18 +1129,24 @@ def main():
         stability_diagnostic = continuous_stability.merge(bundle, observations, records, args.shard_count, shard_nodes)
         (root / 'stability-results.json').write_text(json.dumps(stability_diagnostic, ensure_ascii=False))
         (root / 'upload-results.json').write_text(json.dumps(upload_diagnostic, ensure_ascii=False))
+    recovery = None
+    if args.reuse_report:
+        if not parallel_publish or not args.source_run or not args.source_run.isdigit():
+            raise ValueError('恢复发布必须提供同批次并行检测证据和运行编号')
+        recovery = reuse_measurements(bundle, records, json.loads(Path(args.reuse_report).read_text()), args.source_run)
     if args.phase == 'medium-recheck':
         medium_rechecked_count = recheck_medium_download(records, mapping, binary, root)
     if args.phase == 'web-recheck':
         website_rechecked_count = recheck_websites(records, mapping, binary, root)
     reachable = [r for r in records if r['entry']['status'] == 'passed' and r.get('websites')]
     if args.phase not in repair_modes:
-        ip_types = s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
+        ip_types = {} if recovery else s.lookup_ip_types(r['exit']['exit_ip'] for r in records if r['exit'])
         for record in records:
             record['sources'] = metadata.get(record['id'], {}).get('sources', [])
             record['candidate_origin'] = metadata.get(record['id'], {}).get('candidate_origin', 'latest_subscriptions')
-            record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
-    if args.phase not in repair_modes or args.refresh_ip_reputation:
+            if not recovery:
+                record['ip_type'] = ip_types.get((record.get('exit') or {}).get('exit_ip'), {'status': 'unknown', 'hosting': None})
+    if (args.phase not in repair_modes or args.refresh_ip_reputation) and not recovery:
         eligible_ips = [(r.get('exit') or {}).get('exit_ip') for r in records
                         if (r.get('download') or {}).get('status') == 'passed'
                         and r.get('exit_consistent') is not False]
@@ -1140,7 +1182,8 @@ def main():
         write_attempt(root, records, config, REQUIRED_SITES, sources, input_count,
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES,
                       required_gate=required_websites_passed,
-                      stability_policy=(stability_diagnostic or {}).get('settings') or stability.settings(records))
+                      stability_policy=(stability_diagnostic or {}).get('settings') or stability.settings(records),
+                      measurement_recovery=recovery)
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
             print('全量检测完成：无符合页面、trace及应用TLS门槛的节点，报告已保存；原订阅未更新', flush=True)
@@ -1179,6 +1222,9 @@ def main():
                                          for v in ('passed', 'failed')},
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
+              'measurement_recovery': recovery,
+              'group_latency_policy': {'url': SITES['Google204'], 'interval_seconds': 300,
+                  'timeout_ms': 5000, 'expected_status': 204, 'manual_selection': True, 'lazy': False},
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
                   'scope': 'available_published_quick_download_passed', 'overseas_rounds': WEBSITE_ROUNDS,
                   'workers': 8, 'jobs': 1,

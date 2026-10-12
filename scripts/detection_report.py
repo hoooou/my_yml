@@ -141,6 +141,9 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     result = '待发布候选' if candidate else '当前订阅'
     rows = ['# 节点检测报告', '',
             f'**{result}：{len(config.get("proxies", []))} 个节点。** {title}；报告更新 {clock(report.get("updated_at"))}（北京时间）。', '']
+    if report.get('measurement_recovery'):
+        source = report['measurement_recovery']['source_run']
+        rows += [f'本次沿用[已完成的全量检测](https://github.com/hoooou/my_yml/actions/runs/{source})修复发布和分组，没有重新测速；测量时间保留。', '']
     if mode == 'full':
         rows += [f'本轮获取并去重 **{report.get("input_unique_count", 0)}** 个节点，可解析 **{report.get("parseable_count", len(nodes))}** 个。未入选节点不写入订阅。', '']
     else:
@@ -153,6 +156,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     if counts:
         rows += [' · '.join(f'{cell(name)} **{count}**' for name, count in counts), '',
                  '分组会重叠，不能将数量相加；所有分组保持手动选择。', '']
+    if report.get('group_latency_policy'):
+        rows += ['分组每5分钟自动检测HTTPS 204延迟，5秒超时；节点仍由你手动选择，测速不自动切换节点。', '']
     if candidate:
         rows += [('最终发布状态以本次 Actions 的发布步骤为准。' if selected else
                   '**本轮无合格节点，保留原订阅。** 原订阅不代表通过这次页面与trace检测。'), '']
