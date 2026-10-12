@@ -17,7 +17,7 @@ on:
         type: choice
         required: false
         default: all
-        options: [all, Reddit]
+        options: [all, Reddit, Meta]
       diagnostic_run_id:
         description: 发布恢复或诊断使用的已完成全量检测运行编号
         type: string
@@ -703,6 +703,8 @@ jobs:
           diagnostic_args=()
           if [[ "$DIAGNOSTIC_SITE" == Reddit ]]; then
             diagnostic_args=(--sites Reddit)
+          elif [[ "$DIAGNOSTIC_SITE" == Meta ]]; then
+            diagnostic_args=(--sites Facebook WhatsApp)
           fi
           python scripts/website_diagnostics.py --mihomo .node-work/bin/mihomo \
             --bundle .node-work/diagnostic-input/bundle.json \

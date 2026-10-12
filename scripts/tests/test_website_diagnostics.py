@@ -6,6 +6,15 @@ import website_diagnostics as d
 import mobile_pilot as p
 
 class WebsiteDiagnosticTests(unittest.TestCase):
+    def test_meta_http400_failures_are_selected_for_diagnosis_not_silently_skipped(self):
+        rows = [{'id': str(i), 'exit': {'exit_ip': str(i)}, 'websites': {
+            label: {'status': 'failed', 'attempts': [{'status': 'failed', 'http_status': 400}] * 3}
+            for label in ('Facebook', 'WhatsApp')}} for i in range(3)]
+        tasks = d.choose_samples({'nodes': [{'name': str(i)} for i in range(3)]},
+                                 {'nodes': rows}, limit=2, labels=('Facebook', 'WhatsApp'))
+        self.assertEqual(len(tasks), 4)
+        self.assertEqual({t['group'] for t in tasks}, {'http_error'})
+
     def test_evidence_omits_cookies_and_query_retains_denial_signal(self):
         item = d.evidence('Reddit',403,p.SITES['Reddit'],
             {'Location':'https://accounts.google.com/login?secret=do-not-publish','Set-Cookie':'secret'},

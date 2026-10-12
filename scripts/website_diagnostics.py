@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import re
 import shutil
+import subprocess
+import tempfile
 import time
 from urllib.parse import urljoin, urlparse
 
@@ -12,7 +14,7 @@ import claude_diagnostics as c
 import mobile_pilot as p
 import select_nodes as s
 
-LABELS = ('TikTok', 'Reddit', 'Gemini')
+LABELS = ('TikTok', 'Reddit', 'Gemini', 'Facebook', 'WhatsApp')
 DENIAL_PHRASES = ('blocked by network security', 'request has been blocked', 'access denied',
     'unsupported country', 'not available in your country', 'not available in your region',
     'unusual traffic', 'sign in', 'log in', 'verify you are human', 'just a moment')
@@ -38,7 +40,8 @@ def choose_samples(bundle, report, limit=4, labels=LABELS):
             attempts = page['attempts']
             restricted = [a for a in attempts if a.get('status') == 'needs_review']
             group = ('redirect' if any(300 <= a.get('http_status', 0) < 400 for a in restricted)
-                     else 'denied' if restricted else 'passed' if page.get('status') == 'passed' else None)
+                     else 'denied' if restricted else 'passed' if page.get('status') == 'passed'
+                     else 'http_error' if any((a.get('http_status') or 0) >= 400 for a in attempts) else None)
             if group:
                 groups.setdefault(group, []).append(row)
         for group, rows in sorted(groups.items()):
@@ -56,7 +59,7 @@ def choose_samples(bundle, report, limit=4, labels=LABELS):
     return tasks
 
 
-def requests_probe(port, label, ua, alternate_url=None):
+def requests_probe(port, label, ua, alternate_url=None, browser_headers=False):
     started = time.monotonic(); chain = []
     try:
         with s.session() as client:
@@ -64,7 +67,13 @@ def requests_probe(port, label, ua, alternate_url=None):
                 client.proxies = {k: f'http://127.0.0.1:{port}' for k in ('http', 'https')}
             current = alternate_url or p.SITES[label]
             for hop in range(4):
-                with client.get(current, headers={'User-Agent': ua}, allow_redirects=False,
+                headers = {'User-Agent': ua}
+                if browser_headers:
+                    headers.update(Accept='text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                                   **{'Accept-Language': 'en-US,en;q=0.9', 'Upgrade-Insecure-Requests': '1',
+                                      'Sec-Fetch-Dest': 'document', 'Sec-Fetch-Mode': 'navigate',
+                                      'Sec-Fetch-Site': 'none', 'Sec-Fetch-User': '?1'})
+                with client.get(current, headers=headers, allow_redirects=False,
                                 stream=True, verify=True, timeout=(3, 2)) as response:
                     location = response.headers.get('Location')
                     target = urljoin(current, location) if location else None
@@ -85,6 +94,33 @@ def requests_probe(port, label, ua, alternate_url=None):
         return {'error_type': type(error).__name__, 'redirect_chain': chain,
                 **({'tls_error_kind': 'certificate_verification_failed'} if p.certificate_failure(error) else {}),
                 'elapsed_ms': round((time.monotonic() - started) * 1000, 1)}
+
+
+def curl_probe(port, label, version):
+    with tempfile.TemporaryDirectory(prefix='website-curl-') as directory:
+        root = Path(directory)
+        command = ['curl', '--disable', '--silent', '--show-error', '--compressed', '--' + version,
+            '--connect-timeout', '3', '--max-time', '6', '--max-filesize', '524288',
+            '--proto', '=https', '--proxy', f'http://127.0.0.1:{port}' if port else '',
+            '--user-agent', p.WEB_USER_AGENT, '--dump-header', str(root/'headers'),
+            '--output', str(root/'body'), '--write-out', '%{json}', p.SITES[label]]
+        completed = subprocess.run(command, capture_output=True, text=True, timeout=10)
+        try:
+            stats = json.loads(completed.stdout)
+        except ValueError:
+            return {'curl_exit_code': completed.returncode, 'error_type': 'no_curl_response'}
+        headers = {}
+        if (root/'headers').exists():
+            for line in (root/'headers').read_text(errors='replace').splitlines():
+                if line.lower().startswith('http/'):
+                    headers = {}
+                elif ':' in line:
+                    key, value = line.split(':', 1); headers[key.lower()] = value.strip()
+        body = (root/'body').read_bytes()[:c.BODY_LIMIT] if (root/'body').exists() else b''
+        return {**evidence(label, stats.get('http_code', 0), stats.get('url_effective', p.SITES[label]), headers, body),
+            'curl_exit_code': completed.returncode, 'http_version': stats.get('http_version'),
+            'elapsed_ms': round(stats.get('time_total', 0)*1000, 1),
+            **({'tls_error_kind': 'certificate_verification_failed'} if completed.returncode == 60 else {})}
 
 
 def browser_probe(port, label):
@@ -130,6 +166,10 @@ def inspect(port, task):
             'bot': requests_probe(port, label, p.LEGACY_WEB_USER_AGENT),
             'browser_ua': requests_probe(port, label, c.BROWSER_UA)}
     item['production_rounds'] = [p.check_site(port, label, p.SITES[label]) for _ in range(3)]
+    if label in ('Facebook', 'WhatsApp'):
+        item['browser_headers'] = requests_probe(port, label, p.WEB_USER_AGENT, browser_headers=True)
+        item['curl_http1'] = curl_probe(port, label, 'http1.1')
+        item['curl_http2'] = curl_probe(port, label, 'http2')
     if label == 'Reddit':
         item['old_reddit'] = requests_probe(port, label, c.BROWSER_UA, 'https://old.reddit.com/')
     if task['browser']:
