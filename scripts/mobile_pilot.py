@@ -23,9 +23,10 @@ MOBILE_ASN = 9808
 UDP_TYPES = {'hysteria', 'hysteria2', 'tuic', 'wireguard'}
 # Keep domain routing and the explicit diagnostic URL; neither page is probed daily.
 CLAUDE_PAGE_URL = PAGES['Claude']['url']
+API_SITES = {'ChatGPTAPI': 'https://api.openai.com/compliance/cookie_requirements'}
 SITES = {label: item['url'] for label, item in PAGES.items() if label not in ('抖音', 'Claude')}
 PAGE_SITES = tuple(SITES)
-OVERSEAS_SITES = tuple(label for label in OVERSEAS if label in SITES)
+OVERSEAS_SITES = tuple(label for label in OVERSEAS if label in SITES) + tuple(API_SITES)
 DOMESTIC_SITES = tuple(label for label in DOMESTIC if label in SITES)
 SITE_WORKERS = 5
 LEGACY_WEB_USER_AGENT = 'my-yml-availability-bot/5.0 (https://github.com/hoooou/my_yml) python-requests/' + s.requests.__version__
@@ -42,12 +43,14 @@ PAGE_HOSTS = {}
 for label in (*PAGE_SITES, 'Claude'):
     host = urlparse(PAGES[label]['url']).hostname
     PAGE_HOSTS[label] = {host, host[4:] if host.startswith('www.') else 'www.' + host}
+PAGE_HOSTS.update({label: {urlparse(url).hostname} for label, url in API_SITES.items()})
 CONNECTIVITY_SITES = {
     'Google204': 'https://connectivitycheck.gstatic.com/generate_204',
     'ChatGPTTrace': 'https://chatgpt.com/cdn-cgi/trace',
     'ClaudeTrace': 'https://claude.ai/cdn-cgi/trace',
 }
 SITES.update(CONNECTIVITY_SITES)
+SITES.update(API_SITES)
 POST_SITES = {label: url for label, url in SITES.items() if label != 'Google204'}
 
 
@@ -118,6 +121,23 @@ def check_mobile(node):
 
 def classify_page(label, status, final_url, content_type, body):
     result = {'http_status': status, 'final_url': final_url}
+    if label in API_SITES:
+        try:
+            data = json.loads(body)
+        except (ValueError, UnicodeError):
+            data = None
+        error = data.get('error') if isinstance(data, dict) else None
+        code = error.get('code') if isinstance(error, dict) else None
+        if code in ('unsupported_country', 'unsupported_country_region_territory'):
+            return {**result, 'status': 'needs_review', 'restriction': 'unsupported_country',
+                    'reason': 'ChatGPT API明确返回地区不支持'}
+        if (final_url != API_SITES[label] or status in (401, 403, 429, 451) or 300 <= status < 400):
+            return {**result, 'status': 'needs_review', 'reason': 'ChatGPT API返回限制或跳转'}
+        passed = (status == 200 and 'json' in content_type.lower() and isinstance(data, dict)
+            and type(data.get('cookie_consent_required')) is bool and not error)
+        return {**result, 'status': 'passed' if passed else 'failed',
+            **({'cookie_consent_required': data['cookie_consent_required']} if passed else {}),
+            'reason': 'ChatGPT API返回预期JSON；未验证登录或对话' if passed else 'ChatGPT API未返回预期JSON字段'}
     text = body.decode('utf-8', errors='replace').lower()
     host = urlparse(final_url).hostname or ''
     expected_host = urlparse(PAGES[label]['url'] if label in PAGES else SITES[label]).hostname

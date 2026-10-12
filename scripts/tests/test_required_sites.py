@@ -37,7 +37,7 @@ class RequiredSiteTests(unittest.TestCase):
         self.assertTrue(a.web_quality_eligible(good))
         self.assertTrue(a.regional_eligible(good))
         self.assertEqual(set(a.REQUIRED_SITES), {'Google', 'YouTube', 'ChatGPT', 'Gemini',
-            'GitHub', 'Wikipedia', 'Reddit', 'X', 'Instagram', 'Telegram', 'Discord', 'Facebook'})
+            'GitHub', 'Wikipedia', 'Reddit', 'X', 'Instagram', 'Telegram', 'Discord', 'Facebook', 'ChatGPTAPI'})
         for label in a.REQUIRED_SITES:
             for condition in ('missing', 'unstable', 'needs_review', 'single_round'):
                 bad = copy.deepcopy(good)

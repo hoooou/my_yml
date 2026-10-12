@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   inspect:
-    name: ChatGPT API、FAST CDN与TikTok trace（不发布订阅）
+    name: ChatGPT API与FAST CDN（不发布订阅）
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
@@ -23,7 +23,7 @@ jobs:
           python -m pip install -r scripts/requirements.txt
           python scripts/install_tools.py --mihomo-only
           python -m unittest discover -s scripts/tests -v
-      - name: 验证三个服务及直连对照
+      - name: 验证服务及直连对照
         run: python scripts/service_diagnostics.py --mihomo .node-work/bin/mihomo
       - name: 保存脱敏结果
         if: always()

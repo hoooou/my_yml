@@ -132,11 +132,13 @@ FlClash 需使用规则模式，并让这些应用的流量进入其 VPN；在�
 
 ### 补充服务请求
 
-完整检测在现有1MB下载通过后，并行执行三个补充目标：ChatGPT `https://api.openai.com/compliance/cookie_requirements`、FAST测速API、TikTok `https://www.tiktok.com/cdn-cgi/trace`。每个接口限5秒、正文最多64KiB、禁止自动跳转并严格校验证书。ChatGPT要求200、JSON且`cookie_consent_required`为布尔值；明确`unsupported_country`记录地区限制，不因缺少该错误就判通过。TikTok要求有效纯文本trace、正确域名、HTTPS、公共IP和两位大写地区码；404、HTML或缺字段记录接口不可用，原首页检测独立保留。
+ChatGPT `https://api.openai.com/compliance/cookie_requirements` 放在网站阶段，与原12个必过页面并行、各测三轮，三轮均通过才继续应用TLS和下载。正常响应要求正确HTTPS地址、200、JSON且`cookie_consent_required`为布尔值；明确`unsupported_country`记录地区限制，不因缺少该错误就判通过。沿用网页3秒响应头及5秒样本预算、严格证书校验、CF明确验证例外策略，API通过不代表登录或对话成功。报告的逐网站统计新增该API必过行。
 
-FAST API使用公开浏览器测速token获取一个目标，仅接受HTTPS、443端口、`*.nflxvideo.net`且符合`/speedtest/range/0-N`的地址，然后请求1,000,000字节，6秒内完整下载才算Netflix CDN小样本通过。与上行共享流量调度，接口阶段与下载阶段分别记录；不把API返回当作带宽或Netflix解锁。CDN地区是服务器所在地，不替代节点出口地区。签名查询、Cookie和原始响应正文不写入报告。
+TikTok保持原首页检测和筛选逻辑，不新增必过条件、不使用trace。在三个204通过节点及前后直连对照中，`/cdn-cgi/trace`均302到`/404`，最终是HTML错误页；按用户选择取消这个目标。证据见[云端验证](https://github.com/hoooou/my_yml/actions/runs/38212157289)。
 
-这些结果位于JSON的`service_checks`及独立汇总、MD的“补充服务检测”，不计入原网站覆盖率、不替代Cloudflare/DataPacket下载、不修改节点名称或分组。普通接口限制、接口不可用、下载失败不新增淘汰条件；任何明确证书校验错误仍淘汰。历史重建保留原始证据，不补写未测通过；新检测随下一轮全量实际运行。工作流“补充服务小样本验证”可只读验证最多4个当前节点和前后直连对照，保留脱敏结果7天，不更新订阅。
+FAST在现有1MB下载通过后执行，使用公开浏览器测速token获取一个目标。接口响应预算5秒、正文最多64KiB、禁止自动跳转；仅接受HTTPS、443端口、`*.nflxvideo.net`且符合`/speedtest`或`/speedtest/range/0-N`的地址。按[FAST官方客户端](https://fast.com/app-0bffe1.js)的方式拼接下载范围，然后请求1,000,000字节，6秒内完整下载才算Netflix CDN小样本通过。与上行共享流量调度，接口阶段与下载阶段分别记录；不把API返回当作带宽或Netflix解锁。CDN地区是服务器所在地，不替代节点出口地区。签名查询、Cookie和原始响应正文不写入报告。
+
+FAST结果位于JSON的`service_checks`及独立汇总、MD的“补充服务检测”，不计入网站覆盖率、不替代Cloudflare/DataPacket下载、不修改节点名称或分组。FAST普通接口限制、接口不可用、下载失败不新增淘汰条件；任何明确证书校验错误仍淘汰。ChatGPT API属于上述必过网站阶段，失败会跳过后续检测。历史重建不补写未测通过；采用新必过条件需要实际运行全量检测。工作流“补充服务小样本验证”只读验证最多4个当前节点和前后直连对照，包含生产方式的ChatGPT API三轮和FAST API/CDN结果，保留脱敏结果7天，不更新订阅。
 
 入口和分阶段检测位于 `scripts/availability.py`，网页及 trace 的响应校验位于 `scripts/mobile_pilot.py`。工作流只安装 Mihomo，使用独立节点监听端口，不打开 TUN、不修改系统代理。旧下载测速脚本仅用于历史复现，当前工作流使用直接 HTTP 的1 MB、5 MB快速采样及通过节点的100 MB双目标复测。
 

@@ -60,10 +60,12 @@ class MobilePilotTests(unittest.TestCase):
                 self.url = url
                 if url.endswith('generate_204'): self.status_code = 204
                 if url.endswith('/trace'): self.headers = {'Content-Type': 'text/plain'}
+                if url == pilot.API_SITES['ChatGPTAPI']: self.headers = {'Content-Type': 'application/json'}
             def __enter__(self): return self
             def __exit__(self, *args): pass
             def iter_content(self, size):
                 if self.url.endswith('generate_204'): return iter([])
+                if self.url == pilot.API_SITES['ChatGPTAPI']: return iter([b'{"cookie_consent_required":false}'])
                 if self.url.endswith('/trace'):
                     host = pilot.urlparse(self.url).hostname
                     return iter([f'h={host}\nip=8.8.8.8\nloc=US\nvisit_scheme=https\ncolo=LAX\n'.encode()])
@@ -171,14 +173,14 @@ class MobilePilotTests(unittest.TestCase):
         self.assertEqual(classify(204, b'', 'https://connectivitycheck.gstatic.com/other'), 'needs_review')
 
     def test_catalog_categories_and_known_www_redirects(self):
-        self.assertEqual(len(pilot.OVERSEAS_SITES), 25)
+        self.assertEqual(len(pilot.OVERSEAS_SITES), 26)
         self.assertEqual(len(pilot.DOMESTIC_SITES), 13)
         self.assertNotIn('抖音', pilot.SITES)
         self.assertNotIn('Claude', pilot.SITES)
         self.assertIn('Claude', pilot.OVERSEAS)
         self.assertIn('抖音', pilot.DOMESTIC)
         self.assertFalse(set(pilot.OVERSEAS_SITES) & set(pilot.DOMESTIC_SITES))
-        self.assertEqual(set(pilot.PAGE_SITES), set(pilot.OVERSEAS_SITES) | set(pilot.DOMESTIC_SITES))
+        self.assertEqual(set(pilot.PAGE_SITES), (set(pilot.OVERSEAS_SITES) | set(pilot.DOMESTIC_SITES)) - set(pilot.API_SITES))
         self.assertEqual(pilot.classify_page('Cursor',200,'https://cursor.com/','text/html',b'Cursor')['status'],'passed')
         self.assertEqual(pilot.classify_page('Cursor',200,'https://unrelated.cursor.com/','text/html',b'Cursor')['status'],'needs_review')
         for status in (412,444,451):
