@@ -48,7 +48,7 @@ def website_access_table(nodes, required=()):
     if not counts:
         return []
     rows = ['## 各网站拦截与异常数量', '',
-            f'统计范围 **{len(nodes)}** 个节点；仅实测节点进入各站分母。带★为必过目标，其他目标仅供诊断。', '',
+            f'统计范围 **{len(nodes)}** 个节点；仅实测节点进入各站分母。带★为逐站必过目标，其余目标仍参与整体覆盖率和证书校验。', '',
             '| 网站 | 实测 | 通过 | CF人机验证 | 其他拦截／跳转 | 连接／TLS异常 | 慢／内容异常 |',
             '|---|---:|---:|---:|---:|---:|---:|']
     for label, item in sorted(counts.items(), key=lambda kv: (-(kv[1]['measured'] - kv[1]['accepted']), kv[0])):
