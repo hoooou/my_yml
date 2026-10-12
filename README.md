@@ -41,7 +41,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E4%BC%98%E9%80%89%E9%85%8D
 | 1 | 双HTTPS 204各三轮 | Google `https://connectivitycheck.gstatic.com/generate_204`及Cloudflare `https://cp.cloudflare.com/generate_204`，交替顺序，各三次无正文204、严格TLS；两者全部通过才进入国内TCP。任一失败跳过后续入口检测；报告分别列两个目标和联合门槛，节点名称延迟仍取Google请求 |
 | 2 | 国内入口TCPing | 小小API，一入口一次，共享入口去重；四片总请求约≤5次/秒。明确连接失败淘汰，接口异常保持未验证；UDP不适用TCP，正式流程不凭云端204放行 |
 | 3 | 3MB上行预检 | `https://speed.cloudflare.com/__up?bytes=3000000`，随机合成3,000,000字节、6秒完整HTTP请求预算；严格证书校验。每片同时一个，与同片下载互斥；失败跳过网站及下载 |
-| 4 | 海外网页／API／trace | 25个海外页面及ChatGPT API各三轮，两个trace单轮；每节点最多5个请求并发。指定必过目标见下文 |
+| 4 | 海外网页／API／trace | 25个海外页面及ChatGPT API各三轮，两个trace单轮；每节点最多5个请求并发。指定必过目标见下文；任何网站／API／trace出现TLS异常（含非必过网站）均淘汰，普通连接超时按既有规则处理 |
 | 5 | 应用SSL | chatgpt.com、android.chat.openai.com、auth.openai.com、cdn.oaistatic.com各两次独立TLS，单次5秒、TLS≥1.2，信任链、域名、有效期必须正常 |
 | 6 | Cloudflare 1MB快测 | `https://speed.cloudflare.com/__down?bytes=1000000`，6秒内完整接收；所有入选节点必过 |
 | 补充 | FAST API／Netflix CDN | 1MB通过后通过urlCount=3取得最多三个不同CDN主机，依次各下载1MB、各限6秒。普通失败只报告；明确证书错误淘汰 |

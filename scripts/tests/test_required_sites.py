@@ -32,6 +32,19 @@ class RequiredSiteTests(unittest.TestCase):
                 for label in a.OVERSEAS_SITES},
                 'ClaudeTrace': {'status': 'passed', 'round_count': 1, 'passed_count': 1}}}
 
+    def test_optional_website_tls_error_eliminates_both_pools_but_timeout_does_not(self):
+        for error in ({'error_type': 'SSLError'}, {'tls_error_kind': 'tls_handshake_or_transport_failed'},
+                      {'tls_error_kind': 'certificate_verification_failed'}):
+            row = self.record()
+            row['websites']['Amazon'] = {'status': 'failed', 'attempts': [{'status': 'failed', **error}]}
+            self.assertEqual(a.website_tls_failures(row), ['Amazon'])
+            self.assertFalse(a.web_quality_eligible(row))
+            self.assertFalse(a.regional_eligible(row))
+        row = self.record()
+        row['websites']['Amazon'] = {'status': 'failed', 'attempts': [{'status': 'failed', 'error_type': 'ReadTimeout'}]}
+        self.assertTrue(a.web_quality_eligible(row))
+        self.assertTrue(a.regional_eligible(row))
+
     def test_each_required_site_is_mandatory_for_both_pools(self):
         good = self.record()
         self.assertTrue(a.web_quality_eligible(good))

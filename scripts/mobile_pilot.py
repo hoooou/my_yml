@@ -8,6 +8,7 @@ import html
 import json
 import math
 import re
+import ssl
 from pathlib import Path
 import statistics
 import subprocess
@@ -309,6 +310,28 @@ def certificate_failure(error):
     return False
 
 
+def tls_failure_kind(error):
+    pending, seen = [error], set()
+    found = False
+    for _ in range(32):
+        if not pending:
+            break
+        current = pending.pop()
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
+        if not isinstance(current, BaseException):
+            continue
+        if isinstance(current, (ssl.SSLError, s.requests.exceptions.SSLError)) or type(current).__name__ == 'SSLError':
+            found = True
+            text = str(current).lower()
+            if 'certificate_verify_failed' in text or 'certificate verify failed' in text:
+                return 'certificate_verification_failed'
+        pending.extend(x for x in (*current.args, current.__cause__, current.__context__,
+                                  getattr(current, 'reason', None)) if isinstance(x, BaseException))
+    return 'tls_handshake_or_transport_failed' if found else None
+
+
 def navigation_headers():
     return {'User-Agent': WEB_USER_AGENT,
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -387,7 +410,7 @@ def check_site(port, label, url, timeout=(3, 2), request_headers=None):
         except s.requests.RequestException as error:
             return {'status': 'failed', 'reason': '连接、TLS 或读取失败',
                     'error_type': type(error).__name__,
-                    **({'tls_error_kind': 'certificate_verification_failed'} if certificate_failure(error) else {}),
+                    **({'tls_error_kind': tls_failure_kind(error)} if tls_failure_kind(error) else {}),
                     'elapsed_ms': round((time.perf_counter() - started) * 1000, 1)}
 
 

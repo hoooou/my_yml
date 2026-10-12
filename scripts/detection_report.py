@@ -310,10 +310,10 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     if mode != 'full' and any(r.get('websites') for r in cohort):
         rows += ['上表只统计当前补测／重建范围的节点；未重新检测的网页沿用原测量时间。', '']
     rows += ['', '## 最新筛选流程', '', '| 顺序 | 检查 | 要求 |', '|---:|---|---|',
-             '| 1 | HTTPS 204 | 三轮全部通过 |',
+             ('| 1 | 双HTTPS 204 | Google与Cloudflare各三轮全部通过 |' if (report.get('precheck_policy') or {}).get('requires_both') else '| 1 | HTTPS 204 | 三轮全部通过 |'),
              '| 2 | 国内入口TCP | 国内探测点连接成功；未验证不放行 |',
              '| 3 | 3MB上行预检 | 6秒内完整上传（含建连及响应，约4Mbps下限）；失败跳过网站和下载，每分片同时一个，与下载错开 |',
-             '| 4 | 海外网站及API／trace | 指定12站及ChatGPT API各三轮；必过trace单轮 |',
+             '| 4 | 海外网站及API／trace | 指定12站及ChatGPT API各三轮；必过trace单轮；任何网站TLS异常淘汰 |',
              '| 5 | 应用SSL | 四个域名各两次，严格校验证书链、域名和有效期 |',
              '| 6 | 1MB下载 | 6秒内完整下载，所有入选节点必过 |',
              '| 补充 | FAST API／Netflix CDN | 1MB通过后获取3个不同CDN主机，依次各下载1MB（各6秒）；仅明确证书错误影响淘汰 |',
