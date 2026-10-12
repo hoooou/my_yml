@@ -55,7 +55,7 @@ def counts(stage_id, label, items, validator, fallback):
                     import continuous_stability as cs
                     if any(cs.certificate_error(a) for a in item.get('attempts', [])):
                         reason = '明确证书校验错误'
-                    elif item.get('version') in (2, cs.VERSION) and cs.metrics(item)['success_rate'] < .9:
+                    elif item.get('version') in (2, 3, cs.VERSION) and cs.metrics(item)['success_rate'] < .9:
                         reason = '持续观察成功率低于90%'
                     else:
                         reason = '稳定性原始证据或检查条件未满足，详见逐轮记录'

@@ -10,14 +10,16 @@ import math
 import os
 from pathlib import Path
 import re
+import random
 import statistics
 import time
 
 import select_nodes as s
 import stability as legacy
 
-VERSION = 3
-INTERVAL = 15
+VERSION = 4
+IDLE_MIN = 3
+IDLE_MAX = 10
 PEER_POLL_SECONDS = 30
 STANDALONE_SECONDS = 300
 WORKERS = 8
@@ -27,15 +29,18 @@ PEER_JOB = '两轮上行及负载后SSL'
 
 def settings(version=VERSION):
     policy = {**legacy.settings(), 'version': VERSION, 'rounds': None,
-            'minimum_rounds': None, 'minimum_start_interval_seconds': INTERVAL,
+            'minimum_rounds': None, 'minimum_start_interval_seconds': None,
+            'random_idle_seconds_range': [IDLE_MIN, IDLE_MAX],
             'minimum_idle_seconds_between_rounds': None, 'node_workers': WORKERS,
             'requires_all_rounds': False, 'minimum_success_rate': .90,
             'parallel_independent_runner': True, 'scope': 'domestic_TCP_and_3MB_upload_passed',
             'observes_until': 'uplink_job_completed_and_every_node_sampled_after_completion',
             'maximum_runtime_seconds': MAX_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
             'continuous_latency_hard_caps': False, 'explicit_certificate_error_rejects': True}
-    if version == 2:
-        policy.update(version=2, minimum_rounds=20, minimum_start_interval_seconds=30)
+    if version in (2, 3):
+        policy.update(version=version, minimum_rounds=20 if version == 2 else None,
+                      minimum_start_interval_seconds=30 if version == 2 else 15)
+        policy.pop('random_idle_seconds_range')
     return policy
 
 
@@ -46,11 +51,11 @@ def certificate_error(sample):
 
 
 def valid_evidence(result):
-    if not isinstance(result, dict) or result.get('version') not in (2, VERSION):
+    if not isinstance(result, dict) or result.get('version') not in (2, 3, VERSION):
         return False
     attempts = result.get('attempts') or []
     cutoff = result.get('peer_completed_offset_seconds')
-    interval = 30 if result['version'] == 2 else INTERVAL
+    interval = 30 if result['version'] == 2 else 15 if result['version'] == 3 else IDLE_MIN
     enough = len(attempts) >= 20 if result['version'] == 2 else bool(attempts)
     if not enough or not legacy.finite(cutoff) or cutoff < 0:
         return False
@@ -60,7 +65,7 @@ def valid_evidence(result):
         if (sample.get('round') != number or not legacy.finite(start) or not legacy.finite(end)
                 or not 0 <= start <= end or set(sample.get('sites') or {}) != set(legacy.TARGETS)
                 or not isinstance(sample.get('android_tls'), dict)
-                or (last_start is not None and (start - last_start < interval - .001 or start < last_end))):
+                or (last_start is not None and ((start - last_end if result['version'] == VERSION else start - last_start) < interval - .001 or start < last_end))):
             return False
         last_start, last_end = start, end
     return last_start >= cutoff
@@ -181,8 +186,9 @@ def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=
                     item = job.result()
                     attempts[id].append(item)
                     if not (cutoff is not None and item['started_offset_seconds'] >= cutoff):
-                        heapq.heappush(due, (max(origin + item['started_offset_seconds'] + INTERVAL,
-                                               origin + item['finished_offset_seconds']), id))
+                        idle = random.uniform(IDLE_MIN, IDLE_MAX)
+                        item['next_idle_seconds'] = idle
+                        heapq.heappush(due, (origin + item['finished_offset_seconds'] + idle, id))
                 if due or running:
                     # Poll only active futures briefly; otherwise sleep to the next due/control/API tick.
                     if running:
