@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-12T07:24:52+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-12T10:06:30+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -533,72 +533,38 @@ proxies:
   type: vless
   udp: true
   uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
-  name: 美国01|221ms|477Mbps|非住宅|纯净度0.0%
-- client-fingerprint: chrome
-  network: grpc
-  port: 8444
-  reality-opts:
-    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
-    short-id: ''
-  server: 147.45.60.160
-  servername: github.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: f55e9aba-7b14-4f6f-b59a-d5b3d45c9309
-  name: 美国02|220ms|482Mbps|非住宅|纯净度0.0%
+  name: 美国01|219ms|485Mbps|非住宅|纯净度0.0%
 - port: 443
   server: 64.98.50.100
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国03|412ms|390Mbps|非住宅|纯净度100.0%
+  name: 美国02|222ms|290Mbps|非住宅|纯净度100.0%
+- password: gs4BXwT6SW
+  port: 10988
+  server: 154.26.192.123
+  tls: false
+  type: http
+  username: fQ67Dpe5dU
+  name: 美国03|474ms|7Mbps|住宅未知|纯净度99.8%
 - type: trojan
   network: ws
-  server: 212.183.88.136
+  server: 104.19.229.21
   port: 443
   password: humanity
+  skip-cert-verify: false
   sni: www.calmlunch.com
   ws-opts:
     headers:
       Host: www.calmlunch.com
     path: /assignment
-  name: 法国01|475ms|21Mbps|非住宅|纯净度97.9%
-- network: ws
-  password: humanity
-  port: 443
-  server: 212.183.88.136
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国02|483ms|138Mbps|非住宅|纯净度97.9%
-- network: ws
-  password: humanity
-  port: 443
-  server: 165.215.250.14
+  name: 法国01|615ms|41Mbps|非住宅|纯净度97.9%
+- port: 443
+  server: 82.66.235.221
   skip-cert-verify: true
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国03|495ms|40Mbps|非住宅|纯净度95.9%
-- network: ws
-  password: humanity
-  port: 443
-  server: 104.19.229.21
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国04|484ms|112Mbps|非住宅|纯净度95.9%
+  tls: true
+  type: http
+  name: 法国02|668ms|23Mbps|住宅|纯净度100.0%
 - client-fingerprint: chrome
   network: ws
   password: humanity
@@ -613,27 +579,31 @@ proxies:
       User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
         like Gecko) Chrome/63.0.3239.84 Safari/537.36
     path: /assignment
-  name: 法国05|490ms|89Mbps|非住宅|纯净度95.9%
-- type: http
-  server: 51.158.243.91
-  port: 443
-  username: 'null'
-  password: None
-  tls: true
-  sni: 51.158.243.91
-  skip-cert-verify: true
-  name: 荷兰01|607ms|109Mbps|非住宅|纯净度94.8%
+  name: 法国03|652ms|23Mbps|非住宅|纯净度97.9%
 - network: ws
   password: humanity
   port: 443
-  server: www.calmlunch.com
+  server: 104.19.229.21
+  skip-cert-verify: false
   sni: www.calmlunch.com
   type: trojan
   ws-opts:
     headers:
       Host: www.calmlunch.com
-    path: /assignment
-  name: 法国06|770ms|152Mbps|非住宅|纯净度98.7%
+    path: '%2Fassignment'
+  name: 法国04|622ms|68Mbps|非住宅|纯净度97.9%
+- network: ws
+  password: humanity
+  port: 443
+  server: 165.215.250.14
+  skip-cert-verify: true
+  sni: www.calmlunch.com
+  type: trojan
+  ws-opts:
+    headers:
+      Host: www.calmlunch.com
+    path: '%2Fassignment'
+  name: 法国05|650ms|26Mbps|非住宅|纯净度97.9%
 - alpn:
   - http/1.1
   network: ws
@@ -647,34 +617,39 @@ proxies:
     headers:
       Host: www.trusteeforward.com
     path: /assignment
-  name: 荷兰02|781ms|137Mbps|非住宅|纯净度94.8%
-- alpn:
-  - http/1.1
-  network: ws
-  password: humanity
-  port: 443
-  server: 104.18.35.86
-  skip-cert-verify: true
-  sni: www.volumerOot.coM.
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      Host: www.volumerOot.coM.
-    path: /assignment
-  name: 荷兰03|626ms|135Mbps|非住宅|纯净度94.8%
+  name: 荷兰01|598ms|133Mbps|非住宅|纯净度94.8%
 - network: ws
   password: humanity
-  port: 2053
-  server: 185.114.72.31
-  skip-cert-verify: false
+  port: 443
+  server: 212.183.88.136
   sni: www.calmlunch.com
   type: trojan
   ws-opts:
     headers:
       Host: www.calmlunch.com
-    path: /assignment
-  name: 法国07|839ms|6Mbps|非住宅|纯净度98.7%
+    path: '%2Fassignment'
+  name: 法国06|699ms|12Mbps|非住宅|纯净度97.9%
+- type: http
+  server: 51.158.243.91
+  port: 443
+  username: 'null'
+  password: None
+  tls: true
+  sni: 51.158.243.91
+  skip-cert-verify: true
+  name: 荷兰02|731ms|105Mbps|非住宅|纯净度94.8%
+- type: http
+  server: 51.158.202.56
+  port: 14287
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰03|751ms|112Mbps|非住宅|纯净度94.8%
+- type: http
+  server: 51.158.204.46
+  port: 21384
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰04|754ms|107Mbps|非住宅|纯净度99.6%
 - network: ws
   password: humanity
   port: 443
@@ -686,19 +661,67 @@ proxies:
     headers:
       Host: www.calmlunch.com
     path: /assignment
-  name: 法国08|934ms|107Mbps|非住宅|纯净度97.9%
-- type: http
-  server: 103.86.116.118
-  port: 443
-  tls: true
+  name: 法国07|752ms|51Mbps|非住宅|纯净度97.9%
+- port: 443
+  server: 82.65.162.76
   skip-cert-verify: true
-  name: 印度尼西亚01|1202ms|10Mbps|住宅|纯净度96.5%
+  tls: true
+  type: http
+  name: 法国08|858ms|126Mbps|住宅|纯净度99.8%
+- network: ws
+  password: humanity
+  port: 2053
+  server: 185.114.72.31
+  skip-cert-verify: false
+  sni: www.calmlunch.com
+  type: trojan
+  ws-opts:
+    headers:
+      Host: www.calmlunch.com
+    path: /assignment
+  name: 法国09|749ms|5Mbps|非住宅|纯净度98.7%
+- alterId: 0
+  cipher: auto
+  network: ws
+  port: 443
+  server: 654168416355441.d6f54hd1j.cc
+  servername: 654168416355441.d6f54hd1j.cc
+  skip-cert-verify: true
+  tls: true
+  type: vmess
+  udp: true
+  uuid: ecdc303d-bcbf-4129-bc02-dd67703f7081
+  name: 台湾01|1096ms|12Mbps|住宅|纯净度99.3%
 - type: http
   server: 103.86.117.202
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 印度尼西亚02|1290ms|13Mbps|住宅|纯净度96.5%
+  name: 印度尼西亚01|1096ms|12Mbps|住宅|纯净度96.5%
+- alterId: 0
+  cipher: auto
+  network: ws
+  port: 443
+  server: 654168416355441.d6f54hd1j.cc
+  servername: ''
+  skip-cert-verify: false
+  tls: true
+  type: vmess
+  udp: true
+  uuid: ecdc303d-bcbf-4129-bc02-dd67703f7081
+  name: 台湾02|1102ms|12Mbps|住宅|纯净度99.3%
+- server: pl-1-1.unturned-rust-dead.lol
+  port: 443
+  type: vless
+  uuid: c6e3c24c-ce20-4ad5-8c8c-68cb05890ea8
+  tls: true
+  reality-opts:
+    public-key: gS0qvWKumWcOVoAgf8SHt6Sm3tqpBw07c5sA_Clb1hg
+  servername: pl-1-1.unturned-rust-dead.lol
+  client-fingerprint: random
+  network: tcp
+  udp: true
+  name: 波兰01|775ms|104Mbps|非住宅|纯净度97.6%
 - client-fingerprint: firefox
   flow: xtls-rprx-vision
   network: tcp
@@ -712,7 +735,7 @@ proxies:
   type: vless
   udp: true
   uuid: 57beeeb0-03fc-4fc9-94da-7604488a7134
-  name: 日本01|1403ms|9Mbps|非住宅|纯净度93.4%
+  name: 日本01|1208ms|10Mbps|非住宅|纯净度93.4%
 - alterId: 0
   cipher: auto
   network: ws
@@ -724,7 +747,7 @@ proxies:
   type: vmess
   udp: true
   uuid: ecdc303d-bcbf-4129-bc02-dd67703f7081
-  name: 台湾01|1238ms|3Mbps|住宅|纯净度99.3%
+  name: 台湾03|1132ms|4Mbps|住宅|纯净度99.3%
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -735,70 +758,114 @@ proxy-groups:
   - 🏠 非机房 IP
   - 🌏 台湾／新加坡
   - DIRECT
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
 - name: ⭐ 综合优选
   type: select
   proxies:
-  - 美国01|221ms|477Mbps|非住宅|纯净度0.0%
-  - 美国02|220ms|482Mbps|非住宅|纯净度0.0%
-  - 美国03|412ms|390Mbps|非住宅|纯净度100.0%
-  - 法国01|475ms|21Mbps|非住宅|纯净度97.9%
-  - 法国02|483ms|138Mbps|非住宅|纯净度97.9%
-  - 法国03|495ms|40Mbps|非住宅|纯净度95.9%
-  - 法国04|484ms|112Mbps|非住宅|纯净度95.9%
-  - 法国05|490ms|89Mbps|非住宅|纯净度95.9%
-  - 荷兰01|607ms|109Mbps|非住宅|纯净度94.8%
-  - 法国06|770ms|152Mbps|非住宅|纯净度98.7%
-  - 荷兰02|781ms|137Mbps|非住宅|纯净度94.8%
-  - 荷兰03|626ms|135Mbps|非住宅|纯净度94.8%
-  - 法国07|839ms|6Mbps|非住宅|纯净度98.7%
-  - 法国08|934ms|107Mbps|非住宅|纯净度97.9%
-  - 印度尼西亚01|1202ms|10Mbps|住宅|纯净度96.5%
-  - 印度尼西亚02|1290ms|13Mbps|住宅|纯净度96.5%
-  - 日本01|1403ms|9Mbps|非住宅|纯净度93.4%
-  - 台湾01|1238ms|3Mbps|住宅|纯净度99.3%
+  - 美国01|219ms|485Mbps|非住宅|纯净度0.0%
+  - 美国02|222ms|290Mbps|非住宅|纯净度100.0%
+  - 美国03|474ms|7Mbps|住宅未知|纯净度99.8%
+  - 法国01|615ms|41Mbps|非住宅|纯净度97.9%
+  - 法国02|668ms|23Mbps|住宅|纯净度100.0%
+  - 法国03|652ms|23Mbps|非住宅|纯净度97.9%
+  - 法国04|622ms|68Mbps|非住宅|纯净度97.9%
+  - 法国05|650ms|26Mbps|非住宅|纯净度97.9%
+  - 荷兰01|598ms|133Mbps|非住宅|纯净度94.8%
+  - 法国06|699ms|12Mbps|非住宅|纯净度97.9%
+  - 荷兰02|731ms|105Mbps|非住宅|纯净度94.8%
+  - 荷兰03|751ms|112Mbps|非住宅|纯净度94.8%
+  - 荷兰04|754ms|107Mbps|非住宅|纯净度99.6%
+  - 法国07|752ms|51Mbps|非住宅|纯净度97.9%
+  - 法国08|858ms|126Mbps|住宅|纯净度99.8%
+  - 法国09|749ms|5Mbps|非住宅|纯净度98.7%
+  - 台湾01|1096ms|12Mbps|住宅|纯净度99.3%
+  - 印度尼西亚01|1096ms|12Mbps|住宅|纯净度96.5%
+  - 台湾02|1102ms|12Mbps|住宅|纯净度99.3%
+  - 波兰01|775ms|104Mbps|非住宅|纯净度97.6%
+  - 日本01|1208ms|10Mbps|非住宅|纯净度93.4%
+  - 台湾03|1132ms|4Mbps|住宅|纯净度99.3%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
 - name: 🚄 中速下载
   type: select
   proxies:
-  - 美国02|220ms|482Mbps|非住宅|纯净度0.0%
-  - 美国01|221ms|477Mbps|非住宅|纯净度0.0%
-  - 美国03|412ms|390Mbps|非住宅|纯净度100.0%
-  - 法国04|484ms|112Mbps|非住宅|纯净度95.9%
-  - 法国03|495ms|40Mbps|非住宅|纯净度95.9%
-  - 法国06|770ms|152Mbps|非住宅|纯净度98.7%
-  - 荷兰03|626ms|135Mbps|非住宅|纯净度94.8%
-  - 法国05|490ms|89Mbps|非住宅|纯净度95.9%
-  - 荷兰02|781ms|137Mbps|非住宅|纯净度94.8%
-  - 荷兰01|607ms|109Mbps|非住宅|纯净度94.8%
-  - 法国08|934ms|107Mbps|非住宅|纯净度97.9%
-  - 法国01|475ms|21Mbps|非住宅|纯净度97.9%
-  - 法国02|483ms|138Mbps|非住宅|纯净度97.9%
-  - 印度尼西亚02|1290ms|13Mbps|住宅|纯净度96.5%
-  - 印度尼西亚01|1202ms|10Mbps|住宅|纯净度96.5%
-  - 日本01|1403ms|9Mbps|非住宅|纯净度93.4%
-  - 法国07|839ms|6Mbps|非住宅|纯净度98.7%
+  - 美国01|219ms|485Mbps|非住宅|纯净度0.0%
+  - 美国02|222ms|290Mbps|非住宅|纯净度100.0%
+  - 荷兰01|598ms|133Mbps|非住宅|纯净度94.8%
+  - 法国04|622ms|68Mbps|非住宅|纯净度97.9%
+  - 法国05|650ms|26Mbps|非住宅|纯净度97.9%
+  - 法国02|668ms|23Mbps|住宅|纯净度100.0%
+  - 法国03|652ms|23Mbps|非住宅|纯净度97.9%
+  - 荷兰02|731ms|105Mbps|非住宅|纯净度94.8%
+  - 法国08|858ms|126Mbps|住宅|纯净度99.8%
+  - 荷兰04|754ms|107Mbps|非住宅|纯净度99.6%
+  - 荷兰03|751ms|112Mbps|非住宅|纯净度94.8%
+  - 波兰01|775ms|104Mbps|非住宅|纯净度97.6%
+  - 法国01|615ms|41Mbps|非住宅|纯净度97.9%
+  - 法国06|699ms|12Mbps|非住宅|纯净度97.9%
+  - 台湾02|1102ms|12Mbps|住宅|纯净度99.3%
+  - 印度尼西亚01|1096ms|12Mbps|住宅|纯净度96.5%
+  - 台湾01|1096ms|12Mbps|住宅|纯净度99.3%
+  - 日本01|1208ms|10Mbps|非住宅|纯净度93.4%
+  - 法国07|752ms|51Mbps|非住宅|纯净度97.9%
+  - 美国03|474ms|7Mbps|住宅未知|纯净度99.8%
+  - 法国09|749ms|5Mbps|非住宅|纯净度98.7%
+  - 台湾03|1132ms|4Mbps|住宅|纯净度99.3%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
 - name: ⚡ 高速下载
   type: select
   proxies:
-  - 美国02|220ms|482Mbps|非住宅|纯净度0.0%
-  - 美国01|221ms|477Mbps|非住宅|纯净度0.0%
-  - 美国03|412ms|390Mbps|非住宅|纯净度100.0%
-  - 法国06|770ms|152Mbps|非住宅|纯净度98.7%
-  - 法国02|483ms|138Mbps|非住宅|纯净度97.9%
-  - 荷兰02|781ms|137Mbps|非住宅|纯净度94.8%
-  - 荷兰03|626ms|135Mbps|非住宅|纯净度94.8%
-  - 法国04|484ms|112Mbps|非住宅|纯净度95.9%
-  - 荷兰01|607ms|109Mbps|非住宅|纯净度94.8%
-  - 法国08|934ms|107Mbps|非住宅|纯净度97.9%
-  - 法国05|490ms|89Mbps|非住宅|纯净度95.9%
-  - 法国03|495ms|40Mbps|非住宅|纯净度95.9%
+  - 美国01|219ms|485Mbps|非住宅|纯净度0.0%
+  - 美国02|222ms|290Mbps|非住宅|纯净度100.0%
+  - 荷兰01|598ms|133Mbps|非住宅|纯净度94.8%
+  - 法国08|858ms|126Mbps|住宅|纯净度99.8%
+  - 荷兰03|751ms|112Mbps|非住宅|纯净度94.8%
+  - 荷兰04|754ms|107Mbps|非住宅|纯净度99.6%
+  - 荷兰02|731ms|105Mbps|非住宅|纯净度94.8%
+  - 波兰01|775ms|104Mbps|非住宅|纯净度97.6%
+  - 法国04|622ms|68Mbps|非住宅|纯净度97.9%
+  - 法国07|752ms|51Mbps|非住宅|纯净度97.9%
+  - 法国01|615ms|41Mbps|非住宅|纯净度97.9%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
 - name: 🏠 非机房 IP
   type: select
   proxies:
-  - 美国01|221ms|477Mbps|非住宅|纯净度0.0%
-  - 美国03|412ms|390Mbps|非住宅|纯净度100.0%
-  - 印度尼西亚01|1202ms|10Mbps|住宅|纯净度96.5%
-  - 台湾01|1238ms|3Mbps|住宅|纯净度99.3%
+  - 美国01|219ms|485Mbps|非住宅|纯净度0.0%
+  - 美国02|222ms|290Mbps|非住宅|纯净度100.0%
+  - 美国03|474ms|7Mbps|住宅未知|纯净度99.8%
+  - 法国02|668ms|23Mbps|住宅|纯净度100.0%
+  - 法国08|858ms|126Mbps|住宅|纯净度99.8%
+  - 台湾01|1096ms|12Mbps|住宅|纯净度99.3%
+  - 印度尼西亚01|1096ms|12Mbps|住宅|纯净度96.5%
+  - 台湾03|1132ms|4Mbps|住宅|纯净度99.3%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
 - name: 🌏 台湾／新加坡
   type: select
   proxies:
-  - 台湾01|1238ms|3Mbps|住宅|纯净度99.3%
+  - 台湾01|1096ms|12Mbps|住宅|纯净度99.3%
+  - 台湾02|1102ms|12Mbps|住宅|纯净度99.3%
+  - 台湾03|1132ms|4Mbps|住宅|纯净度99.3%
+  url: https://connectivitycheck.gstatic.com/generate_204
+  interval: 300
+  lazy: false
+  timeout: 5000
+  expected-status: 204
