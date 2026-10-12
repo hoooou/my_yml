@@ -73,33 +73,41 @@ def main():
     root = Path('.node-work/website-diagnostics').resolve(); root.mkdir(parents=True, exist_ok=True)
     bundle = json.loads(Path(args.bundle).read_text())
     report = json.loads(Path(args.report).read_text())
-    selected = choose_samples(bundle, report)
-    if len(selected) != 2:
-        raise RuntimeError('Two mapped, healthy source samples required')
+    candidates = choose_samples(bundle, report, limit=12)
+    if not candidates:
+        raise RuntimeError('No mapped source samples')
     controls = {'before': p.check_site(None, 'Google204', p.SITES['Google204'])}
     mapping = {x['name']: x for x in bundle['nodes']}
-    listeners, ports = s.make_listeners(selected)
+    listeners, ports = s.make_listeners(candidates)
     cohorts = []
-    with s.Core(str(Path(args.mihomo).resolve()), root, [mapping[r['id']] for r in selected], listeners):
-        for row in selected:
+    preflights = []
+    with s.Core(str(Path(args.mihomo).resolve()), root, [mapping[r['id']] for r in candidates], listeners):
+        for row in candidates:
             port = ports[row['id']]
-            control = p.check_site(port, 'Google204', p.SITES['Google204'])
-            if control.get('status') != 'passed':
-                raise RuntimeError('Selected sample currently fails 204; audit is inconclusive')
+            control = [p.check_site(port, 'Google204', p.SITES['Google204']) for _ in range(3)]
+            preflights.append({'sample': row['id'], 'attempts': control})
+            if any(x.get('status') != 'passed' for x in control):
+                print('样本目前204未全过，保留记录并换下一个：' + row['id'], flush=True)
+                continue
             item = inspect_cohort(port, row['id'])
-            item.update(country_code=(row.get('exit') or {}).get('country_code'), precheck=control)
+            item.update(country_code=(row.get('exit') or {}).get('country_code'), precheck=control,
+                        postcheck=p.check_site(port, 'Google204', p.SITES['Google204']))
             cohorts.append(item)
             print('完整请求头对照完成：' + row['id'], flush=True)
+            if len(cohorts) == 2:
+                break
     cohorts.append(inspect_cohort(None, 'github-direct'))
     controls['after'] = p.check_site(None, 'Google204', p.SITES['Google204'])
     output = {'scope': 'readonly_all_daily_destinations', 'source_report_updated_at': report['updated_at'],
               'source_run': os.environ.get('GITHUB_RUN_ID'), 'targets': list(LABELS), 'rounds_per_variant': 3,
               'request_workers': 5, 'tls_verification': True, 'subscription_updated': False,
-              'controls': controls, 'cohorts': cohorts}
+              'controls': controls, 'sample_preflights': preflights,
+              'live_node_samples': len(cohorts) - 1, 'cohorts': cohorts}
     (root/'summary.json').write_text(json.dumps(output, ensure_ascii=False, indent=2)+'\n')
-    rows = ['# 全站请求头对照', '', '两个已通过204／上传的节点及GitHub直连；同目标、每种请求头三轮、交替顺序。', '',
+    columns = [c['sample'] for c in cohorts]
+    rows = ['# 全站请求头对照', '', f'当前连通的{len(cohorts)-1}个节点及GitHub直连；同目标、每种请求头三轮、交替顺序。', '',
             '25个海外网页、ChatGPT API、204及两个trace，共29个目标；严格TLS、原页面识别和速度预算。', '',
-            '| 网站／接口 | 节点1 原→完整 | 节点2 原→完整 | 直连 原→完整 |', '|---|---|---|---|']
+            '| 网站／接口 | '+' | '.join(columns)+' |', '|---|'+'---|'*len(columns)]
     for label in LABELS:
         values = []
         for cohort in cohorts:
