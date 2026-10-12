@@ -329,7 +329,7 @@ class PipelineTests(unittest.TestCase):
                 self.assertEqual(result['stability_policy']['minimum_success_rate'], .9)
                 self.assertEqual(result['nodes'][0]['stability']['passed_count'], 18)
                 self.assertEqual(result['stability_recheck']['scope'], 'domestic_TCP_and_3MB_upload_passed')
-                self.assertIn('18/20 / 90.0%', Path('连通性报告.md').read_text())
+                self.assertIn('18/20 / 90.0%', Path('README.md').read_text())
             finally: os.chdir(cwd)
 
 

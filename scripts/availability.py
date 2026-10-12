@@ -1199,7 +1199,7 @@ def main():
                       s.datetime.now(s.TZ).isoformat(timespec='seconds'), required_traces=REQUIRED_TRACES,
                       required_gate=required_websites_passed,
                       stability_policy=(stability_diagnostic or {}).get('settings') or stability.settings(records),
-                      measurement_recovery=recovery)
+                      measurement_recovery=recovery, publication_root=Path('.'))
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
             print('全量检测完成：无符合页面、trace及应用TLS门槛的节点，报告已保存；原订阅未更新', flush=True)
@@ -1208,7 +1208,17 @@ def main():
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
     checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(candidate)], capture_output=True, text=True, timeout=90)
     if checked.returncode:
+        from attempt_report import record_validation
+        record_validation(root, config, 'failed', required_websites_passed)
+        if (root / 'full-test-report.json').exists():
+            from latest_report import write_latest
+            failed_report = json.loads((root / 'full-test-report.json').read_text())
+            write_latest(failed_report, config, website_gate=required_websites_passed,
+                         candidate=True, validation='failed')
         raise RuntimeError('最终订阅校验失败，不发布')
+    if args.phase in ('all', 'publish'):
+        from attempt_report import record_validation
+        record_validation(root, config, 'passed', required_websites_passed)
     now = s.datetime.now(s.TZ).isoformat(timespec='seconds')
     counts = {v: sum(r['entry']['status'] == v for r in records) for v in ('passed', 'failed', 'unknown')}
     repairing = args.phase in repair_modes
@@ -1345,7 +1355,8 @@ def main():
     report['service_checks_summary'] = service_probes.summary(latest_cohort(report))
     Path('优选配置.yaml').write_text(f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text())
     Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    write_report(report, config, Path('连通性报告.md'), website_gate=required_websites_passed)
+    from latest_report import write_latest
+    write_latest(report, config, website_gate=required_websites_passed, validation='passed')
     print(f'分阶段分类完成，配置校验通过；204 {report["precheck_counts"]}；TCP {counts}；下载 {report["download_counts"]}', flush=True)
 
 

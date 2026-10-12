@@ -354,15 +354,14 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
       - name: 更新配置和报告
+        if: always()
         id: publish_subscription
         run: python scripts/publish_subscription.py
       - name: 发布本次摘要
         if: always()
-        env:
-          PUBLISH_OUTCOME: ${{ steps.publish_subscription.outcome }}
         run: |
-          if [ "$PUBLISH_OUTCOME" = "success" ] && [ -f .node-work/availability/selected.yaml ]; then
-            cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f 最新检测.json ] && [ -f README.md ]; then
+            python scripts/latest_report.py --summary >> "$GITHUB_STEP_SUMMARY"
           elif [ -f .node-work/availability/full-test-report.md ]; then
             cat .node-work/availability/full-test-report.md >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -433,15 +432,14 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
       - name: 更新配置和报告
+        if: always()
         id: publish_subscription
         run: python scripts/publish_subscription.py
       - name: 发布本次摘要
         if: always()
-        env:
-          PUBLISH_OUTCOME: ${{ steps.publish_subscription.outcome }}
         run: |
-          if [ "$PUBLISH_OUTCOME" = "success" ] && [ -f .node-work/availability/selected.yaml ]; then
-            cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f 最新检测.json ] && [ -f README.md ]; then
+            python scripts/latest_report.py --summary >> "$GITHUB_STEP_SUMMARY"
           elif [ -f .node-work/availability/full-test-report.md ]; then
             cat .node-work/availability/full-test-report.md >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -516,7 +514,7 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
       - name: 发布修复摘要
-        run: cat 连通性报告.md >> "$GITHUB_STEP_SUMMARY"
+        run: python scripts/latest_report.py --summary >> "$GITHUB_STEP_SUMMARY"
 
   upload-diagnostics:
     name: 上行与上传后证书稳定性小测
