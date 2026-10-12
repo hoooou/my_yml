@@ -394,6 +394,9 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                     record['websites'] = summarize_rounds(rounds, labels=OVERSEAS_SITES)
                     record['websites'].update(summarize_rounds(rounds[:1],
                         labels=[label for label in DAILY_POST_SITES if label not in OVERSEAS_SITES]))
+                    tls_sites = website_tls_failures(record)
+                    record['website_tls'] = {'status': 'failed' if tls_sites else 'passed',
+                        'sites': tls_sites, 'reason': '网站TLS异常：' + '、'.join(tls_sites) if tls_sites else '网站测试未出现TLS异常'}
                     record['websites_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                     traces = [record['websites'][label]['attempts'][0] for label in ('ChatGPTTrace', 'ClaudeTrace')
                               if record['websites'][label]['status'] == 'passed'
@@ -407,7 +410,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['exit'] = s.query_exit(port, {'id': record['id']})
                         except (s.requests.RequestException, ValueError, KeyError):
                             record['exit_reason'] = '出口 IP/地区未确认'
-                    if required_websites_passed(record):
+                    if required_websites_passed(record) and not destination_tls_failure(record):
                         record['app_tls'] = app_tls.check(port)
                         if app_tls.passed(record['app_tls']):
                             with bandwidth.download():
@@ -425,7 +428,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         else:
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
-                        record['download']['reason'] = '必过网页/API未满足三轮访问条件或必过trace未通过，跳过下载'
+                        record['download']['reason'] = '网站TLS异常或必过网页/API/trace未通过，跳过下载'
             with lock:
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
@@ -545,7 +548,12 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                         raise ValueError('Reddit登录汇总与逐轮响应结果不一致')
             if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
                 raise ValueError('节点未按阶段筛选')
-            should_tls = should_web and required_websites_passed(record)
+            if bundle.get('website_tls_hard_gate') and should_web:
+                failed_sites = website_tls_failures(record)
+                evidence = record.get('website_tls') or {}
+                if evidence.get('sites') != failed_sites or evidence.get('status') != ('failed' if failed_sites else 'passed'):
+                    raise ValueError('网站TLS硬筛选记录与原始请求不一致')
+            should_tls = should_web and required_websites_passed(record) and not destination_tls_failure(record)
             tls = record.get('app_tls') or {}
             if tls.get('status') not in (('passed', 'failed') if should_tls else ('skipped',)):
                 raise ValueError('应用TLS阶段漏测或顺序异常')
@@ -700,10 +708,20 @@ def destination_certificate_failure(record):
         for attempt in item.get('attempts', [item]))
 
 
+def website_tls_failures(record):
+    return sorted(label for label, item in (record.get('websites') or {}).items()
+        if any(a.get('tls_error_kind') or a.get('error_type') == 'SSLError'
+               for a in item.get('attempts', [item])))
+
+
+def destination_tls_failure(record):
+    return destination_certificate_failure(record) or bool(website_tls_failures(record))
+
+
 def web_quality_eligible(record):
     if 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
         return False
-    if destination_certificate_failure(record):
+    if destination_tls_failure(record):
         return False
     if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
         return False
@@ -743,7 +761,7 @@ def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
     if 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
         return False
-    if destination_certificate_failure(record):
+    if destination_tls_failure(record):
         return False
     if 'post_upload_tls' in record and not app_tls.passed(record['post_upload_tls']):
         return False
@@ -1104,7 +1122,7 @@ def main():
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
-                  'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True,
+                  'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True, 'website_tls_hard_gate': True,
                   'parallel_observation': args.phase == 'prepare',
                   'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
                   'historical_candidates': historical,
@@ -1258,7 +1276,7 @@ def main():
     repairing = args.phase in repair_modes
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 21,
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 21, 'website_tls_policy': {'any_tls_error_eliminates': True, 'includes_optional_sites': True},
               'upload_precheck_policy': upload_speed.precheck_settings(),
               'early_upload_precheck_enabled': previous.get('early_upload_precheck_enabled', False) if repairing else bool(bundle.get('early_upload_precheck')),
               'upload_precheck_counts': {v: sum((r.get('upload_precheck') or {}).get('status', 'unmeasured') == v for r in records)

@@ -95,6 +95,8 @@ def stage_summary(report, website_gate=None):
             rows.append(counts('204_' + label, label + '三轮',
                 ((r.get('precheck') or {}).get('targets', {}).get(label) for r in nodes), passed, '未进行该目标204检测'))
     add('tcp', '国内入口TCP', 'entry', passed, '204未通过或UDP不适用；未提交TCP探测')
+    if any(r.get('website_tls') for r in nodes):
+        add('website_tls', '网站TLS异常硬筛选', 'website_tls', passed, '网站未测，未检查网站TLS')
     add('upload_precheck', '3MB上行预检', 'upload_precheck',
         lambda x: upload_speed.sample_passed(x, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET),
         '国内TCP未通过，未进行3MB上行预检')
