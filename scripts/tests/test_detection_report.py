@@ -74,10 +74,10 @@ class CleanReportTests(unittest.TestCase):
             {'websites': {'Reddit': {'status': 'verification_required', 'attempts': [restricted] * 3}}},
             {'websites': {}}]
         counts = d.website_access_summary(rows)['Reddit']
-        self.assertEqual(counts, {'measured': 5, 'accepted': 2, 'cloudflare_challenge': 1,
+        self.assertEqual(counts, {'measured': 5, 'accepted': 2, 'cloudflare_challenge': 1, 'login_required': 0,
             'restricted': 2, 'transport_error': 1, 'page_or_speed_error': 0, 'unmeasured': 1})
         table = '\n'.join(d.website_access_table(rows, {'Reddit'}))
-        self.assertIn('| ★ Reddit | 5 | 2 | 1 | 2 | 1 | 0 |', table)
+        self.assertIn('| ★ Reddit | 5 | 2 | 1 | 0 | 2 | 1 | 0 |', table)
         self.assertIn('未测节点不算失败', table)
 
     def test_repair_site_table_only_counts_latest_cohort(self):
@@ -86,7 +86,7 @@ class CleanReportTests(unittest.TestCase):
             row['websites'] = {'Reddit': {'status': 'needs_review',
                 'attempts': [{'status': 'needs_review', 'http_status': 403}] * 3}}
         text = render(report, config)
-        self.assertIn('| Reddit | 2 | 0 | 0 | 2 | 0 | 0 |', text)
+        self.assertIn('| Reddit | 2 | 0 | 0 | 0 | 2 | 0 | 0 |', text)
         self.assertNotIn('| Reddit | 3 |', text)
 
     def test_latest_cohort_excludes_historical_failures_and_private_fields(self):

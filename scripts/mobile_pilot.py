@@ -4,6 +4,7 @@ import argparse
 import concurrent.futures as futures
 import copy
 import ipaddress
+import html
 import json
 import math
 import re
@@ -173,6 +174,32 @@ def confirmed_cloudflare_challenge(label, attempt):
                  or attempt.get('classification_source') == 'recorded_cloudflare_challenge'))
 
 
+def confirmed_reddit_login(label, attempt):
+    target = urlparse(attempt.get('final_url', ''))
+    signals = attempt.get('login_prompt_signals') or {}
+    return (label == 'Reddit' and target.scheme == 'https' and target.hostname in PAGE_HOSTS['Reddit']
+        and attempt.get('http_status') in (200, 401, 403)
+        and attempt.get('restriction') == 'reddit_login_required'
+        and attempt.get('classification_source') == 'reddit_visible_login_prompt'
+        and (signals.get('security_block') is True and signals.get('login_action') is True
+             or signals.get('login_page') is True))
+
+
+def confirmed_page_exception(label, attempt):
+    return (attempt.get('status') == 'verification_required' and confirmed_cloudflare_challenge(label, attempt)
+        or attempt.get('status') == 'login_required' and confirmed_reddit_login(label, attempt))
+
+
+def reddit_login_signals(final_url, body):
+    text = body.decode('utf-8', errors='replace').lower()
+    visible = re.sub(r'<(?:script|style)\b[^>]*>.*?(?:</(?:script|style)>|$)', '', text, flags=re.S)
+    visible = ' '.join(html.unescape(re.sub(r'<[^>]*>', ' ', visible)).split())
+    return {'security_block': ('blocked by network security' in visible or 'request has been blocked' in visible),
+            'login_action': bool(re.search(r'\b(?:log in|sign in|login)\b', visible)),
+            'login_page': (urlparse(final_url).path.rstrip('/') == '/login'
+                and ('log in to reddit' in visible or 'sign in to reddit' in visible))}
+
+
 def allowed_page_redirect(label, target):
     parsed = urlparse(target)
     return parsed.scheme == 'https' and (parsed.hostname in PAGE_HOSTS.get(label, set())
@@ -216,6 +243,13 @@ def classify_response(label, status, final_url, headers, body):
         if confirmed_cloudflare_challenge(label, result):
             result.update(status='verification_required',
                           reason='明确 Cloudflare 人机验证；按用户策略认可网站可达，实际页面未验证')
+    if label == 'Reddit' and result['status'] == 'needs_review' and result.get('restriction') != 'cloudflare_challenge':
+        candidate = {**result, 'restriction': 'reddit_login_required',
+            'classification_source': 'reddit_visible_login_prompt',
+            'login_prompt_signals': reddit_login_signals(final_url, body)}
+        if confirmed_reddit_login(label, candidate):
+            result.update(candidate, status='login_required',
+                reason='Reddit明确要求登录；按用户策略认可网站可达，未验证登录后功能')
     if label == 'Claude':
         target = urlparse(urljoin(final_url, headers.get('location', '')))
         if (target.scheme == 'https' and target.hostname in ('claude.com', 'www.claude.com')
@@ -281,17 +315,19 @@ def check_site(port, label, url, timeout=(3, 2)):
                     header_received = time.perf_counter()
                     headers_ms = round((header_received - started) * 1000, 1)
                     final_headers_ms = round((header_received - request_started) * 1000, 1)
+                    response_limit = (524288 if label == 'Reddit' and response.status_code in (401, 403)
+                        and response.headers.get('cf-mitigated', '').lower() != 'challenge' else sample_limit)
                     body = bytearray()
                     for chunk in response.iter_content(1024):
-                        body.extend(chunk[:sample_limit - len(body)])
-                        if len(body) >= sample_limit or (time.perf_counter() - started) * 1000 >= MAX_SAMPLE_MS:
+                        body.extend(chunk[:response_limit - len(body)])
+                        if len(body) >= response_limit or (time.perf_counter() - started) * 1000 >= MAX_SAMPLE_MS:
                             break
                     result = classify_response(label, response.status_code, response.url,
                                                response.headers, bytes(body))
                     result['elapsed_ms'] = round((time.perf_counter() - started) * 1000, 1)
                     result['ttfb_ms'] = headers_ms
                     result['sample_bytes'] = len(body)
-                    result['sample_limit_bytes'] = sample_limit
+                    result['sample_limit_bytes'] = response_limit
                     result['final_request_ttfb_ms'] = final_headers_ms
                     resolved_google_redirect = (label == 'Gemini' and any(
                         x.get('target') == 'https://www.google.com/sorry/index' for x in redirect_chain))
@@ -429,7 +465,7 @@ def main():
               'candidate_ids': candidates, 'nodes': records}
     Path('优选配置.yaml').write_text(f'# 移动网络对照小测；{now}；{len(records)} 个样本\n' + candidate.read_text())
     Path('移动小测报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    labels = {'passed': '通过', 'failed': '未通过', 'unknown': '未验证', 'unstable': '不稳定', 'needs_review': '需人工复核', 'verification_required': 'CF需验证'}
+    labels = {'passed': '通过', 'failed': '未通过', 'unknown': '未验证', 'unstable': '不稳定', 'needs_review': '需人工复核', 'verification_required': 'CF需验证', 'login_required': '登录提示通过'}
     rows = ['# 中国移动小规模对照报告', '', f'更新时间：{now}', '',
             f'{len(records)} 个固定样本；移动 TCP 入口通过 {report["mobile_passed"]} 个，云端下载通过 {report["download_passed"]} 个，入口候选 {len(candidates)} 个。', '',
             f'下载地址：[{s.DOWNLOAD_URL}]({s.DOWNLOAD_URL})，每次采样 10 MB，工具测速后再校验完整采样内容。', '',

@@ -10,7 +10,7 @@ from select_nodes import COUNTRIES
 import stability
 import continuous_stability as cs
 import upload_speed
-from mobile_pilot import confirmed_cloudflare_challenge
+from mobile_pilot import confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 
 def website_access_summary(nodes):
@@ -18,7 +18,7 @@ def website_access_summary(nodes):
     labels = {label for row in nodes for label in (row.get('websites') or {}) if label != 'Google204'}
     result = {}
     for label in sorted(labels):
-        stats = dict.fromkeys(('measured', 'accepted', 'cloudflare_challenge', 'restricted',
+        stats = dict.fromkeys(('measured', 'accepted', 'cloudflare_challenge', 'login_required', 'restricted',
                               'transport_error', 'page_or_speed_error', 'unmeasured'), 0)
         for row in nodes:
             item = (row.get('websites') or {}).get(label) or {}
@@ -30,12 +30,13 @@ def website_access_summary(nodes):
             cf = [x.get('status') == 'verification_required' and confirmed_cloudflare_challenge(label, x)
                   for x in attempts]
             accepted = item.get('status') == 'passed' or (
-                item.get('status') == 'verification_required'
-                and all(x.get('status') == 'passed' or challenge for x, challenge in zip(attempts, cf)))
+                item.get('status') in ('verification_required', 'login_required')
+                and all(x.get('status') == 'passed' or confirmed_page_exception(label, x) for x in attempts))
             stats['accepted'] += accepted
             stats['cloudflare_challenge'] += any(cf)
-            stats['restricted'] += any(x.get('status') in ('needs_review', 'verification_required')
-                                      and not challenge for x, challenge in zip(attempts, cf))
+            stats['login_required'] += any(x.get('status') == 'login_required' and confirmed_reddit_login(label, x) for x in attempts)
+            stats['restricted'] += any(x.get('status') in ('needs_review', 'verification_required', 'login_required')
+                                      and not confirmed_page_exception(label, x) for x in attempts)
             stats['transport_error'] += any(x.get('error_type') or x.get('tls_error_kind') for x in attempts)
             stats['page_or_speed_error'] += any(x.get('status') in ('failed', 'slow')
                 and not x.get('error_type') and not x.get('tls_error_kind') for x in attempts)
@@ -49,13 +50,13 @@ def website_access_table(nodes, required=()):
         return []
     rows = ['## 各网站拦截与异常数量', '',
             f'统计范围 **{len(nodes)}** 个节点；仅实测节点进入各站分母。带★为逐站必过目标，其余目标仍参与整体覆盖率和证书校验。', '',
-            '| 网站 | 实测 | 通过 | CF人机验证 | 其他拦截／跳转 | 连接／TLS异常 | 慢／内容异常 |',
-            '|---|---:|---:|---:|---:|---:|---:|']
+            '| 网站 | 实测 | 通过 | CF人机验证 | 登录提示（通过） | 其他拦截／跳转 | 连接／TLS异常 | 慢／内容异常 |',
+            '|---|---:|---:|---:|---:|---:|---:|---:|']
     for label, item in sorted(counts.items(), key=lambda kv: (-(kv[1]['measured'] - kv[1]['accepted']), kv[0])):
         rows.append('| ' + ('★ ' if label in required else '') + cell(label) + ' | ' +
-                    ' | '.join(str(item[k]) for k in ('measured', 'accepted', 'cloudflare_challenge',
+                    ' | '.join(str(item[k]) for k in ('measured', 'accepted', 'cloudflare_challenge', 'login_required',
                         'restricted', 'transport_error', 'page_or_speed_error')) + ' |')
-    rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证；普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '', '[TikTok／Reddit／Gemini拦截与跳转核查](docs/website-restriction-audit-2026-10-12.md)。', '']
+    rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证及Reddit明确登录提示；没有这两类证据的普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '', '[TikTok／Reddit／Gemini拦截与跳转核查](docs/website-restriction-audit-2026-10-12.md)。', '']
     return rows
 
 
@@ -308,7 +309,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              (f'| 并行 | 持续稳定性 | TCP与3MB上传通过即启动独立观察；{"每节点至少" + str(minimum_rounds) + "轮" if minimum_rounds else "不设固定轮数"}，启动间隔至少{interval}秒，成功率≥90%；持续到两轮上行及负载后SSL结束，再补每节点一轮；明确证书错误淘汰 |' if continuous else '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |'), '']
     required = (report.get('website_measurement_policy') or {}).get('required_websites', report.get('required_websites', []))
     if required:
-        rows += ['必过网站：' + '、'.join(required) + '。明确的Cloudflare人机验证认可可达，但不当作真实页面速度；任何已检测网站出现明确证书校验错误均不放行。', '']
+        rows += ['必过网站：' + '、'.join(required) + '。明确的Cloudflare人机验证及Reddit明确登录提示认可可达，但不当作真实页面速度；任何已检测网站出现明确证书校验错误均不放行。', '']
     rows += ['综合组的Google／YouTube中位响应≤1500ms、最慢≤3000ms、波动≤1500ms；台湾／新加坡对应为3000／5000／3000ms，其余必过项相同。响应接近时优先上下行更均衡、重复测速更一致的节点。国内网页不用于淘汰节点，国内直连与公司DNS规则保留。', '',
              '每天北京时间08:00重新获取全部来源检测。GitHub测速反映云端到节点的线路；国内TCP仅反映探测点可达性，不是手机移动网络带宽。SSL检查不模拟应用证书固定或登录后的会话。', '',
              '[订阅配置](https://github.com/hoooou/my_yml/blob/main/优选配置.yaml) · [完整测量明细](https://github.com/hoooou/my_yml/blob/main/连通性报告.json)', '']
