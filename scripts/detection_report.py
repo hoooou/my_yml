@@ -293,6 +293,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     required_targets = set(policy.get('required_websites', report.get('required_websites', [])))
     required_targets.update(policy.get('required_traces', report.get('required_traces', [])))
     rows += website_access_table(nodes if mode == 'full' else cohort, required_targets)
+    if 'Reddit' in required_targets and not (policy.get('confirmed_reddit_login_prompt') or report.get('confirmed_reddit_login_prompt')):
+        rows += ['Reddit明确登录提示已改为认可通过；本表沿用旧版短正文采样，没有相应证据的旧403不会批量追认，下一轮全量按新规则实际检测。', '']
     if mode != 'full' and any(r.get('websites') for r in cohort):
         rows += ['上表只统计当前补测／重建范围的节点；未重新检测的网页沿用原测量时间。', '']
     rows += ['', '## 最新筛选流程', '', '| 顺序 | 检查 | 要求 |', '|---:|---|---|',
