@@ -81,9 +81,10 @@ class PublicationGitTests(unittest.TestCase):
             try:
                 os.chdir(folder)
                 Path('最新检测.json').write_text(json.dumps({'updated_at': '2026-10-12T15:21:01+08:00',
-                    'selected_node_count': 0, 'selection_outcome': 'no_eligible_nodes_previous_subscription_retained'}))
+                    'source_run': 'fixture-run', 'selected_node_count': 0,
+                    'selection_outcome': 'no_eligible_nodes_previous_subscription_retained'}))
                 Path('README.md').write_text('最新全量检测：0个候选，保留旧订阅')
-                with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}), \
+                with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ID': 'fixture-run'}), \
                         patch.object(sys, 'argv', ['publish_subscription']), patch.object(pub, 'publish') as publish:
                     pub.main()
                 publish.assert_called_once()
