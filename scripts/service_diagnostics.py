@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 import yaml
 
@@ -60,8 +61,17 @@ def main():
             outcomes.append(item)
             print('服务检测完成：' + row['id'], flush=True)
     controls['after'] = probes.check(None, gate)
+    followups = []
+    target = (controls['before']['targets']['TikTokTrace']).get('redirect_target')
+    for _ in range(2):
+        if not target or urlparse(target).hostname not in ('www.tiktok.com', 'tiktok.com'):
+            break
+        response, _ = probes.fetch(None, target)
+        followups.append(response)
+        target = response.get('redirect_target')
     output = {'settings': probes.settings(), 'controls': controls, 'nodes': outcomes,
-              'service_checks_summary': probes.summary(outcomes), 'subscription_updated': False}
+              'service_checks_summary': probes.summary(outcomes), 'subscription_updated': False,
+              'tiktok_redirect_followups': followups}
     (root / 'summary.json').write_text(json.dumps(output, ensure_ascii=False, indent=2) + '\n')
     md = ['# 补充服务小样本验证', '', '只读检测当前订阅的最多4个节点，另测前后GitHub直连对照。', '']
     md += service_checks_table(outcomes)
