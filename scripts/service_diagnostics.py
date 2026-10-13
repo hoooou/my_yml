@@ -42,7 +42,8 @@ def main():
     if os.environ.get('GITHUB_ACTIONS') != 'true':
         raise RuntimeError('Real service probes must run in GitHub Actions')
     root = Path('.node-work/service-diagnostics').resolve(); root.mkdir(parents=True, exist_ok=True)
-    report = json.loads(Path('连通性报告.json').read_text())
+    from published_report import load_report
+    report = load_report(Path('连通性报告.json'))
     config = yaml.safe_load(Path('优选配置.yaml').read_text())
     rows = choose_samples(report, config, args.samples)
     if not rows:

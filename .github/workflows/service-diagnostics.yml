@@ -1,7 +1,10 @@
 name: 补充服务小样本验证
 on:
   workflow_dispatch:
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
+  actions: read
   contents: read
 concurrency:
   group: service-diagnostics-main

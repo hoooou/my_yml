@@ -14,7 +14,8 @@ def main():
     args = parser.parse_args()
     binary = str(Path(args.mihomo).resolve())
     root = Path('.node-work/upload-diagnostics').resolve(); root.mkdir(parents=True, exist_ok=True)
-    report = json.loads(Path('连通性报告.json').read_text())
+    from published_report import load_report
+    report = load_report(Path('连通性报告.json'))
     config = yaml.safe_load(Path('优选配置.yaml').read_text())
     by_name = {n['name']: n for n in config['proxies']}
     records = [dict(r) for r in report['nodes'] if r['id'] in report['published_node_ids']]

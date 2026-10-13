@@ -16,7 +16,10 @@ on:
         description: 只检查应用TLS及云端正常对照
         type: boolean
         default: false
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
+  actions: read
   contents: read
 concurrency:
   group: published-diagnostics-main

@@ -1077,7 +1077,8 @@ def main():
     bundle_path = root / 'bundle.json'
     repair_modes = ('repair', 'web-recheck', 'medium-recheck', 'stability-recheck', 'uplink-recheck')
     if args.phase in repair_modes:
-        previous = json.loads(Path('连通性报告.json').read_text())
+        from published_report import load_report
+        previous = load_report(Path('连通性报告.json'))
         published = yaml.safe_load(Path('优选配置.yaml').read_text())
         by_name = {n['name']: n for n in published['proxies']}
         # Published YAML deliberately excludes rejected nodes; reports still audit them.
@@ -1430,7 +1431,11 @@ def main():
     subscription = f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text()
     Path('优选配置.yaml').write_text(subscription)
     Path('v2rayN.txt').write_text(native_subscription, encoding='utf-8')
-    Path('连通性报告.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+    if os.environ.get('GITHUB_RUN_ID'):
+        report['source_run'] = os.environ['GITHUB_RUN_ID']
+    raw_report = json.dumps(report, ensure_ascii=False, separators=(',', ':')) + '\n'
+    Path('连通性报告.json').write_text(raw_report)
+    (root / 'full-test-report.published.json').write_text(raw_report)
     from latest_report import write_latest
     write_latest(report, config, website_gate=required_websites_passed, validation='passed')
     print(f'分阶段分类完成，配置校验通过；204 {report["precheck_counts"]}；TCP {counts}；下载 {report["download_counts"]}', flush=True)

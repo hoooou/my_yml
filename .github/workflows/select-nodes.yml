@@ -24,7 +24,10 @@ on:
         required: false
         default: '38040178745'
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -247,6 +250,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
+      actions: read
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -300,6 +304,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: write
+      actions: read
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -453,6 +458,7 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
+      actions: read
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -526,6 +532,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+      actions: read
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
