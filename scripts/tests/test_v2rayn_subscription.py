@@ -43,6 +43,19 @@ class NativeSubscriptionTests(unittest.TestCase):
         self.assertEqual(result['Alpn'], 'http/1.1')
         self.assertEqual(result['TransportExtraObj'], {'Host': 'cdn.example', 'Path': '/socket?x=1'})
 
+    def test_country_annotation_does_not_block_or_change_native_export(self):
+        node = self.node(password='secret')
+        node.update(type='trojan', network='ws',
+                    **{'ws-opts': {'headers': {'Host': 'cdn.example'}, 'path': '/socket'}})
+        expected = v.render({'proxies': [node]})
+        node['country'] = 'US'
+        original = copy.deepcopy(node)
+        self.assertEqual(v.render({'proxies': [node]}), expected)
+        self.assertEqual(node, original)
+        node['plugin'] = 'unsupported'
+        with self.assertRaises(ValueError):
+            v.render({'proxies': [node]})
+
     def test_vless_http_is_raw_http_disguise_not_removed_or_h2(self):
         node = self.node(); node.update(type='vless', tls=False, uuid='test-id', network='http',
             **{'http-opts': {'headers': {'Host': ['a.example', 'b.example']}, 'path': ['/', '/p'], 'method': 'GET'}})
