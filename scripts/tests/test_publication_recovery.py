@@ -67,6 +67,24 @@ class RecoveredEvidenceTests(unittest.TestCase):
 
 
 class PublicationGitTests(unittest.TestCase):
+    def test_report_compaction_preserves_every_observation(self):
+        data = {'nodes': [{'name': '台湾', 'attempts': [{'status': 'passed', 'elapsed_ms': 42}]}]}
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / '连通性报告.json'
+            path.write_text(json.dumps(data, ensure_ascii=False, indent=12))
+            before = path.stat().st_size
+            with patch.object(pub, 'REPORT_COMPACT_THRESHOLD', 1):
+                pub.compact_report(path)
+            self.assertEqual(json.loads(path.read_text()), data)
+            self.assertLess(path.stat().st_size, before)
+
+    def test_large_file_and_hook_rejections_are_not_branch_races(self):
+        self.assertFalse(pub.retryable_push('remote: error: GH001: Large files detected.\n'
+            '! [remote rejected] HEAD -> main (pre-receive hook declined)'))
+        self.assertFalse(pub.retryable_push('! [remote rejected] HEAD -> main (protected branch hook declined)'))
+        self.assertTrue(pub.retryable_push('! [rejected] HEAD -> main (fetch first)'))
+        self.assertTrue(pub.retryable_push('! [rejected] HEAD -> main (non-fast-forward)'))
+
     def test_same_verified_source_rebuild_can_publish_despite_validation_timestamp_drift(self):
         candidate = {'updated_at': '2026-10-12T19:22:00+08:00', 'configuration_validation': 'passed',
                      'measurement_recovery': {'source_run': '123', 'new_probes': False}}

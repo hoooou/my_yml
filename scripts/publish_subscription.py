@@ -14,6 +14,28 @@ import tempfile
 from latest_report import REPORT_FILES, readme_fragment, replace_fragment
 
 FILES = ('优选配置.yaml', 'v2rayN.txt', '连通性报告.json', *REPORT_FILES)
+REPORT_COMPACT_THRESHOLD = 25 * 1024 * 1024
+
+
+def compact_report(path):
+    """Keep all raw evidence, omitting indentation in the Git copy only."""
+    if not path.exists() or path.stat().st_size <= REPORT_COMPACT_THRESHOLD:
+        return
+    original_size = path.stat().st_size
+    data = json.loads(path.read_text())
+    with path.open('w', encoding='utf-8') as handle:
+        json.dump(data, handle, ensure_ascii=False, separators=(',', ':'))
+        handle.write('\n')
+    if path.stat().st_size >= 100 * 1024 * 1024:
+        raise RuntimeError('完整报告压缩格式后仍超过GitHub单文件上限，保留原订阅；原始证据在Actions附件')
+    print(f'完整报告保留全部数据，仅移除缩进：{original_size / 1048576:.1f} → '
+          f'{path.stat().st_size / 1048576:.1f} MiB', flush=True)
+
+
+def retryable_push(stderr):
+    message = stderr.lower()
+    return any(term in message for term in ('fetch first', 'non-fast-forward',
+        'updates were rejected because the remote contains work', 'cannot lock ref'))
 
 
 def git(root, *args, check=True):
@@ -53,6 +75,7 @@ def publish(root, attempts=3, files=FILES):
         saved = Path(folder)
         for name in files:
             shutil.copyfile(root / name, saved / name)
+        compact_report(saved / '连通性报告.json')
         # Only generated files may be dirty in this ephemeral checkout.
         git(root, 'restore', '--', *FILES)
         if git(root, 'diff', '--quiet', check=False).returncode or git(root, 'diff', '--cached', '--quiet', check=False).returncode:
@@ -85,8 +108,10 @@ def publish(root, attempts=3, files=FILES):
             pushed = git(root, 'push', 'origin', 'HEAD:main', check=False)
             if pushed.returncode == 0:
                 return True
-            if not any(term in pushed.stderr.lower() for term in ('rejected', 'fetch first', 'non-fast-forward')):
-                raise RuntimeError('Git推送失败，保留原订阅')
+            if not retryable_push(pushed.stderr):
+                if 'GH001' in pushed.stderr or 'exceeds GitHub' in pushed.stderr:
+                    raise RuntimeError('GitHub拒绝超大文件，保留原订阅；不是远端分支冲突')
+                raise RuntimeError('Git推送被拒绝（非远端分支冲突），保留原订阅')
         raise RuntimeError('发布期间远端持续变化，保留原订阅')
 
 
