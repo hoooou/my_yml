@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-10-13T13:44:04+08:00",
+  "updated_at": "2026-10-13T15:08:32+08:00",
   "scope": "all_subscriptions",
-  "input_unique_count": 5812,
+  "schema_version": 21,
   "untested_subscription": {
     "status": "appended_without_testing",
     "group": "🍓 小草莓（免测）",
@@ -13,50 +13,460 @@
     "names_preserved_with_source_prefix": true
   },
   "tested_selected_node_count": 101,
-  "measurement_recovery": null,
-  "measurements_updated_at": "2026-10-13T13:44:04+08:00",
-  "parseable_count": 5810,
-  "selected_node_count": 120,
-  "selection_outcome": "candidate_ready",
-  "required_websites": [
-    "Google",
-    "YouTube",
-    "ChatGPT",
-    "Gemini",
-    "GitHub",
-    "Wikipedia",
-    "Reddit",
-    "X",
-    "Instagram",
-    "Telegram",
-    "Discord",
-    "Facebook",
-    "ChatGPTAPI"
-  ],
-  "required_rounds": 3,
-  "confirmed_cloudflare_challenge": "accepted_access_verification_required",
-  "confirmed_reddit_login_prompt": "accepted_access_login_required",
-  "challenge_in_page_speed_ranking": false,
-  "required_traces": [
-    "ClaudeTrace"
-  ],
-  "required_trace_rounds": 1,
-  "app_tls_policy": {
-    "version": 1,
-    "targets": [
-      "chatgpt.com",
-      "android.chat.openai.com",
-      "auth.openai.com",
-      "cdn.oaistatic.com"
-    ],
-    "rounds_per_target": 2,
-    "budget_seconds_per_handshake": 5,
-    "android_certificate_pinning_emulated": false
+  "website_tls_policy": {
+    "any_tls_error_eliminates": true,
+    "includes_optional_sites": true
   },
-  "app_tls_counts": {
-    "skipped": 5657,
-    "passed": 152,
-    "failed": 1
+  "upload_precheck_policy": {
+    "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+    "bytes": 3000000,
+    "budget_seconds": 6,
+    "placement": "after_domestic_TCP_before_websites",
+    "workers_per_shard": 1,
+    "strict_destination_tls": true,
+    "overlaps_downloads_on_same_runner": false,
+    "reused_by_final_upload": true,
+    "failed_skips_websites_and_downloads": true
+  },
+  "early_upload_precheck_enabled": true,
+  "upload_precheck_counts": {
+    "passed": 253,
+    "failed": 30,
+    "skipped": 5527,
+    "unmeasured": 0
+  },
+  "upload_precheck_controls": {
+    "0": {
+      "before": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 296.0,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 81.081,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "LAX",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=11683&min_rtt=9164&rtt_var=4836&sent=87&recv=2174&lost=0&retrans=0&sent_bytes=2855&recv_bytes=3004901&delivery_rate=311348&cwnd=52&unsent_bytes=0&cid=44f213cebed61b06&ts=147&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "after": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 614.4,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 39.062,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "LAX",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=45191&min_rtt=44926&rtt_var=17378&sent=331&recv=2171&lost=0&retrans=0&sent_bytes=2855&recv_bytes=3004901&delivery_rate=60702&cwnd=52&unsent_bytes=0&cid=09f2bb53cc227cb2&ts=500&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "valid": true,
+      "node_count": 68
+    },
+    "2": {
+      "before": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 183.5,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 130.79,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "IAD",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=2016&min_rtt=1893&rtt_var=798&sent=55&recv=2176&lost=0&retrans=0&sent_bytes=2855&recv_bytes=3004901&delivery_rate=1508716&cwnd=52&unsent_bytes=0&cid=02ac65edbf36368f&ts=171&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "after": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 98.3,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 244.151,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "IAD",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1671&min_rtt=1553&rtt_var=666&sent=59&recv=2171&lost=0&retrans=0&sent_bytes=2854&recv_bytes=3004901&delivery_rate=1839021&cwnd=52&unsent_bytes=0&cid=3118408582c8573c&ts=92&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "valid": true,
+      "node_count": 80
+    },
+    "3": {
+      "before": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 52.5,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 457.143,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "SJC",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1453&min_rtt=1309&rtt_var=594&sent=67&recv=2172&lost=0&retrans=0&sent_bytes=2854&recv_bytes=3004901&delivery_rate=2181818&cwnd=52&unsent_bytes=0&cid=8a756b53eb5b36f6&ts=42&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "after": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 222.5,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 107.865,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "SJC",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1649&min_rtt=1462&rtt_var=682&sent=52&recv=2174&lost=0&retrans=0&sent_bytes=2854&recv_bytes=3004901&delivery_rate=1953488&cwnd=52&unsent_bytes=0&cid=7fa09a00fd211a36&ts=215&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "valid": true,
+      "node_count": 65
+    },
+    "1": {
+      "before": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 260.8,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 92.025,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "DFW",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=18368&min_rtt=18363&rtt_var=6897&sent=110&recv=2171&lost=0&retrans=0&sent_bytes=2854&recv_bytes=3004901&delivery_rate=155149&cwnd=52&unsent_bytes=0&cid=8f51cf47782ed55c&ts=187&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "after": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 205.3,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 116.902,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "DFW",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=17438&min_rtt=17383&rtt_var=6558&sent=112&recv=2174&lost=0&retrans=0&sent_bytes=2853&recv_bytes=3004901&delivery_rate=164298&cwnd=52&unsent_bytes=0&cid=3a8bebca737fae39&ts=167&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "valid": true,
+      "node_count": 70
+    }
+  },
+  "upload_policy": {
+    "version": 1,
+    "url": "https://speed.cloudflare.com/__up?bytes=5000000",
+    "bytes_per_round": 5000000,
+    "rounds": 2,
+    "budget_seconds_per_round": 10,
+    "precheck_bytes": 3000000,
+    "precheck_budget_seconds": 6,
+    "minimum_idle_seconds_between_rounds": 20,
+    "workers": 4,
+    "payload": "random_synthetic_bytes",
+    "strict_destination_tls": true,
+    "redirects_allowed": false,
+    "includes_handshake": true,
+    "requires_loaded_204_each_round": true,
+    "loaded_204_budget_ms": 5000,
+    "speed_aggregation": "minimum_of_completed_rounds",
+    "server_byte_receipt_available": false,
+    "china_mobile_uplink_measured": false
+  },
+  "upload_recheck": {
+    "updated_at": "2026-10-13T13:42:34+08:00",
+    "node_count": 147,
+    "controls_valid": true,
+    "node_ids": [
+      "n-00f29a00d4c5",
+      "n-017e48bf62ee",
+      "n-02240da374bd",
+      "n-0568cd5e5beb",
+      "n-0592089f9ab8",
+      "n-05a2bfb8946f",
+      "n-0b8baf8b29a7",
+      "n-0be334de31d4",
+      "n-0f3c4e9d2fea",
+      "n-0f8005414c1b",
+      "n-0fedb144223b",
+      "n-1111faba5e5b",
+      "n-1328b721f1cc",
+      "n-16421af0a60d",
+      "n-179c6bbd716e",
+      "n-194e234bdd10",
+      "n-1ad741401f55",
+      "n-1bae48e979f0",
+      "n-1c34dedc7bea",
+      "n-20f524700da2",
+      "n-21d02e3aa976",
+      "n-2396e6d59aaa",
+      "n-247166e2defb",
+      "n-268603aaa116",
+      "n-288b8d6e20c6",
+      "n-29915fd2543e",
+      "n-29d1e75057d4",
+      "n-2eeebf850b1c",
+      "n-3045e6e31c76",
+      "n-34c5df86a67a",
+      "n-37e2fd5f3e90",
+      "n-3c87f0de33d3",
+      "n-3da7f01f5691",
+      "n-429fd8aa5fdf",
+      "n-42af5f8d1cb7",
+      "n-49fb3e53a1a1",
+      "n-4ce013148a91",
+      "n-4d51d457c2fc",
+      "n-4fdc1e71ba7b",
+      "n-5167f1038a46",
+      "n-536de9bad143",
+      "n-564cebc23727",
+      "n-58e6c42cabac",
+      "n-59c96a73a4f4",
+      "n-5b0fb1e60616",
+      "n-5d6090f7fbcf",
+      "n-61964ab30ce1",
+      "n-61f4b656c36a",
+      "n-6273c673f9e6",
+      "n-6427e0ba888e",
+      "n-651d92ff97c5",
+      "n-6863b33e3243",
+      "n-69882cdc3f7a",
+      "n-6ae0154ee7fc",
+      "n-707c378f20d8",
+      "n-709cc0293516",
+      "n-719f363fdef6",
+      "n-71b149d45e63",
+      "n-71d24b8f88e2",
+      "n-723cdfbce7ee",
+      "n-72c499cb1696",
+      "n-73151cb220f4",
+      "n-75a2f6837ce7",
+      "n-775c33dc77fc",
+      "n-779bb0358f5c",
+      "n-79baff70a408",
+      "n-7acf6a2fb9ff",
+      "n-7b754a8af000",
+      "n-7bbe4e516ea8",
+      "n-7fa190c2668d",
+      "n-7fb5ef7bc49b",
+      "n-8023922d000b",
+      "n-815c48343827",
+      "n-84f57c5d34b0",
+      "n-85cf9ef2f382",
+      "n-881e61de9d7e",
+      "n-8922cee3185c",
+      "n-8a47e3990c11",
+      "n-8a743d4e825a",
+      "n-8abce9e1f498",
+      "n-8b800df5a6ad",
+      "n-8c2899ae7035",
+      "n-8db37e8c5dfb",
+      "n-8e0c5324b51f",
+      "n-92403744b723",
+      "n-94976b9505e6",
+      "n-94b5937dcb55",
+      "n-95a0dc946001",
+      "n-95ed4a6d77ab",
+      "n-97c7e42d4eb0",
+      "n-9a02b80cf639",
+      "n-9bc63f551ace",
+      "n-9bfab8a0502e",
+      "n-a04f78939654",
+      "n-a2ce43b97a90",
+      "n-a819e3b11af9",
+      "n-abeb78f9d408",
+      "n-ad52e2c12994",
+      "n-b006a24761e2",
+      "n-b2eeedf1fee5",
+      "n-b44656517e11",
+      "n-b90d085c4d4b",
+      "n-b98e9fd3a344",
+      "n-ba6a24c37870",
+      "n-bd504ac550ec",
+      "n-bdbe7d72ac40",
+      "n-bf5ff3ac9036",
+      "n-bfe37dd9927e",
+      "n-c14fbf017e05",
+      "n-c1d00f888a47",
+      "n-c33297f60ecf",
+      "n-c58ae68927c0",
+      "n-c5f85e06db3a",
+      "n-c617e7ddc460",
+      "n-c74ad2365038",
+      "n-c9544988f076",
+      "n-c9db6e6bade8",
+      "n-cbe26476789c",
+      "n-cc673104c3cf",
+      "n-d0f1d683f4ac",
+      "n-d2b335b5e16d",
+      "n-d6d5733acc25",
+      "n-da688f669cc8",
+      "n-dab2e1ea6f18",
+      "n-dfa90b95ed1c",
+      "n-dfbdbcec4c6c",
+      "n-e4c0375630be",
+      "n-e4c7aa104dfa",
+      "n-e6f43095a573",
+      "n-e794765725ac",
+      "n-e79b525e60da",
+      "n-ea902185c380",
+      "n-eb8cdb48a3bf",
+      "n-ebd2ca906c26",
+      "n-ecb813a09c51",
+      "n-ecc102fc8a3a",
+      "n-f16d5c851cec",
+      "n-f2d971416f80",
+      "n-f35f7247279c",
+      "n-f56e1c184652",
+      "n-f6f6f6a167fa",
+      "n-fa77d1bd6987",
+      "n-fa960c65b7bf",
+      "n-fc25e7c4fccb",
+      "n-fd59519556d5",
+      "n-fdc20dcb104b",
+      "n-ff1758085b4b"
+    ],
+    "passed_count": 143,
+    "failed_count": 4
+  },
+  "historical_candidates": {
+    "snapshot_limit": 2,
+    "refs": [
+      "da1e58173717da7921c39de1da34f88e4878f1f5",
+      "4cf1b32f09e4bb7b24d9be4d8671673e22dde721"
+    ],
+    "added_count": 27,
+    "added_ids": [
+      "n-0bb780eb605d",
+      "n-c74ad2365038",
+      "n-e4c7aa104dfa",
+      "n-994615c07c73",
+      "n-564cebc23727",
+      "n-79baff70a408",
+      "n-8b800df5a6ad",
+      "n-92403744b723",
+      "n-d0f1d683f4ac",
+      "n-eac633776280",
+      "n-bdbe7d72ac40",
+      "n-c1d00f888a47",
+      "n-95ed4a6d77ab",
+      "n-7acf6a2fb9ff",
+      "n-779bb0358f5c",
+      "n-f35f7247279c",
+      "n-a04f78939654",
+      "n-5d6090f7fbcf",
+      "n-4d1115ac2660",
+      "n-723cdfbce7ee",
+      "n-f2d971416f80",
+      "n-0568cd5e5beb",
+      "n-00f29a00d4c5",
+      "n-8023922d000b",
+      "n-b98e9fd3a344",
+      "n-0be334de31d4",
+      "n-a2ce43b97a90"
+    ],
+    "measurement_reuse": false,
+    "status": "ok"
   },
   "stability_policy": {
     "version": 4,
@@ -92,86 +502,493 @@
     "continuous_latency_hard_caps": false,
     "explicit_certificate_error_rejects": true
   },
-  "upload_policy": {
+  "stability_recheck": {
+    "updated_at": "2026-10-13T13:43:30+08:00",
+    "node_count": 253,
+    "controls_valid": true,
+    "scope": "domestic_TCP_and_3MB_upload_passed",
+    "node_ids": [
+      "n-00f29a00d4c5",
+      "n-017e48bf62ee",
+      "n-02240da374bd",
+      "n-055bcd85b313",
+      "n-0568cd5e5beb",
+      "n-0592089f9ab8",
+      "n-05a2bfb8946f",
+      "n-083832a2de1a",
+      "n-0b893490edb8",
+      "n-0b8baf8b29a7",
+      "n-0be334de31d4",
+      "n-0f3c4e9d2fea",
+      "n-0f8005414c1b",
+      "n-0fedb144223b",
+      "n-1051252c527c",
+      "n-10c438055f26",
+      "n-1111faba5e5b",
+      "n-12e6990b9ba9",
+      "n-1328b721f1cc",
+      "n-16421af0a60d",
+      "n-170d358d2852",
+      "n-179c6bbd716e",
+      "n-194e234bdd10",
+      "n-1a734c70eb85",
+      "n-1ad741401f55",
+      "n-1bae48e979f0",
+      "n-1c34dedc7bea",
+      "n-1df15f7f7f67",
+      "n-1f54d78bd3b2",
+      "n-20e2cce2d6f6",
+      "n-20f524700da2",
+      "n-212782c11ee5",
+      "n-21d02e3aa976",
+      "n-230b676e0d85",
+      "n-2396e6d59aaa",
+      "n-247166e2defb",
+      "n-2568aae07fd9",
+      "n-268603aaa116",
+      "n-27540cdf49f2",
+      "n-2791b2e56bea",
+      "n-288b8d6e20c6",
+      "n-28b5f22c5b70",
+      "n-298dea4d214d",
+      "n-29915fd2543e",
+      "n-29d1e75057d4",
+      "n-2c74d865cd90",
+      "n-2eeebf850b1c",
+      "n-301a769242dd",
+      "n-3045e6e31c76",
+      "n-3109f89fa9e7",
+      "n-34b23d00634e",
+      "n-34c5df86a67a",
+      "n-36f59b9a2b88",
+      "n-37e2fd5f3e90",
+      "n-3c87f0de33d3",
+      "n-3d149ec2172d",
+      "n-3da7f01f5691",
+      "n-408e90999263",
+      "n-429fd8aa5fdf",
+      "n-42af5f8d1cb7",
+      "n-4568aea0a39b",
+      "n-45de2f833c75",
+      "n-48eaae61b3cc",
+      "n-49fb3e53a1a1",
+      "n-4aa75a94c765",
+      "n-4aad923a588b",
+      "n-4ce013148a91",
+      "n-4d51d457c2fc",
+      "n-4e6afcb14f45",
+      "n-4fdc1e71ba7b",
+      "n-515947037c2c",
+      "n-5167f1038a46",
+      "n-536de9bad143",
+      "n-537df6630900",
+      "n-5429c8b2ec89",
+      "n-553f8bbb378f",
+      "n-55a33a8e55cd",
+      "n-564cebc23727",
+      "n-58e6c42cabac",
+      "n-59c96a73a4f4",
+      "n-5b0fb1e60616",
+      "n-5b67ac47b540",
+      "n-5c0fa09d7f7d",
+      "n-5d6090f7fbcf",
+      "n-5eba1a5da39c",
+      "n-60e3cbf9d579",
+      "n-611742e797cd",
+      "n-61964ab30ce1",
+      "n-61f4b656c36a",
+      "n-6273c673f9e6",
+      "n-6427e0ba888e",
+      "n-651d92ff97c5",
+      "n-65bd53e9c930",
+      "n-65fbd4e2f7fb",
+      "n-6863b33e3243",
+      "n-69882cdc3f7a",
+      "n-699167a9db07",
+      "n-6ae0154ee7fc",
+      "n-6f8cc1aa23d4",
+      "n-707c378f20d8",
+      "n-709cc0293516",
+      "n-719f363fdef6",
+      "n-71b149d45e63",
+      "n-71d24b8f88e2",
+      "n-723cdfbce7ee",
+      "n-72c499cb1696",
+      "n-73151cb220f4",
+      "n-74a6e3f1b94d",
+      "n-754785c342af",
+      "n-75a2f6837ce7",
+      "n-772cebed7e3d",
+      "n-775c33dc77fc",
+      "n-779bb0358f5c",
+      "n-7983381e0bff",
+      "n-79baff70a408",
+      "n-7acf6a2fb9ff",
+      "n-7b530c8a92fd",
+      "n-7b63753b96ab",
+      "n-7b754a8af000",
+      "n-7bbe4e516ea8",
+      "n-7bcba9424a41",
+      "n-7c75dfc73d1b",
+      "n-7f7d62a90830",
+      "n-7fa190c2668d",
+      "n-7fb5ef7bc49b",
+      "n-8023922d000b",
+      "n-815c48343827",
+      "n-84f57c5d34b0",
+      "n-85cf9ef2f382",
+      "n-86d6e4426317",
+      "n-87860e4e80b8",
+      "n-87b045133bd7",
+      "n-881e61de9d7e",
+      "n-8922cee3185c",
+      "n-89dff00d48fd",
+      "n-8a47e3990c11",
+      "n-8a743d4e825a",
+      "n-8abce9e1f498",
+      "n-8b800df5a6ad",
+      "n-8c2899ae7035",
+      "n-8d46b79dd162",
+      "n-8db37e8c5dfb",
+      "n-8e0c5324b51f",
+      "n-8f399f3a3cc3",
+      "n-8fabdc83a188",
+      "n-92403744b723",
+      "n-92e17337bbe2",
+      "n-93b960b51b30",
+      "n-94976b9505e6",
+      "n-94b5937dcb55",
+      "n-95a0dc946001",
+      "n-95ed4a6d77ab",
+      "n-964359af6d81",
+      "n-97c7e42d4eb0",
+      "n-994615c07c73",
+      "n-9a02b80cf639",
+      "n-9bc63f551ace",
+      "n-9bfab8a0502e",
+      "n-9feae52584e2",
+      "n-a04f78939654",
+      "n-a2ce43b97a90",
+      "n-a4f3b4faaa8a",
+      "n-a6b03ce864b2",
+      "n-a80f6c2fe2f2",
+      "n-a819e3b11af9",
+      "n-abdbdb5e0779",
+      "n-abeb78f9d408",
+      "n-ad52e2c12994",
+      "n-aea197d3e2ee",
+      "n-b006a24761e2",
+      "n-b2eeedf1fee5",
+      "n-b33cca8d0fe3",
+      "n-b44656517e11",
+      "n-b90d085c4d4b",
+      "n-b98e9fd3a344",
+      "n-ba6a24c37870",
+      "n-bd504ac550ec",
+      "n-bdbe7d72ac40",
+      "n-bdf792fb85bf",
+      "n-bf5ff3ac9036",
+      "n-bf85cc60bec8",
+      "n-bfe37dd9927e",
+      "n-c001580d5ac3",
+      "n-c14fbf017e05",
+      "n-c1d00f888a47",
+      "n-c2a52ce0a47d",
+      "n-c33297f60ecf",
+      "n-c3d2be472483",
+      "n-c3f6688785c1",
+      "n-c4a6ce275684",
+      "n-c58ae68927c0",
+      "n-c5f85e06db3a",
+      "n-c61328c1f8d0",
+      "n-c617e7ddc460",
+      "n-c74ad2365038",
+      "n-c9544988f076",
+      "n-c98893273be5",
+      "n-c9db6e6bade8",
+      "n-cb0546077010",
+      "n-cbe26476789c",
+      "n-cc572a1507a9",
+      "n-cc673104c3cf",
+      "n-cd6d3b4d088f",
+      "n-cdfed74980cf",
+      "n-ce1d84f21adc",
+      "n-d0f1d683f4ac",
+      "n-d249c08c6604",
+      "n-d27cb278469e",
+      "n-d2b335b5e16d",
+      "n-d44bf33ab3d4",
+      "n-d6d5733acc25",
+      "n-d8d8a2212f3e",
+      "n-da276f052aff",
+      "n-da688f669cc8",
+      "n-dab2e1ea6f18",
+      "n-dd0c28124911",
+      "n-de2d5fed0a65",
+      "n-dfa90b95ed1c",
+      "n-dfbdbcec4c6c",
+      "n-e0c531bf670c",
+      "n-e466bb419523",
+      "n-e4c0375630be",
+      "n-e4c7aa104dfa",
+      "n-e6f43095a573",
+      "n-e794765725ac",
+      "n-e79b525e60da",
+      "n-ea902185c380",
+      "n-eb8cdb48a3bf",
+      "n-eb90f760ef50",
+      "n-ebd2ca906c26",
+      "n-ecb813a09c51",
+      "n-ecc102fc8a3a",
+      "n-f11a2f5b9f63",
+      "n-f16d5c851cec",
+      "n-f1d0bce7d24c",
+      "n-f2d971416f80",
+      "n-f35f7247279c",
+      "n-f4b0a208f7d5",
+      "n-f534d5f7c74b",
+      "n-f56e1c184652",
+      "n-f6f6f6a167fa",
+      "n-f73e06f44428",
+      "n-f97073576df3",
+      "n-f98af79e621b",
+      "n-f9dbce002c0b",
+      "n-fa77d1bd6987",
+      "n-fa960c65b7bf",
+      "n-fc25e7c4fccb",
+      "n-fd59519556d5",
+      "n-fdc20dcb104b",
+      "n-fec11fa1058c",
+      "n-ff1758085b4b",
+      "n-ff4732a41933"
+    ],
+    "passed_count": 151,
+    "failed_count": 102,
+    "quality_eligible_count": 107
+  },
+  "app_tls_policy": {
     "version": 1,
-    "url": "https://speed.cloudflare.com/__up?bytes=5000000",
-    "bytes_per_round": 5000000,
-    "rounds": 2,
-    "budget_seconds_per_round": 10,
-    "precheck_bytes": 3000000,
-    "precheck_budget_seconds": 6,
-    "minimum_idle_seconds_between_rounds": 20,
-    "workers": 4,
-    "payload": "random_synthetic_bytes",
-    "strict_destination_tls": true,
-    "redirects_allowed": false,
-    "includes_handshake": true,
-    "requires_loaded_204_each_round": true,
-    "loaded_204_budget_ms": 5000,
-    "speed_aggregation": "minimum_of_completed_rounds",
-    "server_byte_receipt_available": false,
-    "china_mobile_uplink_measured": false
+    "targets": [
+      "chatgpt.com",
+      "android.chat.openai.com",
+      "auth.openai.com",
+      "cdn.oaistatic.com"
+    ],
+    "rounds_per_target": 2,
+    "budget_seconds_per_handshake": 5,
+    "requires_trusted_chain_hostname_validity": true,
+    "android_certificate_pinning_emulated": false
   },
-  "upload_precheck_policy": {
-    "url": "https://speed.cloudflare.com/__up?bytes=3000000",
-    "bytes": 3000000,
-    "budget_seconds": 6,
-    "placement": "after_domestic_TCP_before_websites",
-    "workers_per_shard": 1,
-    "strict_destination_tls": true,
-    "overlaps_downloads_on_same_runner": false,
-    "reused_by_final_upload": true,
-    "failed_skips_websites_and_downloads": true
-  },
-  "early_upload_precheck_enabled": true,
-  "upload_precheck_counts": {
-    "skipped": 5527,
-    "passed": 253,
-    "failed": 30
-  },
-  "upload_counts": {
-    "not_candidate": 5663,
-    "passed": 143,
-    "failed": 4
+  "app_tls_counts": {
+    "passed": 152,
+    "failed": 1,
+    "skipped": 5657
   },
   "post_upload_tls_counts": {
-    "not_candidate": 5663,
     "passed": 145,
     "failed": 2
   },
-  "stability_counts": {
-    "not_candidate": 5557,
-    "failed": 102,
-    "passed": 151
+  "measurements_updated_at": "2026-10-13T13:44:04+08:00",
+  "publication_mode": "full",
+  "measurement_recovery": {
+    "source_run": "38349466728",
+    "measurements_updated_at": "2026-10-13T13:44:04+08:00",
+    "new_probes": false
   },
-  "stability_failure_targets": {
-    "ChatGPTTrace": 83,
-    "Google": 548,
-    "Android SSL": 22,
-    "YouTube": 98,
-    "Google204": 3987
+  "group_latency_policy": {
+    "url": "https://connectivitycheck.gstatic.com/generate_204",
+    "interval_seconds": 300,
+    "timeout_ms": 5000,
+    "expected_status": 204,
+    "manual_selection": true,
+    "lazy": false,
+    "global_type": "select",
+    "default_global_selection": "⭐ 综合优选",
+    "other_group_type": "url-test",
+    "automatic_selection": true,
+    "tolerance_ms": 50
   },
-  "precheck_counts": {
-    "failed": 4335,
-    "passed": 1292,
-    "unstable": 183
+  "website_recheck": null,
+  "cloudflare_classification_update": null,
+  "website_measurement_policy": {
+    "version": 9,
+    "navigation_header_sites": [
+      "Facebook",
+      "WhatsApp"
+    ],
+    "headers_audit_run": "38226619641",
+    "chatgpt_api_validation": "three_rounds_expected_boolean_json",
+    "confirmed_cloudflare_challenge": "accepted_access_verification_required",
+    "confirmed_reddit_login_prompt": "accepted_access_login_required",
+    "challenge_in_page_speed_ranking": false,
+    "challenge_can_replace_204_or_trace": false,
+    "overseas_rounds": 3,
+    "domestic_pages_probed_daily": false,
+    "trace_rounds": 1,
+    "sample_bytes": 16384,
+    "sample_bytes_overrides": {
+      "Amazon": 65536
+    },
+    "conditional_response_sample_bytes": {
+      "Reddit_401_403_without_cf_challenge": 524288
+    },
+    "max_ttfb_ms": 3000,
+    "max_sample_ms": 5000,
+    "required_core_sites": [
+      "Google",
+      "YouTube"
+    ],
+    "required_websites": [
+      "Google",
+      "YouTube",
+      "ChatGPT",
+      "Gemini",
+      "GitHub",
+      "Wikipedia",
+      "Reddit",
+      "X",
+      "Instagram",
+      "Telegram",
+      "Discord",
+      "Facebook",
+      "ChatGPTAPI"
+    ],
+    "required_websites_rounds": 3,
+    "trace_can_replace_required_page": false,
+    "required_traces": [
+      "ClaudeTrace"
+    ],
+    "required_trace_rounds": 1,
+    "claude_validation": "trace_only",
+    "claude_homepage_tested": false,
+    "core_median_limit_ms": 1500,
+    "core_p95_limit_ms": 3000,
+    "core_jitter_limit_ms": 1500,
+    "min_accepted_overseas_sites": 13,
+    "eligible_count": 103
   },
-  "entry_counts": {
-    "unknown": 4683,
-    "failed": 844,
-    "passed": 283
+  "mobile_rejections": {
+    "n-73dadf3c428c": [
+      "sni"
+    ],
+    "n-455317290bcf": [
+      "sni"
+    ]
   },
-  "download_counts": {
-    "skipped": 5658,
-    "passed": 149,
-    "failed": 3
+  "pipeline": true,
+  "parallel_shards": 4,
+  "website_workers_per_shard": 16,
+  "parallel_sites_per_node": 5,
+  "test_targets": {
+    "Google204": "https://connectivitycheck.gstatic.com/generate_204",
+    "Google": "https://www.google.com/",
+    "YouTube": "https://www.youtube.com/",
+    "ChatGPT": "https://chatgpt.com/",
+    "Gemini": "https://gemini.google.com/",
+    "GitHub": "https://github.com/",
+    "Wikipedia": "https://www.wikipedia.org/",
+    "Reddit": "https://www.reddit.com/",
+    "X": "https://x.com/",
+    "Instagram": "https://www.instagram.com/",
+    "Telegram": "https://telegram.org/",
+    "Discord": "https://discord.com/",
+    "Facebook": "https://www.facebook.com/",
+    "WhatsApp": "https://www.whatsapp.com/",
+    "Netflix": "https://www.netflix.com/",
+    "DisneyPlus": "https://www.disneyplus.com/",
+    "Spotify": "https://open.spotify.com/",
+    "TikTok": "https://www.tiktok.com/",
+    "Twitch": "https://www.twitch.tv/",
+    "Amazon": "https://www.amazon.com/",
+    "Bing": "https://www.bing.com/",
+    "Steam": "https://store.steampowered.com/",
+    "StackOverflow": "https://stackoverflow.com/",
+    "HuggingFace": "https://huggingface.co/",
+    "Perplexity": "https://www.perplexity.ai/",
+    "Cursor": "https://www.cursor.com/",
+    "ChatGPTTrace": "https://chatgpt.com/cdn-cgi/trace",
+    "ClaudeTrace": "https://claude.ai/cdn-cgi/trace",
+    "ChatGPTAPI": "https://api.openai.com/compliance/cookie_requirements"
   },
-  "medium_speed_download_counts": {
-    "passed": 147,
-    "failed": 2,
-    "skipped": 5661,
-    "unverified": 0
+  "target_categories": {
+    "overseas": [
+      "Google",
+      "YouTube",
+      "ChatGPT",
+      "Gemini",
+      "GitHub",
+      "Wikipedia",
+      "Reddit",
+      "X",
+      "Instagram",
+      "Telegram",
+      "Discord",
+      "Facebook",
+      "WhatsApp",
+      "Netflix",
+      "DisneyPlus",
+      "Spotify",
+      "TikTok",
+      "Twitch",
+      "Amazon",
+      "Bing",
+      "Steam",
+      "StackOverflow",
+      "HuggingFace",
+      "Perplexity",
+      "Cursor",
+      "ChatGPTAPI"
+    ],
+    "domestic": [],
+    "connectivity": [
+      "Google204",
+      "ChatGPTTrace",
+      "ClaudeTrace"
+    ]
   },
+  "routing_policy": {
+    "domestic": "DIRECT",
+    "overseas": "🚀 全局选择",
+    "unmatched": "🚀 全局选择",
+    "group_count": 7,
+    "version": 2
+  },
+  "stages": [
+    "HTTPS204",
+    "domestic_TCP",
+    "3MB_upload_precheck",
+    "websites_and_trace",
+    "application_TLS",
+    "quick_download",
+    "5MB_quick_download",
+    "100MB_Cloudflare_download",
+    "100MB_DataPacket_download",
+    "upload_double",
+    "post_upload_TLS",
+    "parallel_continuous_stability"
+  ],
+  "precheck_rounds": 3,
+  "precheck_policy": {
+    "version": 2,
+    "targets": {
+      "Google204": "https://connectivitycheck.gstatic.com/generate_204",
+      "Cloudflare204": "https://cp.cloudflare.com/generate_204"
+    },
+    "rounds_per_target": 3,
+    "requires_both": true
+  },
+  "website_rounds": 3,
+  "trace_rounds": 1,
+  "download_test": true,
+  "download_settings": {
+    "url": "https://speed.cloudflare.com/__down?bytes=1000000",
+    "bytes": 1000000,
+    "budget_seconds": 6,
+    "rounds": 1,
+    "read_timeout_seconds": 1,
+    "includes_handshake": true
+  },
+  "web_user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
   "medium_speed_download_settings": {
     "url": "https://speed.cloudflare.com/__down?bytes=5000000",
     "bytes": 5000000,
@@ -184,12 +1001,23 @@
     "requires_1mb_pass": true,
     "failure_blocks_high_speed_test": false
   },
-  "high_speed_download_counts": {
-    "passed": 76,
-    "failed": 73,
+  "medium_speed_download_counts": {
+    "passed": 147,
+    "failed": 2,
     "skipped": 5661,
     "unverified": 0
   },
+  "medium_speed_selection_policy": {
+    "group": "🚄 中速下载",
+    "requires_5mb_pass": true,
+    "requires_published_eligible_pool": true,
+    "regional_exception_allowed": true,
+    "hong_kong_limit": 30,
+    "other_regions_limit": null,
+    "selected_count": 99
+  },
+  "medium_speed_recheck": null,
+  "high_speed_download_test": true,
   "high_speed_download_settings": {
     "version": 2,
     "urls": [
@@ -212,6 +1040,203 @@
     },
     "speed_aggregation": "minimum_of_completed_rounds"
   },
+  "node_selection_policy": {
+    "hong_kong_limit_per_group": 30,
+    "other_regions_limit": null,
+    "non_datacenter_total_limit": null,
+    "qualified_pool_only": true,
+    "requires_time_spaced_stability": true,
+    "requires_uplink_pass": true,
+    "ranking": "success_rate_then_failure_streak_then_successful_P95_IQR_then_duplex",
+    "requires_domestic_tcp_pass": true,
+    "requires_application_tls_pass": true,
+    "rejects_explicit_certificate_error_on_any_tested_website": true,
+    "rejected_proxy_definitions": "omitted",
+    "regional_exception": {
+      "group": "🌏 台湾／新加坡",
+      "country_codes": [
+        "TW",
+        "SG"
+      ],
+      "median_limit_ms": 3000,
+      "tail_limit_ms": 5000,
+      "jitter_limit_ms": 3000,
+      "required_core_rounds": 3,
+      "requires_204_rounds": 3,
+      "requires_quick_download": true,
+      "requires_overseas_coverage": false,
+      "exit_conflict_allowed": false,
+      "other_groups_use_strict_pool": true,
+      "required_websites": [
+        "Google",
+        "YouTube",
+        "ChatGPT",
+        "Gemini",
+        "GitHub",
+        "Wikipedia",
+        "Reddit",
+        "X",
+        "Instagram",
+        "Telegram",
+        "Discord",
+        "Facebook",
+        "ChatGPTAPI"
+      ],
+      "required_traces": [
+        "ClaudeTrace"
+      ]
+    }
+  },
+  "regional_selection": {
+    "group": "🌏 台湾／新加坡",
+    "selected_count": 2,
+    "country_counts": {
+      "TW": 0,
+      "SG": 2
+    }
+  },
+  "published_node_count": 120,
+  "published_node_ids": [
+    "n-61964ab30ce1",
+    "n-0592089f9ab8",
+    "n-72c499cb1696",
+    "n-ad52e2c12994",
+    "n-ebd2ca906c26",
+    "n-abeb78f9d408",
+    "n-6ae0154ee7fc",
+    "n-f56e1c184652",
+    "n-4ce013148a91",
+    "n-8e0c5324b51f",
+    "n-179c6bbd716e",
+    "n-cc673104c3cf",
+    "n-5167f1038a46",
+    "n-dab2e1ea6f18",
+    "n-b90d085c4d4b",
+    "n-cbe26476789c",
+    "n-0fedb144223b",
+    "n-f16d5c851cec",
+    "n-6427e0ba888e",
+    "n-4fdc1e71ba7b",
+    "n-94976b9505e6",
+    "n-288b8d6e20c6",
+    "n-719f363fdef6",
+    "n-7fb5ef7bc49b",
+    "n-f6f6f6a167fa",
+    "n-8db37e8c5dfb",
+    "n-bd504ac550ec",
+    "n-881e61de9d7e",
+    "n-9a02b80cf639",
+    "n-8abce9e1f498",
+    "n-c5f85e06db3a",
+    "n-05a2bfb8946f",
+    "n-e79b525e60da",
+    "n-2eeebf850b1c",
+    "n-8a743d4e825a",
+    "n-71d24b8f88e2",
+    "n-84f57c5d34b0",
+    "n-7bbe4e516ea8",
+    "n-3c87f0de33d3",
+    "n-1c34dedc7bea",
+    "n-29915fd2543e",
+    "n-8a47e3990c11",
+    "n-ff1758085b4b",
+    "n-3da7f01f5691",
+    "n-eb8cdb48a3bf",
+    "n-c14fbf017e05",
+    "n-69882cdc3f7a",
+    "n-8922cee3185c",
+    "n-d2b335b5e16d",
+    "n-16421af0a60d",
+    "n-b2eeedf1fee5",
+    "n-fa77d1bd6987",
+    "n-d6d5733acc25",
+    "n-c9db6e6bade8",
+    "n-6863b33e3243",
+    "n-e4c0375630be",
+    "n-651d92ff97c5",
+    "n-0f3c4e9d2fea",
+    "n-c9544988f076",
+    "n-c617e7ddc460",
+    "n-20f524700da2",
+    "n-1bae48e979f0",
+    "n-707c378f20d8",
+    "n-bfe37dd9927e",
+    "n-8c2899ae7035",
+    "n-4d51d457c2fc",
+    "n-536de9bad143",
+    "n-5b0fb1e60616",
+    "n-fdc20dcb104b",
+    "n-b006a24761e2",
+    "n-58e6c42cabac",
+    "n-775c33dc77fc",
+    "n-c58ae68927c0",
+    "n-b44656517e11",
+    "n-815c48343827",
+    "n-1111faba5e5b",
+    "n-709cc0293516",
+    "n-268603aaa116",
+    "n-c74ad2365038",
+    "n-e4c7aa104dfa",
+    "n-564cebc23727",
+    "n-79baff70a408",
+    "n-8b800df5a6ad",
+    "n-92403744b723",
+    "n-d0f1d683f4ac",
+    "n-bdbe7d72ac40",
+    "n-c1d00f888a47",
+    "n-95ed4a6d77ab",
+    "n-7acf6a2fb9ff",
+    "n-779bb0358f5c",
+    "n-f35f7247279c",
+    "n-a04f78939654",
+    "n-5d6090f7fbcf",
+    "n-723cdfbce7ee",
+    "n-f2d971416f80",
+    "n-0568cd5e5beb",
+    "n-00f29a00d4c5",
+    "n-8023922d000b",
+    "n-b98e9fd3a344",
+    "n-0be334de31d4",
+    "n-a2ce43b97a90"
+  ],
+  "node_naming_policy": {
+    "format": "地区编号|延迟ms|带宽Mbps|住宅类型|纯净度百分比",
+    "numbering": "ranked_per_region_starting_01",
+    "speed_source_priority": [
+      "100MB_double_minimum",
+      "5MB",
+      "1MB"
+    ],
+    "residential_label": "ipapi_isp_and_not_datacenter",
+    "unknown_fields_remain_unknown": true
+  },
+  "ip_reputation_policy": {
+    "provider": "ipapi.is",
+    "scope": "quick_download_passed_unique_exits",
+    "configured": false,
+    "lookup_budget_per_run": 900,
+    "purity_formula": "100 * (1 - company.abuser_score_numeric_ratio)",
+    "score_scope": "company_network_not_individual_ip",
+    "confirmed_nodes": 146
+  },
+  "high_speed_selection_policy": {
+    "max_elapsed_seconds": 20,
+    "selection_limit": null,
+    "required_urls": [
+      "https://speed.cloudflare.com/__down?bytes=100000000",
+      "http://hkg.download.datapacket.com/100mb.bin"
+    ],
+    "required_bytes_per_round": 100000000,
+    "required_rounds": 2,
+    "speed_aggregation": "minimum_of_completed_rounds",
+    "selected_count": 47
+  },
+  "high_speed_download_counts": {
+    "passed": 76,
+    "failed": 73,
+    "skipped": 5661,
+    "unverified": 0
+  },
   "high_speed_target_counts": {
     "https://speed.cloudflare.com/__down?bytes=100000000": {
       "passed": 138,
@@ -224,525 +1249,54 @@
       "skipped": 5661
     }
   },
-  "website_counts": {
-    "Amazon": {
-      "node_status_counts": {
-        "failed": 176,
-        "unstable": 27,
-        "passed": 50
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "202": 560,
-        "200": 186,
-        "no_response": 13
-      },
-      "attempt_reason_counts": {
-        "未返回预期网页": 560,
-        "网页入口正常；实际功能仍需本地测试": 186,
-        "连接、TLS 或读取失败": 13
-      }
+  "input_unique_count": 5812,
+  "parseable_count": 5810,
+  "invalid_node_ids": [
+    "n-73dadf3c428c",
+    "n-455317290bcf"
+  ],
+  "unique_tcp_endpoints": 662,
+  "total_unique_tcp_endpoints": 4295,
+  "precheck_counts": {
+    "passed": 1292,
+    "failed": 4335,
+    "unstable": 183,
+    "needs_review": 0
+  },
+  "entry_counts": {
+    "passed": 283,
+    "failed": 844,
+    "unknown": 4683
+  },
+  "website_tested_count": 253,
+  "website_target_count": 26,
+  "overseas_target_count": 26,
+  "domestic_target_count": 0,
+  "all_websites_passed": 0,
+  "three_connectivity_passed": 248,
+  "download_counts": {
+    "passed": 149,
+    "failed": 3,
+    "skipped": 5658
+  },
+  "services": {
+    "xxapi": {
+      "mode": "automatic",
+      "url": "https://xxapi.cn/doc/tcping",
+      "status": "enabled",
+      "request_rate_per_second": 5
     },
-    "Bing": {
-      "node_status_counts": {
-        "passed": 246,
-        "unstable": 4,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 745,
-        "no_response": 14
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 745,
-        "连接、TLS 或读取失败": 14
-      }
+    "itdog": {
+      "mode": "manual_comparison",
+      "url": "https://www.itdog.cn/batch_tcping/",
+      "status": "manual_required",
+      "reason": "网页安全验证"
     },
-    "ChatGPT": {
-      "node_status_counts": {
-        "passed": 230,
-        "needs_review": 4,
-        "verification_required": 9,
-        "unstable": 7,
-        "failed": 2,
-        "slow": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 706,
-        "403": 39,
-        "no_response": 14
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 704,
-        "需人工确认登录、访问限制或跳转": 12,
-        "明确 Cloudflare 人机验证；按用户策略认可网站可达，实际页面未验证": 27,
-        "连接、TLS 或读取失败": 14,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 2
-      }
-    },
-    "ChatGPTAPI": {
-      "node_status_counts": {
-        "passed": 241,
-        "needs_review": 5,
-        "unstable": 4,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 732,
-        "403": 12,
-        "no_response": 15
-      },
-      "attempt_reason_counts": {
-        "ChatGPT API返回预期JSON；未验证登录或对话": 732,
-        "ChatGPT API明确返回地区不支持": 12,
-        "连接、TLS 或读取失败": 15
-      }
-    },
-    "ChatGPTTrace": {
-      "node_status_counts": {
-        "failed": 5,
-        "passed": 248
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "no_response": 5,
-        "200": 248
-      },
-      "attempt_reason_counts": {
-        "连接、TLS 或读取失败": 5,
-        "域名 HTTPS 连通正常；未验证登录或对话": 248
-      }
-    },
-    "ClaudeTrace": {
-      "node_status_counts": {
-        "passed": 249,
-        "failed": 4
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 249,
-        "no_response": 4
-      },
-      "attempt_reason_counts": {
-        "域名 HTTPS 连通正常；未验证登录或对话": 249,
-        "连接、TLS 或读取失败": 4
-      }
-    },
-    "Cursor": {
-      "node_status_counts": {
-        "unstable": 9,
-        "passed": 172,
-        "failed": 71,
-        "slow": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 536,
-        "no_response": 223
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 531,
-        "连接、TLS 或读取失败": 223,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 5
-      }
-    },
-    "Discord": {
-      "node_status_counts": {
-        "unstable": 7,
-        "passed": 195,
-        "needs_review": 48,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 596,
-        "no_response": 20,
-        "403": 143
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 596,
-        "连接、TLS 或读取失败": 20,
-        "需人工确认登录、访问限制或跳转": 143
-      }
-    },
-    "DisneyPlus": {
-      "node_status_counts": {
-        "passed": 236,
-        "unstable": 13,
-        "failed": 2,
-        "needs_review": 2
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 734,
-        "no_response": 19,
-        "302": 6
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 733,
-        "连接、TLS 或读取失败": 19,
-        "需人工确认登录、访问限制或跳转": 6,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 1
-      }
-    },
-    "Facebook": {
-      "node_status_counts": {
-        "passed": 241,
-        "unstable": 5,
-        "failed": 4,
-        "needs_review": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 731,
-        "no_response": 19,
-        "302": 9
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 731,
-        "连接、TLS 或读取失败": 19,
-        "需人工确认登录、访问限制或跳转": 9
-      }
-    },
-    "Gemini": {
-      "node_status_counts": {
-        "passed": 231,
-        "needs_review": 16,
-        "unstable": 4,
-        "failed": 2
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 702,
-        "429": 6,
-        "403": 40,
-        "no_response": 11
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 702,
-        "需人工确认登录、访问限制或跳转": 46,
-        "连接、TLS 或读取失败": 11
-      }
-    },
-    "GitHub": {
-      "node_status_counts": {
-        "passed": 249,
-        "failed": 2,
-        "unstable": 2
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 751,
-        "no_response": 8
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 750,
-        "连接、TLS 或读取失败": 8,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 1
-      }
-    },
-    "Google": {
-      "node_status_counts": {
-        "passed": 241,
-        "needs_review": 7,
-        "unstable": 3,
-        "failed": 2
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 728,
-        "429": 6,
-        "302": 15,
-        "no_response": 10
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 728,
-        "登录、风控、验证码或地区限制，无法自动确认服务可用": 6,
-        "需人工确认登录、访问限制或跳转": 15,
-        "连接、TLS 或读取失败": 10
-      }
-    },
-    "HuggingFace": {
-      "node_status_counts": {
-        "passed": 245,
-        "unstable": 4,
-        "needs_review": 1,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 742,
-        "no_response": 14,
-        "429": 3
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 742,
-        "连接、TLS 或读取失败": 14,
-        "需人工确认登录、访问限制或跳转": 3
-      }
-    },
-    "Instagram": {
-      "node_status_counts": {
-        "passed": 243,
-        "unstable": 6,
-        "failed": 3,
-        "needs_review": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 743,
-        "no_response": 13,
-        "429": 3
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 740,
-        "连接、TLS 或读取失败": 13,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 3,
-        "需人工确认登录、访问限制或跳转": 3
-      }
-    },
-    "Netflix": {
-      "node_status_counts": {
-        "passed": 221,
-        "failed": 5,
-        "unstable": 25,
-        "slow": 1,
-        "needs_review": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 723,
-        "no_response": 33,
-        "403": 3
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 706,
-        "连接、TLS 或读取失败": 33,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 17,
-        "需人工确认登录、访问限制或跳转": 3
-      }
-    },
-    "Perplexity": {
-      "node_status_counts": {
-        "passed": 204,
-        "verification_required": 45,
-        "failed": 3,
-        "unstable": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 621,
-        "403": 128,
-        "no_response": 10
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 621,
-        "明确 Cloudflare 人机验证；按用户策略认可网站可达，实际页面未验证": 128,
-        "连接、TLS 或读取失败": 10
-      }
-    },
-    "Reddit": {
-      "node_status_counts": {
-        "passed": 114,
-        "login_required": 129,
-        "unstable": 6,
-        "failed": 3,
-        "slow": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 348,
-        "403": 393,
-        "no_response": 18
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 347,
-        "Reddit明确要求登录；按用户策略认可网站可达，未验证登录后功能": 393,
-        "连接、TLS 或读取失败": 18,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 1
-      }
-    },
-    "Spotify": {
-      "node_status_counts": {
-        "passed": 242,
-        "failed": 4,
-        "unstable": 6,
-        "needs_review": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 737,
-        "no_response": 19,
-        "302": 3
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 736,
-        "连接、TLS 或读取失败": 19,
-        "需人工确认登录、访问限制或跳转": 3,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 1
-      }
-    },
-    "StackOverflow": {
-      "node_status_counts": {
-        "unstable": 6,
-        "verification_required": 243,
-        "failed": 4
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "no_response": 18,
-        "403": 741
-      },
-      "attempt_reason_counts": {
-        "连接、TLS 或读取失败": 18,
-        "明确 Cloudflare 人机验证；按用户策略认可网站可达，实际页面未验证": 741
-      }
-    },
-    "Steam": {
-      "node_status_counts": {
-        "unstable": 5,
-        "passed": 245,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 744,
-        "no_response": 15
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 744,
-        "连接、TLS 或读取失败": 15
-      }
-    },
-    "Telegram": {
-      "node_status_counts": {
-        "unstable": 3,
-        "passed": 247,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 746,
-        "no_response": 13
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 746,
-        "连接、TLS 或读取失败": 13
-      }
-    },
-    "TikTok": {
-      "node_status_counts": {
-        "passed": 243,
-        "unstable": 5,
-        "failed": 4,
-        "slow": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 741,
-        "no_response": 18
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 738,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 3,
-        "连接、TLS 或读取失败": 18
-      }
-    },
-    "Twitch": {
-      "node_status_counts": {
-        "unstable": 5,
-        "passed": 245,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 742,
-        "no_response": 17
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 742,
-        "连接、TLS 或读取失败": 17
-      }
-    },
-    "WhatsApp": {
-      "node_status_counts": {
-        "passed": 245,
-        "unstable": 5,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 744,
-        "no_response": 14,
-        "500": 1
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 744,
-        "连接、TLS 或读取失败": 14,
-        "未返回预期网页": 1
-      }
-    },
-    "Wikipedia": {
-      "node_status_counts": {
-        "unstable": 2,
-        "passed": 246,
-        "needs_review": 1,
-        "failed": 3,
-        "slow": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 743,
-        "no_response": 13,
-        "403": 3
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 742,
-        "连接、TLS 或读取失败": 13,
-        "需人工确认登录、访问限制或跳转": 3,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 1
-      }
-    },
-    "X": {
-      "node_status_counts": {
-        "unstable": 12,
-        "passed": 232,
-        "failed": 5,
-        "needs_review": 3,
-        "slow": 1
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 728,
-        "no_response": 27,
-        "403": 4
-      },
-      "attempt_reason_counts": {
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 3,
-        "网页入口正常；实际功能仍需本地测试": 725,
-        "连接、TLS 或读取失败": 27,
-        "需人工确认登录、访问限制或跳转": 4
-      }
-    },
-    "YouTube": {
-      "node_status_counts": {
-        "passed": 243,
-        "unstable": 7,
-        "failed": 3
-      },
-      "unmeasured_nodes": 5557,
-      "attempt_http_status_counts": {
-        "200": 744,
-        "no_response": 15
-      },
-      "attempt_reason_counts": {
-        "网页入口正常；实际功能仍需本地测试": 742,
-        "连接、TLS 或读取失败": 15,
-        "HTTP 和网页特征正常，但请求响应超过速度预算": 2
-      }
+    "tcping_cn": {
+      "mode": "manual_comparison",
+      "url": "https://www.tcping.cn/tcping",
+      "status": "manual_required",
+      "reason": "自动接口要求人机验证"
     }
   },
   "sources": [
@@ -1331,114 +1885,6 @@
       "certificate_error": 0
     }
   },
-  "publication_mode": "full",
-  "published_node_count": 120,
-  "published_node_ids": [
-    "n-61964ab30ce1",
-    "n-0592089f9ab8",
-    "n-72c499cb1696",
-    "n-ad52e2c12994",
-    "n-ebd2ca906c26",
-    "n-abeb78f9d408",
-    "n-6ae0154ee7fc",
-    "n-f56e1c184652",
-    "n-4ce013148a91",
-    "n-8e0c5324b51f",
-    "n-179c6bbd716e",
-    "n-cc673104c3cf",
-    "n-5167f1038a46",
-    "n-dab2e1ea6f18",
-    "n-b90d085c4d4b",
-    "n-cbe26476789c",
-    "n-0fedb144223b",
-    "n-f16d5c851cec",
-    "n-6427e0ba888e",
-    "n-4fdc1e71ba7b",
-    "n-94976b9505e6",
-    "n-288b8d6e20c6",
-    "n-719f363fdef6",
-    "n-7fb5ef7bc49b",
-    "n-f6f6f6a167fa",
-    "n-8db37e8c5dfb",
-    "n-bd504ac550ec",
-    "n-881e61de9d7e",
-    "n-9a02b80cf639",
-    "n-8abce9e1f498",
-    "n-c5f85e06db3a",
-    "n-05a2bfb8946f",
-    "n-e79b525e60da",
-    "n-2eeebf850b1c",
-    "n-8a743d4e825a",
-    "n-71d24b8f88e2",
-    "n-84f57c5d34b0",
-    "n-7bbe4e516ea8",
-    "n-3c87f0de33d3",
-    "n-1c34dedc7bea",
-    "n-29915fd2543e",
-    "n-8a47e3990c11",
-    "n-ff1758085b4b",
-    "n-3da7f01f5691",
-    "n-eb8cdb48a3bf",
-    "n-c14fbf017e05",
-    "n-69882cdc3f7a",
-    "n-8922cee3185c",
-    "n-d2b335b5e16d",
-    "n-16421af0a60d",
-    "n-b2eeedf1fee5",
-    "n-fa77d1bd6987",
-    "n-d6d5733acc25",
-    "n-c9db6e6bade8",
-    "n-6863b33e3243",
-    "n-e4c0375630be",
-    "n-651d92ff97c5",
-    "n-0f3c4e9d2fea",
-    "n-c9544988f076",
-    "n-c617e7ddc460",
-    "n-20f524700da2",
-    "n-1bae48e979f0",
-    "n-707c378f20d8",
-    "n-bfe37dd9927e",
-    "n-8c2899ae7035",
-    "n-4d51d457c2fc",
-    "n-536de9bad143",
-    "n-5b0fb1e60616",
-    "n-fdc20dcb104b",
-    "n-b006a24761e2",
-    "n-58e6c42cabac",
-    "n-775c33dc77fc",
-    "n-c58ae68927c0",
-    "n-b44656517e11",
-    "n-815c48343827",
-    "n-1111faba5e5b",
-    "n-709cc0293516",
-    "n-268603aaa116",
-    "n-c74ad2365038",
-    "n-e4c7aa104dfa",
-    "n-564cebc23727",
-    "n-79baff70a408",
-    "n-8b800df5a6ad",
-    "n-92403744b723",
-    "n-d0f1d683f4ac",
-    "n-bdbe7d72ac40",
-    "n-c1d00f888a47",
-    "n-95ed4a6d77ab",
-    "n-7acf6a2fb9ff",
-    "n-779bb0358f5c",
-    "n-f35f7247279c",
-    "n-a04f78939654",
-    "n-5d6090f7fbcf",
-    "n-723cdfbce7ee",
-    "n-f2d971416f80",
-    "n-0568cd5e5beb",
-    "n-00f29a00d4c5",
-    "n-8023922d000b",
-    "n-b98e9fd3a344",
-    "n-0be334de31d4",
-    "n-a2ce43b97a90"
-  ],
-  "source_run": "38349466728",
-  "source_run_attempt": "1",
-  "configuration_validation": "failed",
   "stage_summary": [
     {
       "id": "sources",
@@ -2099,25 +2545,19 @@
     {
       "id": "config_validation",
       "label": "最终配置校验",
-      "passed": 0,
-      "failed": 1,
+      "passed": 1,
+      "failed": 0,
       "unverified": 0,
       "skipped": 0,
-      "reason_counts": [
-        {
-          "status": "failed",
-          "reason": "未完成最终内核校验，不能声称配置已发布",
-          "count": 1
-        }
-      ],
+      "reason_counts": [],
       "measured": 1
     }
   ],
   "record_count": 5810,
+  "source_run": "38360737029",
+  "source_run_attempt": "1",
+  "configuration_validation": "passed",
   "report_kind": "latest_attempt",
-  "raw_records_retention_days": 7,
-  "retained_subscription": {
-    "node_count": 63,
-    "measurements_updated_at": "2026-10-13T00:17:53+08:00"
-  }
+  "selected_node_count": 120,
+  "raw_records_retention_days": 7
 }
