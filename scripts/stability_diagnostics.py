@@ -114,14 +114,15 @@ def main():
     binary = str(Path(args.mihomo).resolve())
     root = Path('.node-work/stability-diagnostics').resolve()
     root.mkdir(parents=True, exist_ok=True)
-    report = json.loads(Path(args.report or '连通性报告.json').read_text())
+    from published_report import load_report
+    report = load_report(Path(args.report or '连通性报告.json'))
     refs = []
     if args.bundle:
         chosen, mapping = batch_candidates(report, json.loads(Path(args.bundle).read_text()))
     else:
         refs = subprocess.check_output(['git', 'log', '-2', '--format=%H', '--', '优选配置.yaml'], text=True).splitlines()
         snapshots = [(yaml.safe_load(subprocess.check_output(['git', 'show', ref + ':优选配置.yaml'], text=True)),
-                      json.loads(subprocess.check_output(['git', 'show', ref + ':连通性报告.json'], text=True))) for ref in refs]
+                      load_report(json.loads(subprocess.check_output(['git', 'show', ref + ':连通性报告.json'], text=True)))) for ref in refs]
         chosen, mapping = candidates(report, snapshots)
     if not chosen:
         raise RuntimeError('没有可用的小样本历史定义')

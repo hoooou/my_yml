@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import tempfile
 from latest_report import REPORT_FILES, readme_fragment, replace_fragment
+from published_report import repository_summary, FILENAME
 
 FILES = ('优选配置.yaml', 'v2rayN.txt', '连通性报告.json', *REPORT_FILES)
 REPORT_COMPACT_THRESHOLD = 25 * 1024 * 1024
@@ -75,7 +76,14 @@ def publish(root, attempts=3, files=FILES):
         saved = Path(folder)
         for name in files:
             shutil.copyfile(root / name, saved / name)
-        compact_report(saved / '连通性报告.json')
+        raw_path = saved / '连通性报告.json'
+        if raw_path.exists() and (root / '.node-work/availability' / FILENAME).exists():
+            raw = raw_path.read_bytes()
+            report = json.loads(raw)
+            summary = repository_summary(report, raw, os.environ['GITHUB_RUN_ID'])
+            raw_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n')
+        else:
+            compact_report(raw_path)
         # Only generated files may be dirty in this ephemeral checkout.
         git(root, 'restore', '--', *FILES)
         if git(root, 'diff', '--quiet', check=False).returncode or git(root, 'diff', '--cached', '--quiet', check=False).returncode:

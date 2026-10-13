@@ -5,7 +5,10 @@ on:
     workflows: [每日节点连通性分类]
     types: [completed]
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
+  actions: read
   contents: write
 
 concurrency:

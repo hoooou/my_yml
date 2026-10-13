@@ -28,7 +28,8 @@ def snapshot(ref):
     def read(path):
         return subprocess.check_output(['git', 'show', ref + ':' + path], text=True)
     config = yaml.safe_load(read('优选配置.yaml'))
-    report = json.loads(read('连通性报告.json'))
+    from published_report import load_report
+    report = load_report(json.loads(read('连通性报告.json')))
     mapping = {n['name']: n for n in config['proxies']}
     rows = {r['id']: r for r in report['nodes'] if r.get('name') in mapping}
     if set(rows) != set(report['published_node_ids']):
