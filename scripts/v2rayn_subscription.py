@@ -13,6 +13,8 @@ COMMON = {'name', 'type', 'server', 'port', 'username', 'password', 'uuid', 'tls
           'sni', 'servername', 'skip-cert-verify', 'alpn', 'client-fingerprint',
           'network', 'udp', 'delay', 'xudp', 'encryption', 'flow', 'cipher', 'alterId',
           'ws-opts', 'http-opts', 'grpc-opts', 'xhttp-opts', 'reality-opts'}
+# Subscription metadata has no effect on native connection settings.
+ANNOTATIONS = {'country'}
 
 
 def _limited(options, allowed, label):
@@ -24,7 +26,7 @@ def profile(node):
     kind = node['type']
     if kind not in TYPES:
         raise ValueError('v2rayN原生导出暂不支持协议：' + kind)
-    _limited(node, COMMON, kind)
+    _limited(node, COMMON | ANNOTATIONS, kind)
     result = {'ConfigVersion': 4, 'ConfigType': TYPES[kind][0], 'CoreType': 2,
               'Remarks': node['name'], 'Address': str(node['server']), 'Port': int(node['port']),
               'Network': 'raw', 'MuxEnabled': False,
