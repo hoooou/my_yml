@@ -1,12 +1,21 @@
 """Compile mobile routing without adding strategy groups or geosite dependencies."""
+import copy
+
 from site_catalog import OVERSEAS, DOMESTIC
 from app_catalog import DIRECT_APPS, PROXY_APPS, process_payload, domain_payload
 
 GLOBAL = '🚀 全局选择'
 CHINA_DNS = ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
 PROXY_DNS = [f'https://1.1.1.1/dns-query#{GLOBAL}', f'https://8.8.8.8/dns-query#{GLOBAL}']
-COMPANY_DOMAINS = ('tech.bitauto.com', 'yiche.com', 'bitauto.com', 'bitautotech.com')
+COMPANY_DOMAINS = ('tech.bitauto.com', 'yiche.com', 'bitauto.com', 'bitautotech.com', 'inneryiche.com')
 COMPANY_DNS = ['192.168.70.49', '192.168.70.1']
+# Recover the hostname (TLS SNI / HTTP Host / QUIC) for connections that arrive as a bare IP
+# (browser secure DNS, Android Private DNS, cached answers). Without it they skip every domain
+# rule and fall through to MATCH. Routing uses the sniffed name; the destination IP is kept.
+SNIFFER = {'enable': True, 'force-dns-mapping': True, 'parse-pure-ip': True, 'override-destination': False,
+           'sniff': {'HTTP': {'ports': [80, '8080-8880']}, 'TLS': {'ports': [443, 8443]},
+                     'QUIC': {'ports': [443, 8443]}},
+           'skip-domain': ['Mijia Cloud', '+.push.apple.com']}
 
 
 def domains(catalog):
@@ -17,6 +26,7 @@ def optimize_routing(config):
     """Company/LAN first, then fixed app choices, then service-domain fallback."""
     providers = config.setdefault('rule-providers', {})
     config['find-process-mode'] = 'strict'
+    config['sniffer'] = copy.deepcopy(SNIFFER)
     for name, catalog in [('app-direct', DIRECT_APPS), ('app-proxy', PROXY_APPS)]:
         providers[name] = {'type': 'inline', 'behavior': 'classical', 'format': 'yaml',
                            'payload': process_payload(catalog)}
@@ -67,9 +77,13 @@ def optimize_routing(config):
     dns.update({'enable': True, 'default-nameserver': ['223.5.5.5', '119.29.29.29'],
                 'proxy-server-nameserver': list(CHINA_DNS), 'direct-nameserver': list(CHINA_DNS),
                 'direct-nameserver-follow-policy': True,
-                'nameserver': list(CHINA_DNS), 'fallback': list(PROXY_DNS),
-                'fallback-filter': {'geoip': True, 'geoip-code': 'CN',
-                                    'ipcidr': ['240.0.0.0/4', '0.0.0.0/32']}})
+                'nameserver': list(CHINA_DNS)})
+    # No general fallback through the proxy. With fake-ip, proxied domains are resolved remotely;
+    # the local answer only feeds IP rules (GEOIP,CN). A polluted answer is a non-CN IP and still
+    # ends up proxied, so the fallback never changed routing; it only made unmatched lookups wait
+    # on DoH through the selected node. Per-list policy below still sends overseas lists to PROXY_DNS.
+    dns.pop('fallback', None)
+    dns.pop('fallback-filter', None)
     # Policy matching follows YAML order: company choices must precede broad lists.
     policy = {'+.' + domain: list(COMPANY_DNS) for domain in COMPANY_DOMAINS}
     policy['rule-set:company-internal'] = list(COMPANY_DNS)

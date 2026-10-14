@@ -101,8 +101,30 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(dns['direct-nameserver'],r.CHINA_DNS)
         self.assertEqual(dns['nameserver-policy']['rule-set:domestic-services'],r.CHINA_DNS)
         self.assertEqual(dns['nameserver-policy']['rule-set:overseas-services'],r.PROXY_DNS)
-        self.assertTrue(all('#🚀 全局选择' in url for url in dns['fallback']))
+        # No general fallback through the proxy; overseas lists still use PROXY_DNS via policy.
+        self.assertNotIn('fallback', dns)
+        self.assertNotIn('fallback-filter', dns)
         self.assertTrue(dns['ipv6'])
+
+    def test_stale_fallback_is_removed_and_sniffer_is_enabled(self):
+        config = {'dns': {'fallback': ['https://1.1.1.1/dns-query'], 'fallback-filter': {'geoip': True}}, 'rules': []}
+        r.optimize_routing(config)
+        self.assertNotIn('fallback', config['dns'])
+        self.assertNotIn('fallback-filter', config['dns'])
+        sn = config['sniffer']
+        self.assertTrue(sn['enable'] and sn['parse-pure-ip'] and sn['force-dns-mapping'])
+        self.assertFalse(sn['override-destination'])
+        self.assertIn(443, sn['sniff']['TLS']['ports'])
+        config['sniffer']['enable'] = False
+        self.assertTrue(r.SNIFFER['enable'], 'module default must not be mutated through the config')
+
+    def test_inneryiche_is_company_internal(self):
+        config = {'dns': {}, 'rules': []}
+        r.optimize_routing(config)
+        self.assertIn('inneryiche.com', r.COMPANY_DOMAINS)
+        self.assertEqual(config['dns']['nameserver-policy']['+.inneryiche.com'], r.COMPANY_DNS)
+        self.assertIn('+.inneryiche.com', config['dns']['fake-ip-filter'])
+        self.assertIn('+.inneryiche.com', config['rule-providers']['company-internal']['payload'])
 
     def test_company_policy_overrides_public_resolvers_and_survives_daily_compilation(self):
         config = {'dns': {'nameserver-policy': {'+.bitauto.com': r.CHINA_DNS,
@@ -117,7 +139,8 @@ class RoutingTests(unittest.TestCase):
             self.assertEqual(dns['nameserver-policy']['+.' + domain], r.COMPANY_DNS)
             self.assertIn('+.' + domain, dns['fake-ip-filter'])
         self.assertEqual(dns['nameserver-policy']['rule-set:company-internal'], r.COMPANY_DNS)
-        self.assertEqual(list(dns['nameserver-policy'])[:5],
+        n = len(r.COMPANY_DOMAINS) + 1
+        self.assertEqual(list(dns['nameserver-policy'])[:n],
                          ['+.' + domain for domain in r.COMPANY_DOMAINS] + ['rule-set:company-internal'])
         self.assertTrue(dns['direct-nameserver-follow-policy'])
         self.assertEqual(dns['nameserver-policy']['+.office.com'], ['system'])
