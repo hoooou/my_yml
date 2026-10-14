@@ -448,3 +448,10 @@ API通过表示取得预期响应；FAST请求3个不同CDN主机，依次各下
 
 [本轮Actions及原始测量附件](https://github.com/hoooou/my_yml/actions/runs/38504865841)。原始附件保留7天。
 <!-- latest-detection:end -->
+
+## 2026-10-15 与 edgetunnel-template 同步
+
+- **去掉 DNS fallback**：fake-ip 下走代理的域名由远端解析，本地解析结果只用于 IP 规则（GEOIP,CN）。被污染的答案是非 CN IP，照样走代理，所以 fallback 从未改变分流结果，只让未命中规则的域名等待经节点的 DoH。海外列表仍按 `nameserver-policy` 用 1.1.1.1 / 8.8.8.8 经 `🚀 全局选择` 解析，不变。
+- **开启 sniffer**：浏览器安全 DNS、Android 私人 DNS、系统 DNS 缓存会让连接只带 IP，匹配不到任何域名规则而落到 MATCH。sniffer 从 TLS SNI / HTTP Host / QUIC 取回域名再按规则走；`override-destination: false`，实际连接的 IP 不变。
+- **公司域名加 `inneryiche.com`**：公网 DNS 返回 NXDOMAIN，只能经公司 DNS 192.168.70.49 / .1 解析，与其他办公域名同样处理（DIRECT、不分配 fake-ip）。
+
