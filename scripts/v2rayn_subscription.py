@@ -87,19 +87,30 @@ def profile(node):
     return result
 
 
-def render(config):
-    lines = []
+def render_with_skips(config):
+    """Native lines for every node v2rayN can represent exactly, plus the nodes it cannot.
+
+    A node with a field v2rayN has no slot for (e.g. a WS User-Agent header) is left out of the
+    native subscription rather than exported with that field silently dropped. The Clash profile
+    still carries it, so one unusual node never blocks the whole publication.
+    """
+    lines, skipped = [], []
     for node in config['proxies']:
-        data = json.dumps(profile(node), ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+        try:
+            data = json.dumps(profile(node), ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+        except ValueError as error:
+            skipped.append({'name': node.get('name'), 'type': node.get('type'), 'reason': str(error)})
+            continue
         payload = base64.urlsafe_b64encode(data).decode('ascii').rstrip('=')
         lines.append('v2rayn://' + TYPES[node['type']][1] + '/' + payload)
     if not lines:
         raise ValueError('拒绝发布空v2rayN订阅')
-    return '\n'.join(lines) + '\n'
+    return '\n'.join(lines) + '\n', skipped
 
 
-if __name__ == '__main__':
-    import yaml
-    content = render(yaml.safe_load(Path('优选配置.yaml').read_text()))
-    Path('v2rayN.txt').write_text(content, encoding='utf-8')
-    print('v2rayN原生订阅已生成：' + str(len(content.splitlines())) + '个独立节点')
+def render(config):
+    """Strict form: every node must export exactly (used by tests and callers that require it)."""
+    text, skipped = render_with_skips(config)
+    if skipped:
+        raise ValueError(skipped[0]['reason'])
+    return text
