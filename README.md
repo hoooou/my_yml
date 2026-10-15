@@ -26,7 +26,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 
 使用该版本官方支持的`v2rayn://`原生节点格式（ConfigVersion=4），保留HTTP、Trojan、VLESS等节点的实际地址、端口、认证、TLS/SNI、WS、XHTTP和HTTP伪装传输。当前54个节点完整导出，49个HTTP节点仍是HTTP，不冒充SOCKS、不包成一份Custom。设置Xray核心、关闭节点Mux，其他协议将按实际支持导出；遇到不能完整转换的协议或字段（例如WS自定义User-Agent），该节点只从v2rayN订阅中略过、Clash配置照常保留，日志和报告`v2rayn_skipped`列出名称与原因，不会为了一个节点整轮不发布，也不会删掉字段后冒充原节点。[7.24.4官方原生格式](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/Fmt/InnerFmt.cs) · [HTTP原生导入支持](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/ConfigHandler.cs)
 
-每轮与Clash订阅使用同一轮合格节点一同发布。原生节点订阅只携带节点参数及测量名称，不携带Clash的url-test分组、进程规则或公司DNS；v2rayN使用自己的路由和DNS设置。公司内网域名如需直连和私有DNS，应在v2rayN另行设置；不同核心的兼容性校验不能替代本地网络实测。
+每轮与Clash订阅使用同一轮合格节点一同发布。原生节点订阅只携带节点参数及测量名称，不携带Clash的url-test分组、进程规则或内网DNS；v2rayN使用自己的路由和DNS设置。内网域名如需直连和私有DNS，应在v2rayN另行设置；不同核心的兼容性校验不能替代本地网络实测。
 
 | 分组 | 条件与用途 |
 |---|---|
@@ -92,11 +92,11 @@ FAST官方客户端使用`api.fast.com/netflix/speedtest/v2`获取Netflix测速C
 
 最多三个不同主机，顺序各测1MB、各6秒；API给不足三个时仍测有效目标，整体记未知，不重复凑数。三个都完整通过才记FAST通过，分别记录目标地区、耗时、字节及Mbps，汇总成功目标中位数和范围。不同主机不保证不同物理服务器或地区。API获取和实际CDN下载分别统计，普通失败不改变综合／地区门槛，不替代Cloudflare/DataPacket，不修改节点名或分组；明确证书错误仍淘汰。[FAST官方说明](https://fast.com/)
 
-## 分流、公司DNS与IP标签
+## 分流、内网DNS与IP标签
 
-公司域名tech.bitauto.com、yiche.com、bitauto.com、bitautotech.com及子域名优先DIRECT，nameserver-policy使用192.168.70.49和192.168.70.1，并排除fake-IP。开启direct-nameserver-follow-policy，防止直连解析改用公共DNS。使用精确域名后缀，不依赖模糊公司关键词；配置随订阅生成，无需Clash Verge本地覆写。私有DNS需要公司网络或可到达内网的VPN。
+私有内网域名及其子域名优先DIRECT，nameserver-policy指向内网DNS并排除fake-IP（域名与DNS地址只写在 `scripts/routing.py` 配置中）。开启direct-nameserver-follow-policy，防止直连解析改用公共DNS。使用精确域名后缀，不依赖模糊关键词；配置随订阅生成，无需Clash Verge本地覆写。私有DNS只在对应内网或可到达内网的VPN下可用。
 
-匹配顺序：公司／局域网直连 → 广告规则 → 个人进程例外 → 应用进程 → 应用域名兜底 → 明确海外服务 → 国内服务 → 个人域名例外及维护规则集 → 中国IP直连 → 未匹配走全局。保留Office、OneDrive、SharePoint个人直连选择；Cursor及相关域名代理，取消Tencent／元宝模糊关键词直连，并使用GFW列表。没有额外应用策略组。
+匹配顺序：内网／局域网直连 → 广告规则 → 个人进程例外 → 应用进程 → 应用域名兜底 → 明确海外服务 → 国内服务 → 个人域名例外及维护规则集 → 中国IP直连 → 未匹配走全局。保留Office、OneDrive、SharePoint个人直连选择；Cursor及相关域名代理，取消Tencent／元宝模糊关键词直连，并使用GFW列表。没有额外应用策略组。
 
 | 路由 | 应用 |
 |---|---|
@@ -105,7 +105,7 @@ FAST官方客户端使用`api.fast.com/netflix/speedtest/v2`获取Netflix测速C
 | 指定代理 | X／Twitter、Google Play、YouTube、Threads |
 | 补充代理 | Telegram、Discord、Instagram、ChatGPT、Claude、Gemini、Cursor |
 
-find-process-mode: strict按需识别；Android用完整包名，macOS／Windows用实际可执行名称，不使用macOS bundle ID。个人PROCESS-NAME／PATH／正则／通配符优先保留，浏览器、Python、Node、Git和通用Helper不整进程固定路由。未识别进程时回退域名规则；微信内打开海外链接仍按微信直连选择，公司和局域网优先级更高。
+find-process-mode: strict按需识别；Android用完整包名，macOS／Windows用实际可执行名称，不使用macOS bundle ID。个人PROCESS-NAME／PATH／正则／通配符优先保留，浏览器、Python、Node、Git和通用Helper不整进程固定路由。未识别进程时回退域名规则；微信内打开海外链接仍按微信直连选择，内网和局域网优先级更高。
 
 Google Play包括com.android.vending、com.google.android.gms、com.google.android.gsf；服务和框架的其他Google流量也代理。采用com.tencent.wemeet.app、com.autonavi.minimap及com.oray.sunlogin等有官方商店证据的完整包名；不导入厂商前缀、不采用被注释条目，不把Surge的USER-AGENT／通配符原样当成Mihomo精确进程匹配。
 
@@ -141,7 +141,7 @@ Google Play包括com.android.vending、com.google.android.gms、com.google.andro
 | detection_report.py / latest_report.py | 实测展示及README最新记录；无候选也更新报告 |
 | attempt_report.py / publish_subscription.py | 存档全量原始记录及匿名发布；订阅与检测报告分别保护 |
 
-正式节点请求只在GitHub Actions进行，内核独立端口，不开TUN、不改本机代理。提交使用github-actions[bot]或hoooou的noreply地址，避免实名。配置含非法控制字符时剔除对应节点，保留合法中文／图标，防止FlClash报control characters are not allowed。
+正式节点请求只在GitHub Actions进行，内核独立端口，不开TUN、不改本机代理。提交使用github-actions[bot]或仓库所有者的noreply地址，避免实名。配置含非法控制字符时剔除对应节点，保留合法中文／图标，防止FlClash报control characters are not allowed。
 
 ## 如何看报告
 
@@ -476,5 +476,5 @@ API通过表示取得预期响应；FAST请求3个不同CDN主机，依次各下
 
 - **去掉 DNS fallback**：fake-ip 下走代理的域名由远端解析，本地解析结果只用于 IP 规则（GEOIP,CN）。被污染的答案是非 CN IP，照样走代理，所以 fallback 从未改变分流结果，只让未命中规则的域名等待经节点的 DoH。海外列表仍按 `nameserver-policy` 用 1.1.1.1 / 8.8.8.8 经 `🚀 全局选择` 解析，不变。
 - **开启 sniffer**：浏览器安全 DNS、Android 私人 DNS、系统 DNS 缓存会让连接只带 IP，匹配不到任何域名规则而落到 MATCH。sniffer 从 TLS SNI / HTTP Host / QUIC 取回域名再按规则走；`override-destination: false`，实际连接的 IP 不变。
-- **公司域名加 `inneryiche.com`**：公网 DNS 返回 NXDOMAIN，只能经公司 DNS 192.168.70.49 / .1 解析，与其他办公域名同样处理（DIRECT、不分配 fake-ip）。
+- **补充一个内网域名**：它在公网 DNS 上不存在，只能经内网 DNS 解析，与其他内网域名同样处理（DIRECT、不分配 fake-ip）。
 
