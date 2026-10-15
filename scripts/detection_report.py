@@ -231,6 +231,8 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         if mode == 'repair':
             rows += ['本次仅重建配置和报告，没有重新测速。', '']
     untested = report.get('untested_subscription') or {}
+    if untested.get('status') == 'fetch_failed':
+        rows += ['本轮“小草莓”免测订阅获取失败，未加入免测节点；检测入选节点照常发布，下一轮自动重试。', '']
     if untested.get('node_count'):
         rows += [f'另按用户要求加入 **{untested["node_count"]}** 个“小草莓”免测节点'
                  f'（新增{untested.get("added_node_count", 0)}个，重复定义共用已有节点）；'
@@ -335,6 +337,6 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     if required:
         rows += ['必过网站：' + '、'.join(required) + '。明确的Cloudflare人机验证及Reddit明确登录提示认可可达，但不当作真实页面速度；任何已检测网站出现明确证书校验错误均不放行。', '']
     rows += ['综合组的Google／YouTube中位响应≤1500ms、最慢≤3000ms、波动≤1500ms；台湾／新加坡对应为3000／5000／3000ms，其余必过项相同。响应接近时优先上下行更均衡、重复测速更一致的节点。国内网页不用于淘汰节点，国内直连与公司DNS规则保留。', '',
-             '每天北京时间17:00重新获取全部来源检测。GitHub测速反映云端到节点的线路；国内TCP仅反映探测点可达性，不是手机移动网络带宽。SSL检查不模拟应用证书固定或登录后的会话。', '',
+             '每6小时（北京时间05/11/17/23点）重新获取全部来源检测。GitHub测速反映云端到节点的线路；国内TCP仅反映探测点可达性，不是手机移动网络带宽。SSL检查不模拟应用证书固定或登录后的会话。', '',
              '[订阅配置](https://github.com/hoooou/my_yml/blob/main/优选配置.yaml) · [当前订阅统计](https://github.com/hoooou/my_yml/blob/main/连通性报告.json)', '']
     Path(path).write_text('\n'.join(rows))
