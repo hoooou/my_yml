@@ -28,7 +28,7 @@ import stability
 import continuous_stability
 import upload_speed
 import service_probes
-from v2rayn_subscription import render as render_v2rayn
+from v2rayn_subscription import render_with_skips as render_v2rayn
 from untested_subscription import append_from_env as append_untested
 from bandwidth_gate import BandwidthGate
 from detection_report import write_report, website_access_summary, latest_cohort
@@ -1268,11 +1268,14 @@ def main():
         raise RuntimeError('没有满足综合或台湾／新加坡门槛的节点；保留旧订阅')
     candidate = root / 'selected.yaml'; s.dump(candidate, config)
     checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(candidate)], capture_output=True, text=True, timeout=90)
-    native_error = None
+    native_error, native_skipped = None, []
     try:
-        native_subscription = render_v2rayn(config)
+        native_subscription, native_skipped = render_v2rayn(config)
     except (ValueError, KeyError, TypeError) as error:
         native_error = error
+    if native_skipped:
+        print(f'v2rayN原生订阅跳过 {len(native_skipped)} 个无法完整表达的节点（Clash配置保留）：'
+              + '；'.join(f"{x['name']}（{x['reason']}）" for x in native_skipped[:5]), flush=True)
     if checked.returncode or native_error is not None:
         from attempt_report import record_validation
         record_validation(root, config, 'failed', required_websites_passed)
@@ -1292,6 +1295,7 @@ def main():
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
     report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 21,
               'untested_subscription': untested_info, 'tested_selected_node_count': tested_selected_count,
+              'v2rayn_skipped': native_skipped,
               'website_tls_policy': {'any_tls_error_eliminates': True, 'includes_optional_sites': True},
               'upload_precheck_policy': upload_speed.precheck_settings(),
               'early_upload_precheck_enabled': previous.get('early_upload_precheck_enabled', False) if repairing else bool(bundle.get('early_upload_precheck')),

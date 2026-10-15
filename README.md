@@ -24,7 +24,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 
 适用于已核对的v2rayN 7.24.4。在订阅分组中添加上述地址，关闭订阅转换，更新订阅后每个节点独立显示在主列表，可单独选择、编辑和测速。旧的`v2rayN.yaml`是整份Custom配置，已替换；已有旧订阅的用户需要把地址改为`v2rayN.txt`。
 
-使用该版本官方支持的`v2rayn://`原生节点格式（ConfigVersion=4），保留HTTP、Trojan、VLESS等节点的实际地址、端口、认证、TLS/SNI、WS、XHTTP和HTTP伪装传输。当前54个节点完整导出，49个HTTP节点仍是HTTP，不冒充SOCKS、不包成一份Custom。设置Xray核心、关闭节点Mux，其他协议将按实际支持导出；遇到不能完整转换的协议或字段会明确报错并保留旧订阅，不静默丢节点。[7.24.4官方原生格式](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/Fmt/InnerFmt.cs) · [HTTP原生导入支持](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/ConfigHandler.cs)
+使用该版本官方支持的`v2rayn://`原生节点格式（ConfigVersion=4），保留HTTP、Trojan、VLESS等节点的实际地址、端口、认证、TLS/SNI、WS、XHTTP和HTTP伪装传输。当前54个节点完整导出，49个HTTP节点仍是HTTP，不冒充SOCKS、不包成一份Custom。设置Xray核心、关闭节点Mux，其他协议将按实际支持导出；遇到不能完整转换的协议或字段（例如WS自定义User-Agent），该节点只从v2rayN订阅中略过、Clash配置照常保留，日志和报告`v2rayn_skipped`列出名称与原因，不会为了一个节点整轮不发布，也不会删掉字段后冒充原节点。[7.24.4官方原生格式](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/Fmt/InnerFmt.cs) · [HTTP原生导入支持](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/ConfigHandler.cs)
 
 每轮与Clash订阅使用同一轮合格节点一同发布。原生节点订阅只携带节点参数及测量名称，不携带Clash的url-test分组、进程规则或公司DNS；v2rayN使用自己的路由和DNS设置。公司内网域名如需直连和私有DNS，应在v2rayN另行设置；不同核心的兼容性校验不能替代本地网络实测。
 

@@ -87,5 +87,15 @@ class NativeSubscriptionTests(unittest.TestCase):
         with self.assertRaises(ValueError): v.render({'proxies': []})
 
 
+    def test_publication_skips_only_the_node_v2rayn_cannot_express(self):
+        good = self.node(); bad = self.node(); bad['name'] = 'ua'
+        bad.update({'network': 'ws', 'ws-opts': {'path': '/', 'headers': {'Host': 'h', 'User-Agent': 'x'}}})
+        text, skipped = v.render_with_skips({'proxies': [good, bad]})
+        self.assertEqual(len(text.splitlines()), 1)
+        self.assertEqual([x['name'] for x in skipped], ['ua'])
+        self.assertIn('User-Agent', skipped[0]['reason'])
+        with self.assertRaises(ValueError): v.render_with_skips({'proxies': [bad]})
+
+
 if __name__ == '__main__':
     unittest.main()
