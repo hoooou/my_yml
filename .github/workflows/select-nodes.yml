@@ -3,7 +3,7 @@ name: 每日节点连通性分类
 on:
   schedule:
     # GitHub uses UTC: 00:00 UTC = 08:00 Asia/Shanghai.
-    - cron: '0 0 * * *'
+    - cron: '0 9 * * *'   # 17:00 Asia/Shanghai
   workflow_dispatch:
     inputs:
       mode:
