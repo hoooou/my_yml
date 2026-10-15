@@ -89,4 +89,11 @@ def append_from_env(config):
     url = os.environ.get('UNTESTED_SUBSCRIPTION_URL', '').strip()
     if not url:
         return config, {'status': 'not_configured', 'added_node_count': 0, 'node_count': 0, 'tested': False}
-    return append_nodes(config, fetch_nodes(url))
+    try:
+        nodes = fetch_nodes(url)
+    except ValueError as error:
+        # An optional, untested extra must never block publishing the tested selection.
+        # The message comes from fetch_nodes and never contains the URL or credentials.
+        print(f'{error}；本轮发布不含免测节点', flush=True)
+        return config, {'status': 'fetch_failed', 'added_node_count': 0, 'node_count': 0, 'tested': False}
+    return append_nodes(config, nodes)

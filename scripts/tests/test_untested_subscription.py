@@ -50,6 +50,16 @@ class UntestedSubscriptionTests(unittest.TestCase):
         self.assertEqual(info['node_count'], 0)
         with self.assertRaises(ValueError): u.append_nodes(self.config(), [{'name': 'invalid'}])
 
+    def test_fetch_failure_publishes_tested_selection_without_the_untested_group(self):
+        with patch.dict(os.environ, {'UNTESTED_SUBSCRIPTION_URL': 'https://example.com/sub?token=very-secret'}), \
+             patch.object(u, 'fetch_nodes', side_effect=ValueError('免测订阅获取或解析失败；保留原订阅')):
+            config = self.config()
+            result, info = u.append_from_env(config)
+        self.assertEqual(result, self.config())
+        self.assertEqual(info['status'], 'fetch_failed')
+        self.assertEqual(info['node_count'], 0)
+        self.assertNotIn('very-secret', str(info))
+
     def test_fetch_failure_does_not_leak_secret_url_or_credentials(self):
         with patch.object(u.requests, 'Session') as client:
             client.return_value.__enter__.return_value.get.side_effect = requests.RequestException('token=very-secret')

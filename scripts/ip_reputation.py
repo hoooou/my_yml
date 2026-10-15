@@ -7,7 +7,7 @@ import requests
 import select_nodes as s
 
 API_URL = 'https://api.ipapi.is/'
-DAILY_LOOKUP_BUDGET = 900  # Leave headroom in the free 1,000-IP daily allowance.
+DAILY_LOOKUP_BUDGET = 900  # Per-run cap. Runs only look up download-passed exits (~140), so 4 runs/day stay under the free 1,000/day.
 
 
 def normalize(ip, value):
