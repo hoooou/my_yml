@@ -1,6 +1,6 @@
 # Clash / v2rayN 节点优选与检测说明
 
-每天北京时间 **08:00**，使用免费 GitHub Actions 获取全部订阅，去重后检测，生成适用于 FlClash、Clash Meta / Mihomo 的完整配置。目标是入口可达、请求响应快、稳定且上下行良好的节点。全局组保留手动选择、默认综合优选，其他分组自动按延迟选择节点；出口IP变化本身不作为淘汰理由。
+每天北京时间 **17:00**，使用免费 GitHub Actions 获取全部订阅，去重后检测，生成适用于 FlClash、Clash Meta / Mihomo 的完整配置。目标是入口可达、请求响应快、稳定且上下行良好的节点。全局组保留手动选择、默认综合优选，其他分组自动按延迟选择节点；出口IP变化本身不作为淘汰理由。
 
 本文件是唯一维护的 Markdown：使用方法、当前规则、来源、诊断结论及最新检测结果均集中在这里。历史方案、已被替代的门槛和重复报告已经合并清理；原记录仍可从 Git 历史追溯。
 
@@ -26,7 +26,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 
 使用该版本官方支持的`v2rayn://`原生节点格式（ConfigVersion=4），保留HTTP、Trojan、VLESS等节点的实际地址、端口、认证、TLS/SNI、WS、XHTTP和HTTP伪装传输。当前54个节点完整导出，49个HTTP节点仍是HTTP，不冒充SOCKS、不包成一份Custom。设置Xray核心、关闭节点Mux，其他协议将按实际支持导出；遇到不能完整转换的协议或字段会明确报错并保留旧订阅，不静默丢节点。[7.24.4官方原生格式](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/Fmt/InnerFmt.cs) · [HTTP原生导入支持](https://github.com/2dust/v2rayN/blob/7.24.4/v2rayN/ServiceLib/Handler/ConfigHandler.cs)
 
-每天08:00与Clash订阅使用同一轮合格节点一同发布。原生节点订阅只携带节点参数及测量名称，不携带Clash的url-test分组、进程规则或公司DNS；v2rayN使用自己的路由和DNS设置。公司内网域名如需直连和私有DNS，应在v2rayN另行设置；不同核心的兼容性校验不能替代本地网络实测。
+每天17:00与Clash订阅使用同一轮合格节点一同发布。原生节点订阅只携带节点参数及测量名称，不携带Clash的url-test分组、进程规则或公司DNS；v2rayN使用自己的路由和DNS设置。公司内网域名如需直连和私有DNS，应在v2rayN另行设置；不同核心的兼容性校验不能替代本地网络实测。
 
 | 分组 | 条件与用途 |
 |---|---|
@@ -130,7 +130,7 @@ Google Play包括com.android.vending、com.google.android.gms、com.google.andro
 
 | 入口／代码 | 用途 |
 |---|---|
-| 每日节点连通性分类 / full | 每天08:00或手动重新获取所有来源；四片前置、四片网站／下载、独立持续观察及最终上传、合并发布 |
+| 每日节点连通性分类 / full | 每天17:00或手动重新获取所有来源；四片前置、四片网站／下载、独立持续观察及最终上传、合并发布 |
 | repair | 按已有原始证据重建规则／分组；不是全量重测，不伪造新时间或旧下载轮数 |
 | web／medium／stability／uplink-recheck | 已发布池相应专项复测，保留其他项原测量；独立稳定性／上行复测用5分钟观察窗口 |
 | publish-retry | 复用指定完整且仍可取得的同轮存档恢复发布，不重新测速，不复用不同节点原始记录 |
