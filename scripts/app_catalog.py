@@ -49,9 +49,10 @@ PROXY_APPS = {
     'Telegram': app(['org.telegram.messenger'], ['Telegram', 'Telegram.exe'], ['telegram.org', 't.me', 'telegram.me']),
     'Discord': app(['com.discord'], ['Discord', 'Discord.exe'], ['discord.com', 'discord.gg', 'discordapp.com', 'discordapp.net']),
     'Instagram': app(['com.instagram.android'], domains=['instagram.com', 'cdninstagram.com']),
-    'ChatGPT': app(['com.openai.chatgpt'], ['ChatGPT', 'ChatGPT.exe'], ['chatgpt.com', 'openai.com', 'oaistatic.com', 'oaiusercontent.com']),
-    'Claude': app(['com.anthropic.claude'], ['Claude', 'Claude.exe', 'Claude Helper', 'Claude Helper (GPU)',
-                     'Claude Helper (Plugin)', 'Claude Helper (Renderer)'], ['claude.ai', 'anthropic.com']),
+    # Desktop ChatGPT/Claude are deliberately not process-matched: their traffic follows
+    # the domain lists, so helper processes cannot pin unrelated connections.
+    'ChatGPT': app(['com.openai.chatgpt'], domains=['chatgpt.com', 'openai.com', 'oaistatic.com', 'oaiusercontent.com']),
+    'Claude': app(['com.anthropic.claude'], domains=['claude.ai', 'anthropic.com']),
     'Gemini': app(['com.google.android.apps.bard'], domains=['gemini.google.com', 'generativelanguage.googleapis.com']),
     'Cursor': app([], ['Cursor', 'Cursor.exe', 'Cursor Helper', 'Cursor Helper (GPU)',
                       'Cursor Helper (Renderer)', 'Cursor Helper (Plugin)'], ['cursor.com', 'cursor.sh']),
