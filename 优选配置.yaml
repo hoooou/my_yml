@@ -2325,11 +2325,11 @@ proxy-groups:
   - 🏠 非机房 IP
   - 🌏 台湾／新加坡
   - DIRECT
-  url: https://connectivitycheck.gstatic.com/generate_204
+  url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
   timeout: 5000
-  expected-status: 204
+  expected-status: 200
   default-selected: ⭐ 综合优选
 - name: ⭐ 综合优选
   type: url-test
@@ -2528,11 +2528,11 @@ proxy-groups:
   - 罗马尼亚40|925ms|12Mbps|非住宅|纯净度86.7%
   - 法国09|761ms|23Mbps|非住宅|纯净度95.9%
   - 荷兰50|635ms|22Mbps|非住宅|纯净度99.2%
-  url: https://connectivitycheck.gstatic.com/generate_204
+  url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
   timeout: 5000
-  expected-status: 204
+  expected-status: 200
   tolerance: 50
 - name: 🚄 中速下载
   type: url-test
@@ -2729,11 +2729,11 @@ proxy-groups:
   - 罗马尼亚29|1299ms|45Mbps|非住宅|纯净度86.7%
   - 罗马尼亚16|926ms|4Mbps|非住宅|纯净度86.7%
   - 德国04|838ms|4Mbps|非住宅|纯净度93.2%
-  url: https://connectivitycheck.gstatic.com/generate_204
+  url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
   timeout: 5000
-  expected-status: 204
+  expected-status: 200
   tolerance: 50
 - name: ⚡ 高速下载
   type: url-test
@@ -2870,11 +2870,11 @@ proxy-groups:
   - 罗马尼亚29|1299ms|45Mbps|非住宅|纯净度86.7%
   - 罗马尼亚09|924ms|45Mbps|非住宅|纯净度86.7%
   - 瑞典02|795ms|45Mbps|住宅|纯净度99.9%
-  url: https://connectivitycheck.gstatic.com/generate_204
+  url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
   timeout: 5000
-  expected-status: 204
+  expected-status: 200
   tolerance: 50
 - name: 🏠 非机房 IP
   type: url-test
@@ -2888,19 +2888,19 @@ proxy-groups:
   - 荷兰41|1035ms|23Mbps|非住宅|纯净度98.8%
   - 美国78|325ms|68Mbps|非住宅|纯净度99.7%
   - 荷兰50|635ms|22Mbps|非住宅|纯净度99.2%
-  url: https://connectivitycheck.gstatic.com/generate_204
+  url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
   timeout: 5000
-  expected-status: 204
+  expected-status: 200
   tolerance: 50
 - name: 🌏 台湾／新加坡
   type: url-test
   proxies:
   - REJECT
-  url: https://connectivitycheck.gstatic.com/generate_204
+  url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
   timeout: 5000
-  expected-status: 204
+  expected-status: 200
   tolerance: 50
