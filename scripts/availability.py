@@ -51,6 +51,10 @@ REGIONAL_COUNTRIES = ('TW', 'SG')
 REGIONAL_MEDIAN_MS = 3000
 REGIONAL_TAIL_MS = 5000
 REGIONAL_JITTER_MS = 3000
+# Group health checks target Claude: every published node already passed this trace once,
+# and it reflects the service the user actually needs. url-test expects HTTP 200, not 204.
+GROUP_TEST_URL = SITES['ClaudeTrace']
+GROUP_TEST_STATUS = 200
 # Domestic apps use DIRECT: keep their routing catalog, but avoid measuring
 # unrelated return-to-China pages through every overseas proxy each day.
 DAILY_POST_SITES = {label: url for label, url in POST_SITES.items() if label not in DOMESTIC_SITES}
@@ -966,8 +970,8 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
     regional = [r['name'] for r in ranked if regional_eligible(r)]
     def group(name, names):
         return {'name': name, 'type': 'select' if name == '🚀 全局选择' else 'url-test', 'proxies': names or ['REJECT'],
-                'url': SITES['Google204'], 'interval': 300, 'lazy': False,
-                'timeout': 5000, 'expected-status': 204,
+                'url': GROUP_TEST_URL, 'interval': 300, 'lazy': False,
+                'timeout': 5000, 'expected-status': GROUP_TEST_STATUS,
                 **({'default-selected': '⭐ 综合优选'} if name == '🚀 全局选择' else {'tolerance': 50})}
     config['proxies'] = proxies
     choices = ['⭐ 综合优选', medium_speed.GROUP, '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
@@ -1321,8 +1325,8 @@ def main():
               'measurements_updated_at': bundle.get('measurements_updated_at', now),
               'publication_mode': args.phase if repairing else 'full',
               'measurement_recovery': recovery,
-              'group_latency_policy': {'url': SITES['Google204'], 'interval_seconds': 300,
-                  'timeout_ms': 5000, 'expected_status': 204, 'manual_selection': True, 'lazy': False,
+              'group_latency_policy': {'url': GROUP_TEST_URL, 'interval_seconds': 300,
+                  'timeout_ms': 5000, 'expected_status': GROUP_TEST_STATUS, 'manual_selection': True, 'lazy': False,
                   'global_type': 'select', 'default_global_selection': '⭐ 综合优选',
                   'other_group_type': 'url-test', 'automatic_selection': True, 'tolerance_ms': 50},
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,

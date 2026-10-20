@@ -244,7 +244,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         rows += [' · '.join(f'{cell(name)} **{count}**' for name, count in counts), '',
                  ('分组会重叠，不能将数量相加；全局组手动选择、默认综合优选，其他优选组自动选择，免测组手动选择。' if (report.get('group_latency_policy') or {}).get('other_group_type') == 'url-test' else '分组会重叠，不能将数量相加；所有分组保持手动选择。'), '']
     if report.get('group_latency_policy'):
-        rows += [('分组每5分钟自动检测HTTPS 204延迟，5秒超时；全局为select，默认综合优选；其他优选组为url-test，切换容差50ms，免测组无自动测速。客户端支持时可手动固定节点，不可用后可能自动切换。' if report['group_latency_policy'].get('other_group_type') == 'url-test' else '分组每5分钟自动检测HTTPS 204延迟，5秒超时；节点仍由你手动选择，测速不自动切换节点。'), '']
+        rows += [('分组每5分钟自动检测HTTPS 200（claude.ai/cdn-cgi/trace）延迟，5秒超时；全局为select，默认综合优选；其他优选组为url-test，切换容差50ms，免测组无自动测速。客户端支持时可手动固定节点，不可用后可能自动切换。' if report['group_latency_policy'].get('other_group_type') == 'url-test' else '分组每5分钟自动检测HTTPS 200（claude.ai/cdn-cgi/trace）延迟，5秒超时；节点仍由你手动选择，测速不自动切换节点。'), '']
     if candidate and not (untested.get('node_count') and not selected):
         rows += [('最终发布状态以本次 Actions 的发布步骤为准。' if selected else
                   '**本轮无合格节点，保留原订阅。** 原订阅不代表通过这次页面与trace检测。'), '']
