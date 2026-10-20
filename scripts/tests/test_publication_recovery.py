@@ -58,10 +58,10 @@ class RecoveredEvidenceTests(unittest.TestCase):
                 self.assertEqual(group['proxies'][0], '⭐ 综合优选')
             else:
                 self.assertEqual(group['tolerance'], 50)
-            self.assertEqual(group['url'], 'https://connectivitycheck.gstatic.com/generate_204')
+            self.assertEqual(group['url'], 'https://claude.ai/cdn-cgi/trace')
             self.assertEqual(group['interval'], 300)
             self.assertEqual(group['timeout'], 5000)
-            self.assertEqual(group['expected-status'], 204)
+            self.assertEqual(group['expected-status'], 200)
             self.assertFalse(group['lazy'])
         self.assertTrue(any(row['name'] in group['proxies'] for group in config['proxy-groups']))
 
