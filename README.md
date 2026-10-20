@@ -42,7 +42,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 
 小草莓来源是用户明确授权的免测例外，通过Actions Secret `UNTESTED_SUBSCRIPTION_URL`配置地址，不将带token的地址写入仓库。只在全部筛选完成后获取并追加`proxies`，不接受来源自己的规则或DNS；节点名称加“🍓 ”前缀，不伪造延迟、带宽、住宅或纯净度。与已入选定义相同的节点共用，来源内重复去重；这些节点同时进入v2rayN原生汇总订阅。只做格式和最终核心配置校验，不连接节点进行探测；获取失败时本轮不含免测节点、检测入选节点照常发布（报告注明），报告单列免测数量，不计入任何检查通过数。该组使用select且没有自动延迟检测，全局默认仍为综合优选。
 
-全局组使用select、default-selected为综合优选；其他组使用url-test，切换容差50ms。HTTPS 204延迟检查每300秒一次、5秒超时、期望204、关闭lazy。客户端支持时可手动固定节点，节点不可用时可能自动切换出口。[Mihomo分组字段](https://wiki.metacubex.one/config/proxy-groups/)
+全局组使用select、default-selected为综合优选；其他组使用url-test，切换容差50ms。HTTPS 200（claude.ai/cdn-cgi/trace）延迟检查每300秒一次、5秒超时、期望200、关闭lazy。客户端支持时可手动固定节点，节点不可用时可能自动切换出口。[Mihomo分组字段](https://wiki.metacubex.one/config/proxy-groups/)
 
 节点名称：`美国01|120ms|85Mbps|住宅|纯净度99.2%`。延迟使用实际请求中位数；带宽优先双100MB较低值，再用通过的5MB或1MB。未确认的住宅／信誉信息显示未知。非机房不等同住宅，住宅也不保证快速或稳定。
 
@@ -242,7 +242,7 @@ GitHub测量代表云端到节点再到网站的路径；国内TCP只补入口�
 
 分组会重叠，不能将数量相加；全局组手动选择、默认综合优选，其他优选组自动选择，免测组手动选择。
 
-分组每5分钟自动检测HTTPS 204延迟，5秒超时；全局为select，默认综合优选；其他优选组为url-test，切换容差50ms，免测组无自动测速。客户端支持时可手动固定节点，不可用后可能自动切换。
+分组每5分钟自动检测HTTPS 200（claude.ai/cdn-cgi/trace）延迟，5秒超时；全局为select，默认综合优选；其他优选组为url-test，切换容差50ms，免测组无自动测速。客户端支持时可手动固定节点，不可用后可能自动切换。
 
 ### 测量时间
 
