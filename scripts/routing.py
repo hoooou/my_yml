@@ -26,6 +26,8 @@ def optimize_routing(config):
     """Company/LAN first, then fixed app choices, then service-domain fallback."""
     providers = config.setdefault('rule-providers', {})
     config['find-process-mode'] = 'strict'
+    # Allow IPv6 end-to-end when the local network has a working route.
+    config.setdefault('ipv6', True)
     config['sniffer'] = copy.deepcopy(SNIFFER)
     for name, catalog in [('app-direct', DIRECT_APPS), ('app-proxy', PROXY_APPS)]:
         providers[name] = {'type': 'inline', 'behavior': 'classical', 'format': 'yaml',
@@ -78,9 +80,9 @@ def optimize_routing(config):
                 'proxy-server-nameserver': list(CHINA_DNS), 'direct-nameserver': list(CHINA_DNS),
                 'direct-nameserver-follow-policy': True,
                 'nameserver': list(CHINA_DNS)})
-    # Do not hand AAAA answers to apps. On mobile TUN without a working IPv6 route,
-    # direct IPv6 dials fail with "network is unreachable"; IPv6 literals still work.
-    dns['ipv6'] = False
+    # Return AAAA so IPv6-capable networks can use native IPv6. On an IPv4-only
+    # path, switch this back to false or disable IPv6 in the client.
+    dns['ipv6'] = True
     # No general fallback through the proxy. With fake-ip, proxied domains are resolved remotely;
     # the local answer only feeds IP rules (GEOIP,CN). A polluted answer is a non-CN IP and still
     # ends up proxied, so the fallback never changed routing; it only made unmatched lookups wait
