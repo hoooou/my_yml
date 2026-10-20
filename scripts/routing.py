@@ -78,6 +78,9 @@ def optimize_routing(config):
                 'proxy-server-nameserver': list(CHINA_DNS), 'direct-nameserver': list(CHINA_DNS),
                 'direct-nameserver-follow-policy': True,
                 'nameserver': list(CHINA_DNS)})
+    # Do not hand AAAA answers to apps. On mobile TUN without a working IPv6 route,
+    # direct IPv6 dials fail with "network is unreachable"; IPv6 literals still work.
+    dns['ipv6'] = False
     # No general fallback through the proxy. With fake-ip, proxied domains are resolved remotely;
     # the local answer only feeds IP rules (GEOIP,CN). A polluted answer is a non-CN IP and still
     # ends up proxied, so the fallback never changed routing; it only made unmatched lookups wait

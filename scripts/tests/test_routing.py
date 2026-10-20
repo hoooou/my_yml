@@ -104,7 +104,7 @@ class RoutingTests(unittest.TestCase):
         # No general fallback through the proxy; overseas lists still use PROXY_DNS via policy.
         self.assertNotIn('fallback', dns)
         self.assertNotIn('fallback-filter', dns)
-        self.assertTrue(dns['ipv6'])
+        self.assertFalse(dns['ipv6'])
 
     def test_stale_fallback_is_removed_and_sniffer_is_enabled(self):
         config = {'dns': {'fallback': ['https://1.1.1.1/dns-query'], 'fallback-filter': {'geoip': True}}, 'rules': []}
