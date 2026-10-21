@@ -41,6 +41,7 @@ class RoutingTests(unittest.TestCase):
             self.assertLess(rules.index(app_rule), rules.index('RULE-SET,overseas-services,' + r.GLOBAL))
             self.assertLess(rules.index(app_rule), rules.index('RULE-SET,domestic-services,DIRECT'))
         self.assertEqual(config['find-process-mode'], 'strict')
+        self.assertIn('IP-CIDR6,::/0,REJECT,no-resolve', rules)
 
     def test_app_domain_fallback_and_dns_cover_every_catalog_entry(self):
         config = {}
@@ -104,7 +105,7 @@ class RoutingTests(unittest.TestCase):
         # No general fallback through the proxy; overseas lists still use PROXY_DNS via policy.
         self.assertNotIn('fallback', dns)
         self.assertNotIn('fallback-filter', dns)
-        self.assertTrue(dns['ipv6'])
+        self.assertFalse(dns['ipv6'])
 
     def test_stale_fallback_is_removed_and_sniffer_is_enabled(self):
         config = {'dns': {'fallback': ['https://1.1.1.1/dns-query'], 'fallback-filter': {'geoip': True}}, 'rules': []}
