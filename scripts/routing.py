@@ -27,6 +27,8 @@ def optimize_routing(config):
     providers = config.setdefault('rule-providers', {})
     config['find-process-mode'] = 'strict'
     # Allow IPv6 end-to-end when the local network has a working route.
+    # Keep IPv6 visible to TUN so public IPv6 can hit the reject rule below;
+    # DNS itself returns no AAAA (dns.ipv6 false).
     config.setdefault('ipv6', True)
     config['sniffer'] = copy.deepcopy(SNIFFER)
     for name, catalog in [('app-direct', DIRECT_APPS), ('app-proxy', PROXY_APPS)]:
@@ -63,7 +65,10 @@ def optimize_routing(config):
         custom.append(rule)
     rules = (rule_set('company-internal', 'DIRECT')
              + rule_set('private', 'DIRECT') + rule_set('lancidr', 'DIRECT', True)
-             + ['GEOIP,LAN,DIRECT,no-resolve'] + rule_set('reject', 'REJECT')
+             + ['GEOIP,LAN,DIRECT,no-resolve',
+                'IP-CIDR6,::1/128,DIRECT,no-resolve', 'IP-CIDR6,fc00::/7,DIRECT,no-resolve',
+                'IP-CIDR6,fe80::/10,DIRECT,no-resolve', 'IP-CIDR6,fd00::/8,DIRECT,no-resolve',
+                'IP-CIDR6,::/0,REJECT,no-resolve'] + rule_set('reject', 'REJECT')
              + process_custom + rule_set('app-proxy', GLOBAL) + rule_set('app-direct', 'DIRECT')
              + rule_set('app-proxy-domains', GLOBAL) + rule_set('app-direct-domains', 'DIRECT')
              + rule_set('overseas-services', GLOBAL) + rule_set('domestic-services', 'DIRECT')
@@ -80,9 +85,9 @@ def optimize_routing(config):
                 'proxy-server-nameserver': list(CHINA_DNS), 'direct-nameserver': list(CHINA_DNS),
                 'direct-nameserver-follow-policy': True,
                 'nameserver': list(CHINA_DNS)})
-    # Return AAAA so IPv6-capable networks can use native IPv6. On an IPv4-only
-    # path, switch this back to false or disable IPv6 in the client.
-    dns['ipv6'] = True
+    # No AAAA: apps use IPv4. Public IPv6 literals from HTTPDNS are rejected
+    # by the rule above, so they fall back instead of hanging on a broken route.
+    dns['ipv6'] = False
     # No general fallback through the proxy. With fake-ip, proxied domains are resolved remotely;
     # the local answer only feeds IP rules (GEOIP,CN). A polluted answer is a non-CN IP and still
     # ends up proxied, so the fallback never changed routing; it only made unmatched lookups wait
