@@ -1,29 +1,38 @@
 {
-  "updated_at": "2026-10-22T17:06:11+08:00",
+  "updated_at": "2026-10-22T23:06:48+08:00",
   "scope": "all_subscriptions",
   "schema_version": 21,
   "untested_subscription": {
-    "status": "fetch_failed",
-    "added_node_count": 0,
-    "node_count": 0,
-    "tested": false
+    "status": "appended_without_testing",
+    "group": "🍓 小草莓（免测）",
+    "source_node_count": 2,
+    "node_count": 1,
+    "added_node_count": 1,
+    "duplicates": 1,
+    "tested": false,
+    "names_preserved_with_source_prefix": true
   },
-  "tested_selected_node_count": 175,
+  "tested_selected_node_count": 116,
   "v2rayn_skipped": [
     {
-      "name": "美国02|200ms|172Mbps|住宅未知|纯净度未知",
+      "name": "美国02|211ms|182Mbps|非住宅|纯净度99.1%",
       "type": "vless",
       "reason": "v2rayN原生导出暂不支持WS headers中的字段：User-Agent"
     },
     {
-      "name": "新加坡01|1169ms|88Mbps|住宅未知|纯净度未知",
+      "name": "美国03|196ms|179Mbps|住宅未知|纯净度未知",
       "type": "vless",
       "reason": "v2rayN原生导出暂不支持WS headers中的字段：User-Agent"
     },
     {
-      "name": "波兰03|1118ms|20Mbps|非住宅|纯净度97.3%",
+      "name": "波兰03|1037ms|91Mbps|非住宅|纯净度97.3%",
       "type": "http",
       "reason": "v2rayN原生导出暂不支持http中的字段：sub_tag"
+    },
+    {
+      "name": "瑞典01|844ms|118Mbps|非住宅|纯净度100.0%",
+      "type": "vless",
+      "reason": "v2rayN原生导出暂不支持WS headers中的字段：User-Agent"
     }
   ],
   "website_tls_policy": {
@@ -43,9 +52,9 @@
   },
   "early_upload_precheck_enabled": true,
   "upload_precheck_counts": {
-    "passed": 310,
-    "failed": 32,
-    "skipped": 4940,
+    "passed": 208,
+    "failed": 36,
+    "skipped": 4860,
     "unmeasured": 0
   },
   "upload_precheck_controls": {
@@ -62,16 +71,16 @@
         "http_status": 200,
         "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
         "uploaded_bytes": 3000000,
-        "elapsed_ms": 75.9,
+        "elapsed_ms": 143.8,
         "ssl_verify_result": 0,
         "redirect_count": 0,
-        "speed_mbps": 316.206,
+        "speed_mbps": 166.898,
         "response_bytes": 0,
         "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "response_headers": {
           "content-type": "text/plain;charset=UTF-8",
           "cf-meta-colo": "IAD",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1689&min_rtt=1644&rtt_var=649&sent=69&recv=2172&lost=0&retrans=0&sent_bytes=2859&recv_bytes=3004901&delivery_rate=2605839&cwnd=53&unsent_bytes=0&cid=253fee9a2a5068e5&ts=60&x=0\""
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1998&min_rtt=1795&rtt_var=818&sent=68&recv=2180&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=2386629&cwnd=53&unsent_bytes=0&cid=38f30a3207920e8f&ts=129&x=0\""
         },
         "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
       },
@@ -87,129 +96,21 @@
         "http_status": 200,
         "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
         "uploaded_bytes": 3000000,
-        "elapsed_ms": 88.5,
+        "elapsed_ms": 121.9,
         "ssl_verify_result": 0,
         "redirect_count": 0,
-        "speed_mbps": 271.186,
+        "speed_mbps": 196.883,
         "response_bytes": 0,
         "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "response_headers": {
           "content-type": "text/plain;charset=UTF-8",
           "cf-meta-colo": "IAD",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1575&min_rtt=1573&rtt_var=595&sent=78&recv=2171&lost=0&retrans=0&sent_bytes=2857&recv_bytes=3004901&delivery_rate=2685893&cwnd=53&unsent_bytes=0&cid=d8f969b79c063b9d&ts=77&x=0\""
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1972&min_rtt=1790&rtt_var=608&sent=53&recv=2176&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=2194672&cwnd=53&unsent_bytes=0&cid=28e0aa8d16b6046b&ts=110&x=0\""
         },
         "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
       },
       "valid": true,
-      "node_count": 89
-    },
-    "1": {
-      "before": {
-        "version": 1,
-        "status": "passed",
-        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "requested_bytes": 3000000,
-        "budget_seconds": 6,
-        "tls_verification_enabled": true,
-        "http_completed": true,
-        "curl_exit_code": 0,
-        "http_status": 200,
-        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "uploaded_bytes": 3000000,
-        "elapsed_ms": 227.2,
-        "ssl_verify_result": 0,
-        "redirect_count": 0,
-        "speed_mbps": 105.634,
-        "response_bytes": 0,
-        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "response_headers": {
-          "content-type": "text/plain;charset=UTF-8",
-          "cf-meta-colo": "LAX",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=8304&min_rtt=8303&rtt_var=3117&sent=82&recv=2172&lost=0&retrans=0&sent_bytes=2857&recv_bytes=3004901&delivery_rate=515151&cwnd=53&unsent_bytes=0&cid=7ceb1233e536114d&ts=197&x=0\""
-        },
-        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
-      },
-      "after": {
-        "version": 1,
-        "status": "passed",
-        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "requested_bytes": 3000000,
-        "budget_seconds": 6,
-        "tls_verification_enabled": true,
-        "http_completed": true,
-        "curl_exit_code": 0,
-        "http_status": 200,
-        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "uploaded_bytes": 3000000,
-        "elapsed_ms": 125.7,
-        "ssl_verify_result": 0,
-        "redirect_count": 0,
-        "speed_mbps": 190.931,
-        "response_bytes": 0,
-        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "response_headers": {
-          "content-type": "text/plain;charset=UTF-8",
-          "cf-meta-colo": "LAX",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=8665&min_rtt=8480&rtt_var=2549&sent=110&recv=2172&lost=0&retrans=0&sent_bytes=2857&recv_bytes=3004901&delivery_rate=504950&cwnd=53&unsent_bytes=0&cid=42fb86ba1687ca21&ts=106&x=0\""
-        },
-        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
-      },
-      "valid": true,
-      "node_count": 86
-    },
-    "3": {
-      "before": {
-        "version": 1,
-        "status": "passed",
-        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "requested_bytes": 3000000,
-        "budget_seconds": 6,
-        "tls_verification_enabled": true,
-        "http_completed": true,
-        "curl_exit_code": 0,
-        "http_status": 200,
-        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "uploaded_bytes": 3000000,
-        "elapsed_ms": 93.3,
-        "ssl_verify_result": 0,
-        "redirect_count": 0,
-        "speed_mbps": 257.235,
-        "response_bytes": 0,
-        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "response_headers": {
-          "content-type": "text/plain;charset=UTF-8",
-          "cf-meta-colo": "SJC",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1425&min_rtt=1382&rtt_var=430&sent=60&recv=2174&lost=0&retrans=0&sent_bytes=2859&recv_bytes=3004901&delivery_rate=2837086&cwnd=53&unsent_bytes=0&cid=726e5821ff63e9de&ts=84&x=0\""
-        },
-        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
-      },
-      "after": {
-        "version": 1,
-        "status": "passed",
-        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "requested_bytes": 3000000,
-        "budget_seconds": 6,
-        "tls_verification_enabled": true,
-        "http_completed": true,
-        "curl_exit_code": 0,
-        "http_status": 200,
-        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
-        "uploaded_bytes": 3000000,
-        "elapsed_ms": 124.0,
-        "ssl_verify_result": 0,
-        "redirect_count": 0,
-        "speed_mbps": 193.548,
-        "response_bytes": 0,
-        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "response_headers": {
-          "content-type": "text/plain;charset=UTF-8",
-          "cf-meta-colo": "SJC",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=1345&min_rtt=1318&rtt_var=513&sent=124&recv=2172&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=3250379&cwnd=53&unsent_bytes=0&cid=2a89792207d686ba&ts=118&x=0\""
-        },
-        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
-      },
-      "valid": true,
-      "node_count": 76
+      "node_count": 66
     },
     "2": {
       "before": {
@@ -224,16 +125,16 @@
         "http_status": 200,
         "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
         "uploaded_bytes": 3000000,
-        "elapsed_ms": 237.3,
+        "elapsed_ms": 146.2,
         "ssl_verify_result": 0,
         "redirect_count": 0,
-        "speed_mbps": 101.138,
+        "speed_mbps": 164.159,
         "response_bytes": 0,
         "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "response_headers": {
           "content-type": "text/plain;charset=UTF-8",
-          "cf-meta-colo": "DFW",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=17490&min_rtt=17412&rtt_var=4945&sent=123&recv=2173&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=245178&cwnd=53&unsent_bytes=0&cid=c61e5c085de00bc0&ts=178&x=0\""
+          "cf-meta-colo": "IAD",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=2452&min_rtt=2384&rtt_var=942&sent=85&recv=2176&lost=0&retrans=0&sent_bytes=2859&recv_bytes=3004901&delivery_rate=1796979&cwnd=53&unsent_bytes=0&cid=279022756c450c3d&ts=119&x=0\""
         },
         "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
       },
@@ -249,21 +150,129 @@
         "http_status": 200,
         "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
         "uploaded_bytes": 3000000,
-        "elapsed_ms": 270.0,
+        "elapsed_ms": 72.1,
         "ssl_verify_result": 0,
         "redirect_count": 0,
-        "speed_mbps": 88.889,
+        "speed_mbps": 332.871,
         "response_bytes": 0,
         "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "response_headers": {
           "content-type": "text/plain;charset=UTF-8",
-          "cf-meta-colo": "DFW",
-          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=17810&min_rtt=17796&rtt_var=5016&sent=101&recv=2172&lost=0&retrans=0&sent_bytes=2857&recv_bytes=3004901&delivery_rate=240647&cwnd=53&unsent_bytes=0&cid=7396f83595eb4a12&ts=201&x=0\""
+          "cf-meta-colo": "IAD",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=2054&min_rtt=1843&rtt_var=842&sent=65&recv=2175&lost=0&retrans=0&sent_bytes=2859&recv_bytes=3004901&delivery_rate=2324470&cwnd=53&unsent_bytes=0&cid=4a7aa60b29498d40&ts=65&x=0\""
         },
         "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
       },
       "valid": true,
-      "node_count": 91
+      "node_count": 66
+    },
+    "3": {
+      "before": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 410.6,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 58.451,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "MSP",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=8724&min_rtt=5912&rtt_var=4225&sent=77&recv=2172&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=724627&cwnd=53&unsent_bytes=0&cid=7805eda7f76de288&ts=379&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "after": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 171.2,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 140.187,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "MSP",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=8362&min_rtt=5644&rtt_var=4058&sent=52&recv=2173&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=759036&cwnd=53&unsent_bytes=0&cid=9991329b7720b9d9&ts=154&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "valid": true,
+      "node_count": 45
+    },
+    "1": {
+      "before": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 160.8,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 149.254,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "IAD",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=5239&min_rtt=5061&rtt_var=1208&sent=72&recv=2180&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=827666&cwnd=53&unsent_bytes=0&cid=6bad854f27b5850f&ts=137&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "after": {
+        "version": 1,
+        "status": "passed",
+        "url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "requested_bytes": 3000000,
+        "budget_seconds": 6,
+        "tls_verification_enabled": true,
+        "http_completed": true,
+        "curl_exit_code": 0,
+        "http_status": 200,
+        "effective_url": "https://speed.cloudflare.com/__up?bytes=3000000",
+        "uploaded_bytes": 3000000,
+        "elapsed_ms": 177.5,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "speed_mbps": 135.211,
+        "response_bytes": 0,
+        "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_headers": {
+          "content-type": "text/plain;charset=UTF-8",
+          "cf-meta-colo": "IAD",
+          "server-timing": "cfL4;desc=\"?proto=TCP&rtt=5563&min_rtt=5480&rtt_var=2114&sent=93&recv=2172&lost=0&retrans=0&sent_bytes=2858&recv_bytes=3004901&delivery_rate=781751&cwnd=53&unsent_bytes=0&cid=744cb2a8239b7d32&ts=150&x=0\""
+        },
+        "reason": "完整HTTPS上传请求完成；无逐字节接收回执"
+      },
+      "valid": true,
+      "node_count": 67
     }
   },
   "upload_policy": {
@@ -287,281 +296,233 @@
     "china_mobile_uplink_measured": false
   },
   "upload_recheck": {
-    "updated_at": "2026-10-22T17:04:09+08:00",
-    "node_count": 226,
+    "updated_at": "2026-10-22T22:57:47+08:00",
+    "node_count": 147,
     "controls_valid": true,
     "node_ids": [
-      "n-00384c851d97",
-      "n-027cf38e9e7f",
       "n-0568cd5e5beb",
-      "n-08484978de77",
+      "n-0801ebb8ef08",
       "n-08af633a1174",
-      "n-09a158e93e4b",
       "n-0ac48a4d2dd0",
       "n-0bc423bdae7c",
       "n-0be334de31d4",
-      "n-0cc0b4a77400",
       "n-0d245f0bc5a5",
       "n-0d72612879c5",
-      "n-0e660135bcd1",
-      "n-0e881c8f361a",
-      "n-0e97999d07dd",
-      "n-0f06af257d7e",
       "n-0fedb144223b",
-      "n-1202c8f1c7f4",
+      "n-109d16f785c2",
       "n-121d98d12a44",
-      "n-12e6990b9ba9",
       "n-13035eca42bb",
       "n-16421af0a60d",
       "n-169e5de8668c",
       "n-179c6bbd716e",
       "n-1975c522d136",
-      "n-1a242073147c",
-      "n-1c55b6010dac",
-      "n-1c83bac96dc4",
       "n-1c853faf8b5f",
       "n-1de6bc6593bb",
-      "n-1e342f4f174a",
       "n-20f524700da2",
+      "n-23ef2e43f2d1",
+      "n-246c9183fb0a",
       "n-247166e2defb",
-      "n-24e8f80122b6",
       "n-256a4241b458",
-      "n-268603aaa116",
       "n-272def11fb01",
-      "n-2820a9e4805a",
       "n-285853c34ec6",
       "n-288b8d6e20c6",
-      "n-2c096ac0846b",
-      "n-2df495ac24d7",
+      "n-2ab35ee061d7",
       "n-2eeebf850b1c",
-      "n-31b9f5d2298f",
+      "n-3303d93fcb4f",
       "n-351f283b1b76",
       "n-359c3f95304a",
       "n-362463ec372f",
+      "n-36ac2c0bb3c4",
       "n-391327ede748",
       "n-3a0f0e29d7f0",
       "n-3a8f477e82ac",
-      "n-3c87f0de33d3",
       "n-3da7f01f5691",
+      "n-3e4d25760113",
       "n-3fb4cb6a287d",
       "n-4058d08233d7",
       "n-405dc74345ec",
       "n-464224654acd",
       "n-483cfb50b9fc",
-      "n-4c94fbee5f9a",
       "n-4ce013148a91",
-      "n-4d447b8fa5b1",
-      "n-4f6348f5961e",
       "n-4fdc1e71ba7b",
       "n-51f016dcd6e6",
-      "n-564cebc23727",
-      "n-579b2d214c3a",
-      "n-59c95e2421d0",
-      "n-5bc8f562cf83",
-      "n-5bf19688dacd",
-      "n-5c2a16fa034b",
-      "n-5c3cadfadc0d",
-      "n-5d226ff0536d",
       "n-5d4011b85474",
       "n-5d6090f7fbcf",
-      "n-61779d53f067",
+      "n-60ebba740525",
+      "n-6273c673f9e6",
       "n-638ebec9f352",
       "n-6427e0ba888e",
       "n-64c038b8843e",
       "n-65731f952628",
-      "n-670e96f37f29",
       "n-6863b33e3243",
-      "n-688201c003ec",
-      "n-68829458ae4b",
       "n-6a9765033192",
       "n-6ae0154ee7fc",
-      "n-6ae347a48914",
       "n-6c07e12e6818",
-      "n-6dfa9d478b29",
       "n-71d24b8f88e2",
-      "n-72c499cb1696",
-      "n-7318615b478d",
-      "n-732b551f7f5b",
       "n-73333f806437",
       "n-7361d8d101ca",
       "n-745972b39861",
-      "n-74a6e3f1b94d",
       "n-75bfe78680a5",
-      "n-779bb0358f5c",
-      "n-79ba21bb4dfd",
       "n-7acf6a2fb9ff",
-      "n-7b1dc8264824",
-      "n-7b3c132f23e1",
-      "n-7bbe4e516ea8",
-      "n-7c06e12354a0",
+      "n-7b754a8af000",
       "n-7d59d79ac3c0",
-      "n-7f03e352af11",
-      "n-7f7d62a90830",
-      "n-7fb5ef7bc49b",
+      "n-7ea087a74265",
+      "n-7fa190c2668d",
       "n-7fbb9cac4eb7",
-      "n-7ff633ba3f8e",
-      "n-8099c30090ac",
       "n-8156d3bb3723",
       "n-81da2af96dff",
       "n-82966ca15e80",
       "n-84f57c5d34b0",
       "n-85cf9ef2f382",
       "n-881e61de9d7e",
-      "n-8922cee3185c",
-      "n-8998fae258a6",
       "n-89fe631d6c53",
-      "n-8a0d8f136984",
       "n-8a47e3990c11",
-      "n-8a743d4e825a",
       "n-8abce9e1f498",
-      "n-8b472b05d82f",
-      "n-8c4ded62af45",
       "n-8ccddf7586ed",
-      "n-8db37e8c5dfb",
-      "n-8e0c5324b51f",
       "n-90ce5dfbce52",
-      "n-92403744b723",
-      "n-94976b9505e6",
-      "n-94b5937dcb55",
+      "n-9259c08e2b20",
+      "n-934bf15412af",
       "n-94c97c9e81e4",
-      "n-94f33e2d207f",
       "n-952f480375d9",
-      "n-9538dbb72a96",
-      "n-95491e813b19",
-      "n-97eec8e4f3fb",
+      "n-99349ee38e11",
       "n-9bad0944ae0f",
-      "n-9bc63f551ace",
-      "n-9bfab8a0502e",
-      "n-9d6d2faeef14",
       "n-9d84bed57b00",
-      "n-a0539d8423ed",
-      "n-a65e538e2a09",
+      "n-9e90b52e2088",
       "n-aa0c509a0f44",
       "n-abe5fb9b11c1",
       "n-abeb78f9d408",
       "n-ac6dd74e6484",
+      "n-ad0cf9ab354f",
+      "n-ad3de7866002",
       "n-ad52e2c12994",
-      "n-ad97346e2ed8",
       "n-b042fcadc1e7",
-      "n-b13fc83d5bcc",
-      "n-b175d6c0f3a9",
       "n-b2207dda538c",
       "n-b3a872e7f6f2",
       "n-b3ca9a85709e",
-      "n-b3fe7c3ecd96",
       "n-b567ab8965d2",
-      "n-b61608d94fed",
       "n-b651da45e601",
-      "n-b957d51b04dd",
       "n-b98e9fd3a344",
-      "n-bb784b67f9d1",
-      "n-bd417b2f0e47",
       "n-bd504ac550ec",
       "n-be5ac291e62c",
-      "n-bf331d70d9ba",
       "n-c156e20748bd",
+      "n-c1658a38b9f6",
+      "n-c26013e7c058",
       "n-c54dfadb422b",
       "n-c61328c1f8d0",
       "n-c64c3a18d387",
-      "n-c71b47d2232c",
+      "n-c75d10938c77",
       "n-c77d0431d165",
       "n-c7a164238372",
       "n-c9544988f076",
       "n-c9bf45749cf3",
       "n-cab74287f3eb",
       "n-cc673104c3cf",
-      "n-cf75862e0051",
-      "n-cf828b32fb3c",
-      "n-d3274f16be91",
-      "n-d3db6048d965",
+      "n-cf72f2504656",
+      "n-d0f2b5929f2c",
       "n-d45e0bef979f",
       "n-d4e14d99fe49",
       "n-d50edaa1b550",
-      "n-d6d5733acc25",
-      "n-d7b12276bebc",
-      "n-d8cd1acf94cb",
-      "n-dc39b998c945",
-      "n-dfa90b95ed1c",
+      "n-d9727b9ad861",
+      "n-dc7a3b0dbac7",
+      "n-dfbdbcec4c6c",
       "n-e125128e4532",
-      "n-e2f94885bc4a",
       "n-e4c7aa104dfa",
-      "n-e606ef47b5a0",
+      "n-e5472083de84",
       "n-e79b525e60da",
+      "n-ea902185c380",
       "n-eb3753b96b71",
-      "n-ebde1a3e04a2",
       "n-ebf62f93c230",
+      "n-ec600c51be7d",
       "n-ec84e56ba075",
-      "n-ecc102fc8a3a",
       "n-edcc5f4b58e9",
       "n-ef398a873340",
-      "n-ef7cff489dfe",
       "n-efa00687f64b",
-      "n-f09086acb57a",
-      "n-f1111723ad4e",
       "n-f1b228d820ab",
       "n-f2786ca8283b",
-      "n-f3443d66388e",
-      "n-f4d963e1fc3b",
       "n-f56e1c184652",
-      "n-f6f6f6a167fa",
-      "n-f7ef8bf6a721",
-      "n-f849cb8ba604",
+      "n-f7e906ec64a6",
       "n-f98d3d0f2a70",
-      "n-f9e1cc3cee36",
-      "n-fa77d1bd6987",
       "n-fb78c1f64e0e",
       "n-fb86a0010f3b",
       "n-fbf95b68ba70",
-      "n-fd36f456ff40",
-      "n-fd59519556d5",
       "n-fd851844ab0a",
-      "n-feb535fa2254",
-      "n-ff1758085b4b"
+      "n-feb535fa2254"
     ],
-    "passed_count": 220,
-    "failed_count": 6
+    "passed_count": 140,
+    "failed_count": 7
   },
   "historical_candidates": {
     "snapshot_limit": 2,
     "refs": [
-      "98eea25592c81397e2342b02cb8fddfb6c13f437",
-      "9f089210cc7937001fb2bf87cbf682e17dd3d4df"
+      "5551ea88ee8bea73caf6c49efea3827403a16ced",
+      "98eea25592c81397e2342b02cb8fddfb6c13f437"
     ],
-    "added_count": 125,
+    "added_count": 167,
     "added_ids": [
-      "n-ff5da6dc676c",
-      "n-754785c342af",
-      "n-ed7217d56949",
-      "n-bf2714928fdc",
-      "n-2476c6594065",
-      "n-12bb44bd494a",
-      "n-35cec04c7d3f",
-      "n-2c096ac0846b",
-      "n-dac8c5150872",
+      "n-5bf19688dacd",
+      "n-71d24b8f88e2",
+      "n-7bbe4e516ea8",
+      "n-8e0c5324b51f",
+      "n-b3a872e7f6f2",
+      "n-5d6090f7fbcf",
+      "n-359c3f95304a",
+      "n-3a0f0e29d7f0",
+      "n-d4e14d99fe49",
+      "n-b3ca9a85709e",
+      "n-00384c851d97",
+      "n-8ccddf7586ed",
+      "n-7fb5ef7bc49b",
+      "n-f6f6f6a167fa",
+      "n-0bc423bdae7c",
+      "n-51f016dcd6e6",
+      "n-4058d08233d7",
+      "n-08af633a1174",
+      "n-12e6990b9ba9",
+      "n-7b3c132f23e1",
+      "n-6c07e12e6818",
+      "n-f1b228d820ab",
+      "n-a0539d8423ed",
+      "n-464224654acd",
+      "n-7b1dc8264824",
+      "n-bf331d70d9ba",
+      "n-c71b47d2232c",
+      "n-84f57c5d34b0",
+      "n-f56e1c184652",
+      "n-cc673104c3cf",
+      "n-e125128e4532",
+      "n-0e881c8f361a",
+      "n-362463ec372f",
+      "n-e79b525e60da",
+      "n-16421af0a60d",
+      "n-2eeebf850b1c",
+      "n-eb3753b96b71",
+      "n-b957d51b04dd",
+      "n-5c3cadfadc0d",
+      "n-92403744b723",
+      "n-0be334de31d4",
+      "n-ef7cff489dfe",
+      "n-121d98d12a44",
+      "n-c7a164238372",
+      "n-3a8f477e82ac",
+      "n-1c55b6010dac",
+      "n-ac6dd74e6484",
       "n-ebf62f93c230",
       "n-5d226ff0536d",
-      "n-b881b38dddb5",
       "n-c156e20748bd",
       "n-6a9765033192",
       "n-b98e9fd3a344",
       "n-be5ac291e62c",
       "n-579b2d214c3a",
-      "n-f7e906ec64a6",
       "n-fb86a0010f3b",
-      "n-feb535fa2254",
-      "n-745972b39861",
       "n-64c038b8843e",
       "n-8abce9e1f498",
-      "n-1202c8f1c7f4",
       "n-edcc5f4b58e9",
       "n-0fedb144223b",
       "n-638ebec9f352",
-      "n-779bb0358f5c",
       "n-2df495ac24d7",
       "n-4fdc1e71ba7b",
       "n-881e61de9d7e",
       "n-9d84bed57b00",
-      "n-fa77d1bd6987",
       "n-6427e0ba888e",
       "n-268603aaa116",
       "n-8db37e8c5dfb",
@@ -571,7 +532,6 @@
       "n-8c4ded62af45",
       "n-6dfa9d478b29",
       "n-952f480375d9",
-      "n-d45e0bef979f",
       "n-cf75862e0051",
       "n-89fe631d6c53",
       "n-288b8d6e20c6",
@@ -588,7 +548,6 @@
       "n-7d59d79ac3c0",
       "n-027cf38e9e7f",
       "n-9538dbb72a96",
-      "n-60ebba740525",
       "n-90ce5dfbce52",
       "n-e4c7aa104dfa",
       "n-3fb4cb6a287d",
@@ -604,7 +563,6 @@
       "n-f2786ca8283b",
       "n-5d4011b85474",
       "n-564cebc23727",
-      "n-3e4d25760113",
       "n-fd851844ab0a",
       "n-c9544988f076",
       "n-20f524700da2",
@@ -626,34 +584,48 @@
       "n-d50edaa1b550",
       "n-483cfb50b9fc",
       "n-94c97c9e81e4",
-      "n-cab74287f3eb",
       "n-179c6bbd716e",
       "n-d7b12276bebc",
       "n-1975c522d136",
       "n-dc39b998c945",
-      "n-8a47e3990c11",
       "n-8a743d4e825a",
-      "n-f7ef8bf6a721",
       "n-f09086acb57a",
-      "n-b41574961d14",
       "n-3c87f0de33d3",
       "n-ff1758085b4b",
-      "n-65ad770d14e6",
       "n-5bc8f562cf83",
-      "n-bcb030b9e6d0",
-      "n-76cc324dd93b",
       "n-f3443d66388e",
       "n-9bad0944ae0f",
-      "n-a018fceba75c",
       "n-7acf6a2fb9ff",
       "n-b175d6c0f3a9",
       "n-2820a9e4805a",
-      "n-fba5080811d5",
-      "n-15925aae6fc9",
       "n-0ac48a4d2dd0",
       "n-d3db6048d965",
       "n-f98d3d0f2a70",
-      "n-4cc0045aa5ad"
+      "n-ff5da6dc676c",
+      "n-754785c342af",
+      "n-ed7217d56949",
+      "n-bf2714928fdc",
+      "n-2476c6594065",
+      "n-12bb44bd494a",
+      "n-47970f3e0c19",
+      "n-59c95e2421d0",
+      "n-58826a26a5fe",
+      "n-35cec04c7d3f",
+      "n-9655f8dfc98a",
+      "n-9a9d0a0d0d3e",
+      "n-0cc0b4a77400",
+      "n-dac8c5150872",
+      "n-09eaf7348480",
+      "n-b881b38dddb5",
+      "n-f7e906ec64a6",
+      "n-d45e0bef979f",
+      "n-60ebba740525",
+      "n-3e4d25760113",
+      "n-b41574961d14",
+      "n-65ad770d14e6",
+      "n-bcb030b9e6d0",
+      "n-76cc324dd93b",
+      "n-a018fceba75c"
     ],
     "measurement_reuse": false,
     "status": "ok"
@@ -693,325 +665,223 @@
     "explicit_certificate_error_rejects": true
   },
   "stability_recheck": {
-    "updated_at": "2026-10-22T17:05:19+08:00",
-    "node_count": 310,
+    "updated_at": "2026-10-22T23:06:00+08:00",
+    "node_count": 208,
     "controls_valid": true,
     "scope": "domestic_TCP_and_3MB_upload_passed",
     "node_ids": [
-      "n-00384c851d97",
-      "n-027cf38e9e7f",
-      "n-028e3afc9b65",
       "n-04641adcccb2",
       "n-0568cd5e5beb",
-      "n-07403afaa482",
-      "n-08484978de77",
+      "n-0801ebb8ef08",
       "n-08af633a1174",
-      "n-09a158e93e4b",
       "n-0ac48a4d2dd0",
-      "n-0b109a14aa51",
+      "n-0b33850d45ea",
       "n-0bc423bdae7c",
       "n-0be334de31d4",
-      "n-0cc0b4a77400",
       "n-0d245f0bc5a5",
       "n-0d72612879c5",
-      "n-0e660135bcd1",
-      "n-0e881c8f361a",
-      "n-0e97999d07dd",
-      "n-0f06af257d7e",
       "n-0fedb144223b",
-      "n-1202c8f1c7f4",
+      "n-109d16f785c2",
       "n-121d98d12a44",
       "n-12e6990b9ba9",
       "n-13035eca42bb",
       "n-16421af0a60d",
       "n-169e5de8668c",
       "n-179c6bbd716e",
+      "n-17f645c3e51f",
       "n-1975c522d136",
-      "n-1a242073147c",
-      "n-1c55b6010dac",
-      "n-1c83bac96dc4",
       "n-1c853faf8b5f",
       "n-1de6bc6593bb",
-      "n-1e342f4f174a",
       "n-20e2cce2d6f6",
       "n-20f524700da2",
-      "n-212782c11ee5",
-      "n-22244163974b",
+      "n-225b77c1aa10",
+      "n-2356f8bc6195",
+      "n-23ef2e43f2d1",
+      "n-246c9183fb0a",
       "n-247166e2defb",
       "n-24e8f80122b6",
       "n-256a4241b458",
-      "n-268603aaa116",
       "n-272def11fb01",
-      "n-2820a9e4805a",
       "n-285853c34ec6",
       "n-288b8d6e20c6",
-      "n-2c096ac0846b",
+      "n-2ab35ee061d7",
       "n-2c74d865cd90",
-      "n-2d5114d8acc2",
-      "n-2df495ac24d7",
       "n-2eeebf850b1c",
       "n-31b9f5d2298f",
+      "n-3303d93fcb4f",
       "n-33f5ce825a12",
       "n-34b5f6c60607",
-      "n-34ce94ee0c31",
       "n-351f283b1b76",
       "n-359c3f95304a",
       "n-362463ec372f",
+      "n-36ac2c0bb3c4",
+      "n-37bb579eee49",
+      "n-38eb97597d8e",
       "n-391327ede748",
       "n-3a0f0e29d7f0",
       "n-3a8f477e82ac",
-      "n-3c87f0de33d3",
+      "n-3d5a8b33c9ee",
       "n-3da7f01f5691",
-      "n-3dc176073589",
       "n-3de060c91d84",
       "n-3e4d25760113",
-      "n-3f8b19290a46",
       "n-3fb4cb6a287d",
-      "n-4034c49e2496",
       "n-4058d08233d7",
       "n-405dc74345ec",
-      "n-408e90999263",
-      "n-4277a430798d",
-      "n-4588938fac17",
       "n-45bdc1508fe7",
-      "n-45fcd7632f14",
       "n-464224654acd",
       "n-47970f3e0c19",
       "n-47fe00416ab8",
       "n-483cfb50b9fc",
-      "n-4c94fbee5f9a",
       "n-4ce013148a91",
       "n-4d447b8fa5b1",
-      "n-4f6348f5961e",
       "n-4fdc1e71ba7b",
       "n-51f016dcd6e6",
-      "n-5242e63a69bc",
-      "n-564cebc23727",
-      "n-579b2d214c3a",
-      "n-59c95e2421d0",
-      "n-5a5e4f8c7844",
-      "n-5bc8f562cf83",
-      "n-5bf19688dacd",
-      "n-5c2a16fa034b",
-      "n-5c3cadfadc0d",
-      "n-5d226ff0536d",
+      "n-59d3375ca4c8",
       "n-5d4011b85474",
       "n-5d6090f7fbcf",
       "n-5eba1a5da39c",
       "n-60ebba740525",
-      "n-61779d53f067",
+      "n-6273c673f9e6",
       "n-638ebec9f352",
       "n-6427e0ba888e",
       "n-64c038b8843e",
       "n-65731f952628",
-      "n-670e96f37f29",
-      "n-673c357b0ff0",
       "n-6863b33e3243",
-      "n-688201c003ec",
-      "n-68829458ae4b",
       "n-6a9765033192",
       "n-6ae0154ee7fc",
       "n-6ae347a48914",
       "n-6c07e12e6818",
-      "n-6dfa9d478b29",
       "n-71d24b8f88e2",
       "n-72c499cb1696",
-      "n-72f50cf6c9eb",
-      "n-7318615b478d",
-      "n-732b551f7f5b",
       "n-73333f806437",
       "n-7361d8d101ca",
       "n-745972b39861",
-      "n-74a6e3f1b94d",
-      "n-754785c342af",
       "n-75bfe78680a5",
-      "n-779bb0358f5c",
-      "n-780ebbae8552",
-      "n-79ba21bb4dfd",
       "n-7acf6a2fb9ff",
-      "n-7b1dc8264824",
-      "n-7b3c132f23e1",
       "n-7b754a8af000",
-      "n-7bbe4e516ea8",
-      "n-7c06e12354a0",
-      "n-7cccc193a79c",
       "n-7d59d79ac3c0",
-      "n-7f03e352af11",
-      "n-7f7d62a90830",
-      "n-7fb5ef7bc49b",
+      "n-7ea087a74265",
+      "n-7fa190c2668d",
       "n-7fbb9cac4eb7",
-      "n-7ff633ba3f8e",
       "n-8099c30090ac",
       "n-8156d3bb3723",
+      "n-81c0f54bb33c",
       "n-81da2af96dff",
       "n-82966ca15e80",
       "n-84f57c5d34b0",
       "n-85cf9ef2f382",
       "n-881e61de9d7e",
-      "n-8922cee3185c",
       "n-8998fae258a6",
+      "n-89dff00d48fd",
       "n-89fe631d6c53",
-      "n-8a0d8f136984",
-      "n-8a1aa71b7848",
       "n-8a47e3990c11",
-      "n-8a743d4e825a",
       "n-8abce9e1f498",
-      "n-8b472b05d82f",
-      "n-8be736299252",
-      "n-8c4ded62af45",
       "n-8cbd87fa9889",
       "n-8ccddf7586ed",
       "n-8d46b79dd162",
-      "n-8db37e8c5dfb",
-      "n-8e0c5324b51f",
       "n-8e5a9ed66465",
-      "n-8f2f4b047c4f",
       "n-8fc227cf77c0",
       "n-90ce5dfbce52",
-      "n-912cd00edab2",
-      "n-92403744b723",
-      "n-94976b9505e6",
-      "n-94b5937dcb55",
+      "n-9259c08e2b20",
+      "n-934bf15412af",
       "n-94c97c9e81e4",
-      "n-94f33e2d207f",
       "n-952f480375d9",
-      "n-9538dbb72a96",
-      "n-95491e813b19",
-      "n-9655f8dfc98a",
-      "n-97eec8e4f3fb",
-      "n-98066e7b884a",
+      "n-99349ee38e11",
       "n-9bad0944ae0f",
-      "n-9bc63f551ace",
-      "n-9bfab8a0502e",
-      "n-9cbf9a8b26fe",
       "n-9d6d2faeef14",
       "n-9d84bed57b00",
-      "n-a0539d8423ed",
-      "n-a0f922261790",
-      "n-a134d34c6fb5",
-      "n-a24e94da3a47",
+      "n-9dd53160988b",
+      "n-9e90b52e2088",
+      "n-9ff81c0704b3",
       "n-a4c65d2da825",
-      "n-a65e538e2a09",
+      "n-a82993f8cd89",
       "n-a86ea6914c93",
       "n-aa0c509a0f44",
-      "n-abdbdb5e0779",
       "n-abe5fb9b11c1",
       "n-abeb78f9d408",
       "n-ac6dd74e6484",
+      "n-ad0cf9ab354f",
+      "n-ad3de7866002",
       "n-ad52e2c12994",
-      "n-ad97346e2ed8",
       "n-b042fcadc1e7",
-      "n-b08797542371",
       "n-b13fc83d5bcc",
-      "n-b175d6c0f3a9",
       "n-b2207dda538c",
-      "n-b33cca8d0fe3",
       "n-b3a872e7f6f2",
       "n-b3ca9a85709e",
-      "n-b3fe7c3ecd96",
       "n-b567ab8965d2",
       "n-b601fadcf245",
       "n-b61608d94fed",
       "n-b651da45e601",
-      "n-b881b38dddb5",
-      "n-b957d51b04dd",
+      "n-b916911b059b",
       "n-b98e9fd3a344",
-      "n-bb784b67f9d1",
-      "n-bce27866c375",
-      "n-bd417b2f0e47",
-      "n-bd4670ff597f",
       "n-bd504ac550ec",
       "n-be5ac291e62c",
-      "n-befabf15bb71",
-      "n-bf331d70d9ba",
-      "n-bfcd75f0c37d",
-      "n-c0ba1fab26a8",
       "n-c156e20748bd",
-      "n-c4a6ce275684",
+      "n-c1658a38b9f6",
+      "n-c26013e7c058",
       "n-c54dfadb422b",
       "n-c61328c1f8d0",
       "n-c64c3a18d387",
-      "n-c71b47d2232c",
-      "n-c73b0a984357",
+      "n-c75d10938c77",
       "n-c77d0431d165",
       "n-c7a164238372",
       "n-c9544988f076",
       "n-c9bf45749cf3",
-      "n-c9edeb3cdbdf",
-      "n-ca2ae2450358",
+      "n-c9e367f22acb",
       "n-cab74287f3eb",
       "n-cc673104c3cf",
       "n-cd6d3b4d088f",
       "n-cd71824d3fd9",
-      "n-cdfed74980cf",
-      "n-cf75862e0051",
-      "n-cf828b32fb3c",
-      "n-d20e617ce500",
-      "n-d3274f16be91",
-      "n-d3db6048d965",
+      "n-cf72f2504656",
+      "n-d0f2b5929f2c",
+      "n-d112413c7787",
       "n-d3dd20977d78",
-      "n-d44bf33ab3d4",
       "n-d45e0bef979f",
       "n-d4e14d99fe49",
       "n-d50edaa1b550",
-      "n-d6d5733acc25",
-      "n-d7b12276bebc",
-      "n-d8cd1acf94cb",
-      "n-dac8c5150872",
-      "n-dc39b998c945",
-      "n-de000e100bb4",
-      "n-de1d706be16e",
+      "n-d9727b9ad861",
+      "n-dc7a3b0dbac7",
       "n-de2d5fed0a65",
-      "n-dfa90b95ed1c",
+      "n-dfbdbcec4c6c",
       "n-e125128e4532",
-      "n-e2a1d13f7d3e",
       "n-e2f94885bc4a",
       "n-e4c7aa104dfa",
-      "n-e606ef47b5a0",
+      "n-e5472083de84",
       "n-e79b525e60da",
-      "n-e972d6d2306b",
+      "n-ea902185c380",
+      "n-eaac1e039525",
       "n-eb3753b96b71",
       "n-eb90f760ef50",
-      "n-ebde1a3e04a2",
       "n-ebf62f93c230",
+      "n-ec600c51be7d",
       "n-ec84e56ba075",
-      "n-ecc102fc8a3a",
       "n-edcc5f4b58e9",
-      "n-ee77921c2b43",
       "n-ef398a873340",
-      "n-ef7cff489dfe",
+      "n-ef5d5c52d585",
       "n-efa00687f64b",
-      "n-f09086acb57a",
-      "n-f1111723ad4e",
       "n-f11a2f5b9f63",
       "n-f1b228d820ab",
       "n-f2786ca8283b",
-      "n-f3443d66388e",
-      "n-f4332c3541e0",
-      "n-f4d963e1fc3b",
+      "n-f3050ae7c46b",
+      "n-f54a60ffd49e",
       "n-f56e1c184652",
       "n-f6f6f6a167fa",
+      "n-f7e1895993a5",
       "n-f7e906ec64a6",
-      "n-f7ef8bf6a721",
-      "n-f849cb8ba604",
       "n-f98d3d0f2a70",
-      "n-f9e1cc3cee36",
-      "n-fa77d1bd6987",
+      "n-faaf4ca32a93",
       "n-fb78c1f64e0e",
       "n-fb86a0010f3b",
+      "n-fbd32509b94d",
       "n-fbf95b68ba70",
-      "n-fd36f456ff40",
-      "n-fd59519556d5",
+      "n-fd5b34aae37d",
       "n-fd851844ab0a",
       "n-feb535fa2254",
-      "n-fec11fa1058c",
-      "n-ff1758085b4b",
-      "n-ff4732a41933",
-      "n-ff5da6dc676c"
+      "n-fec11fa1058c"
     ],
-    "passed_count": 211,
-    "failed_count": 99,
-    "quality_eligible_count": 178
+    "passed_count": 147,
+    "failed_count": 61,
+    "quality_eligible_count": 121
   },
   "app_tls_policy": {
     "version": 1,
@@ -1027,15 +897,15 @@
     "android_certificate_pinning_emulated": false
   },
   "app_tls_counts": {
-    "passed": 232,
-    "failed": 1,
-    "skipped": 5049
+    "passed": 147,
+    "failed": 0,
+    "skipped": 4957
   },
   "post_upload_tls_counts": {
-    "passed": 222,
-    "failed": 4
+    "passed": 145,
+    "failed": 2
   },
-  "measurements_updated_at": "2026-10-22T17:05:55+08:00",
+  "measurements_updated_at": "2026-10-22T23:06:33+08:00",
   "publication_mode": "full",
   "measurement_recovery": null,
   "group_latency_policy": {
@@ -1108,16 +978,13 @@
     "core_p95_limit_ms": 3000,
     "core_jitter_limit_ms": 1500,
     "min_accepted_overseas_sites": 13,
-    "eligible_count": 177
+    "eligible_count": 121
   },
   "mobile_rejections": {
-    "n-46db08a8b926": [
-      "sni"
-    ],
     "n-73dadf3c428c": [
       "sni"
     ],
-    "n-455317290bcf": [
+    "n-46db08a8b926": [
       "sni"
     ]
   },
@@ -1196,7 +1063,7 @@
     "domestic": "DIRECT",
     "overseas": "🚀 全局选择",
     "unmatched": "🚀 全局选择",
-    "group_count": 6,
+    "group_count": 7,
     "version": 2
   },
   "stages": [
@@ -1248,9 +1115,9 @@
     "failure_blocks_high_speed_test": false
   },
   "medium_speed_download_counts": {
-    "passed": 229,
-    "failed": 1,
-    "skipped": 5052,
+    "passed": 141,
+    "failed": 6,
+    "skipped": 4957,
     "unverified": 0
   },
   "medium_speed_selection_policy": {
@@ -1260,7 +1127,7 @@
     "regional_exception_allowed": true,
     "hong_kong_limit": 30,
     "other_regions_limit": null,
-    "selected_count": 174
+    "selected_count": 112
   },
   "medium_speed_recheck": null,
   "high_speed_download_test": true,
@@ -1341,155 +1208,108 @@
       "SG": 0
     }
   },
-  "published_node_count": 175,
+  "published_node_count": 117,
   "published_node_ids": [
-    "n-8b472b05d82f",
-    "n-f9e1cc3cee36",
-    "n-0e97999d07dd",
-    "n-ef398a873340",
-    "n-24e8f80122b6",
-    "n-5bf19688dacd",
-    "n-72c499cb1696",
-    "n-ad52e2c12994",
-    "n-b13fc83d5bcc",
-    "n-8099c30090ac",
-    "n-e2f94885bc4a",
-    "n-71d24b8f88e2",
+    "n-3303d93fcb4f",
+    "n-d0f2b5929f2c",
+    "n-9e90b52e2088",
+    "n-23ef2e43f2d1",
+    "n-c26013e7c058",
+    "n-745972b39861",
+    "n-246c9183fb0a",
+    "n-109d16f785c2",
+    "n-7ea087a74265",
+    "n-ad3de7866002",
+    "n-c1658a38b9f6",
     "n-6ae0154ee7fc",
-    "n-7bbe4e516ea8",
-    "n-8e0c5324b51f",
+    "n-4ce013148a91",
+    "n-8a47e3990c11",
+    "n-cab74287f3eb",
+    "n-e5472083de84",
+    "n-d9727b9ad861",
+    "n-99349ee38e11",
+    "n-0801ebb8ef08",
+    "n-9259c08e2b20",
+    "n-1c853faf8b5f",
+    "n-b651da45e601",
+    "n-dc7a3b0dbac7",
+    "n-feb535fa2254",
+    "n-c75d10938c77",
+    "n-71d24b8f88e2",
     "n-b3a872e7f6f2",
     "n-5d6090f7fbcf",
     "n-359c3f95304a",
     "n-3a0f0e29d7f0",
     "n-d4e14d99fe49",
     "n-b3ca9a85709e",
-    "n-00384c851d97",
     "n-8ccddf7586ed",
-    "n-7fb5ef7bc49b",
-    "n-f6f6f6a167fa",
     "n-0bc423bdae7c",
     "n-51f016dcd6e6",
     "n-4058d08233d7",
     "n-08af633a1174",
-    "n-12e6990b9ba9",
-    "n-7b3c132f23e1",
     "n-6c07e12e6818",
     "n-f1b228d820ab",
-    "n-a0539d8423ed",
     "n-464224654acd",
-    "n-bd417b2f0e47",
-    "n-7b1dc8264824",
-    "n-bf331d70d9ba",
-    "n-c71b47d2232c",
     "n-84f57c5d34b0",
     "n-f56e1c184652",
-    "n-4ce013148a91",
     "n-cc673104c3cf",
     "n-e125128e4532",
-    "n-0e881c8f361a",
-    "n-efa00687f64b",
-    "n-5c2a16fa034b",
     "n-362463ec372f",
     "n-e79b525e60da",
     "n-16421af0a60d",
-    "n-73333f806437",
     "n-2eeebf850b1c",
     "n-eb3753b96b71",
-    "n-b651da45e601",
-    "n-e606ef47b5a0",
-    "n-cf828b32fb3c",
-    "n-6ae347a48914",
-    "n-8998fae258a6",
-    "n-4d447b8fa5b1",
-    "n-1c853faf8b5f",
-    "n-1e342f4f174a",
-    "n-b957d51b04dd",
-    "n-5c3cadfadc0d",
-    "n-92403744b723",
     "n-0be334de31d4",
-    "n-ef7cff489dfe",
     "n-121d98d12a44",
     "n-c7a164238372",
     "n-3a8f477e82ac",
-    "n-1c55b6010dac",
     "n-ac6dd74e6484",
-    "n-2c096ac0846b",
     "n-ebf62f93c230",
-    "n-5d226ff0536d",
     "n-c156e20748bd",
     "n-6a9765033192",
     "n-b98e9fd3a344",
     "n-be5ac291e62c",
-    "n-579b2d214c3a",
     "n-fb86a0010f3b",
-    "n-feb535fa2254",
-    "n-745972b39861",
     "n-64c038b8843e",
     "n-8abce9e1f498",
-    "n-1202c8f1c7f4",
     "n-edcc5f4b58e9",
     "n-0fedb144223b",
     "n-638ebec9f352",
-    "n-779bb0358f5c",
-    "n-2df495ac24d7",
     "n-4fdc1e71ba7b",
     "n-881e61de9d7e",
     "n-9d84bed57b00",
-    "n-fa77d1bd6987",
     "n-6427e0ba888e",
-    "n-268603aaa116",
-    "n-8db37e8c5dfb",
     "n-c9bf45749cf3",
-    "n-68829458ae4b",
-    "n-ebde1a3e04a2",
-    "n-8c4ded62af45",
-    "n-6dfa9d478b29",
     "n-952f480375d9",
-    "n-cf75862e0051",
     "n-89fe631d6c53",
     "n-288b8d6e20c6",
-    "n-8922cee3185c",
     "n-0d72612879c5",
     "n-c77d0431d165",
     "n-c61328c1f8d0",
     "n-bd504ac550ec",
     "n-abe5fb9b11c1",
-    "n-a65e538e2a09",
     "n-fb78c1f64e0e",
     "n-abeb78f9d408",
     "n-aa0c509a0f44",
     "n-7d59d79ac3c0",
-    "n-027cf38e9e7f",
-    "n-9538dbb72a96",
     "n-90ce5dfbce52",
     "n-e4c7aa104dfa",
     "n-3fb4cb6a287d",
-    "n-bb784b67f9d1",
-    "n-7f03e352af11",
     "n-0568cd5e5beb",
-    "n-7c06e12354a0",
     "n-8156d3bb3723",
-    "n-7ff633ba3f8e",
     "n-7fbb9cac4eb7",
-    "n-f4d963e1fc3b",
     "n-169e5de8668c",
     "n-f2786ca8283b",
     "n-5d4011b85474",
-    "n-564cebc23727",
     "n-fd851844ab0a",
     "n-c9544988f076",
     "n-20f524700da2",
-    "n-d6d5733acc25",
     "n-391327ede748",
     "n-351f283b1b76",
     "n-285853c34ec6",
     "n-b2207dda538c",
-    "n-97eec8e4f3fb",
     "n-b567ab8965d2",
     "n-3da7f01f5691",
-    "n-94976b9505e6",
-    "n-8a0d8f136984",
     "n-b042fcadc1e7",
     "n-13035eca42bb",
     "n-256a4241b458",
@@ -1497,27 +1317,15 @@
     "n-82966ca15e80",
     "n-d50edaa1b550",
     "n-483cfb50b9fc",
-    "n-94c97c9e81e4",
-    "n-cab74287f3eb",
     "n-179c6bbd716e",
-    "n-d7b12276bebc",
     "n-1975c522d136",
-    "n-dc39b998c945",
-    "n-8a47e3990c11",
-    "n-8a743d4e825a",
-    "n-f7ef8bf6a721",
-    "n-f09086acb57a",
-    "n-3c87f0de33d3",
-    "n-ff1758085b4b",
-    "n-5bc8f562cf83",
-    "n-f3443d66388e",
     "n-9bad0944ae0f",
-    "n-7acf6a2fb9ff",
-    "n-b175d6c0f3a9",
-    "n-2820a9e4805a",
     "n-0ac48a4d2dd0",
-    "n-d3db6048d965",
-    "n-f98d3d0f2a70"
+    "n-f98d3d0f2a70",
+    "n-f7e906ec64a6",
+    "n-d45e0bef979f",
+    "n-60ebba740525",
+    "n-3e4d25760113"
   ],
   "node_naming_policy": {
     "format": "地区编号|延迟ms|带宽Mbps|住宅类型|纯净度百分比",
@@ -1537,7 +1345,7 @@
     "lookup_budget_per_run": 900,
     "purity_formula": "100 * (1 - company.abuser_score_numeric_ratio)",
     "score_scope": "company_network_not_individual_ip",
-    "confirmed_nodes": 228
+    "confirmed_nodes": 149
   },
   "high_speed_selection_policy": {
     "max_elapsed_seconds": 20,
@@ -1549,56 +1357,55 @@
     "required_bytes_per_round": 100000000,
     "required_rounds": 2,
     "speed_aggregation": "minimum_of_completed_rounds",
-    "selected_count": 95
+    "selected_count": 80
   },
   "high_speed_download_counts": {
-    "passed": 128,
-    "failed": 102,
-    "skipped": 5052,
+    "passed": 99,
+    "failed": 48,
+    "skipped": 4957,
     "unverified": 0
   },
   "high_speed_target_counts": {
     "https://speed.cloudflare.com/__down?bytes=100000000": {
-      "passed": 219,
-      "failed": 11,
-      "skipped": 5052
+      "passed": 132,
+      "failed": 15,
+      "skipped": 4957
     },
     "http://hkg.download.datapacket.com/100mb.bin": {
-      "passed": 130,
-      "failed": 100,
-      "skipped": 5052
+      "passed": 100,
+      "failed": 47,
+      "skipped": 4957
     }
   },
-  "input_unique_count": 5285,
-  "parseable_count": 5282,
+  "input_unique_count": 5106,
+  "parseable_count": 5104,
   "invalid_node_ids": [
-    "n-46db08a8b926",
     "n-73dadf3c428c",
-    "n-455317290bcf"
+    "n-46db08a8b926"
   ],
-  "unique_tcp_endpoints": 556,
-  "total_unique_tcp_endpoints": 4047,
+  "unique_tcp_endpoints": 477,
+  "total_unique_tcp_endpoints": 3946,
   "precheck_counts": {
-    "passed": 1125,
-    "failed": 4039,
-    "unstable": 118,
+    "passed": 1032,
+    "failed": 3948,
+    "unstable": 124,
     "needs_review": 0
   },
   "entry_counts": {
-    "passed": 342,
-    "failed": 638,
-    "unknown": 4302
+    "passed": 244,
+    "failed": 561,
+    "unknown": 4299
   },
-  "website_tested_count": 310,
+  "website_tested_count": 208,
   "website_target_count": 26,
   "overseas_target_count": 26,
   "domestic_target_count": 0,
   "all_websites_passed": 0,
-  "three_connectivity_passed": 304,
+  "three_connectivity_passed": 197,
   "download_counts": {
-    "passed": 230,
-    "failed": 2,
-    "skipped": 5050
+    "passed": 147,
+    "failed": 0,
+    "skipped": 4957
   },
   "services": {
     "xxapi": {
@@ -1631,7 +1438,7 @@
       "duplicates": 0,
       "unique_added": 896,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
+      "fetched_at": "2026-10-22T22:18:28+08:00",
       "sha256": "ae64569f4b941d38479a46bff94412160f39f0f015b461c44b1eac34ef3827ac"
     },
     {
@@ -1644,7 +1451,7 @@
       "duplicates": 13,
       "unique_added": 338,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
+      "fetched_at": "2026-10-22T22:18:28+08:00",
       "sha256": "610d61e20c05b90811952a274bab5c0ac961449e0379ea20acdbaa4db7172cc8"
     },
     {
@@ -1657,21 +1464,21 @@
       "duplicates": 0,
       "unique_added": 99,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
+      "fetched_at": "2026-10-22T22:18:28+08:00",
       "sha256": "615604d51cffc4ae0c60a3a2a583ea897d8d481418f7c1b8cb33e711b1dd4685"
     },
     {
       "provider": "a4",
       "url": "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml",
       "repository": "",
-      "downloaded": 523,
-      "accepted": 523,
+      "downloaded": 448,
+      "accepted": 448,
       "skipped": 0,
       "duplicates": 1,
-      "unique_added": 522,
+      "unique_added": 447,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
-      "sha256": "1bbf6b38b72a88540c924a0bc40b907cf013d1b85e1e4b8a88bd031e6dbb5742"
+      "fetched_at": "2026-10-22T22:18:28+08:00",
+      "sha256": "914bffad948cf082527a6cce3a9e0008d7768174f9b535896023363abc701374"
     },
     {
       "provider": "a5",
@@ -1683,7 +1490,7 @@
       "duplicates": 2,
       "unique_added": 12,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
+      "fetched_at": "2026-10-22T22:18:28+08:00",
       "sha256": "4c8370070094817e001f5504428f08788dcee99333ebf3bd1a70a154c8ac521f"
     },
     {
@@ -1696,7 +1503,7 @@
       "duplicates": 27,
       "unique_added": 490,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
+      "fetched_at": "2026-10-22T22:18:28+08:00",
       "sha256": "636d7947072b92e9fe66456fadd8c019662e66905a854461bd7cc3fabb398f9f"
     },
     {
@@ -1709,7 +1516,7 @@
       "duplicates": 0,
       "unique_added": 28,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
+      "fetched_at": "2026-10-22T22:18:28+08:00",
       "sha256": "78caeb8e6878fc4351fa120efdff57230498dd20db4e0d366af99462c5fc3d7d"
     },
     {
@@ -1722,21 +1529,21 @@
       "duplicates": 26,
       "unique_added": 63,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:54+08:00",
+      "fetched_at": "2026-10-22T22:18:28+08:00",
       "sha256": "cac8e2b8fb93b175e756191baeb214b48e86b7e6238f6f9c0b284cbf33df4260"
     },
     {
       "provider": "a9",
       "url": "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml",
       "repository": "",
-      "downloaded": 444,
-      "accepted": 444,
+      "downloaded": 426,
+      "accepted": 426,
       "skipped": 0,
-      "duplicates": 328,
-      "unique_added": 116,
+      "duplicates": 426,
+      "unique_added": 0,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:55+08:00",
-      "sha256": "5ea829249032a08e3065e1263144ceaf8bed982db91922d6152cdb1b0fcde526"
+      "fetched_at": "2026-10-22T22:18:28+08:00",
+      "sha256": "dc43e105bc1ce8bbca529aca8b51fd7424a508c9e4638df254be5b88cbe46bfc"
     },
     {
       "provider": "a10",
@@ -1748,7 +1555,7 @@
       "duplicates": 0,
       "unique_added": 15,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:55+08:00",
+      "fetched_at": "2026-10-22T22:18:29+08:00",
       "sha256": "44105f58deeeec3349e08ab24d657dbcc9da2aa6f5d8e0b46a35865703622897"
     },
     {
@@ -1761,7 +1568,7 @@
       "duplicates": 1,
       "unique_added": 117,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:55+08:00",
+      "fetched_at": "2026-10-22T22:18:29+08:00",
       "sha256": "453709a238e60dca1565d2bd28cc99775d6cde002871031c7f8bc969f815c59f"
     },
     {
@@ -1771,24 +1578,24 @@
       "downloaded": 16,
       "accepted": 16,
       "skipped": 0,
-      "duplicates": 5,
-      "unique_added": 11,
+      "duplicates": 4,
+      "unique_added": 12,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:55+08:00",
-      "sha256": "2b0740ce566d468111bc45cb33955f52f2389838fc13c0c73795e3c93d7954da"
+      "fetched_at": "2026-10-22T22:18:29+08:00",
+      "sha256": "3466af29367d5eecea22ce55b3fa1e817e725da84f164cefd51986e9621d3af9"
     },
     {
       "provider": "au1rxx",
       "url": "https://raw.githubusercontent.com/Au1rxx/free-vpn-subscriptions/main/output/clash.yaml",
       "repository": "https://github.com/Au1rxx/free-vpn-subscriptions",
-      "downloaded": 1597,
-      "accepted": 1597,
+      "downloaded": 1513,
+      "accepted": 1513,
       "skipped": 0,
-      "duplicates": 830,
-      "unique_added": 767,
+      "duplicates": 787,
+      "unique_added": 726,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:55+08:00",
-      "sha256": "27c0a76f72c3c458764505475376595b5ac0c77af2edbabeb2d600d75cf7137a"
+      "fetched_at": "2026-10-22T22:18:30+08:00",
+      "sha256": "34b18febbe84524adfd8a5686f1d1e550c55e7eb23ed6a6bcc245fd6a7f3c166"
     },
     {
       "provider": "anaer",
@@ -1797,24 +1604,24 @@
       "downloaded": 1611,
       "accepted": 1611,
       "skipped": 0,
-      "duplicates": 85,
-      "unique_added": 1526,
+      "duplicates": 71,
+      "unique_added": 1540,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:56+08:00",
+      "fetched_at": "2026-10-22T22:18:30+08:00",
       "sha256": "73783ab2f4254be93eba210695c23d1a6b529dfbb1e16fdf33b5fac91472c303"
     },
     {
       "provider": "automerge",
       "url": "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.yml",
       "repository": "https://github.com/chengaopan/AutoMergePublicNodes",
-      "downloaded": 133,
-      "accepted": 133,
+      "downloaded": 126,
+      "accepted": 126,
       "skipped": 0,
-      "duplicates": 127,
-      "unique_added": 6,
+      "duplicates": 126,
+      "unique_added": 0,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:56+08:00",
-      "sha256": "1aeb5452ddaf689492bb5a770ce6f87dcbade2f45f1509887d26bbb2a75e9ca9"
+      "fetched_at": "2026-10-22T22:18:31+08:00",
+      "sha256": "6b47a70d239cf963fe14a03da8f7168d36f1809468f2821d1d6483ba86517de6"
     },
     {
       "provider": "eternity",
@@ -1823,334 +1630,334 @@
       "downloaded": 201,
       "accepted": 201,
       "skipped": 0,
-      "duplicates": 74,
-      "unique_added": 127,
+      "duplicates": 71,
+      "unique_added": 130,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:57+08:00",
+      "fetched_at": "2026-10-22T22:18:32+08:00",
       "sha256": "9930fc8252a91ddda6483d175de18ee6f956b5e7966c0ce0ef1f2ae485639b4b"
     },
     {
       "provider": "zhuhaiuk",
       "url": "https://raw.githubusercontent.com/zhuhaiuk/free-nodes/main/clash_config.yaml",
       "repository": "https://github.com/zhuhaiuk/free-nodes",
-      "downloaded": 28,
-      "accepted": 28,
+      "downloaded": 27,
+      "accepted": 27,
       "skipped": 0,
       "duplicates": 1,
-      "unique_added": 27,
+      "unique_added": 26,
       "status": "ok",
-      "fetched_at": "2026-10-22T16:14:58+08:00",
-      "sha256": "8bfba16ac7f715913c66e48e05eab098eae50f5c7b5e0751723ecd686821a8c5"
+      "fetched_at": "2026-10-22T22:18:32+08:00",
+      "sha256": "c29ad78474da98e13ac83f8dd108202402ec663ea177fcb33af6b0cd26866f61"
     }
   ],
   "website_access_summary": {
     "Amazon": {
-      "measured": 310,
-      "accepted": 59,
+      "measured": 208,
+      "accepted": 25,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 4,
+      "transport_error": 15,
       "http_error": 0,
-      "page_or_speed_error": 248,
-      "unmeasured": 4972
+      "page_or_speed_error": 175,
+      "unmeasured": 4896
     },
     "Bing": {
-      "measured": 310,
-      "accepted": 302,
+      "measured": 208,
+      "accepted": 195,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 8,
-      "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
-    },
-    "ChatGPT": {
-      "measured": 310,
-      "accepted": 293,
-      "cloudflare_challenge": 16,
-      "login_required": 0,
-      "restricted": 4,
-      "transport_error": 11,
-      "http_error": 0,
-      "page_or_speed_error": 2,
-      "unmeasured": 4972
-    },
-    "ChatGPTAPI": {
-      "measured": 310,
-      "accepted": 299,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 5,
-      "transport_error": 6,
-      "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
-    },
-    "ChatGPTTrace": {
-      "measured": 310,
-      "accepted": 305,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 0,
-      "transport_error": 5,
-      "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
-    },
-    "ClaudeTrace": {
-      "measured": 310,
-      "accepted": 304,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 0,
-      "transport_error": 6,
-      "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
-    },
-    "Cursor": {
-      "measured": 310,
-      "accepted": 206,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 0,
-      "transport_error": 102,
-      "http_error": 0,
-      "page_or_speed_error": 3,
-      "unmeasured": 4972
-    },
-    "Discord": {
-      "measured": 310,
-      "accepted": 262,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 43,
-      "transport_error": 5,
-      "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
-    },
-    "DisneyPlus": {
-      "measured": 310,
-      "accepted": 299,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 0,
-      "transport_error": 10,
+      "transport_error": 12,
       "http_error": 0,
       "page_or_speed_error": 1,
-      "unmeasured": 4972
+      "unmeasured": 4896
     },
-    "Facebook": {
-      "measured": 310,
-      "accepted": 300,
-      "cloudflare_challenge": 0,
+    "ChatGPT": {
+      "measured": 208,
+      "accepted": 192,
+      "cloudflare_challenge": 11,
       "login_required": 0,
-      "restricted": 4,
-      "transport_error": 6,
+      "restricted": 1,
+      "transport_error": 13,
       "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
+      "page_or_speed_error": 2,
+      "unmeasured": 4896
     },
-    "Gemini": {
-      "measured": 310,
-      "accepted": 291,
+    "ChatGPTAPI": {
+      "measured": 208,
+      "accepted": 197,
       "cloudflare_challenge": 0,
       "login_required": 0,
-      "restricted": 10,
+      "restricted": 1,
       "transport_error": 10,
       "http_error": 0,
       "page_or_speed_error": 0,
-      "unmeasured": 4972
+      "unmeasured": 4896
     },
-    "GitHub": {
-      "measured": 310,
-      "accepted": 298,
+    "ChatGPTTrace": {
+      "measured": 208,
+      "accepted": 198,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 0,
+      "transport_error": 10,
+      "http_error": 0,
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
+    },
+    "ClaudeTrace": {
+      "measured": 208,
+      "accepted": 199,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
       "transport_error": 9,
       "http_error": 0,
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
+    },
+    "Cursor": {
+      "measured": 208,
+      "accepted": 122,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 0,
+      "transport_error": 82,
+      "http_error": 0,
+      "page_or_speed_error": 6,
+      "unmeasured": 4896
+    },
+    "Discord": {
+      "measured": 208,
+      "accepted": 173,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 25,
+      "transport_error": 10,
+      "http_error": 0,
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
+    },
+    "DisneyPlus": {
+      "measured": 208,
+      "accepted": 199,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 0,
+      "transport_error": 9,
+      "http_error": 0,
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
+    },
+    "Facebook": {
+      "measured": 208,
+      "accepted": 194,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 2,
+      "transport_error": 10,
+      "http_error": 0,
+      "page_or_speed_error": 2,
+      "unmeasured": 4896
+    },
+    "Gemini": {
+      "measured": 208,
+      "accepted": 186,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 8,
+      "transport_error": 12,
+      "http_error": 0,
       "page_or_speed_error": 3,
-      "unmeasured": 4972
+      "unmeasured": 4896
+    },
+    "GitHub": {
+      "measured": 208,
+      "accepted": 193,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 0,
+      "transport_error": 13,
+      "http_error": 0,
+      "page_or_speed_error": 2,
+      "unmeasured": 4896
     },
     "Google": {
-      "measured": 310,
-      "accepted": 293,
+      "measured": 208,
+      "accepted": 187,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 4,
-      "transport_error": 13,
+      "transport_error": 14,
       "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
+      "page_or_speed_error": 4,
+      "unmeasured": 4896
     },
     "HuggingFace": {
-      "measured": 310,
-      "accepted": 304,
+      "measured": 208,
+      "accepted": 193,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 5,
-      "http_error": 0,
-      "page_or_speed_error": 1,
-      "unmeasured": 4972
-    },
-    "Instagram": {
-      "measured": 310,
-      "accepted": 299,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 3,
-      "transport_error": 5,
+      "transport_error": 12,
       "http_error": 0,
       "page_or_speed_error": 3,
-      "unmeasured": 4972
+      "unmeasured": 4896
+    },
+    "Instagram": {
+      "measured": 208,
+      "accepted": 193,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 2,
+      "transport_error": 12,
+      "http_error": 0,
+      "page_or_speed_error": 1,
+      "unmeasured": 4896
     },
     "Netflix": {
-      "measured": 310,
-      "accepted": 284,
+      "measured": 208,
+      "accepted": 185,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 0,
+      "transport_error": 18,
+      "http_error": 0,
+      "page_or_speed_error": 8,
+      "unmeasured": 4896
+    },
+    "Perplexity": {
+      "measured": 208,
+      "accepted": 198,
+      "cloudflare_challenge": 26,
+      "login_required": 0,
+      "restricted": 0,
+      "transport_error": 10,
+      "http_error": 0,
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
+    },
+    "Reddit": {
+      "measured": 208,
+      "accepted": 194,
+      "cloudflare_challenge": 0,
+      "login_required": 112,
+      "restricted": 0,
+      "transport_error": 14,
+      "http_error": 0,
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
+    },
+    "Spotify": {
+      "measured": 208,
+      "accepted": 194,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 1,
-      "transport_error": 17,
-      "http_error": 0,
-      "page_or_speed_error": 8,
-      "unmeasured": 4972
-    },
-    "Perplexity": {
-      "measured": 310,
-      "accepted": 304,
-      "cloudflare_challenge": 45,
-      "login_required": 0,
-      "restricted": 0,
-      "transport_error": 5,
+      "transport_error": 12,
       "http_error": 0,
       "page_or_speed_error": 1,
-      "unmeasured": 4972
-    },
-    "Reddit": {
-      "measured": 310,
-      "accepted": 304,
-      "cloudflare_challenge": 0,
-      "login_required": 166,
-      "restricted": 0,
-      "transport_error": 6,
-      "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
-    },
-    "Spotify": {
-      "measured": 310,
-      "accepted": 297,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 3,
-      "transport_error": 11,
-      "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
+      "unmeasured": 4896
     },
     "StackOverflow": {
-      "measured": 310,
-      "accepted": 304,
-      "cloudflare_challenge": 307,
+      "measured": 208,
+      "accepted": 188,
+      "cloudflare_challenge": 200,
       "login_required": 0,
-      "restricted": 0,
-      "transport_error": 6,
+      "restricted": 8,
+      "transport_error": 12,
       "http_error": 0,
       "page_or_speed_error": 0,
-      "unmeasured": 4972
+      "unmeasured": 4896
     },
     "Steam": {
-      "measured": 310,
-      "accepted": 304,
+      "measured": 208,
+      "accepted": 194,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 6,
+      "transport_error": 13,
       "http_error": 0,
-      "page_or_speed_error": 0,
-      "unmeasured": 4972
+      "page_or_speed_error": 1,
+      "unmeasured": 4896
     },
     "Telegram": {
-      "measured": 310,
-      "accepted": 297,
+      "measured": 208,
+      "accepted": 198,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 11,
+      "transport_error": 7,
       "http_error": 1,
       "page_or_speed_error": 2,
-      "unmeasured": 4972
+      "unmeasured": 4896
     },
     "TikTok": {
-      "measured": 310,
-      "accepted": 303,
+      "measured": 208,
+      "accepted": 193,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 6,
-      "http_error": 0,
-      "page_or_speed_error": 1,
-      "unmeasured": 4972
-    },
-    "Twitch": {
-      "measured": 310,
-      "accepted": 305,
-      "cloudflare_challenge": 0,
-      "login_required": 0,
-      "restricted": 0,
-      "transport_error": 5,
+      "transport_error": 15,
       "http_error": 0,
       "page_or_speed_error": 0,
-      "unmeasured": 4972
+      "unmeasured": 4896
+    },
+    "Twitch": {
+      "measured": 208,
+      "accepted": 199,
+      "cloudflare_challenge": 0,
+      "login_required": 0,
+      "restricted": 0,
+      "transport_error": 9,
+      "http_error": 0,
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
     },
     "WhatsApp": {
-      "measured": 310,
-      "accepted": 297,
+      "measured": 208,
+      "accepted": 196,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
       "transport_error": 11,
       "http_error": 0,
-      "page_or_speed_error": 3,
-      "unmeasured": 4972
+      "page_or_speed_error": 2,
+      "unmeasured": 4896
     },
     "Wikipedia": {
-      "measured": 310,
-      "accepted": 303,
+      "measured": 208,
+      "accepted": 197,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 6,
+      "transport_error": 11,
       "http_error": 0,
-      "page_or_speed_error": 1,
-      "unmeasured": 4972
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
     },
     "X": {
-      "measured": 310,
-      "accepted": 303,
+      "measured": 208,
+      "accepted": 193,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 6,
+      "transport_error": 13,
       "http_error": 0,
-      "page_or_speed_error": 1,
-      "unmeasured": 4972
+      "page_or_speed_error": 2,
+      "unmeasured": 4896
     },
     "YouTube": {
-      "measured": 310,
-      "accepted": 303,
+      "measured": 208,
+      "accepted": 193,
       "cloudflare_challenge": 0,
       "login_required": 0,
       "restricted": 0,
-      "transport_error": 6,
+      "transport_error": 15,
       "http_error": 0,
-      "page_or_speed_error": 1,
-      "unmeasured": 4972
+      "page_or_speed_error": 0,
+      "unmeasured": 4896
     }
   },
   "service_checks_policy": {
@@ -2180,230 +1987,208 @@
       "unavailable": 0,
       "unknown": 0,
       "failed": 0,
-      "unmeasured": 5282,
+      "unmeasured": 5104,
       "certificate_error": 0
     },
     "FAST": {
-      "measured": 224,
-      "passed": 209,
+      "measured": 147,
+      "passed": 138,
       "restricted": 0,
       "verification_required": 0,
       "unavailable": 0,
       "unknown": 0,
-      "failed": 15,
-      "unmeasured": 5058,
+      "failed": 9,
+      "unmeasured": 4957,
       "certificate_error": 0
     },
     "FASTAPI": {
-      "measured": 230,
-      "passed": 224,
+      "measured": 147,
+      "passed": 147,
       "restricted": 0,
       "verification_required": 0,
       "unavailable": 0,
-      "unknown": 5,
-      "failed": 1,
-      "unmeasured": 5052,
+      "unknown": 0,
+      "failed": 0,
+      "unmeasured": 4957,
       "certificate_error": 0
     }
   },
-  "source_run": "39746292632",
+  "source_run": "39794500023",
   "nodes": [
     {
-      "id": "n-8b472b05d82f",
-      "name": "德国08|934ms|115Mbps|非住宅|纯净度100.0%",
-      "server": "903.rtgpu.com",
+      "id": "n-3303d93fcb4f",
+      "name": "美国02|211ms|182Mbps|非住宅|纯净度99.1%",
+      "server": "172.64.154.211",
       "port": 443,
       "protocol": "vless",
       "sources": [
-        "a2"
+        "a4",
+        "a9"
       ],
       "exit": {
-        "id": "n-8b472b05d82f",
-        "exit_ip": "2a01:4f8:10b:62f::2",
+        "id": "n-3303d93fcb4f",
+        "exit_ip": "104.28.161.127",
+        "country_code": "US",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-d0f2b5929f2c",
+      "name": "加拿大01|249ms|166Mbps|非住宅|纯净度97.5%",
+      "server": "35.183.131.26",
+      "port": 443,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-d0f2b5929f2c",
+        "exit_ip": "35.183.131.26",
+        "country_code": "CA",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-9e90b52e2088",
+      "name": "瑞典01|844ms|118Mbps|非住宅|纯净度100.0%",
+      "server": "ct.877774.xyz",
+      "port": 443,
+      "protocol": "vless",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-9e90b52e2088",
+        "exit_ip": "2600:3c09::2000:7bff:fefe:318b",
+        "country_code": "SE",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-23ef2e43f2d1",
+      "name": "德国05|965ms|136Mbps|非住宅|纯净度97.8%",
+      "server": "213.109.163.119",
+      "port": 443,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-23ef2e43f2d1",
+        "exit_ip": "213.109.163.119",
         "country_code": "DE",
         "source": "verified_trace"
       }
     },
     {
-      "id": "n-f9e1cc3cee36",
-      "name": "德国09|909ms|25Mbps|非住宅|纯净度100.0%",
-      "server": "903.rtgpu.com",
+      "id": "n-c26013e7c058",
+      "name": "德国07|963ms|101Mbps|非住宅|纯净度97.8%",
+      "server": "213.109.163.119",
       "port": 443,
-      "protocol": "vless",
+      "protocol": "http",
       "sources": [
-        "a2"
+        "a4",
+        "a9"
       ],
       "exit": {
-        "id": "n-f9e1cc3cee36",
-        "exit_ip": "2a01:4f8:10b:62f::2",
+        "id": "n-c26013e7c058",
+        "exit_ip": "213.109.163.119",
         "country_code": "DE",
         "source": "verified_trace"
       }
     },
     {
-      "id": "n-0e97999d07dd",
-      "name": "德国10|918ms|24Mbps|非住宅|纯净度95.3%",
-      "server": "903.rtgpu.com",
+      "id": "n-745972b39861",
+      "name": "法国01|646ms|96Mbps|住宅|纯净度99.8%",
+      "server": "82.65.162.76",
       "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "a2"
-      ],
-      "exit": {
-        "id": "n-0e97999d07dd",
-        "exit_ip": "88.99.248.90",
-        "country_code": "DE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-ef398a873340",
-      "name": "爱沙尼亚01|1034ms|9Mbps|非住宅|纯净度100.0%",
-      "server": "eu3.998998.best",
-      "port": 443,
-      "protocol": "vmess",
-      "sources": [
-        "a2"
-      ],
-      "exit": {
-        "id": "n-ef398a873340",
-        "exit_ip": "2406:17c0:0:2::20f2:c7c2",
-        "country_code": "EE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-24e8f80122b6",
-      "name": "意大利01|763ms|199Mbps|非住宅|纯净度89.8%",
-      "server": "202.50.253.90",
-      "port": 19999,
-      "protocol": "ss",
+      "protocol": "http",
       "sources": [
         "a4",
-        "a9",
-        "automerge",
-        "eternity"
+        "a9"
       ],
       "exit": {
-        "id": "n-24e8f80122b6",
-        "exit_ip": "80.174.118.90",
-        "country_code": "IT",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-5bf19688dacd",
-      "name": "意大利02|761ms|215Mbps|非住宅|纯净度89.8%",
-      "server": "202.50.253.27",
-      "port": 19999,
-      "protocol": "ss",
-      "sources": [
-        "a4",
-        "au1rxx"
-      ],
-      "exit": {
-        "id": "n-5bf19688dacd",
-        "exit_ip": "80.174.118.23",
-        "country_code": "IT",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-72c499cb1696",
-      "name": "法国15|1040ms|72Mbps|非住宅|纯净度97.9%",
-      "server": "185.220.100.168",
-      "port": 443,
-      "protocol": "trojan",
-      "sources": [
-        "a4",
-        "a9",
-        "anaer",
-        "automerge"
-      ],
-      "exit": {
-        "id": "n-72c499cb1696",
-        "exit_ip": "51.159.189.73",
+        "id": "n-745972b39861",
+        "exit_ip": "82.65.162.76",
         "country_code": "FR",
         "source": "verified_trace"
       }
     },
     {
-      "id": "n-ad52e2c12994",
-      "name": "法国13|549ms|113Mbps|非住宅|纯净度98.7%",
-      "server": "www.calmlunch.com",
+      "id": "n-246c9183fb0a",
+      "name": "荷兰23|887ms|94Mbps|非住宅|纯净度94.7%",
+      "server": "51.158.243.91",
       "port": 443,
-      "protocol": "trojan",
+      "protocol": "http",
       "sources": [
         "a4",
-        "a9",
-        "anaer",
-        "automerge"
+        "a9"
       ],
       "exit": {
-        "id": "n-ad52e2c12994",
-        "exit_ip": "51.158.105.199",
+        "id": "n-246c9183fb0a",
+        "exit_ip": "51.158.243.91",
+        "country_code": "NL",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-109d16f785c2",
+      "name": "法国04|931ms|97Mbps|非住宅|纯净度100.0%",
+      "server": "51.210.167.149",
+      "port": 443,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-109d16f785c2",
+        "exit_ip": "2001:41d0:304:300::25e0",
         "country_code": "FR",
         "source": "verified_trace"
       }
     },
     {
-      "id": "n-b13fc83d5bcc",
-      "name": "法国06|757ms|115Mbps|非住宅|纯净度98.7%",
-      "server": "104.19.229.21",
-      "port": 443,
-      "protocol": "trojan",
+      "id": "n-7ea087a74265",
+      "name": "荷兰37|623ms|96Mbps|非住宅|纯净度99.6%",
+      "server": "51.159.225.196",
+      "port": 23856,
+      "protocol": "http",
       "sources": [
         "a4",
-        "a9",
-        "automerge"
+        "a9"
       ],
       "exit": {
-        "id": "n-b13fc83d5bcc",
-        "exit_ip": "51.158.105.199",
-        "country_code": "FR",
+        "id": "n-7ea087a74265",
+        "exit_ip": "51.159.225.196",
+        "country_code": "NL",
         "source": "verified_trace"
       }
     },
     {
-      "id": "n-8099c30090ac",
-      "name": "法国05|762ms|114Mbps|非住宅|纯净度98.7%",
-      "server": "165.215.250.14",
+      "id": "n-ad3de7866002",
+      "name": "以色列02|999ms|16Mbps|住宅未知|纯净度99.6%",
+      "server": "62.90.77.30",
       "port": 443,
-      "protocol": "trojan",
+      "protocol": "http",
       "sources": [
         "a4",
-        "a9",
-        "automerge"
+        "a9"
       ],
       "exit": {
-        "id": "n-8099c30090ac",
-        "exit_ip": "51.158.105.199",
-        "country_code": "FR",
+        "id": "n-ad3de7866002",
+        "exit_ip": "62.90.77.18",
+        "country_code": "IL",
         "source": "verified_trace"
       }
     },
     {
-      "id": "n-e2f94885bc4a",
-      "name": "法国03|676ms|111Mbps|非住宅|纯净度97.9%",
-      "server": "212.183.88.136",
-      "port": 443,
-      "protocol": "trojan",
-      "sources": [
-        "a4",
-        "a9",
-        "automerge"
-      ],
-      "exit": {
-        "id": "n-e2f94885bc4a",
-        "exit_ip": "51.159.167.67",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-71d24b8f88e2",
-      "name": "荷兰01|643ms|105Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.125",
+      "id": "n-c1658a38b9f6",
+      "name": "荷兰25|926ms|101Mbps|非住宅|纯净度74.1%",
+      "server": "84.17.47.123",
       "port": 9002,
       "protocol": "http",
       "sources": [
@@ -2411,15 +2196,15 @@
         "a9"
       ],
       "exit": {
-        "id": "n-71d24b8f88e2",
-        "exit_ip": "84.17.47.125",
+        "id": "n-c1658a38b9f6",
+        "exit_ip": "84.17.47.123",
         "country_code": "NL",
         "source": "verified_trace"
       }
     },
     {
       "id": "n-6ae0154ee7fc",
-      "name": "荷兰05|640ms|102Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰19|645ms|101Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.125",
       "port": 9002,
       "protocol": "http",
@@ -2435,9 +2220,9 @@
       }
     },
     {
-      "id": "n-7bbe4e516ea8",
-      "name": "荷兰40|908ms|22Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.146",
+      "id": "n-4ce013148a91",
+      "name": "荷兰05|645ms|106Mbps|非住宅|纯净度74.1%",
+      "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
       "sources": [
@@ -2445,16 +2230,16 @@
         "a9"
       ],
       "exit": {
-        "id": "n-7bbe4e516ea8",
-        "exit_ip": "84.17.47.146",
+        "id": "n-4ce013148a91",
+        "exit_ip": "84.17.47.148",
         "country_code": "NL",
         "source": "verified_trace"
       }
     },
     {
-      "id": "n-8e0c5324b51f",
-      "name": "荷兰17|704ms|107Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.149",
+      "id": "n-8a47e3990c11",
+      "name": "罗马尼亚09|934ms|49Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.24",
       "port": 9002,
       "protocol": "http",
       "sources": [
@@ -2462,15 +2247,214 @@
         "a9"
       ],
       "exit": {
-        "id": "n-8e0c5324b51f",
-        "exit_ip": "84.17.47.149",
+        "id": "n-8a47e3990c11",
+        "exit_ip": "193.176.84.24",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-cab74287f3eb",
+      "name": "罗马尼亚26|948ms|14Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.38",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-cab74287f3eb",
+        "exit_ip": "193.176.84.38",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-e5472083de84",
+      "name": "罗马尼亚16|913ms|16Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.26",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-e5472083de84",
+        "exit_ip": "193.176.84.26",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-d9727b9ad861",
+      "name": "罗马尼亚10|918ms|16Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.19",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-d9727b9ad861",
+        "exit_ip": "193.176.84.19",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-99349ee38e11",
+      "name": "罗马尼亚34|1184ms|53Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.21",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-99349ee38e11",
+        "exit_ip": "193.176.84.21",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-0801ebb8ef08",
+      "name": "美国12|463ms|128Mbps|非住宅|纯净度100.0%",
+      "server": "64.98.50.100",
+      "port": 443,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-0801ebb8ef08",
+        "exit_ip": "64.98.50.100",
+        "country_code": "US",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-9259c08e2b20",
+      "name": "美国15|552ms|169Mbps|非住宅|纯净度99.2%",
+      "server": "44.248.167.117",
+      "port": 8443,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-9259c08e2b20",
+        "exit_ip": "44.248.167.117",
+        "country_code": "US",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-1c853faf8b5f",
+      "name": "美国03|196ms|179Mbps|住宅未知|纯净度未知",
+      "server": "172.64.150.43",
+      "port": 443,
+      "protocol": "vless",
+      "sources": [
+        "anaer"
+      ],
+      "exit": {
+        "id": "n-1c853faf8b5f",
+        "exit_ip": "104.28.167.107",
+        "country_code": "US",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-b651da45e601",
+      "name": "罗马尼亚01|918ms|59Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.26",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "zhuhaiuk"
+      ],
+      "exit": {
+        "id": "n-b651da45e601",
+        "exit_ip": "193.176.84.26",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-dc7a3b0dbac7",
+      "name": "罗马尼亚13|910ms|74Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.23",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "zhuhaiuk"
+      ],
+      "exit": {
+        "id": "n-dc7a3b0dbac7",
+        "exit_ip": "193.176.84.23",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-feb535fa2254",
+      "name": "荷兰04|642ms|101Mbps|非住宅|纯净度74.1%",
+      "server": "84.17.47.148",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "zhuhaiuk"
+      ],
+      "exit": {
+        "id": "n-feb535fa2254",
+        "exit_ip": "84.17.47.148",
+        "country_code": "NL",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-c75d10938c77",
+      "name": "罗马尼亚07|946ms|3Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.34",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "zhuhaiuk"
+      ],
+      "exit": {
+        "id": "n-c75d10938c77",
+        "exit_ip": "193.176.84.34",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-71d24b8f88e2",
+      "name": "荷兰35|649ms|100Mbps|非住宅|纯净度74.1%",
+      "server": "84.17.47.125",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-71d24b8f88e2",
+        "exit_ip": "84.17.47.125",
         "country_code": "NL",
         "source": "verified_trace"
       }
     },
     {
       "id": "n-b3a872e7f6f2",
-      "name": "爱尔兰03|762ms|86Mbps|非住宅|纯净度99.5%",
+      "name": "爱尔兰01|726ms|67Mbps|非住宅|纯净度99.5%",
       "server": "18.200.158.139",
       "port": 443,
       "protocol": "http",
@@ -2486,7 +2470,7 @@
     },
     {
       "id": "n-5d6090f7fbcf",
-      "name": "法国09|892ms|5Mbps|住宅|纯净度99.8%",
+      "name": "法国02|644ms|97Mbps|住宅|纯净度99.8%",
       "server": "82.65.162.76",
       "port": 443,
       "protocol": "http",
@@ -2502,7 +2486,7 @@
     },
     {
       "id": "n-359c3f95304a",
-      "name": "德国06|994ms|20Mbps|非住宅|纯净度97.8%",
+      "name": "德国04|964ms|115Mbps|非住宅|纯净度97.8%",
       "server": "213.109.163.119",
       "port": 443,
       "protocol": "http",
@@ -2519,7 +2503,7 @@
     },
     {
       "id": "n-3a0f0e29d7f0",
-      "name": "荷兰34|910ms|87Mbps|非住宅|纯净度94.7%",
+      "name": "荷兰29|885ms|97Mbps|非住宅|纯净度94.7%",
       "server": "51.158.243.91",
       "port": 443,
       "protocol": "http",
@@ -2535,7 +2519,7 @@
     },
     {
       "id": "n-d4e14d99fe49",
-      "name": "罗马尼亚11|918ms|21Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚24|922ms|20Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.24",
       "port": 9002,
       "protocol": "http",
@@ -2551,7 +2535,7 @@
     },
     {
       "id": "n-b3ca9a85709e",
-      "name": "美国13|371ms|113Mbps|非住宅|纯净度99.2%",
+      "name": "美国13|554ms|170Mbps|非住宅|纯净度99.2%",
       "server": "44.248.167.117",
       "port": 8443,
       "protocol": "http",
@@ -2566,24 +2550,8 @@
       }
     },
     {
-      "id": "n-00384c851d97",
-      "name": "法国07|809ms|89Mbps|住宅|纯净度100.0%",
-      "server": "82.66.235.221",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-00384c851d97",
-        "exit_ip": "2a01:e0a:1018:8c90:be24:11ff:fe98:e8b1",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-8ccddf7586ed",
-      "name": "法国12|1028ms|18Mbps|非住宅|纯净度95.9%",
+      "name": "法国05|979ms|76Mbps|非住宅|纯净度95.9%",
       "server": "141.94.16.4",
       "port": 443,
       "protocol": "http",
@@ -2598,40 +2566,8 @@
       }
     },
     {
-      "id": "n-7fb5ef7bc49b",
-      "name": "法国14|871ms|20Mbps|非住宅|纯净度99.2%",
-      "server": "103.82.101.44",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-7fb5ef7bc49b",
-        "exit_ip": "103.82.101.44",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-f6f6f6a167fa",
-      "name": "法国11|969ms|84Mbps|非住宅|纯净度100.0%",
-      "server": "51.210.167.149",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-f6f6f6a167fa",
-        "exit_ip": "2001:41d0:304:300::25e0",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-0bc423bdae7c",
-      "name": "美国03|223ms|166Mbps|非住宅|纯净度100.0%",
+      "name": "美国09|461ms|123Mbps|非住宅|纯净度100.0%",
       "server": "64.98.50.100",
       "port": 443,
       "protocol": "http",
@@ -2647,7 +2583,7 @@
     },
     {
       "id": "n-51f016dcd6e6",
-      "name": "罗马尼亚38|1219ms|16Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚29|1186ms|57Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.21",
       "port": 9002,
       "protocol": "http",
@@ -2663,7 +2599,7 @@
     },
     {
       "id": "n-4058d08233d7",
-      "name": "加拿大02|255ms|172Mbps|非住宅|纯净度97.5%",
+      "name": "加拿大03|250ms|170Mbps|非住宅|纯净度97.5%",
       "server": "35.183.131.26",
       "port": 443,
       "protocol": "http",
@@ -2679,7 +2615,7 @@
     },
     {
       "id": "n-08af633a1174",
-      "name": "以色列01|1033ms|16Mbps|住宅未知|纯净度99.6%",
+      "name": "以色列01|997ms|15Mbps|住宅未知|纯净度99.6%",
       "server": "62.90.77.30",
       "port": 443,
       "protocol": "http",
@@ -2694,41 +2630,8 @@
       }
     },
     {
-      "id": "n-12e6990b9ba9",
-      "name": "芬兰01|776ms|20Mbps|非住宅|纯净度未知",
-      "server": "198.105.124.180",
-      "port": 8443,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-12e6990b9ba9",
-        "exit_ip": "198.105.124.180",
-        "country_code": "FI",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-7b3c132f23e1",
-      "name": "BR01|889ms|21Mbps|非住宅|纯净度100.0%",
-      "server": "134.65.17.77",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-7b3c132f23e1",
-        "exit_ip": "2603:c025:4002:687e:24ba:c8e5:8981:f119",
-        "country_code": "BR",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-6c07e12e6818",
-      "name": "罗马尼亚24|1159ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚15|922ms|52Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.26",
       "port": 9002,
       "protocol": "http",
@@ -2744,7 +2647,7 @@
     },
     {
       "id": "n-f1b228d820ab",
-      "name": "罗马尼亚18|1028ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚23|971ms|3Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.34",
       "port": 9002,
       "protocol": "http",
@@ -2759,24 +2662,8 @@
       }
     },
     {
-      "id": "n-a0539d8423ed",
-      "name": "新加坡01|1169ms|88Mbps|住宅未知|纯净度未知",
-      "server": "128.1.186.61",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-a0539d8423ed",
-        "exit_ip": "104.28.156.128",
-        "country_code": "SG",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-464224654acd",
-      "name": "荷兰09|705ms|97Mbps|非住宅|纯净度99.6%",
+      "name": "荷兰36|623ms|93Mbps|非住宅|纯净度99.6%",
       "server": "51.159.225.196",
       "port": 23856,
       "protocol": "http",
@@ -2792,74 +2679,8 @@
       }
     },
     {
-      "id": "n-bd417b2f0e47",
-      "name": "德国11|518ms|60Mbps|非住宅|纯净度100.0%",
-      "server": "63.178.23.66",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "a4",
-        "anaer"
-      ],
-      "exit": {
-        "id": "n-bd417b2f0e47",
-        "exit_ip": "2a05:d014:7c4:b300:9de7:8f79:b97c:ba5",
-        "country_code": "DE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-7b1dc8264824",
-      "name": "西班牙01|631ms|25Mbps|非住宅|纯净度100.0%",
-      "server": "51.49.126.162",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-7b1dc8264824",
-        "exit_ip": "2a05:d011:b71:1000:22bf:4a0b:2b71:c49c",
-        "country_code": "ES",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-bf331d70d9ba",
-      "name": "爱尔兰01|327ms|51Mbps|非住宅|纯净度100.0%",
-      "server": "3.252.104.83",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-bf331d70d9ba",
-        "exit_ip": "2a05:d018:ebe:f300:ef55:a011:b06d:5162",
-        "country_code": "IE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-c71b47d2232c",
-      "name": "荷兰25|839ms|104Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.147",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-c71b47d2232c",
-        "exit_ip": "84.17.47.147",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-84f57c5d34b0",
-      "name": "荷兰45|919ms|21Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰26|926ms|100Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.150",
       "port": 9002,
       "protocol": "http",
@@ -2876,7 +2697,7 @@
     },
     {
       "id": "n-f56e1c184652",
-      "name": "荷兰30|841ms|100Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰18|645ms|106Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
@@ -2892,25 +2713,8 @@
       }
     },
     {
-      "id": "n-4ce013148a91",
-      "name": "荷兰27|836ms|102Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.148",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-4ce013148a91",
-        "exit_ip": "84.17.47.148",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-cc673104c3cf",
-      "name": "罗马尼亚42|1198ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚38|1180ms|19Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.20",
       "port": 9002,
       "protocol": "http",
@@ -2927,7 +2731,7 @@
     },
     {
       "id": "n-e125128e4532",
-      "name": "美国06|247ms|49Mbps|非住宅|纯净度99.7%",
+      "name": "美国08|329ms|45Mbps|非住宅|纯净度99.7%",
       "server": "38.247.141.135",
       "port": 443,
       "protocol": "http",
@@ -2943,62 +2747,8 @@
       }
     },
     {
-      "id": "n-0e881c8f361a",
-      "name": "德国12|913ms|95Mbps|非住宅|纯净度95.3%",
-      "server": "903.rtgpu.com",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-0e881c8f361a",
-        "exit_ip": "88.99.248.90",
-        "country_code": "DE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-efa00687f64b",
-      "name": "意大利04|558ms|215Mbps|非住宅|纯净度89.8%",
-      "server": "202.50.253.81",
-      "port": 19999,
-      "protocol": "ss",
-      "sources": [
-        "a9",
-        "automerge",
-        "bestclash",
-        "eternity"
-      ],
-      "exit": {
-        "id": "n-efa00687f64b",
-        "exit_ip": "80.174.118.80",
-        "country_code": "IT",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-5c2a16fa034b",
-      "name": "意大利06|774ms|208Mbps|非住宅|纯净度89.8%",
-      "server": "202.50.253.27",
-      "port": 19999,
-      "protocol": "ss",
-      "sources": [
-        "a9",
-        "automerge",
-        "eternity"
-      ],
-      "exit": {
-        "id": "n-5c2a16fa034b",
-        "exit_ip": "80.174.118.23",
-        "country_code": "IT",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-362463ec372f",
-      "name": "荷兰41|920ms|104Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰31|927ms|99Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.123",
       "port": 9002,
       "protocol": "http",
@@ -3014,7 +2764,7 @@
     },
     {
       "id": "n-e79b525e60da",
-      "name": "罗马尼亚07|907ms|105Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚02|925ms|20Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.19",
       "port": 9002,
       "protocol": "http",
@@ -3030,7 +2780,7 @@
     },
     {
       "id": "n-16421af0a60d",
-      "name": "荷兰16|708ms|101Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰20|663ms|101Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.124",
       "port": 9002,
       "protocol": "http",
@@ -3045,24 +2795,8 @@
       }
     },
     {
-      "id": "n-73333f806437",
-      "name": "罗马尼亚44|1240ms|17Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.36",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a9"
-      ],
-      "exit": {
-        "id": "n-73333f806437",
-        "exit_ip": "193.176.84.36",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-2eeebf850b1c",
-      "name": "罗马尼亚31|1214ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚31|1175ms|88Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.21",
       "port": 9002,
       "protocol": "http",
@@ -3078,7 +2812,7 @@
     },
     {
       "id": "n-eb3753b96b71",
-      "name": "罗马尼亚23|1169ms|6Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚27|950ms|4Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.38",
       "port": 9002,
       "protocol": "http",
@@ -3093,184 +2827,8 @@
       }
     },
     {
-      "id": "n-b651da45e601",
-      "name": "罗马尼亚28|1183ms|7Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.26",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a9"
-      ],
-      "exit": {
-        "id": "n-b651da45e601",
-        "exit_ip": "193.176.84.26",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-e606ef47b5a0",
-      "name": "意大利05|774ms|192Mbps|非住宅|纯净度89.8%",
-      "server": "202.50.253.27",
-      "port": 19999,
-      "protocol": "ss",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-e606ef47b5a0",
-        "exit_ip": "80.174.118.23",
-        "country_code": "IT",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-cf828b32fb3c",
-      "name": "意大利03|608ms|223Mbps|非住宅|纯净度89.8%",
-      "server": "202.50.253.63",
-      "port": 19999,
-      "protocol": "ss",
-      "sources": [
-        "au1rxx"
-      ],
-      "exit": {
-        "id": "n-cf828b32fb3c",
-        "exit_ip": "80.174.118.60",
-        "country_code": "IT",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-6ae347a48914",
-      "name": "美国24|298ms|182Mbps|非住宅|纯净度99.1%",
-      "server": "69.42.222.165",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "au1rxx"
-      ],
-      "exit": {
-        "id": "n-6ae347a48914",
-        "exit_ip": "104.28.219.196",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-8998fae258a6",
-      "name": "法国04|764ms|115Mbps|非住宅|纯净度98.7%",
-      "server": "104.19.229.21",
-      "port": 443,
-      "protocol": "trojan",
-      "sources": [
-        "anaer"
-      ],
-      "exit": {
-        "id": "n-8998fae258a6",
-        "exit_ip": "51.158.105.199",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-4d447b8fa5b1",
-      "name": "法国01|665ms|113Mbps|非住宅|纯净度97.9%",
-      "server": "212.183.88.136",
-      "port": 443,
-      "protocol": "trojan",
-      "sources": [
-        "anaer"
-      ],
-      "exit": {
-        "id": "n-4d447b8fa5b1",
-        "exit_ip": "51.159.167.67",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-1c853faf8b5f",
-      "name": "美国02|200ms|172Mbps|住宅未知|纯净度未知",
-      "server": "172.64.150.43",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "anaer"
-      ],
-      "exit": {
-        "id": "n-1c853faf8b5f",
-        "exit_ip": "104.28.166.202",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-1e342f4f174a",
-      "name": "瑞典01|521ms|24Mbps|非住宅|纯净度100.0%",
-      "server": "13.60.198.133",
-      "port": 443,
-      "protocol": "vless",
-      "sources": [
-        "anaer"
-      ],
-      "exit": {
-        "id": "n-1e342f4f174a",
-        "exit_ip": "2a05:d016:95c:5d00:84ad:cd25:d068:8f2e",
-        "country_code": "SE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-b957d51b04dd",
-      "name": "法国10|538ms|118Mbps|非住宅|纯净度98.7%",
-      "server": "141.101.115.104",
-      "port": 443,
-      "protocol": "trojan",
-      "sources": [
-        "automerge"
-      ],
-      "exit": {
-        "id": "n-b957d51b04dd",
-        "exit_ip": "51.158.105.199",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-5c3cadfadc0d",
-      "name": "荷兰21|840ms|104Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.147",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-5c3cadfadc0d",
-        "exit_ip": "84.17.47.147",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-92403744b723",
-      "name": "德国07|1014ms|20Mbps|非住宅|纯净度98.4%",
-      "server": "87.106.223.158",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-92403744b723",
-        "exit_ip": "87.106.223.158",
-        "country_code": "DE",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-0be334de31d4",
-      "name": "罗马尼亚27|1166ms|6Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚20|924ms|82Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.23",
       "port": 9002,
       "protocol": "http",
@@ -3285,24 +2843,8 @@
       }
     },
     {
-      "id": "n-ef7cff489dfe",
-      "name": "美国21|577ms|121Mbps|住宅|纯净度99.6%",
-      "server": "kimberlymilano.icu",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-ef7cff489dfe",
-        "exit_ip": "64.62.219.60",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-121d98d12a44",
-      "name": "罗马尼亚45|1236ms|16Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚37|1208ms|5Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.36",
       "port": 9002,
       "protocol": "http",
@@ -3318,7 +2860,7 @@
     },
     {
       "id": "n-c7a164238372",
-      "name": "美国09|267ms|94Mbps|非住宅|纯净度88.4%",
+      "name": "美国04|242ms|91Mbps|非住宅|纯净度88.4%",
       "server": "147.182.216.4",
       "port": 443,
       "protocol": "http",
@@ -3334,7 +2876,7 @@
     },
     {
       "id": "n-3a8f477e82ac",
-      "name": "美国07|247ms|89Mbps|非住宅|纯净度99.7%",
+      "name": "美国07|327ms|54Mbps|非住宅|纯净度99.7%",
       "server": "38.247.141.135",
       "port": 443,
       "protocol": "http",
@@ -3349,24 +2891,8 @@
       }
     },
     {
-      "id": "n-1c55b6010dac",
-      "name": "罗马尼亚25|1178ms|17Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.39",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-1c55b6010dac",
-        "exit_ip": "193.176.84.39",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-ac6dd74e6484",
-      "name": "荷兰35|910ms|91Mbps|非住宅|纯净度94.7%",
+      "name": "荷兰24|884ms|94Mbps|非住宅|纯净度94.7%",
       "server": "51.158.243.91",
       "port": 443,
       "protocol": "http",
@@ -3381,24 +2907,8 @@
       }
     },
     {
-      "id": "n-2c096ac0846b",
-      "name": "日本01|781ms|16Mbps|非住宅|纯净度100.0%",
-      "server": "45.202.254.20",
-      "port": 9443,
-      "protocol": "vless",
-      "sources": [
-        "au1rxx"
-      ],
-      "exit": {
-        "id": "n-2c096ac0846b",
-        "exit_ip": "2602:fa4f:a30:1bee:6be4:6a0f:9fd9:7113",
-        "country_code": "JP",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-ebf62f93c230",
-      "name": "荷兰29|834ms|104Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰06|640ms|106Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
@@ -3413,24 +2923,8 @@
       }
     },
     {
-      "id": "n-5d226ff0536d",
-      "name": "罗马尼亚48|1176ms|16Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.35",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-5d226ff0536d",
-        "exit_ip": "193.176.84.35",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-c156e20748bd",
-      "name": "美国17|338ms|121Mbps|住宅|纯净度99.7%",
+      "name": "美国16|591ms|116Mbps|住宅|纯净度99.7%",
       "server": "efr-marktplatz.club",
       "port": 443,
       "protocol": "http",
@@ -3439,14 +2933,14 @@
       ],
       "exit": {
         "id": "n-c156e20748bd",
-        "exit_ip": "65.49.68.48",
+        "exit_ip": "65.49.68.65",
         "country_code": "US",
         "source": "verified_trace"
       }
     },
     {
       "id": "n-6a9765033192",
-      "name": "美国08|290ms|4Mbps|非住宅|纯净度95.9%",
+      "name": "美国18|532ms|4Mbps|非住宅|纯净度95.9%",
       "server": "162.243.146.243",
       "port": 443,
       "protocol": "http",
@@ -3462,7 +2956,7 @@
     },
     {
       "id": "n-b98e9fd3a344",
-      "name": "美国10|275ms|91Mbps|非住宅|纯净度88.4%",
+      "name": "美国06|242ms|90Mbps|非住宅|纯净度88.4%",
       "server": "147.182.216.4",
       "port": 443,
       "protocol": "http",
@@ -3478,7 +2972,7 @@
     },
     {
       "id": "n-be5ac291e62c",
-      "name": "罗马尼亚10|908ms|20Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚18|921ms|20Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.19",
       "port": 9002,
       "protocol": "http",
@@ -3493,24 +2987,8 @@
       }
     },
     {
-      "id": "n-579b2d214c3a",
-      "name": "荷兰19|833ms|96Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.147",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-579b2d214c3a",
-        "exit_ip": "84.17.47.147",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-fb86a0010f3b",
-      "name": "荷兰03|641ms|97Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰13|650ms|99Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.125",
       "port": 9002,
       "protocol": "http",
@@ -3525,41 +3003,8 @@
       }
     },
     {
-      "id": "n-feb535fa2254",
-      "name": "荷兰23|833ms|22Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.148",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-feb535fa2254",
-        "exit_ip": "84.17.47.148",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-745972b39861",
-      "name": "法国08|888ms|96Mbps|住宅|纯净度99.8%",
-      "server": "82.65.162.76",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-745972b39861",
-        "exit_ip": "82.65.162.76",
-        "country_code": "FR",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-64c038b8843e",
-      "name": "罗马尼亚43|1217ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚32|1198ms|11Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.20",
       "port": 9002,
       "protocol": "http",
@@ -3575,7 +3020,7 @@
     },
     {
       "id": "n-8abce9e1f498",
-      "name": "德国05|991ms|20Mbps|非住宅|纯净度97.8%",
+      "name": "德国06|964ms|150Mbps|非住宅|纯净度97.8%",
       "server": "213.109.163.119",
       "port": 443,
       "protocol": "http",
@@ -3590,24 +3035,8 @@
       }
     },
     {
-      "id": "n-1202c8f1c7f4",
-      "name": "荷兰11|703ms|90Mbps|非住宅|纯净度99.6%",
-      "server": "51.159.225.197",
-      "port": 19362,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-1202c8f1c7f4",
-        "exit_ip": "51.159.225.197",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-edcc5f4b58e9",
-      "name": "罗马尼亚06|913ms|20Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚03|915ms|20Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.19",
       "port": 9002,
       "protocol": "http",
@@ -3623,7 +3052,7 @@
     },
     {
       "id": "n-0fedb144223b",
-      "name": "美国15|372ms|110Mbps|非住宅|纯净度99.2%",
+      "name": "美国14|558ms|142Mbps|非住宅|纯净度99.2%",
       "server": "44.248.167.117",
       "port": 8443,
       "protocol": "http",
@@ -3639,7 +3068,7 @@
     },
     {
       "id": "n-638ebec9f352",
-      "name": "波兰03|1118ms|20Mbps|非住宅|纯净度97.3%",
+      "name": "波兰03|1037ms|91Mbps|非住宅|纯净度97.3%",
       "server": "151.115.54.133",
       "port": 443,
       "protocol": "http",
@@ -3654,40 +3083,8 @@
       }
     },
     {
-      "id": "n-779bb0358f5c",
-      "name": "美国11|333ms|104Mbps|非住宅|纯净度99.6%",
-      "server": "23.133.176.14",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-779bb0358f5c",
-        "exit_ip": "23.133.176.14",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-2df495ac24d7",
-      "name": "美国01|148ms|194Mbps|非住宅|纯净度未知",
-      "server": "172.64.69.89",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-2df495ac24d7",
-        "exit_ip": "2606:4700:4408::",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-4fdc1e71ba7b",
-      "name": "法国02|713ms|77Mbps|非住宅|纯净度98.4%",
+      "name": "法国03|647ms|18Mbps|非住宅|纯净度98.4%",
       "server": "87.98.174.157",
       "port": 6103,
       "protocol": "http",
@@ -3703,7 +3100,7 @@
     },
     {
       "id": "n-881e61de9d7e",
-      "name": "加拿大01|253ms|174Mbps|非住宅|纯净度97.5%",
+      "name": "加拿大02|251ms|169Mbps|非住宅|纯净度97.5%",
       "server": "35.183.131.26",
       "port": 443,
       "protocol": "http",
@@ -3720,7 +3117,7 @@
     },
     {
       "id": "n-9d84bed57b00",
-      "name": "荷兰36|909ms|91Mbps|非住宅|纯净度94.7%",
+      "name": "荷兰22|885ms|92Mbps|非住宅|纯净度94.7%",
       "server": "51.158.243.91",
       "port": 443,
       "protocol": "http",
@@ -3735,24 +3132,8 @@
       }
     },
     {
-      "id": "n-fa77d1bd6987",
-      "name": "美国16|369ms|159Mbps|非住宅|纯净度99.2%",
-      "server": "44.229.69.166",
-      "port": 8443,
-      "protocol": "http",
-      "sources": [
-        "a9"
-      ],
-      "exit": {
-        "id": "n-fa77d1bd6987",
-        "exit_ip": "44.229.69.166",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-6427e0ba888e",
-      "name": "爱尔兰02|740ms|21Mbps|非住宅|纯净度99.5%",
+      "name": "爱尔兰02|725ms|31Mbps|非住宅|纯净度99.5%",
       "server": "18.200.158.139",
       "port": 443,
       "protocol": "http",
@@ -3767,40 +3148,8 @@
       }
     },
     {
-      "id": "n-268603aaa116",
-      "name": "美国18|480ms|119Mbps|住宅|纯净度99.7%",
-      "server": "berniesbodybla.fun",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-268603aaa116",
-        "exit_ip": "65.49.68.25",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-8db37e8c5dfb",
-      "name": "瑞典03|1049ms|8Mbps|住宅|纯净度99.9%",
-      "server": "217.210.129.243",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-8db37e8c5dfb",
-        "exit_ip": "217.210.129.243",
-        "country_code": "SE",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-c9bf45749cf3",
-      "name": "罗马尼亚36|1168ms|17Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚17|912ms|15Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.26",
       "port": 9002,
       "protocol": "http",
@@ -3815,72 +3164,8 @@
       }
     },
     {
-      "id": "n-68829458ae4b",
-      "name": "瑞典02|1061ms|12Mbps|住宅|纯净度99.9%",
-      "server": "217.210.129.243",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-68829458ae4b",
-        "exit_ip": "217.210.129.243",
-        "country_code": "SE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-ebde1a3e04a2",
-      "name": "荷兰18|716ms|94Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.149",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-ebde1a3e04a2",
-        "exit_ip": "84.17.47.149",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-8c4ded62af45",
-      "name": "荷兰42|915ms|99Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.146",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-8c4ded62af45",
-        "exit_ip": "84.17.47.146",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-6dfa9d478b29",
-      "name": "荷兰31|838ms|106Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.147",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-6dfa9d478b29",
-        "exit_ip": "84.17.47.147",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-952f480375d9",
-      "name": "荷兰47|910ms|99Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰27|924ms|99Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.150",
       "port": 9002,
       "protocol": "http",
@@ -3895,24 +3180,8 @@
       }
     },
     {
-      "id": "n-cf75862e0051",
-      "name": "瑞典04|1062ms|17Mbps|住宅|纯净度99.9%",
-      "server": "217.210.129.243",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-cf75862e0051",
-        "exit_ip": "217.210.129.243",
-        "country_code": "SE",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-89fe631d6c53",
-      "name": "波兰01|817ms|100Mbps|非住宅|纯净度81.6%",
+      "name": "波兰01|793ms|106Mbps|非住宅|纯净度81.6%",
       "server": "91.92.250.33",
       "port": 443,
       "protocol": "http",
@@ -3928,7 +3197,7 @@
     },
     {
       "id": "n-288b8d6e20c6",
-      "name": "荷兰37|912ms|104Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰33|930ms|103Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.123",
       "port": 9002,
       "protocol": "http",
@@ -3943,25 +3212,8 @@
       }
     },
     {
-      "id": "n-8922cee3185c",
-      "name": "罗马尼亚13|924ms|19Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.17",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-8922cee3185c",
-        "exit_ip": "193.176.84.17",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-0d72612879c5",
-      "name": "荷兰07|702ms|94Mbps|非住宅|纯净度99.6%",
+      "name": "荷兰02|623ms|93Mbps|非住宅|纯净度99.6%",
       "server": "51.159.225.196",
       "port": 23856,
       "protocol": "http",
@@ -3978,7 +3230,7 @@
     },
     {
       "id": "n-c77d0431d165",
-      "name": "荷兰08|701ms|95Mbps|非住宅|纯净度99.6%",
+      "name": "荷兰01|624ms|95Mbps|非住宅|纯净度99.6%",
       "server": "51.159.225.196",
       "port": 23856,
       "protocol": "http",
@@ -3996,7 +3248,7 @@
     },
     {
       "id": "n-c61328c1f8d0",
-      "name": "罗马尼亚21|1166ms|13Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚11|911ms|56Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.23",
       "port": 9002,
       "protocol": "http",
@@ -4012,7 +3264,7 @@
     },
     {
       "id": "n-bd504ac550ec",
-      "name": "美国05|228ms|123Mbps|非住宅|纯净度100.0%",
+      "name": "美国11|466ms|104Mbps|非住宅|纯净度100.0%",
       "server": "64.98.50.100",
       "port": 443,
       "protocol": "http",
@@ -4028,7 +3280,7 @@
     },
     {
       "id": "n-abe5fb9b11c1",
-      "name": "德国03|813ms|116Mbps|非住宅|纯净度100.0%",
+      "name": "德国02|702ms|19Mbps|非住宅|纯净度100.0%",
       "server": "185.232.70.11",
       "port": 443,
       "protocol": "http",
@@ -4043,24 +3295,8 @@
       }
     },
     {
-      "id": "n-a65e538e2a09",
-      "name": "美国14|366ms|24Mbps|非住宅|纯净度98.4%",
-      "server": "35.84.133.236",
-      "port": 8443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-a65e538e2a09",
-        "exit_ip": "35.84.133.236",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-fb78c1f64e0e",
-      "name": "美国04|221ms|254Mbps|非住宅|纯净度未知",
+      "name": "美国01|176ms|187Mbps|非住宅|纯净度未知",
       "server": "172.64.68.89",
       "port": 443,
       "protocol": "http",
@@ -4069,14 +3305,14 @@
       ],
       "exit": {
         "id": "n-fb78c1f64e0e",
-        "exit_ip": "2606:4700:4408::",
+        "exit_ip": "2a06:98c1:3101::",
         "country_code": "US",
         "source": "verified_trace"
       }
     },
     {
       "id": "n-abeb78f9d408",
-      "name": "荷兰22|829ms|98Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰09|637ms|99Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.126",
       "port": 9002,
       "protocol": "http",
@@ -4092,7 +3328,7 @@
     },
     {
       "id": "n-aa0c509a0f44",
-      "name": "德国02|806ms|77Mbps|非住宅|纯净度100.0%",
+      "name": "德国03|705ms|18Mbps|非住宅|纯净度100.0%",
       "server": "159.69.94.125",
       "port": 443,
       "protocol": "http",
@@ -4108,7 +3344,7 @@
     },
     {
       "id": "n-7d59d79ac3c0",
-      "name": "荷兰48|1032ms|20Mbps|非住宅|纯净度98.0%",
+      "name": "荷兰34|1020ms|90Mbps|非住宅|纯净度98.0%",
       "server": "82.196.9.7",
       "port": 443,
       "protocol": "http",
@@ -4123,40 +3359,8 @@
       }
     },
     {
-      "id": "n-027cf38e9e7f",
-      "name": "德国01|706ms|23Mbps|非住宅|纯净度100.0%",
-      "server": "116.202.172.99",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-027cf38e9e7f",
-        "exit_ip": "2a01:4f8:241:b5c::2",
-        "country_code": "DE",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-9538dbb72a96",
-      "name": "荷兰20|839ms|99Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.147",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a9"
-      ],
-      "exit": {
-        "id": "n-9538dbb72a96",
-        "exit_ip": "84.17.47.147",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-90ce5dfbce52",
-      "name": "罗马尼亚20|1166ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚04|920ms|17Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.23",
       "port": 9002,
       "protocol": "http",
@@ -4172,7 +3376,7 @@
     },
     {
       "id": "n-e4c7aa104dfa",
-      "name": "荷兰46|907ms|97Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰32|929ms|107Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.150",
       "port": 9002,
       "protocol": "http",
@@ -4188,7 +3392,7 @@
     },
     {
       "id": "n-3fb4cb6a287d",
-      "name": "荷兰32|842ms|104Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰08|646ms|97Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
@@ -4203,40 +3407,8 @@
       }
     },
     {
-      "id": "n-bb784b67f9d1",
-      "name": "荷兰14|705ms|101Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.149",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-bb784b67f9d1",
-        "exit_ip": "84.17.47.149",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-7f03e352af11",
-      "name": "荷兰12|704ms|95Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.149",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-7f03e352af11",
-        "exit_ip": "84.17.47.149",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-0568cd5e5beb",
-      "name": "波兰02|1045ms|19Mbps|非住宅|纯净度97.3%",
+      "name": "波兰02|1040ms|92Mbps|非住宅|纯净度97.3%",
       "server": "151.115.54.133",
       "port": 443,
       "protocol": "http",
@@ -4251,24 +3423,8 @@
       }
     },
     {
-      "id": "n-7c06e12354a0",
-      "name": "荷兰43|908ms|93Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.146",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-7c06e12354a0",
-        "exit_ip": "84.17.47.146",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-8156d3bb3723",
-      "name": "荷兰49|910ms|99Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰28|925ms|98Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.150",
       "port": 9002,
       "protocol": "http",
@@ -4283,24 +3439,8 @@
       }
     },
     {
-      "id": "n-7ff633ba3f8e",
-      "name": "荷兰38|910ms|105Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.146",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-7ff633ba3f8e",
-        "exit_ip": "84.17.47.146",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-7fbb9cac4eb7",
-      "name": "荷兰33|844ms|104Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰16|641ms|105Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
@@ -4315,24 +3455,8 @@
       }
     },
     {
-      "id": "n-f4d963e1fc3b",
-      "name": "荷兰15|702ms|25Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.149",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-f4d963e1fc3b",
-        "exit_ip": "84.17.47.149",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-169e5de8668c",
-      "name": "荷兰04|640ms|101Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰10|650ms|105Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.125",
       "port": 9002,
       "protocol": "http",
@@ -4348,7 +3472,7 @@
     },
     {
       "id": "n-f2786ca8283b",
-      "name": "荷兰06|640ms|99Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰17|646ms|106Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.125",
       "port": 9002,
       "protocol": "http",
@@ -4364,7 +3488,7 @@
     },
     {
       "id": "n-5d4011b85474",
-      "name": "荷兰02|642ms|97Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰15|644ms|94Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.125",
       "port": 9002,
       "protocol": "http",
@@ -4379,24 +3503,8 @@
       }
     },
     {
-      "id": "n-564cebc23727",
-      "name": "荷兰13|709ms|101Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.149",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-564cebc23727",
-        "exit_ip": "84.17.47.149",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-fd851844ab0a",
-      "name": "荷兰10|703ms|93Mbps|非住宅|纯净度99.6%",
+      "name": "荷兰03|624ms|96Mbps|非住宅|纯净度99.6%",
       "server": "51.159.225.196",
       "port": 23856,
       "protocol": "http",
@@ -4412,7 +3520,7 @@
     },
     {
       "id": "n-c9544988f076",
-      "name": "荷兰44|913ms|103Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰30|926ms|97Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.150",
       "port": 9002,
       "protocol": "http",
@@ -4428,7 +3536,7 @@
     },
     {
       "id": "n-20f524700da2",
-      "name": "荷兰26|835ms|100Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰07|640ms|106Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
@@ -4443,25 +3551,8 @@
       }
     },
     {
-      "id": "n-d6d5733acc25",
-      "name": "罗马尼亚35|1187ms|7Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.31",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-d6d5733acc25",
-        "exit_ip": "193.176.84.31",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-391327ede748",
-      "name": "罗马尼亚47|1054ms|12Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚22|958ms|3Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.40",
       "port": 9002,
       "protocol": "http",
@@ -4478,7 +3569,7 @@
     },
     {
       "id": "n-351f283b1b76",
-      "name": "美国22|406ms|50Mbps|非住宅|纯净度99.5%",
+      "name": "美国17|162ms|62Mbps|非住宅|纯净度99.5%",
       "server": "18.206.28.143",
       "port": 8443,
       "protocol": "http",
@@ -4494,7 +3585,7 @@
     },
     {
       "id": "n-285853c34ec6",
-      "name": "荷兰24|842ms|98Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰14|642ms|97Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
@@ -4510,7 +3601,7 @@
     },
     {
       "id": "n-b2207dda538c",
-      "name": "罗马尼亚05|909ms|21Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚19|906ms|19Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.24",
       "port": 9002,
       "protocol": "http",
@@ -4525,24 +3616,8 @@
       }
     },
     {
-      "id": "n-97eec8e4f3fb",
-      "name": "美国20|583ms|124Mbps|住宅|纯净度99.7%",
-      "server": "purecambogiasl.live",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-97eec8e4f3fb",
-        "exit_ip": "65.49.68.25",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-b567ab8965d2",
-      "name": "荷兰28|847ms|96Mbps|非住宅|纯净度74.1%",
+      "name": "荷兰11|653ms|106Mbps|非住宅|纯净度74.1%",
       "server": "84.17.47.148",
       "port": 9002,
       "protocol": "http",
@@ -4558,7 +3633,7 @@
     },
     {
       "id": "n-3da7f01f5691",
-      "name": "罗马尼亚26|1163ms|16Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚08|920ms|15Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.27",
       "port": 9002,
       "protocol": "http",
@@ -4573,41 +3648,8 @@
       }
     },
     {
-      "id": "n-94976b9505e6",
-      "name": "罗马尼亚02|895ms|12Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.18",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-94976b9505e6",
-        "exit_ip": "193.176.84.18",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-8a0d8f136984",
-      "name": "荷兰39|907ms|104Mbps|非住宅|纯净度74.1%",
-      "server": "84.17.47.146",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a10"
-      ],
-      "exit": {
-        "id": "n-8a0d8f136984",
-        "exit_ip": "84.17.47.146",
-        "country_code": "NL",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-b042fcadc1e7",
-      "name": "罗马尼亚39|1176ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚05|925ms|17Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.27",
       "port": 9002,
       "protocol": "http",
@@ -4623,7 +3665,7 @@
     },
     {
       "id": "n-13035eca42bb",
-      "name": "罗马尼亚09|914ms|20Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚06|915ms|19Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.24",
       "port": 9002,
       "protocol": "http",
@@ -4639,7 +3681,7 @@
     },
     {
       "id": "n-256a4241b458",
-      "name": "罗马尼亚03|903ms|21Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚14|922ms|20Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.24",
       "port": 9002,
       "protocol": "http",
@@ -4655,7 +3697,7 @@
     },
     {
       "id": "n-6863b33e3243",
-      "name": "罗马尼亚33|1222ms|13Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚33|1172ms|9Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.22",
       "port": 9002,
       "protocol": "http",
@@ -4671,7 +3713,7 @@
     },
     {
       "id": "n-82966ca15e80",
-      "name": "罗马尼亚14|1028ms|59Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚25|954ms|3Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.30",
       "port": 9002,
       "protocol": "http",
@@ -4687,7 +3729,7 @@
     },
     {
       "id": "n-d50edaa1b550",
-      "name": "罗马尼亚50|1239ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚28|1183ms|18Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.25",
       "port": 9002,
       "protocol": "http",
@@ -4704,7 +3746,7 @@
     },
     {
       "id": "n-483cfb50b9fc",
-      "name": "罗马尼亚29|1163ms|16Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚21|938ms|4Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.38",
       "port": 9002,
       "protocol": "http",
@@ -4719,40 +3761,8 @@
       }
     },
     {
-      "id": "n-94c97c9e81e4",
-      "name": "罗马尼亚19|1039ms|19Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.29",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-94c97c9e81e4",
-        "exit_ip": "193.176.84.29",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-cab74287f3eb",
-      "name": "罗马尼亚22|1169ms|12Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.38",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-cab74287f3eb",
-        "exit_ip": "193.176.84.38",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-179c6bbd716e",
-      "name": "罗马尼亚34|1199ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚30|1167ms|19Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.25",
       "port": 9002,
       "protocol": "http",
@@ -4768,25 +3778,8 @@
       }
     },
     {
-      "id": "n-d7b12276bebc",
-      "name": "罗马尼亚01|898ms|20Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.17",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "a9"
-      ],
-      "exit": {
-        "id": "n-d7b12276bebc",
-        "exit_ip": "193.176.84.17",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-1975c522d136",
-      "name": "罗马尼亚41|1224ms|18Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚35|1187ms|46Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.16",
       "port": 9002,
       "protocol": "http",
@@ -4801,152 +3794,8 @@
       }
     },
     {
-      "id": "n-dc39b998c945",
-      "name": "罗马尼亚30|1194ms|18Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.31",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-dc39b998c945",
-        "exit_ip": "193.176.84.31",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-8a47e3990c11",
-      "name": "罗马尼亚08|909ms|20Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.24",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-8a47e3990c11",
-        "exit_ip": "193.176.84.24",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-8a743d4e825a",
-      "name": "罗马尼亚04|920ms|8Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.17",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-8a743d4e825a",
-        "exit_ip": "193.176.84.17",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-f7ef8bf6a721",
-      "name": "罗马尼亚37|1226ms|18Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.37",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-f7ef8bf6a721",
-        "exit_ip": "193.176.84.37",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-f09086acb57a",
-      "name": "罗马尼亚40|1171ms|18Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.31",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-f09086acb57a",
-        "exit_ip": "193.176.84.31",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-3c87f0de33d3",
-      "name": "罗马尼亚15|1025ms|89Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.33",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-3c87f0de33d3",
-        "exit_ip": "193.176.84.33",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-ff1758085b4b",
-      "name": "罗马尼亚49|1184ms|8Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.31",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4"
-      ],
-      "exit": {
-        "id": "n-ff1758085b4b",
-        "exit_ip": "193.176.84.31",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-5bc8f562cf83",
-      "name": "罗马尼亚12|907ms|18Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.17",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-5bc8f562cf83",
-        "exit_ip": "193.176.84.17",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-f3443d66388e",
-      "name": "罗马尼亚46|1237ms|17Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.37",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-f3443d66388e",
-        "exit_ip": "193.176.84.37",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-9bad0944ae0f",
-      "name": "罗马尼亚32|1217ms|17Mbps|非住宅|纯净度86.7%",
+      "name": "罗马尼亚36|1200ms|5Mbps|非住宅|纯净度86.7%",
       "server": "193.176.84.36",
       "port": 9002,
       "protocol": "http",
@@ -4961,57 +3810,8 @@
       }
     },
     {
-      "id": "n-7acf6a2fb9ff",
-      "name": "罗马尼亚16|1018ms|19Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.29",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "a4",
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-7acf6a2fb9ff",
-        "exit_ip": "193.176.84.29",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-b175d6c0f3a9",
-      "name": "美国19|572ms|124Mbps|住宅|纯净度99.7%",
-      "server": "fullmanfirm.icu",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-b175d6c0f3a9",
-        "exit_ip": "65.49.68.24",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
-      "id": "n-2820a9e4805a",
-      "name": "罗马尼亚17|1047ms|91Mbps|非住宅|纯净度86.7%",
-      "server": "193.176.84.33",
-      "port": 9002,
-      "protocol": "http",
-      "sources": [
-        "zhuhaiuk"
-      ],
-      "exit": {
-        "id": "n-2820a9e4805a",
-        "exit_ip": "193.176.84.33",
-        "country_code": "RO",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-0ac48a4d2dd0",
-      "name": "美国12|272ms|94Mbps|非住宅|纯净度88.4%",
+      "name": "美国05|241ms|90Mbps|非住宅|纯净度88.4%",
       "server": "147.182.216.4",
       "port": 443,
       "protocol": "http",
@@ -5027,24 +3827,8 @@
       }
     },
     {
-      "id": "n-d3db6048d965",
-      "name": "美国23|199ms|38Mbps|非住宅|纯净度93.8%",
-      "server": "216.107.139.82",
-      "port": 443,
-      "protocol": "http",
-      "sources": [
-        "a9"
-      ],
-      "exit": {
-        "id": "n-d3db6048d965",
-        "exit_ip": "216.107.139.82",
-        "country_code": "US",
-        "source": "verified_trace"
-      }
-    },
-    {
       "id": "n-f98d3d0f2a70",
-      "name": "德国04|922ms|21Mbps|非住宅|纯净度99.8%",
+      "name": "德国01|668ms|41Mbps|非住宅|纯净度99.8%",
       "server": "79.76.126.155",
       "port": 443,
       "protocol": "http",
@@ -5058,15 +3842,80 @@
         "country_code": "DE",
         "source": "verified_trace"
       }
+    },
+    {
+      "id": "n-f7e906ec64a6",
+      "name": "美国10|456ms|101Mbps|非住宅|纯净度99.7%",
+      "server": "129.153.93.183",
+      "port": 443,
+      "protocol": "http",
+      "sources": [
+        "zhuhaiuk"
+      ],
+      "exit": {
+        "id": "n-f7e906ec64a6",
+        "exit_ip": "129.153.93.183",
+        "country_code": "US",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-d45e0bef979f",
+      "name": "罗马尼亚12|919ms|17Mbps|非住宅|纯净度86.7%",
+      "server": "193.176.84.26",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "a10"
+      ],
+      "exit": {
+        "id": "n-d45e0bef979f",
+        "exit_ip": "193.176.84.26",
+        "country_code": "RO",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-60ebba740525",
+      "name": "荷兰21|886ms|87Mbps|非住宅|纯净度94.7%",
+      "server": "51.158.243.91",
+      "port": 443,
+      "protocol": "http",
+      "sources": [
+        "a4",
+        "a9"
+      ],
+      "exit": {
+        "id": "n-60ebba740525",
+        "exit_ip": "51.158.243.91",
+        "country_code": "NL",
+        "source": "verified_trace"
+      }
+    },
+    {
+      "id": "n-3e4d25760113",
+      "name": "荷兰12|651ms|96Mbps|非住宅|纯净度74.1%",
+      "server": "84.17.47.125",
+      "port": 9002,
+      "protocol": "http",
+      "sources": [
+        "a10"
+      ],
+      "exit": {
+        "id": "n-3e4d25760113",
+        "exit_ip": "84.17.47.125",
+        "country_code": "NL",
+        "source": "verified_trace"
+      }
     }
   ],
   "report_kind": "published_summary",
-  "raw_record_count": 5282,
+  "raw_record_count": 5104,
   "raw_evidence": {
-    "run_id": "39746292632",
+    "run_id": "39794500023",
     "artifact": "full-test-report",
     "filename": "full-test-report.published.json",
-    "sha256": "e9c044a84f40f66590555963d2b3b48cf71854b9df8a09a0d8c889d8574c486e",
+    "sha256": "d10e3eda96c62eef62bc5397ef72531bd6cd7678e6b2f022d8c992ef9fea20a7",
     "retention_days": 7
   }
 }
