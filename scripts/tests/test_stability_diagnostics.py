@@ -21,7 +21,7 @@ class DiagnosticCandidatesTests(unittest.TestCase):
             if i < 10:
                 for sample in result['attempts'][8:]:
                     sample['sites']['Google204'].update(status='failed', error_type='ReadTimeout')
-                result = cs.summarize(result['attempts'], 0)
+                result = cs.summarize(result['attempts'], 0, version=4)
             rows.append({'id': 'n-' + str(i), 'stability': result,
                          'exit': {'country_code': str(i % 4)}})
             nodes.append({'name': rows[-1]['id'], 'type': 'http' if i < 12 else 'vless'})

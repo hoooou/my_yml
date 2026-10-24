@@ -31,12 +31,13 @@ def evidence(failures=0, cutoff=0):
         for k in ('Google', 'YouTube', 'ChatGPTTrace'):
             item['sites'][k]['status'] = 'skipped'
         item['android_tls']['status'] = 'skipped'
-    return cs.summarize(attempts, cutoff)
+    return cs.summarize(attempts, cutoff, version=4)
 
 
 def observation(bundle, rows):
+    bundle['stability_policy'] = cs.settings(4)
     return {'bundle_id': bundle['id'], 'index': 0, 'count': 1, 'diagnostic': {
-        'settings': cs.settings(), 'updated_at': '2026-10-12T08:00:00+08:00', 'complete': True, 'controls_valid': True,
+        'settings': cs.settings(4), 'updated_at': '2026-10-12T08:00:00+08:00', 'complete': True, 'controls_valid': True,
         'node_count': len(rows), 'nodes': [{'id': r['id'], 'stability': evidence()} for r in rows],
         'controls': [{'sites': {'Google204': {'status': 'passed', 'elapsed_ms': 10}},
                       'android_tls': sample(1)['android_tls'], 'started_offset_seconds': i*60, 'finished_offset_seconds': i*60+1} for i in range(11)],
@@ -83,7 +84,7 @@ class EvidenceTests(unittest.TestCase):
 
     def test_new_policy_accepts_actual_short_window_and_keeps_old_version_requirements(self):
         attempts = [sample(i, (i-1)*15) for i in range(1, 4)]
-        current = cs.summarize(attempts, cutoff=20)
+        current = cs.summarize(attempts, cutoff=20, version=4)
         self.assertTrue(st.passed(current))
         self.assertIsNone(cs.settings()['minimum_rounds'])
         self.assertEqual(cs.settings()['random_idle_seconds_range'], [3, 10])
@@ -98,7 +99,7 @@ class EvidenceTests(unittest.TestCase):
 
     def test_random_policy_does_not_reinterpret_historical_fixed_interval(self):
         attempts = [sample(1, 0), sample(2, 5)]
-        current = cs.summarize(attempts, cutoff=4)
+        current = cs.summarize(attempts, cutoff=4, version=4)
         self.assertTrue(cs.passed(current))
         historical = copy.deepcopy(current); historical['version'] = 3
         self.assertFalse(cs.passed(historical))
@@ -157,7 +158,7 @@ class ScheduleTests(unittest.TestCase):
             if bad_control: raise RuntimeError('对照异常')
         def checkpoint(attempts, cutoff, complete):
             checkpoints.append(complete)
-            return {id: cs.summarize(copy.deepcopy(x), cutoff) for id, x in attempts.items()}
+            return {id: cs.summarize(copy.deepcopy(x), cutoff, version=4) for id, x in attempts.items()}
         with patch.object(cs.futures, 'ThreadPoolExecutor', ImmediatePool):
             result = cs.schedule(['a', 'b', 'c'], probe, lambda: clock.now() >= peer_at,
                 control, checkpoint, clock=clock.now, sleep=clock.sleep, workers=2)
@@ -179,7 +180,7 @@ class ScheduleTests(unittest.TestCase):
 
     def test_fast_peer_does_not_wait_for_twenty_rounds(self):
         results, _, _ = self.run_schedule(peer_at=0)
-        self.assertTrue(all(len(x['attempts']) == 1 and cs.passed(x) for x in results.values()))
+        self.assertTrue(all(x['window_seconds'] >= 600 and cs.passed(x) for x in results.values()))
 
     def test_control_failure_aborts_and_empty_shard_is_safe_without_core_or_api(self):
         with self.assertRaisesRegex(RuntimeError, '对照异常'): self.run_schedule(bad_control=True)
@@ -198,7 +199,7 @@ class ScheduleTests(unittest.TestCase):
             item = sample(number, started); item['finished_offset_seconds'] = time.monotonic()-origin
             with lock: active.remove(id)
             return item
-        with patch.object(cs.random, 'uniform', return_value=.03), patch.object(cs, 'PEER_POLL_SECONDS', .03):
+        with patch.object(cs.random, 'uniform', return_value=.03), patch.object(cs, 'PEER_POLL_SECONDS', .03), patch.object(cs, 'MIN_WINDOW_SECONDS', .04):
             origin = time.monotonic()
             result = cs.schedule(['a','b','c','d'], probe, lambda: time.monotonic()-origin >= .04,
                 lambda *_: None, lambda attempts, cutoff, complete: attempts, workers=2)
@@ -309,7 +310,7 @@ class PipelineTests(unittest.TestCase):
         row = record('n-a'); row.update(server='8.8.8.8', port=443, protocol='ss', upload_precheck=upload_evidence()['precheck'])
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443, 'cipher': 'aes-128-gcm', 'password': 'test-password'}
         bundle = {'nodes': [node], 'base': {}, 'metadata': {}, 'sources': [], 'input_count': 1,
-                  'rejected': [], 'services': {}, 'scope': 'all_subscriptions', 'id': 'batch', 'parallel_observation': True}
+                  'rejected': [], 'services': {}, 'scope': 'all_subscriptions', 'id': 'batch', 'parallel_observation': True, 'stability_policy': cs.settings(4)}
         with tempfile.TemporaryDirectory() as folder:
             cwd = os.getcwd()
             try:

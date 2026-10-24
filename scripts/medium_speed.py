@@ -8,9 +8,10 @@ URL = f'https://speed.cloudflare.com/__down?bytes={BYTES}'
 GROUP = '🚄 中速下载'
 
 
-def settings():
+def settings(total_deadline=False):
     return {'url': URL, 'bytes': BYTES, 'budget_seconds': BUDGET, 'rounds': 1,
-            'workers_per_shard': WORKERS, 'read_timeout_seconds': 1,
+            'workers_per_shard': WORKERS, 'read_timeout_seconds': None if total_deadline else 1,
+            'total_deadline': total_deadline,
             'includes_handshake': True, 'selection_limit': None,
             'requires_1mb_pass': True, 'failure_blocks_high_speed_test': False}
 

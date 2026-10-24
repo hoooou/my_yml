@@ -11,6 +11,7 @@ import medium_speed
 import service_probes
 import stability
 import upload_speed
+import quality_policy as qp
 
 START = '<!-- latest-detection:start -->'
 END = '<!-- latest-detection:end -->'
@@ -55,7 +56,7 @@ def counts(stage_id, label, items, validator, fallback):
                     import continuous_stability as cs
                     if any(cs.certificate_error(a) for a in item.get('attempts', [])):
                         reason = '明确证书校验错误'
-                    elif item.get('version') in (2, 3, cs.VERSION) and cs.metrics(item)['success_rate'] < .9:
+                    elif item.get('version') in cs.VERSIONS and cs.metrics(item)['success_rate'] < .9:
                         reason = '持续观察成功率低于90%'
                     else:
                         reason = '稳定性原始证据或检查条件未满足，详见逐轮记录'
@@ -76,6 +77,7 @@ def stage_summary(report, website_gate=None):
         from availability import required_websites_passed
         website_gate = required_websites_passed
     nodes = report.get('nodes', [])
+    modern = (report.get('selection_policy') or {}).get('version') == qp.VERSION
     rows = []
     def add(stage_id, label, key, validator, fallback):
         rows.append(counts(stage_id, label, (r.get(key) for r in nodes), validator, fallback))
@@ -108,7 +110,7 @@ def stage_summary(report, website_gate=None):
             items.append({'status': 'passed' if accepted else 'failed',
                           'reason': '必过网页/API或trace未全部通过；各站原因见下表'})
         else:
-            items.append({'status': 'skipped', 'reason': '国内TCP或3MB上传未通过，未进行网站检测'})
+            items.append({'status': 'skipped', 'reason': '国内TCP未通过，未进行网站检测' if modern else '国内TCP或3MB上传未通过，未进行网站检测'})
     api_tested = any('ChatGPTAPI' in (r.get('websites') or {}) for r in nodes)
     rows.append(counts('websites', '12站＋ChatGPT API＋必过trace' if api_tested else '12站＋Claude trace', items, passed, '未进行网站检测'))
     add('app_tls', '应用SSL', 'app_tls', app_tls.passed, '必过网站未通过，未进行应用SSL检查')
@@ -133,6 +135,12 @@ def stage_summary(report, website_gate=None):
                            samples, lambda x, url=url: high_speed.sample_passed(x, url), '1MB未通过，未进行100MB下载'))
     add('high', '双100MB下载（高速组）', 'high_speed_download', high_speed.passed, '未完成双目标100MB检测')
     add('upload', '两轮上行及上传中204', 'upload', upload_speed.passed, '未进入合格候选池，未进行两轮上行检测')
+    if modern:
+        rows.append(counts('upload_observation', '上行观测完整性（非速度门槛）',
+            ({'status': 'passed' if qp.upload_observed(r) else 'failed' if r.get('upload') else 'skipped',
+              'reason': '观测缺失或TLS异常；普通测速失败不等于淘汰'} for r in nodes), passed, '上行未测'))
+        add('application_resources', '应用资源诊断（仅观察）', 'application_quality',
+            lambda x: x.get('status') == 'diagnostic_only', '前置网站或应用SSL未通过')
     for index in range(upload_speed.ROUNDS):
         samples = []
         for record in nodes:
@@ -141,7 +149,7 @@ def stage_summary(report, website_gate=None):
         rows.append(counts(f'upload_{index + 1}', f'5MB上行第{index + 1}轮', samples,
                            upload_speed.sample_passed, '未进入合格池，未执行该轮5MB上传'))
     add('post_upload_tls', '上传后SSL', 'post_upload_tls', app_tls.passed, '未进行两轮上行，未进行上传后SSL检查')
-    add('stability', '持续并行稳定性', 'stability', stability.passed, '国内TCP或3MB上行未通过，未开始观察')
+    add('stability', '持续并行稳定性', 'stability', stability.passed, '国内TCP未通过，未开始观察' if modern else '国内TCP或3MB上行未通过，未开始观察')
     exits, types, reputations = [], [], []
     for record in nodes:
         exit_info = record.get('exit') or {}
@@ -178,6 +186,8 @@ def stage_table(report, website_gate=None):
         rows.append(f'| {stage["label"]} | {stage["measured"]} | {stage["passed"]} | {stage["failed"]} | '
                     f'{stage["unverified"]} | {stage["skipped"]} | {cell(reason)} |')
     rows += ['', '未验证与真实失败分开；未测不计失败。TCP不适用于UDP，未提交的TCP探测列为跳过。FAST、5MB与100MB用于补测或分组，普通失败不等于综合池淘汰。稳定性独立并行，阶段计数不能相加。详细原因计数保存在最新检测JSON，逐次原始请求在本次Actions附件。', '']
+    if (report.get('selection_policy') or {}).get('version') == qp.VERSION:
+        rows += ['3MB及两轮5MB上行的“未通过”表示速度或负载表现未达原测速标准，不直接淘汰普通节点；最终需观测完整、TLS合格且持续稳定性达标。应用资源诊断的“通过”只表示检查已执行，实际资源结果另行汇总。', '']
     return rows
 
 

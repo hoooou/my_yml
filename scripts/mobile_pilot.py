@@ -3,6 +3,7 @@
 import argparse
 import concurrent.futures as futures
 import copy
+from contextlib import nullcontext
 import ipaddress
 import html
 import json
@@ -349,9 +350,9 @@ def website_headers(label):
     return headers
 
 
-def check_site(port, label, url, timeout=(3, 2), request_headers=None):
+def check_site(port, label, url, timeout=(3, 2), request_headers=None, client=None):
     sample_limit = PAGE_SAMPLE_LIMITS.get(label, PAGE_SAMPLE_BYTES)
-    with s.session() as client:
+    with (s.session() if client is None else nullcontext(client)) as client:
         if port is not None:
             client.proxies = {'http': f'http://127.0.0.1:{port}', 'https': f'http://127.0.0.1:{port}'}
         try:

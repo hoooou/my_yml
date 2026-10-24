@@ -31,11 +31,11 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 | 分组 | 条件与用途 |
 |---|---|
 | 🚀 全局选择 | 选择使用哪类节点；默认综合优选 |
-| ⭐ 综合优选 | 完整通过入口、网站/API、应用SSL、1MB、上传和稳定性门槛，按响应与稳定性排序 |
+| ⭐ 综合优选 | 入口、逐站可达、应用SSL及1MB通过，持续稳定性≥90%；综合组取本轮≥99%（不足时取最高成功率档）且结束已恢复的节点，多轮历史不稳者不进综合组 |
 | 🚄 中速下载 | 已入选合格池内完整通过5MB快测的节点，包含台湾／新加坡地区池 |
 | ⚡ 高速下载 | 综合合格池内Cloudflare和DataPacket双100MB都完整通过；取较慢一次速度排序 |
 | 🏠 非机房 IP | 综合合格池内明确hosting=false、没有已发现的出口矛盾；按独立出口IP去重 |
-| 🌏 台湾／新加坡 | trace确认TW/SG，网页响应允许稍慢；入口、必过网站/API、SSL、1MB、上传和稳定性仍须通过 |
+| 🌏 台湾／新加坡 | trace确认TW/SG；入口、必过网站/API、SSL、1MB和稳定性仍须通过，上传速度用于分级 |
 | 🍓 小草莓（免测） | 用户指定订阅在最终生成时追加，保留原名称；独立select手动分组，不测速、不淘汰、不进入各优选组 |
 
 香港整体最多30个，非香港不限数量；公共订阅输入节点仍按阶段接受检测。中速／高速组保留所有满足对应条件的已入选节点，不另外取前30。组间可重叠，数量不能相加；空组显示REJECT，不用失败节点补足。TCP通／不通／未验证、全部节点、按地区选择等诊断组已移除。淘汰节点的定义和凭据不写入订阅。
@@ -55,34 +55,46 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 | 0 | 来源获取／去重／配置解析 | 原配置11个来源加6个新增来源；按完整连接配置去重，不合并不同凭据或传输参数。剔除不支持或含非法控制字符的节点 |
 | 1 | 双HTTPS 204各三轮 | Google `https://connectivitycheck.gstatic.com/generate_204`及Cloudflare `https://cp.cloudflare.com/generate_204`，交替顺序，各三次无正文204、严格TLS；两者全部通过才进入国内TCP。任一失败跳过后续入口检测；报告分别列两个目标和联合门槛，节点名称延迟仍取Google请求 |
 | 2 | 国内入口TCPing | 小小API，一入口一次，共享入口去重；四片总请求约≤5次/秒。明确连接失败淘汰，接口异常保持未验证；UDP不适用TCP，正式流程不凭云端204放行 |
-| 3 | 3MB上行预检 | `https://speed.cloudflare.com/__up?bytes=3000000`，随机合成3,000,000字节、6秒完整HTTP请求预算；严格证书校验。每片同时一个，与同片下载互斥；失败跳过网站及下载 |
+| 3 | 3MB上行预检 | `https://speed.cloudflare.com/__up?bytes=3000000`，随机合成3,000,000字节、6秒完整HTTP请求预算，严格证书校验；每片同时一个。速度不达标继续网站及观察，TLS异常仍淘汰 |
 | 4 | 海外网页／API／trace | 25个海外页面及ChatGPT API各三轮，两个trace单轮；每节点最多5个请求并发。指定必过目标见下文；任何网站／API／trace出现TLS异常（含非必过网站）均淘汰，普通连接超时按既有规则处理 |
-| 5 | 应用SSL | chatgpt.com、android.chat.openai.com、auth.openai.com、cdn.oaistatic.com各两次独立TLS，单次5秒、TLS≥1.2，信任链、域名、有效期必须正常 |
+| 5 | 应用SSL | chatgpt.com、android.chat.openai.com、auth.openai.com、cdn.oaistatic.com各至少两次成功独立TLS；仅一次普通连接失败可补测一次。单次5秒、TLS≥1.2，信任链、域名、有效期必须正常 |
 | 6 | Cloudflare 1MB快测 | `https://speed.cloudflare.com/__down?bytes=1000000`，6秒内完整接收；所有入选节点必过 |
 | 补充 | FAST API／Netflix CDN | 1MB通过后通过urlCount=3取得最多三个不同CDN主机，依次各下载1MB、各限6秒。普通失败只报告；明确证书错误淘汰 |
 | 7 | Cloudflare 5MB快测 | `https://speed.cloudflare.com/__down?bytes=5000000`，10秒完整接收，每片最多4个并发；通过才进中速组，失败仍可继续100MB |
 | 8a | Cloudflare 100MB | `https://speed.cloudflare.com/__down?bytes=100000000`，20秒完整接收，带Referer: https://speed.cloudflare.com/ |
 | 8b | DataPacket 100MB | `http://hkg.download.datapacket.com/100mb.bin`，20秒完整接收；同节点两目标顺序测试，首轮失败也测第二轮，每片最多2节点同时测。两目标都过才进高速组 |
-| 9 | 最终上行及负载 | 复用3MB预检，再对Cloudflare上传5MB两轮、各10秒、间隔20秒，取较慢速度；上传中204均须通过 |
+| 9 | 最终上行及负载 | 复用3MB预检，再对Cloudflare上传5MB两轮、各10秒、间隔20秒；预检速度失败也完成两轮。速率、重复一致性及上传中204用于分级，TLS异常仍淘汰 |
 | 10 | 上传后SSL | 四个应用域名再次各两轮严格TLS检查 |
-| 并行 | 持续稳定性 | TCP及3MB通过后独立观察；每节点每轮结束后随机等待3～10秒再检查，不重叠、不限定20轮，每片最多8节点；并发排队可能延后实际检查时间；持续到网站／下载／上传／上传后SSL结束，再完成每节点一轮 |
+| 并行 | 持续稳定性 | TCP通过后独立观察，3MB预检不阻挡观察；每轮结束随机等待3～10秒，不重叠、不限定20轮，每节点至少10分钟，每片最多8节点；排队可能延后实际间隔。持续到主流程结束，再补每节点一轮且满足最短观察时长 |
 | 11 | 合并／分组／配置校验 | 核对同轮、所有分片和节点覆盖、各项原始证据及轮数；缺片、漏测、对照异常拒绝更新订阅。最终Mihomo校验通过才发布配置 |
 
 204和网站的响应时间、trace、完整上下行以及证书证据分别判断，不能相互替代。上行6秒包含建连与响应，3MB对应约4Mbps端到端采样下限；客户端完整提交且预期HTTP响应正常，不是逐字节服务器收据。下载要求HTTP200、正确目标／类型／声明长度、无压缩／跳转及完整字节数；半截下载不能当作通过。小文件速度包含握手和首字节等待，不是持续峰值带宽。[Cloudflare官方测速引擎](https://github.com/cloudflare/speedtest)
 
 稳定性成功率≥90%，排名考虑成功率、最长连续失败、每站成功请求P95／P99、四分位距和上下行表现。失败通过成功率单独处罚，不混入延迟分位数；小样本P99接近最大值，仅作参考。明确证书校验错误始终淘汰，不因偶尔恢复抹去失败，也不要求ChatGPT trace出口IP固定。旧五轮全过／额外最大延迟硬门槛已被此方案替代；不能把旧记录追认为新的持续采样。
 
-综合池Google／YouTube三轮中位耗时≤1.5秒、最慢≤3秒、极差≤1.5秒；台湾／新加坡对应3／5／3秒，其余必过项相同。覆盖要求至少半数海外目标可达，CF／Reddit确认例外可以计入覆盖，真实响应速度只用正常页面。一般5MB／100MB失败不淘汰综合池，只有对应下载组要求更严格。
+新版Google／YouTube成功响应耗时用于排序，不再额外叠加1.5/3/1.5秒硬门槛；请求本身仍有有界超时，各地区都不放宽证书和逐站可达要求。CF／Reddit确认例外可以认可可达，真实响应速度只用正常页面。5MB／100MB失败不淘汰普通池，只影响对应下载分组。
+
+### 稳定性优先策略（第2版）
+
+3MB/6秒与两轮5MB上行继续实测，速度不决定普通节点资格；全部大样本上传未完成时补一次64KB/6秒请求，确认基本上行可用，不能放行完全无法提交数据的节点。1MB基础下载仍必过，5MB/双100MB继续决定下载分组。新版下载使用curl总时限，取消独立1秒读取超时；完整字节、目标、类型和严格TLS要求保留。
+
+持续观察第5版从国内TCP通过后启动，每节点至少10分钟，不以20轮为上限。每轮独立请求Google204、Google、YouTube、ChatGPT trace及Android TLS，另通过节点独占的HTTPS连接池请求Google204；前置失败不跳过其他目标。连接池可能重建连接，不声称保持一条始终不断开的TCP连接，也不模拟登录会话。成功轮次是多个请求的联合结果，请求成功/失败另记；排名考虑成功率、连续失败、恢复耗时、历史表现、每站P95和波动。少于100个成功样本不展示P99。
+
+利用现有每6小时（北京时间05/11/17/23点）运行积累近7天精简记录，按完整连接参数识别节点；旧版测量、仅重建或修复发布不增加新观测。记录样本数、时长、昼夜P95及变化；没有晚间或跨日证据标为待积累，不把云端成绩称为本地移动网络成绩。普通节点保留线仍为90%；综合组优先99%及以上且结束已恢复的节点，不足99%时只取本轮最高成功率档；至少两轮历史且历史成功率不足99%或入口曾失败的节点不进入综合组。下载组仍可保留满足基本资格的节点，不新增诊断分组。
+
+新增YouTube页面实际JS/CSS/图片资源诊断和ChatGPT API响应完整性检查。普通资源失败先观察，不作为未经对照验证的新淘汰项，任何TLS异常仍淘汰；未测试真实视频或登录后对话。
+
+另从原始公共节点提取HTTP(S)/SOCKS上游候选，放在Actions的edgetunnel-candidates附件（1天）；不受国内TCP门槛影响、不混入免测来源、不写进现有订阅、不冒充原生ProxyIP。尚无实际Worker链路证据，这部分标为未验证。
 
 ### 网站、API及访问限制
 
-逐站必过三轮：Google、YouTube、ChatGPT、Gemini、GitHub、Wikipedia、Reddit、X、Instagram、Telegram、Discord、Facebook、ChatGPT API。Claude首页不测试，只要求`https://claude.ai/cdn-cgi/trace`单轮；ChatGPT trace为`https://chatgpt.com/cdn-cgi/trace`。trace要求预期HTTPS主机、公网IP及地区结构正确，只说明该接口可达。
+逐站均需通过（三轮至少两次认可可达，余下一次只能是普通连接失败）：Google、YouTube、ChatGPT、Gemini、GitHub、Wikipedia、Reddit、X、Instagram、Telegram、Discord、Facebook、ChatGPT API。Claude首页不测试，只要求`https://claude.ai/cdn-cgi/trace`；ChatGPT trace为`https://chatgpt.com/cdn-cgi/trace`。trace首次普通连接失败允许复测一次且必须成功，仍要求预期HTTPS主机、公网IP及地区结构，只说明接口可达。
 
 其他页面：Amazon、Bing、Cursor、Disney+、Hugging Face、Netflix、Perplexity、Spotify、Stack Overflow、Steam、TikTok、Twitch、WhatsApp。它们参与覆盖／质量和证书检查，但单站失败不是独立的必过淘汰条件。TikTok保持首页原逻辑；`/cdn-cgi/trace`经云端验证均跳到/404，因此未接入。抖音和普通国产网页不参加每日逐节点测试；国产应用走DIRECT，经海外节点访问国产网站的成绩不能代表手机直连体验。检测与分流共用`site_catalog.py`清单，范围参考[EDT](https://edt-pages.github.io/admin/)。
 
 正常网页要求正确HTTPS主机、200、HTML及站点特征；首响应预算3秒、正文采样总预算5秒。一般正文上限16KiB，Amazon64KiB；Reddit 401/403可读取至512KiB以定位可见登录提示。使用桌面Chrome兼容请求头，不固定Bot UA；普通HTTPS跳转最多两次，限制到入口域名及对应www／非www；Gemini可有限经过Google /sorry/index后返回正常Gemini页面，最多四次，最终请求首响应仍≤3秒、累计总耗时≤5秒，不把302本身记为通过。
 
-明确的Cloudflare人机验证在所有已测网页上认可可达，依据预期HTTPS主机和`cf-mitigated: challenge`等已确认信号；普通403、server=cloudflare或脚本中出现captcha都不足以放行。Reddit明确要求登录也认可可达，保留原401/403及可见证据，不把普通安全拒绝误当登录提示。三轮不得混入真实失败或超时；这两类例外不算正常页面速度、登录／对话／播放成功。[Cloudflare验证页说明](https://developers.cloudflare.com/cloudflare-challenges/challenge-types/challenge-pages/detect-response/)
+明确的Cloudflare人机验证在所有已测网页上认可可达，依据预期HTTPS主机和`cf-mitigated: challenge`等已确认信号；普通403、server=cloudflare或脚本中出现captcha都不足以放行。Reddit明确要求登录也认可可达，保留原401/403及可见证据，不把普通安全拒绝误当登录提示。新版三轮只允许一次普通连接失败，另外两次必须认可可达；HTTP拦截、错误内容或TLS异常不能使用该例外。人机验证和登录提示不算正常页面速度、登录／对话／播放成功。[Cloudflare验证页说明](https://developers.cloudflare.com/cloudflare-challenges/challenge-types/challenge-pages/detect-response/)
 
 ChatGPT API：`https://api.openai.com/compliance/cookie_requirements`。要求预期地址、HTTP200、JSON且cookie_consent_required为布尔值、无实际error；unsupported_country记录地区限制。这个接口不是ChatGPT会话检测，缺少地区错误也不能直接算通过。认证错误、跳转、结构变化、接口失效、超时、证书错误分别保存；解析规则不能仅从任意同名字段、country或最后HTTP200推断解锁。
 
@@ -132,7 +144,7 @@ Google Play包括com.android.vending、com.google.android.gms、com.google.andro
 |---|---|
 | 每日节点连通性分类 / full | 每6小时或手动重新获取所有来源；四片前置、四片网站／下载、独立持续观察及最终上传、合并发布 |
 | repair | 按已有原始证据重建规则／分组；不是全量重测，不伪造新时间或旧下载轮数 |
-| web／medium／stability／uplink-recheck | 已发布池相应专项复测，保留其他项原测量；独立稳定性／上行复测用5分钟观察窗口 |
+| web／medium／stability／uplink-recheck | 已发布池相应专项复测，保留其他项原测量；新版独立稳定性至少观察10分钟 |
 | publish-retry | 复用指定完整且仍可取得的同轮存档恢复发布，不重新测速，不复用不同节点原始记录 |
 | 补充服务小样本验证 | 最多4个当前节点、前后直连对照，验证ChatGPT API／FAST，不发布订阅 |
 | 其他只读诊断 | Claude、网站、上传、持续稳定性、已发布节点、异常阶段以及Hysteria2；不改变订阅 |
@@ -179,7 +191,7 @@ Hysteria2只读诊断使用在线且有UDP能力的国内探测点，DNS正对�
 
 借鉴服务独立超时、有限并发、结构化证据和响应地址；不采用“403就是未解锁”“某地区字段就是解锁”“关闭SSL校验”“接口失败退回首页country就算成功”等乐观判定。参考版ChatGPT地区错误识别不足、FAST误当流媒体播放、Disney+递归找字段／地区回退、Netflix固定视频ID容易失效；这些都不能证明付费内容播放或登录后的完整会话。[参考实现](https://github.com/clash-verge-rev/clash-verge-rev/tree/27efaf3/crates/clash-verge-media-unlock)、[Netflix VPN说明](https://help.netflix.com/en/node/114701/)、[Requests证书验证](https://requests.readthedocs.io/en/stable/user/advanced/#ssl-cert-verification)
 
-尚未实施：动态解析YouTube脚本／图片／视频资源与真实播放、登录后ChatGPT对话、账号或付费内容授权、跨日7天稳定评分、额外国内TCP间隔复测、晚间核心复测、完整国内HY2认证。旧六轮／五轮全过建议、50MB下载和1MB上传前置已被当前流程替换。任何扩展应先小样本／对照，不把检测器失效变成批量淘汰。
+尚未实施：YouTube真实视频播放、登录后ChatGPT对话、账号或付费内容授权、额外国内TCP间隔复测、独立晚间加测、实际Worker链路验收、完整国内HY2认证。YouTube静态资源与7天历史已接入，新版数据从实际运行开始积累。旧六轮／五轮全过、50MB下载和1MB上传前置已被替换；新端点先诊断，不把检测器失效变成批量淘汰。
 
 GitHub测量代表云端到节点再到网站的路径；国内TCP只补入口可达，不等于手机中国移动的上行／下行／首字节。短时高分不保证全天稳定，住宅／纯净度不替代性能。手机校准可固定8–12个节点，在同网络对Google／YouTube做三次并晚间复查，记录短名、时间与恢复情况；不用一次恢复抹去本轮失败，不开启自动切换来掩盖问题。
 

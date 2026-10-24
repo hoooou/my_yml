@@ -46,7 +46,7 @@ def batch_candidates(report, bundle):
     for row in report['nodes']:
         node = mapping.get(row['id'])
         result = row.get('stability') or {}
-        if not node or not (cs.valid_evidence(result) if result.get('version') in (2, 3, cs.VERSION)
+        if not node or not (cs.valid_evidence(result) if result.get('version') in cs.VERSIONS
                             else len(result.get('attempts', [])) == st.ROUNDS):
             continue
         if node['type'] == 'http' and not st.passed(result):

@@ -11,6 +11,7 @@ import stability
 import continuous_stability as cs
 import upload_speed
 import service_probes
+import quality_policy as qp
 from mobile_pilot import confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 
@@ -18,9 +19,12 @@ def website_access_summary(nodes):
     """Count affected nodes, never confuse three attempts with three nodes."""
     labels = {label for row in nodes for label in (row.get('websites') or {}) if label != 'Google204'}
     result = {}
+    modern = any(qp.modern(r) for r in nodes)
     for label in sorted(labels):
         stats = dict.fromkeys(('measured', 'accepted', 'cloudflare_challenge', 'login_required', 'restricted',
                               'transport_error', 'http_error', 'page_or_speed_error', 'unmeasured'), 0)
+        if modern:
+            stats.update(tls_error=0, recovered_transport=0, timeout_error=0)
         for row in nodes:
             item = (row.get('websites') or {}).get(label) or {}
             if item.get('status', 'missing') in ('missing', 'skipped', 'unknown', 'not_candidate'):
@@ -33,7 +37,13 @@ def website_access_summary(nodes):
             accepted = item.get('status') == 'passed' or (
                 item.get('status') in ('verification_required', 'login_required')
                 and all(x.get('status') == 'passed' or confirmed_page_exception(label, x) for x in attempts))
+            if qp.modern(row):
+                accepted = qp.accepted(label, item, confirmed_page_exception, trace=label.endswith('Trace'))
             stats['accepted'] += accepted
+            if modern:
+                stats['tls_error'] += any(qp.tls_errors(x) for x in attempts)
+                stats['recovered_transport'] += accepted and any(qp.transient(x) for x in attempts)
+                stats['timeout_error'] += any(x.get('error_type') in ('ReadTimeout', 'ConnectTimeout', 'Timeout', 'timeout') for x in attempts)
             stats['cloudflare_challenge'] += any(cf)
             stats['login_required'] += any(x.get('status') == 'login_required' and confirmed_reddit_login(label, x) for x in attempts)
             stats['restricted'] += any(x.get('status') in ('needs_review', 'verification_required', 'login_required')
@@ -61,6 +71,8 @@ def website_access_table(nodes, required=()):
                     ' | '.join(str(item[k]) for k in ('measured', 'accepted', 'cloudflare_challenge', 'login_required',
                         'restricted', 'transport_error', 'http_error', 'page_or_speed_error')) + ' |')
     rows += ['', '数量按涉及节点计算，同一节点三轮中重复失败只计一个。通过包含已确认的Cloudflare人机验证及Reddit明确登录提示；没有这两类证据的普通403、429或跳转列入其他拦截／跳转，不能当作线路断开。异常原因列可能重叠，不相加。未测节点不算失败；完整数量见JSON的website_access_summary。', '']
+    if any(qp.modern(r) for r in nodes):
+        rows += ['新版逐站通过允许一次普通连接失败且另外两次认可可达；已恢复的超时仍保留在异常计数。TLS、超时和恢复通过数量在JSON分别记录，任何TLS异常都不放行。', '']
     anomalies = [label for label, x in counts.items() if label in required and x['measured'] >= 10 and not x['accepted']]
     if anomalies:
         rows += ['**必过站全失败，需检查检测器和服务响应：' + '、'.join(sorted(anomalies)) + '。** 不据此断言所有节点线路失效；保留原始结果，未自动放宽筛选。', '']
@@ -165,7 +177,7 @@ def upload_failure(row):
 
 def stability_details(nodes):
     """Explain the latest real rounds without trusting cached pass counts."""
-    continuous = [r['stability'] for r in nodes if (r.get('stability') or {}).get('version') in (2, 3, cs.VERSION)]
+    continuous = [r['stability'] for r in nodes if (r.get('stability') or {}).get('version') in cs.VERSIONS]
     if continuous:
         stats = [cs.metrics(x) for x in continuous]
         good = sum(stability.passed(x) for x in continuous)
@@ -203,7 +215,7 @@ def stability_details(nodes):
 
 def write_report(report, config, path, candidate=False, website_gate=None):
     nodes = report.get('nodes', [])
-    continuous = (report.get('stability_policy') or {}).get('version') in (2, 3, cs.VERSION) or any((r.get('stability') or {}).get('version') in (2, 3, cs.VERSION) for r in nodes)
+    continuous = (report.get('stability_policy') or {}).get('version') in cs.VERSIONS or any((r.get('stability') or {}).get('version') in cs.VERSIONS for r in nodes)
     policy = report.get('stability_policy') or stability.settings(nodes)
     interval = policy.get('minimum_start_interval_seconds', 15)
     minimum_rounds = policy.get('minimum_rounds')
@@ -268,7 +280,10 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '|---|---:|---:|---:|---:|---|---|']
     if continuous:
         rows[-2] = '| 节点 | P95 / P99 / 波动 ms | 下行 Mbps / 样本 | 上行 Mbps | 上传中204 | SSL | 成功轮数 / 成功率 |'
-    for row in selected:
+    modern = (report.get('selection_policy') or {}).get('version') == qp.VERSION
+    if modern:
+        h = report.get('quality_history_summary') or {}
+    for row in selected[:10] if modern else selected:
         stable = row.get('stability') or {}
         good_stable = stability.passed(stable)
         metrics = stability.core_metrics(stable) if good_stable else {}
@@ -276,16 +291,26 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         jitter = max((x['jitter_ms'] for x in metrics.values()), default=None)
         upload = row.get('upload') or {}
         good_upload = upload_speed.passed(upload)
+        upload_value = upload.get('observed_speed_mbps') if qp.modern(row) else upload.get('speed_mbps') if good_upload else None
         probes = [p for a in upload.get('attempts', []) for p in a.get('loaded_204', [])]
-        success = cs.metrics(stable) if stable.get('version') in (2, 3, cs.VERSION) else {}
+        success = cs.metrics(stable) if stable.get('version') in cs.VERSIONS else {}
         stability_text = (f'{success["passed_count"]}/{success["round_count"]} / {success["success_rate"]:.1%}' if success and good_stable else '5/5' if good_stable else '未验证／需复核')
-        delay_text = (f'{number(max((x["p95_ms"] for x in metrics.values()), default=None))} / {number(max((x["p99_ms"] for x in metrics.values()), default=None))} / {number(jitter)}' if continuous else f'{number(latency)} / {number(jitter)}')
+        delay_text = (f'{number(max((x["p95_ms"] for x in metrics.values()), default=None))} / {number(max((x["p99_ms"] for x in metrics.values() if x.get("p99_ms") is not None), default=None))} / {number(jitter)}' if continuous else f'{number(latency)} / {number(jitter)}')
         rows.append(f'| {cell(row["name"].split("|")[0])} | {delay_text} | '
-            f'{download(row)} | {number(upload.get("speed_mbps"), 1) if good_upload else "—"} | '
+            f'{download(row)} | {number(upload_value, 1)} | '
             f'{sum(p.get("status") == "passed" for p in probes)}/{len(probes)} | '
             f'{"通过" if ssl_passed(row) else "未验证／需复核"} | {stability_text} |')
     if not selected:
         rows.append('| 本轮没有入选节点 | — | — | — | — | — | — |')
+    if modern:
+        rows += ['', f'仅展示排名靠前的最多10个节点，实际经测入选{len(selected)}个；上传速度未达标不等于普通节点淘汰。',
+            f'近7天观察：跨日且覆盖昼夜的节点{h.get("multi_period_nodes", 0)}个，证据待积累{h.get("provisional_nodes", 0)}个；晚间有观测{h.get("peak_observed_nodes", 0)}个。首次执行不能声称已验证多天稳定。', '']
+        change = report.get('quality_change') or {}
+        if change.get('available'):
+            differences = change['differences']
+            rows += [f'相比上一轮：观察节点{differences["observed_nodes"]:+d}，稳定性通过{differences["passed_observations"]:+d}，结束仍未恢复{differences["unrecovered_nodes"]:+d}，跨时段证据充分{differences["multi_period_nodes"]:+d}。', '']
+        else:
+            rows += ['尚无同口径的上一轮结果，本轮作为稳定性新策略的起点。', '']
     explanation = ('P95／P99取Google／YouTube各自成功请求统计中较慢的一站，波动为较大的四分位距；失败由成功率和连续失败次数单独计入排名。成功样本较少时P99接近最大值，仅作参考；每站样本数见JSON。' if continuous else '延迟取最终五轮Google／YouTube中较慢的中位数，波动取较大的极差。')
     rows += ['', explanation + '下行优先双100MB较低速度，上行取两轮5MB较低速度；名称延迟仍用中位数。', '']
     excluded = [r for r in cohort if r['id'] not in selected_ids]
@@ -308,7 +333,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         from latest_report import stage_table
         rows += stage_table(report, website_gate)
         if continuous:
-            rows += ['', '稳定性在国内TCP与3MB上传通过后独立并行检测，覆盖范围大于后续下载、上行复测；持续检测行不是最后一道串行统计。']
+            rows += ['', '稳定性在国内TCP通过后独立并行检测，至少观察10分钟；3MB上行速度不阻挡观察。持续检测行不是最后一道串行统计。' if modern else '稳定性在国内TCP与3MB上传通过后独立并行检测，覆盖范围大于后续下载、上行复测；持续检测行不是最后一道串行统计。']
         rows += ['', '各阶段仅检测满足前置条件的候选；同一节点可能在多项中失败，不能把失败数相加。逐网站及逐节点失败明细保存在JSON。', '']
         rows += stability_details(nodes)
     policy = report.get('website_measurement_policy') or {}
@@ -316,6 +341,22 @@ def write_report(report, config, path, candidate=False, website_gate=None):
     required_targets.update(policy.get('required_traces', report.get('required_traces', [])))
     rows += website_access_table(nodes if mode == 'full' else cohort, required_targets)
     rows += service_checks_table(nodes if mode == 'full' else cohort)
+    if modern:
+        app_checks = [r['application_quality'] for r in nodes if r.get('application_quality')]
+        resources = [p for item in app_checks for p in item.get('youtube_resources', [])]
+        rows += ['', f'YouTube资源诊断：检查{len(app_checks)}个节点，发现并请求{len(resources)}个资源，响应通过{sum(p.get("status") == "passed" for p in resources)}次；未发现资源记未测。普通资源失败暂不作为新增淘汰条件，TLS异常仍淘汰；未验证真实视频播放或登录后ChatGPT对话。', '']
+    if modern:
+        observed = [r['stability'] for r in nodes if (r.get('stability') or {}).get('version') == cs.VERSION]
+        if observed:
+            counts = {'100%': 0, '99%～100%': 0, '95%～99%': 0, '90%～95%': 0, '<90%': 0}
+            stats = [cs.metrics(x) for x in observed]
+            for x in stats:
+                rate = x['success_rate']
+                counts['100%' if rate == 1 else '99%～100%' if rate >= .99 else '95%～99%' if rate >= .95 else '90%～95%' if rate >= .9 else '<90%'] += 1
+            rows += ['', '## 稳定性分布', '', '| 成功率区间 | 节点数 |', '|---|---:|']
+            rows += [f'| {label} | {count} |' for label, count in counts.items()]
+            rows += ['', f'持续轮次为多个新连接、应用TLS和连接池请求的联合结果；请求数合计{sum(x["request_count"] for x in stats)}，连接池请求失败{sum(x["reused_request_count"]-x["reused_success_count"] for x in stats)}。',
+                f'末尾尚未恢复{sum(x["unrecovered_at_end"] for x in stats)}个节点；最长连续失败{max(x["maximum_consecutive_failures"] for x in stats)}轮。失败不混入成功响应P95，样本少于100不展示P99。', '']
     if 'Reddit' in required_targets and not (policy.get('confirmed_reddit_login_prompt') or report.get('confirmed_reddit_login_prompt')):
         rows += ['Reddit明确登录提示已改为认可通过；本表沿用旧版短正文采样，没有相应证据的旧403不会批量追认，下一轮全量按新规则实际检测。', '']
     if mode != 'full' and any(r.get('websites') for r in cohort):
@@ -333,6 +374,16 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '| 9 | 上行及负载 | 复用本轮3MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',
              '| 10 | 负载后SSL | 再检查四个应用域名，各两次 |',
              (f'| 并行 | 持续稳定性 | TCP与3MB上传通过即启动独立观察；{"每节点至少" + str(minimum_rounds) + "轮" if minimum_rounds else "不设固定轮数"}，{interval_text}，成功率≥90%；持续到两轮上行及负载后SSL结束，再补每节点一轮；明确证书错误淘汰 |' if continuous else '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |'), '']
+    if modern:
+        replacements = {'失败跳过网站和下载': '速度失败只记分级，不阻挡网站和观察',
+            '上传中204全部通过': '上传中204记录负载表现，普通波动纳入分级',
+            'TCP与3MB上传通过即启动独立观察': 'TCP通过即启动独立观察，至少10分钟',
+            '指定12站及ChatGPT API各三轮；必过trace单轮': '指定12站及ChatGPT API各三轮，允许一次恢复的普通连接失败；trace失败可复测一次',
+            '各三轮全部通过': '各三轮全部通过',
+            '四个域名各两次，严格校验证书链、域名和有效期': '四域名至少两次成功握手，仅一次普通超时可补测；TLS异常不放行'}
+        rows = [line for line in rows]
+        for old, new in replacements.items():
+            rows = [line.replace(old, new) for line in rows]
     required = (report.get('website_measurement_policy') or {}).get('required_websites', report.get('required_websites', []))
     if required:
         rows += ['必过网站：' + '、'.join(required) + '。明确的Cloudflare人机验证及Reddit明确登录提示认可可达，但不当作真实页面速度；任何已检测网站出现明确证书校验错误均不放行。', '']

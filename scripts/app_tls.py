@@ -80,28 +80,39 @@ def probe(port, hostname, context=None):
     return result
 
 
-def check(port):
+def check(port, retry_transient=False):
     def measure(hostname):
         attempts = [probe(port, hostname) for _ in range(ROUNDS)]
-        return hostname, {'status': 'passed' if all(r['status'] == 'passed' for r in attempts) else 'failed',
-                          'round_count': ROUNDS, 'attempts': attempts}
+        if retry_transient and sum(r['status'] == 'passed' for r in attempts) == 1 and any(
+                r.get('error_type') in ('timeout', 'connection_or_protocol_failed') for r in attempts):
+            attempts.append(probe(port, hostname))
+        accepted = sum(r['status'] == 'passed' for r in attempts) >= ROUNDS and all(
+            r['status'] == 'passed' or r.get('error_type') in ('timeout', 'connection_or_protocol_failed') for r in attempts)
+        return hostname, {'status': 'passed' if accepted else 'failed',
+                          'round_count': len(attempts), 'attempts': attempts}
     with futures.ThreadPoolExecutor(max_workers=2) as pool:
         targets = dict(pool.map(measure, TARGETS))
-    result = {'version': VERSION, 'status': 'passed' if all(r['status'] == 'passed' for r in targets.values())
+    result = {'version': 2 if retry_transient else VERSION, 'status': 'passed' if all(r['status'] == 'passed' for r in targets.values())
               else 'failed', 'targets': targets}
     return result
 
 
 def passed(result):
     """Fail closed on old/missing, mismatched, unverified or incomplete evidence."""
-    if (not isinstance(result, dict) or result.get('version') != VERSION or result.get('status') != 'passed'
+    if (not isinstance(result, dict) or result.get('version') not in (VERSION, 2) or result.get('status') != 'passed'
             or set(result.get('targets') or {}) != set(TARGETS)):
         return False
     for hostname, item in result['targets'].items():
         attempts = item.get('attempts') or []
-        if item.get('status') != 'passed' or item.get('round_count') != ROUNDS or len(attempts) != ROUNDS:
+        if (item.get('status') != 'passed' or item.get('round_count') != len(attempts)
+                or len(attempts) not in ((2, 3) if result['version'] == 2 else (2,))
+                or sum(a.get('status') == 'passed' for a in attempts) < ROUNDS):
             return False
         for attempt in attempts:
+            if (result['version'] == 2 and attempt.get('status') == 'failed'
+                    and attempt.get('hostname') == hostname
+                    and attempt.get('error_type') in ('timeout', 'connection_or_protocol_failed')):
+                continue
             elapsed = attempt.get('elapsed_ms')
             if (attempt.get('status') != 'passed' or attempt.get('hostname') != hostname
                     or any(attempt.get(k) is not True for k in
