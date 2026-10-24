@@ -7,8 +7,11 @@ def collect(nodes):
     for node in nodes:
         if node.get('type') not in ('http', 'socks5'):
             continue
+        # TLS-wrapped SOCKS is not an HTTPS CONNECT proxy supported by this adapter.
+        if node['type'] == 'socks5' and node.get('tls'):
+            continue
         candidates.append({'id': node['name'], 'node': copy.deepcopy(node),
-            'upstream_type': 'https' if node.get('tls') else node['type'],
+            'upstream_type': 'https' if node['type'] == 'http' and node.get('tls') else node['type'],
             'status': 'untested_worker_chain', 'native_proxyip': False,
             'custom_sni_requires_validation': bool(node.get('sni')),
             'upstream_certificate_validation_required': bool(node.get('tls'))})

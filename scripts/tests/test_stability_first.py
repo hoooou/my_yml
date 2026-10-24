@@ -262,8 +262,10 @@ class AppAndTransferTests(unittest.TestCase):
         self.assertEqual(result['status'], 'passed'); self.assertEqual(result['received_bytes'], 100)
 
     def test_edge_candidates_are_independent_of_domestic_gate_and_not_native_proxyips(self):
-        nodes = [{'name': 'n-a', 'type': 'http', 'tls': True}, {'name': 'n-b', 'type': 'socks5'}, {'name': 'n-c', 'type': 'vless'}]
+        nodes = [{'name': 'n-a', 'type': 'http', 'tls': True}, {'name': 'n-b', 'type': 'socks5'},
+                 {'name': 'n-c', 'type': 'vless'}, {'name': 'n-d', 'type': 'socks5', 'tls': True}]
         pool = edge_candidates.collect(nodes)
         self.assertEqual(pool['count'], 2); self.assertFalse(pool['worker_chain_tested'])
         self.assertTrue(all(not x['native_proxyip'] for x in pool['candidates']))
+        self.assertEqual([x['upstream_type'] for x in pool['candidates']], ['https', 'socks5'])
         self.assertNotIn('candidates', edge_candidates.summary(pool))
