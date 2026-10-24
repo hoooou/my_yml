@@ -28,6 +28,11 @@ import stability
 import continuous_stability
 import upload_speed
 import service_probes
+import quality_policy as qp
+import quality_history
+import transfer_probe
+import application_quality
+import edge_candidates
 from v2rayn_subscription import render_with_skips as render_v2rayn
 from untested_subscription import append_from_env as append_untested
 from bandwidth_gate import BandwidthGate
@@ -319,13 +324,22 @@ def high_speed_download(port):
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
                    site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
                    medium_download=None, upload_precheck=None, upload_controls=None,
-                   preflight_only=False, initial_records=None, service_check=None):
+                   preflight_only=False, initial_records=None, service_check=None, policy_version=None):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
+    modern = policy_version == qp.VERSION
+    if modern:
+        if download is quick_download:
+            download = lambda port: transfer_probe.download(port, DOWNLOAD_BYTES, DOWNLOAD_BUDGET)
+        if medium_download is medium_speed_download:
+            medium_download = lambda port: transfer_probe.download(port, medium_speed.BYTES, medium_speed.BUDGET)
+        if large_download is high_speed_download:
+            large_download = lambda port: high_speed.summarize([
+                transfer_probe.download(port, high_speed.BYTES, high_speed.BUDGET, url) for url in high_speed.URLS])
     upload_precheck = upload_precheck or (lambda port: upload_speed.sample(
         port, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET, root))
     controls = upload_controls if upload_controls is not None else {}
-    if initial_records is None:
+    if initial_records is None or modern:
         controls.update(before=None, after=None, valid=None, node_count=0)
     if not nodes:
         controls['valid'] = True
@@ -336,11 +350,12 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     if initial_records is not None and set(seed) != {n['name'] for n in nodes}:
         raise ValueError('前置记录存在缺失或多余节点')
     active = [n for n in nodes if initial_records is None or
-              (seed[n['name']]['entry']['status'] == 'passed' and upload_speed.sample_passed(
-                  seed[n['name']].get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET))]
+              (seed[n['name']]['entry']['status'] == 'passed' and (modern or upload_speed.sample_passed(
+                  seed[n['name']].get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)))]
     initial_endpoint_count = len({endpoint_key(n) for n in nodes if tcp_supported(n)
         and seed[n['name']]['precheck']['status'] == 'passed'}) if initial_records is not None else None
     if not active:
+        controls['valid'] = True
         return copy.deepcopy(initial_records), initial_endpoint_count
     listeners, ports = s.make_listeners({'id': n['name']} for n in active)
     pace, lock, tcp_jobs = Pace(interval), threading.Lock(), {}
@@ -366,6 +381,8 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 record = copy.deepcopy(seed[node['name']])
             else:
                 record['precheck'] = precheck(port)
+            if modern:
+                record['selection_policy_version'] = qp.VERSION
             if initial_records is None and record['precheck']['status'] == 'passed':
                 if not tcp_supported(node):
                     record['entry']['reason'] = 'UDP 协议不适用 TCP 检测，后续阶段未测'
@@ -376,7 +393,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             tcp_jobs[key] = tcp_pool.submit(probe, key, pace)
                         job = tcp_jobs[key]
                     record['entry'] = copy.deepcopy(job.result())
-                if record['entry']['status'] == 'passed':
+                if record['entry']['status'] == 'passed' and not modern:
                     with bandwidth.upload():
                         if controls['before'] is None:
                             controls['before'] = upload_precheck(None)
@@ -390,8 +407,17 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                     if not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                         record['download']['reason'] = 'TCP通过但3MB上行预检未通过，跳过网站和下载'
             if not preflight_only:
-                if record['entry']['status'] == 'passed' and upload_speed.sample_passed(
-                        record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+                if modern and record['entry']['status'] == 'passed':
+                    with bandwidth.upload():
+                        if controls['before'] is None:
+                            controls['before'] = upload_precheck(None)
+                        if not upload_speed.sample_passed(controls['before'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+                            raise RuntimeError('上行测量环境对照异常，保留原订阅')
+                        record['upload_precheck'] = upload_precheck(port)
+                        record['upload_precheck_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+                        controls['node_count'] += 1
+                if record['entry']['status'] == 'passed' and (modern or upload_speed.sample_passed(
+                        record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)):
                     rounds = [site_check(port)]
                     # Only traces get one round; overseas pages get three.
                     for _ in range(WEBSITE_ROUNDS - 1):
@@ -400,6 +426,12 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                     record['websites'] = summarize_rounds(rounds, labels=OVERSEAS_SITES)
                     record['websites'].update(summarize_rounds(rounds[:1],
                         labels=[label for label in DAILY_POST_SITES if label not in OVERSEAS_SITES]))
+                    if modern:
+                        for label in ('ChatGPTTrace', 'ClaudeTrace'):
+                            item = record['websites'].get(label) or {}
+                            if qp.transient((item.get('attempts') or [{}])[0]):
+                                attempts = item['attempts'] + [check_site(port, label, SITES[label])]
+                                record['websites'][label] = summarize_rounds([{label: a} for a in attempts], (label,))[label]
                     tls_sites = website_tls_failures(record)
                     record['website_tls'] = {'status': 'failed' if tls_sites else 'passed',
                         'sites': tls_sites, 'reason': '网站TLS异常：' + '、'.join(tls_sites) if tls_sites else '网站测试未出现TLS异常'}
@@ -417,8 +449,10 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         except (s.requests.RequestException, ValueError, KeyError):
                             record['exit_reason'] = '出口 IP/地区未确认'
                     if required_websites_passed(record) and not destination_tls_failure(record):
-                        record['app_tls'] = app_tls.check(port)
+                        record['app_tls'] = app_tls.check(port, **({'retry_transient': True} if modern else {}))
                         if app_tls.passed(record['app_tls']):
+                            if modern:
+                                record['application_quality'] = application_quality.check(port)
                             with bandwidth.download():
                                 record['download'] = download(port)
                             if record['download']['status'] == 'passed':
@@ -449,7 +483,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
             return record
         with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             records = list(pool.map(measure, nodes))
-        if initial_records is not None:
+        if initial_records is not None and not modern:
             return records, initial_endpoint_count
         if controls['node_count']:
             controls['after'] = upload_precheck(None)
@@ -458,10 +492,11 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 raise RuntimeError('上行预检结束直连对照异常，不据此淘汰或发布')
         else:
             controls['valid'] = True  # No TCP-qualified candidate needed an upload.
-    return records, len(tcp_jobs)
+    return records, initial_endpoint_count if initial_records is not None else len(tcp_jobs)
 
 
 def merge_shards(bundle, parts, count, preflight_only=False):
+    modern = bundle.get('selection_policy_version') == qp.VERSION
     if len(parts) != count or {p['index'] for p in parts} != set(range(count)):
         raise ValueError('缺少分片，拒绝发布')
     combined = {}
@@ -479,7 +514,7 @@ def merge_shards(bundle, parts, count, preflight_only=False):
         by_id = {r['id']: r for r in rows}
         if bundle.get('early_upload_precheck'):
             controls = part.get('upload_precheck_controls') or {}
-            tested = sum(r['entry']['status'] == 'passed' for r in rows)
+            tested = 0 if modern and preflight_only else sum(r['entry']['status'] == 'passed' for r in rows)
             if controls.get('valid') is not True or controls.get('node_count') != tested:
                 raise ValueError('上行预检缺少分片对照或检测计数不一致')
             if tested and not all(upload_speed.sample_passed(controls.get(k) or {},
@@ -490,6 +525,8 @@ def merge_shards(bundle, parts, count, preflight_only=False):
         if part['endpoint_count'] != len(eligible):
             raise ValueError('TCP 入口统计不完整')
         for record in rows:
+            if modern and not qp.modern(record):
+                raise ValueError('节点缺少本轮稳定性优先策略版本')
             node = definitions[record['id']]
             if bundle.get('parallel_observation') and any(record.get(key) != node[field] for key, field in (('server', 'server'), ('port', 'port'), ('protocol', 'type'))):
                 raise ValueError('节点与本轮定义不一致')
@@ -520,18 +557,18 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             early = record.get('upload_precheck') or {}
             uses_early = bundle.get('early_upload_precheck') or 'upload_precheck' in record
             if uses_early:
-                expected_status = ('passed', 'failed') if record['entry']['status'] == 'passed' else ('skipped',)
+                expected_status = ('passed', 'failed') if record['entry']['status'] == 'passed' and not (modern and preflight_only) else ('skipped',)
                 if early.get('status') not in expected_status:
                     raise ValueError('上行预检漏测或国内TCP未通过却已测速')
                 if early.get('status') == 'passed' and not upload_speed.sample_passed(
                         early, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                     raise ValueError('3MB上行预检证据不完整或超出预算')
-            should_web = not preflight_only and record['entry']['status'] == 'passed' and (not uses_early or early.get('status') == 'passed')
+            should_web = not preflight_only and record['entry']['status'] == 'passed' and (modern or not uses_early or early.get('status') == 'passed')
             if not should_web and record.get('websites'):
                 raise ValueError('上行预检或前置阶段未通过却检测了网站')
             if should_web and (not record.get('websites') or any(
-                    record['websites'].get(site, {}).get('round_count') != (WEBSITE_ROUNDS if site in OVERSEAS_SITES else 1) or
-                    len(record['websites'].get(site, {}).get('attempts', [])) != (WEBSITE_ROUNDS if site in OVERSEAS_SITES else 1)
+                    record['websites'].get(site, {}).get('round_count') not in ((WEBSITE_ROUNDS,) if site in OVERSEAS_SITES else (1, 2) if modern else (1,)) or
+                    len(record['websites'].get(site, {}).get('attempts', [])) != record['websites'].get(site, {}).get('round_count')
                     for site in DAILY_POST_SITES)):
                 raise ValueError('通过节点缺少海外三轮或trace 单轮检测')
             if (not preflight_only and bundle.get('service_checks_enabled')
@@ -700,6 +737,11 @@ def reclassify_cloudflare_records(records):
 
 
 def required_websites_passed(record):
+    if qp.modern(record):
+        sites = record.get('websites') or {}
+        return all(qp.accepted(label, sites.get(label) or {}, confirmed_page_exception)
+                   for label in REQUIRED_SITES) and all(qp.accepted(
+                       label, sites.get(label) or {}, confirmed_page_exception, trace=True) for label in REQUIRED_TRACES)
     return all(page_rounds_accepted(label, (record.get('websites') or {}).get(label) or {})
         for label in REQUIRED_SITES) and all(
         (record.get('websites') or {}).get(label, {}).get('status') == 'passed'
@@ -721,11 +763,13 @@ def website_tls_failures(record):
 
 
 def destination_tls_failure(record):
-    return destination_certificate_failure(record) or bool(website_tls_failures(record))
+    return destination_certificate_failure(record) or bool(website_tls_failures(record)) or (qp.modern(record) and any(
+        qp.tls_errors(record.get(key)) for key in ('upload_precheck', 'upload', 'download',
+            'medium_speed_download', 'high_speed_download', 'application_quality', 'post_upload_tls')))
 
 
 def web_quality_eligible(record):
-    if 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+    if not qp.modern(record) and 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
         return False
     if destination_tls_failure(record):
         return False
@@ -735,6 +779,8 @@ def web_quality_eligible(record):
         return False
     if not required_websites_passed(record) or not app_tls.passed(record.get('app_tls')):
         return False
+    if qp.modern(record):
+        return True  # Successful-request latency ranks candidates; it is no extra hard cap.
     sites = record.get('websites') or {}
     for label in CORE_SITES:
         item = sites.get(label) or {}
@@ -765,7 +811,7 @@ def web_rank_metrics(record):
 
 def regional_eligible(record):
     """A regional exception permits slower pages, never failed access or downloads."""
-    if 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
+    if not qp.modern(record) and 'upload_precheck' in record and not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
         return False
     if destination_tls_failure(record):
         return False
@@ -783,6 +829,8 @@ def regional_eligible(record):
     pre = record.get('precheck') or {}
     if pre.get('status') != 'passed' or pre.get('round_count') != 3 or pre.get('passed_count') != 3:
         return False
+    if qp.modern(record):
+        return True
     for label in CORE_SITES:
         item = (record.get('websites') or {}).get(label) or {}
         if item.get('status') == 'verification_required' and page_rounds_accepted(label, item):
@@ -807,6 +855,10 @@ def rank_key(record):
     downloaded = record.get('download') or {}
     uplink = record.get('upload') or {}
     upload_ok = upload_speed.passed(uplink)
+    upload_rate = uplink.get('speed_mbps') or 0
+    if qp.modern(record):
+        upload_ok = qp.upload_observed(record)
+        upload_rate = uplink.get('observed_speed_mbps') or 0
     measured = (record.get('high_speed_download') if high_speed_eligible(record) else
                 record.get('medium_speed_download') if medium_speed.passed(record.get('medium_speed_download') or {})
                 else downloaded)
@@ -814,14 +866,16 @@ def rank_key(record):
     # Within the same 250ms worst-response band, prefer the weaker direction
     # of the two measured rates rather than rewarding download alone.
     response_band = math.ceil(temporal_tail / 250) if upload_ok and math.isfinite(temporal_tail) else temporal_tail
-    duplex = min(down_mbps, uplink['speed_mbps']) if upload_ok else 0
+    duplex = min(down_mbps, upload_rate) if upload_ok else 0
     prefix = ()
-    if temporal.get('version') in (2, 3, continuous_stability.VERSION):
+    if temporal.get('version') in continuous_stability.VERSIONS:
         metrics = continuous_stability.metrics(temporal)
         core = continuous_stability.core_metrics(temporal)
         p95 = max((x['p95_ms'] for x in core.values()), default=math.inf)
         jitter = max((x['iqr_ms'] for x in core.values()), default=math.inf)
-        prefix = (-metrics['success_rate'], metrics['maximum_consecutive_failures'], p95, jitter)
+        prefix = (-metrics['success_rate'], metrics['maximum_consecutive_failures'],
+                  metrics.get('maximum_recovery_seconds', 0), *quality_history.rank(record), p95, jitter) if qp.modern(record) else (
+                  -metrics['success_rate'], metrics['maximum_consecutive_failures'], p95, jitter)
     return prefix + (downloaded.get('status') != 'passed', not web_quality_eligible(record), response_band,
             -duplex, -(uplink.get('speed_ratio') or 0) if upload_ok else 0,
             *web_rank_metrics(record), -website_count(record), -connectivity_count(record),
@@ -915,7 +969,7 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
     # The slower regional pool is selectable only in its own group.
     ranked = limit_hong_kong(sorted((r for r in records if r['id'] in mapping
         and (stability.passed(r.get('stability')) if require_stability or 'stability' in r else True)
-        and (upload_speed.passed(r.get('upload')) if require_upload or 'upload' in r else True)
+        and ((qp.upload_observed(r) if qp.modern(r) else upload_speed.passed(r.get('upload'))) if require_upload or 'upload' in r else True)
         and (app_tls.passed(r.get('post_upload_tls')) if require_upload else True)
         and r['entry']['status'] == 'passed'
         and (r.get('download') or {}).get('status') == 'passed'
@@ -930,7 +984,7 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
         pre = record.get('precheck') or {}
         core_latencies = [(record.get('websites') or {}).get(label, {}).get('median_elapsed_ms') for label in CORE_SITES]
         if stability.passed(record.get('stability')):
-            core_latencies = [stability.core_metrics(record['stability'])[label]['median_ms'] for label in CORE_SITES]
+            core_latencies = [stability.core_metrics(record['stability']).get(label, {}).get('median_ms') for label in CORE_SITES]
         latency = max(core_latencies) if all(isinstance(v, (float, int)) and math.isfinite(v) for v in core_latencies) else None
         if latency is None:
             latency = pre.get('median_elapsed_ms') if pre.get('status') == 'passed' else None
@@ -966,7 +1020,16 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
     medium = [r['name'] for r in sorted(ranked, key=lambda r: (
         -((r.get('medium_speed_download') or {}).get('speed_mib_s') or 0), r['id']))
         if medium_speed.passed(r.get('medium_speed_download') or {})]
-    recommended = [r['name'] for r in strict]
+    recommended_pool = strict
+    modern_strict = [r for r in strict if qp.modern(r) and stability.passed(r.get('stability'))]
+    if modern_strict:
+        best = max(continuous_stability.metrics(r['stability'])['success_rate'] for r in modern_strict)
+        recommended_pool = [r for r in modern_strict
+            if continuous_stability.metrics(r['stability'])['success_rate'] >= min(.99, best)
+            and not continuous_stability.metrics(r['stability']).get('unrecovered_at_end')
+            and ((r.get('quality_history') or {}).get('measured_runs', 0) < 2 or
+                 ((r['quality_history'].get('success_rate') or 0) >= .99 and not r['quality_history'].get('failed_entry_runs')))]
+    recommended = [r['name'] for r in recommended_pool]
     regional = [r['name'] for r in ranked if regional_eligible(r)]
     def group(name, names):
         return {'name': name, 'type': 'select' if name == '🚀 全局选择' else 'url-test', 'proxies': names or ['REJECT'],
@@ -1128,6 +1191,7 @@ def main():
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
+                  'selection_policy_version': qp.VERSION,
                   'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True, 'website_tls_hard_gate': True,
                   'parallel_observation': args.phase == 'prepare',
                   'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
@@ -1137,8 +1201,11 @@ def main():
                   'scope': 'fixture' if args.sample else 'all_subscriptions',
                   'prepared_at': s.datetime.now(s.TZ).isoformat(timespec='seconds')}
         bundle['id'] = hashlib.sha256(json.dumps(bundle, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        edge_pool = edge_candidates.collect(nodes)
+        (root / 'edgetunnel-candidates.json').write_text(json.dumps(edge_pool, ensure_ascii=False))
+        (root / 'edgetunnel-candidates.summary.json').write_text(json.dumps(edge_candidates.summary(edge_pool), ensure_ascii=False))
         bundle_path.write_text(json.dumps(bundle, ensure_ascii=False))
-        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；已准备204→TCP→3MB上行预检；后续网站/下载与独立稳定性持续观察并行，最终校验两轮上行和全部证据', flush=True)
+        print(f'全量节点 {input_count}，内核可解析 {len(nodes)}；双204→TCP后立即独立观察；上行仅分级，观察至少10分钟，最终校验证书与全部证据', flush=True)
         if args.phase == 'prepare':
             return
     else:
@@ -1160,7 +1227,8 @@ def main():
             if seed is None:
                 raise ValueError('持续观察必须来自同轮前置检测')
             candidates = [r for r in seed if r['entry']['status'] == 'passed'
-                and upload_speed.sample_passed(r.get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)]
+                and (bundle.get('selection_policy_version') == qp.VERSION or upload_speed.sample_passed(
+                    r.get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET))]
             diagnostic = continuous_stability.observe(candidates, mapping, binary, root)
             result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
                       'diagnostic': diagnostic}
@@ -1171,7 +1239,7 @@ def main():
             records, endpoint_count = probe_pipeline(subset, binary, root,
                 interval=.25 * args.shard_count, upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
-                service_check=service_probes.check_fast)
+                service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
         result = {'bundle_id': bundle['id'], 'index': args.shard_index, 'count': args.shard_count,
@@ -1185,7 +1253,7 @@ def main():
         controls = {}
         try:
             records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls,
-                                                     service_check=service_probes.check_fast)
+                service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
     upload_diagnostic = stability_diagnostic = None
@@ -1245,13 +1313,32 @@ def main():
             for r in candidates:
                 r['stability'] = observations[r['id']]
         else:
-            stability_diagnostic = stability.recheck(candidates, mapping, binary, root)
+            if any(qp.modern(r) for r in candidates):
+                stability_diagnostic = continuous_stability.observe(candidates, mapping, binary, root, peer=lambda: True)
+                by_id = {r['id']: r['stability'] for r in stability_diagnostic['nodes']}
+                for r in candidates:
+                    r['stability'] = by_id[r['id']]
+            else:
+                stability_diagnostic = stability.recheck(candidates, mapping, binary, root)
     requires_stability = (args.phase in ('all', 'publish', 'stability-recheck', 'uplink-recheck')
         or (args.phase in repair_modes
             and previous.get('node_selection_policy', {}).get('requires_time_spaced_stability') is True))
     requires_upload = (args.phase in ('all', 'publish', 'uplink-recheck')
-        or (args.phase in repair_modes and previous.get('node_selection_policy', {}).get('requires_uplink_pass') is True))
+        or (args.phase in repair_modes and any(previous.get('node_selection_policy', {}).get(key) is True
+            for key in ('requires_uplink_pass', 'requires_uplink_observation'))))
+    history = None
+    if any(qp.modern(r) for r in records):
+        old_latest = json.loads(Path('最新检测.json').read_text()) if Path('最新检测.json').exists() else {}
+        if args.phase in repair_modes or recovery:
+            history = old_latest.get('quality_history')
+            for record in records:
+                record['quality_history'] = quality_history.summarize((history or {}).get('nodes', {}).get(record['id'], []))
+        else:
+            history = quality_history.update(records, old_latest.get('quality_history'),
+                s.datetime.now(s.TZ).isoformat(timespec='seconds'), os.environ.get('GITHUB_RUN_ID', 'local'))
     config = render_comparison(base, records, mapping, require_stability=requires_stability, require_upload=requires_upload)
+    history_summary = quality_history.summary(records)
+    history_change = quality_history.compare(history_summary, old_latest.get('quality_history_summary')) if history is not None else None
     tested_selected_count = len(config['proxies'])
     config, untested_info = append_untested(config)
     if mobile_control_paths(config):
@@ -1264,7 +1351,8 @@ def main():
                       required_gate=required_websites_passed,
                       stability_policy=(stability_diagnostic or {}).get('settings') or stability.settings(records),
                       measurement_recovery=recovery, publication_root=Path('.'),
-                      untested_subscription=untested_info, tested_selected_count=tested_selected_count)
+                      untested_subscription=untested_info, tested_selected_count=tested_selected_count,
+                      quality_history=history, quality_change=history_change)
     if not config['proxies']:
         if args.phase in ('all', 'publish'):
             print('全量检测完成：无符合页面、trace及应用TLS门槛的节点，报告已保存；原订阅未更新', flush=True)
@@ -1297,17 +1385,20 @@ def main():
     repairing = args.phase in repair_modes
     published_names = {n['name'] for n in config['proxies']}
     published_ids = [r['id'] for r in records if r.get('name') in published_names and r['id'] in mapping]
-    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 21,
+    is_modern = any(qp.modern(r) for r in records)
+    report = {'updated_at': now, 'scope': bundle['scope'], 'schema_version': 22 if is_modern else 21,
+              'selection_policy': qp.settings() if any(qp.modern(r) for r in records) else None,
+              'quality_history': history, 'quality_history_summary': history_summary, 'quality_change': history_change,
               'untested_subscription': untested_info, 'tested_selected_node_count': tested_selected_count,
               'v2rayn_skipped': native_skipped,
               'website_tls_policy': {'any_tls_error_eliminates': True, 'includes_optional_sites': True},
-              'upload_precheck_policy': upload_speed.precheck_settings(),
+              'upload_precheck_policy': upload_speed.precheck_settings(is_modern),
               'early_upload_precheck_enabled': previous.get('early_upload_precheck_enabled', False) if repairing else bool(bundle.get('early_upload_precheck')),
               'upload_precheck_counts': {v: sum((r.get('upload_precheck') or {}).get('status', 'unmeasured') == v for r in records)
                                          for v in ('passed', 'failed', 'skipped', 'unmeasured')},
               'upload_precheck_controls': (previous.get('upload_precheck_controls') if repairing else
                   {str(p['index']): p.get('upload_precheck_controls') for p in parts} if args.phase == 'publish' else {'0': controls}),
-              'upload_policy': upload_speed.settings(),
+              'upload_policy': upload_speed.settings(is_modern),
               'upload_recheck': upload_speed.recheck_summary(records, upload_diagnostic,
                   previous.get('upload_recheck') if repairing else None),
               'historical_candidates': bundle.get('historical_candidates', {}),
@@ -1315,7 +1406,7 @@ def main():
               'stability_recheck': stability.recheck_summary(records, stability_diagnostic,
                   previous.get('stability_recheck') if repairing else None,
                   quality=lambda r: web_quality_eligible(r) or regional_eligible(r)),
-              'app_tls_policy': {'version': app_tls.VERSION, 'targets': list(app_tls.TARGETS),
+              'app_tls_policy': {'version': 2 if is_modern else app_tls.VERSION, 'targets': list(app_tls.TARGETS),
                   'rounds_per_target': app_tls.ROUNDS, 'budget_seconds_per_handshake': app_tls.BUDGET_SECONDS,
                   'requires_trusted_chain_hostname_validity': True, 'android_certificate_pinning_emulated': False},
               'app_tls_counts': {v: sum((r.get('app_tls') or {}).get('status') == v for r in records)
@@ -1350,12 +1441,13 @@ def main():
                   'conditional_response_sample_bytes': {'Reddit_401_403_without_cf_challenge': REDDIT_LOGIN_SAMPLE_BYTES},
                   'max_ttfb_ms': MAX_TTFB_MS, 'max_sample_ms': MAX_SAMPLE_MS,
                   'required_core_sites': list(CORE_SITES), 'required_websites': list(REQUIRED_SITES),
-                  'required_websites_rounds': WEBSITE_ROUNDS, 'trace_can_replace_required_page': False,
+                  'required_websites_rounds': WEBSITE_ROUNDS, 'minimum_accepted_rounds': 2 if is_modern else 3,
+                  'one_transport_failure_allowed': is_modern, 'trace_can_replace_required_page': False,
                   'required_traces': list(REQUIRED_TRACES), 'required_trace_rounds': 1,
                   'claude_validation': 'trace_only', 'claude_homepage_tested': False,
                   'core_median_limit_ms': CORE_MEDIAN_MS,
                   'core_p95_limit_ms': CORE_TAIL_MS, 'core_jitter_limit_ms': CORE_JITTER_MS,
-                  'min_accepted_overseas_sites': math.ceil(len(OVERSEAS_SITES) / 2),
+                  'min_accepted_overseas_sites': None if is_modern else math.ceil(len(OVERSEAS_SITES) / 2),
                   'eligible_count': sum(web_quality_eligible(r) and (r.get('download') or {}).get('status') == 'passed' for r in records)},
               'mobile_rejections': bundle.get('mobile_rejections', {}),
               'pipeline': True, 'parallel_shards': bundle.get('parallel_shards', args.shard_count if args.phase == 'publish' else 1),
@@ -1372,9 +1464,9 @@ def main():
               'website_rounds': WEBSITE_ROUNDS if args.phase == 'web-recheck' or not repairing else previous.get('website_rounds', 1),
               'trace_rounds': previous.get('trace_rounds', 1) if repairing else 1,
               'download_test': previous.get('download_test', False) if repairing else True,
-              'download_settings': previous.get('download_settings') if repairing else {'url': DOWNLOAD_URL, 'bytes': DOWNLOAD_BYTES, 'budget_seconds': DOWNLOAD_BUDGET, 'rounds': 1, 'read_timeout_seconds': 1, 'includes_handshake': True},
+              'download_settings': previous.get('download_settings') if repairing else {'url': DOWNLOAD_URL, 'bytes': DOWNLOAD_BYTES, 'budget_seconds': DOWNLOAD_BUDGET, 'rounds': 1, 'read_timeout_seconds': None if is_modern else 1, 'total_deadline': is_modern, 'includes_handshake': True},
               'web_user_agent': previous.get('web_user_agent') if repairing else WEB_USER_AGENT,
-              'medium_speed_download_settings': medium_speed.settings(),
+              'medium_speed_download_settings': medium_speed.settings(is_modern),
               'medium_speed_download_counts': medium_speed.counts(records),
               'medium_speed_selection_policy': {'group': medium_speed.GROUP, 'requires_5mb_pass': True,
                   'requires_published_eligible_pool': True, 'regional_exception_allowed': True, 'hong_kong_limit': 30, 'other_regions_limit': None,
@@ -1384,11 +1476,12 @@ def main():
                   if args.phase == 'medium-recheck' else previous.get('medium_speed_recheck') if repairing else None),
               'high_speed_download_test': previous.get('high_speed_download_test', False) if repairing else True,
               'high_speed_download_settings': ({**previous['high_speed_download_settings'], 'selection_limit': None}
-                  if previous.get('high_speed_download_settings') else None) if repairing else high_speed.settings(),
+                  if previous.get('high_speed_download_settings') else None) if repairing else high_speed.settings(is_modern),
               'node_selection_policy': {'hong_kong_limit_per_group': 30, 'other_regions_limit': None,
                   'non_datacenter_total_limit': None, 'qualified_pool_only': True,
                   'requires_time_spaced_stability': requires_stability,
-                  'requires_uplink_pass': requires_upload,
+                  'requires_uplink_pass': requires_upload and not is_modern, 'requires_uplink_observation': requires_upload,
+                  'comprehensive_pool': 'success_rate_at_least_99_percent_or_best_observed_tier_and_recovered' if is_modern else 'all_qualified',
                   'ranking': ('success_rate_then_failure_streak_then_successful_P95_IQR_then_duplex' if parallel_publish else 'core_response_250ms_band_then_min_upload_download_mbps_then_upload_repeat_ratio_then_web_quality'),
                   'requires_domestic_tcp_pass': True, 'requires_application_tls_pass': True,
                   'rejects_explicit_certificate_error_on_any_tested_website': True,

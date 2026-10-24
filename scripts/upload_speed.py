@@ -29,19 +29,20 @@ WORKERS = 4
 PRECHECK_WORKERS_PER_SHARD = 1
 
 
-def precheck_settings():
+def precheck_settings(stability_first=False):
     return {'url': url(PRECHECK_BYTES), 'bytes': PRECHECK_BYTES,
             'budget_seconds': PRECHECK_BUDGET, 'placement': 'after_domestic_TCP_before_websites',
             'workers_per_shard': PRECHECK_WORKERS_PER_SHARD, 'strict_destination_tls': True,
             'overlaps_downloads_on_same_runner': False,
-            'reused_by_final_upload': True, 'failed_skips_websites_and_downloads': True}
+            'reused_by_final_upload': True, 'failed_skips_websites_and_downloads': not stability_first,
+            'stability_starts_before_upload': stability_first}
 
 
 def url(byte_count):
     return f'https://speed.cloudflare.com/__up?bytes={byte_count}'
 
 
-def settings():
+def settings(stability_first=False):
     return {'version': VERSION, 'url': url(BYTES), 'bytes_per_round': BYTES,
             'rounds': ROUNDS, 'budget_seconds_per_round': BUDGET,
             'precheck_bytes': PRECHECK_BYTES, 'precheck_budget_seconds': PRECHECK_BUDGET,
@@ -50,7 +51,8 @@ def settings():
             'redirects_allowed': False, 'includes_handshake': True,
             'requires_loaded_204_each_round': True, 'loaded_204_budget_ms': 5000,
             'speed_aggregation': 'minimum_of_completed_rounds',
-            'server_byte_receipt_available': False, 'china_mobile_uplink_measured': False}
+            'server_byte_receipt_available': False, 'china_mobile_uplink_measured': False,
+            'rate_and_loaded_204_are_grades': stability_first}
 
 
 def finite(value):
@@ -185,17 +187,24 @@ def recheck_summary(records, diagnostic=None, previous=None):
     return info
 
 
-def check(port, directory=None, precheck=None):
+def check(port, directory=None, precheck=None, stability_first=False):
     if precheck is None:
         precheck = sample(port, PRECHECK_BYTES, PRECHECK_BUDGET, directory)
-    if not sample_passed(precheck, PRECHECK_BYTES, PRECHECK_BUDGET):
+    if not stability_first and not sample_passed(precheck, PRECHECK_BYTES, PRECHECK_BUDGET):
         return summarize(precheck, [], None)
     first = loaded_sample(port, directory)
     ended = time.monotonic()
     time.sleep(GAP_SECONDS)
     idle = time.monotonic() - ended
     second = loaded_sample(port, directory)
-    return summarize(precheck, [first, second], idle)
+    result = summarize(precheck, [first, second], idle)
+    if stability_first:
+        result['selection_policy_version'] = 2
+        speeds = [a['speed_mbps'] for a in (first, second) if sample_passed(a)]
+        result['observed_speed_mbps'] = min(speeds) if speeds else None
+        if not speeds and not sample_passed(precheck, PRECHECK_BYTES, PRECHECK_BUDGET):
+            result['basic_write'] = sample(port, 64_000, PRECHECK_BUDGET, directory)
+    return result
 
 
 def recheck(records, mapping, binary, root, reuse_precheck=False):
@@ -206,9 +215,11 @@ def recheck(records, mapping, binary, root, reuse_precheck=False):
     with s.Core(binary, root, [mapping[r['id']] for r in records], listeners) as core:
         control_before = check(None, root)
         def measure(row):
+            import quality_policy as qp
             result = check(ports[row['id']], root,
-                precheck=row.get('upload_precheck') if reuse_precheck else None)
-            tls = app_tls.check(ports[row['id']])
+                precheck=row.get('upload_precheck') if reuse_precheck else None,
+                **({'stability_first': True} if qp.modern(row) else {}))
+            tls = app_tls.check(ports[row['id']], **({'retry_transient': True} if qp.modern(row) else {}))
             return result, tls
         with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
             jobs = {pool.submit(measure, r): r for r in records}

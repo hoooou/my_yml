@@ -81,8 +81,17 @@ jobs:
           if-no-files-found: error
           overwrite: true
 
+      - name: 保存独立上游候选（尚未验证Worker链路）
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: edgetunnel-candidates
+          path: .node-work/availability/edgetunnel-candidates*.json
+          include-hidden-files: true
+          retention-days: 1
+          if-no-files-found: error
+
   preflight:
-    name: 双204 → TCP → 3MB上行预检（分片 ${{ matrix.shard }}）
+    name: 双204 → 国内TCP（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
     timeout-minutes: 90

@@ -10,7 +10,7 @@ import upload_speed
 import service_probes
 
 
-def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None, publication_root=None, untested_subscription=None, tested_selected_count=None):
+def write_attempt(root, records, config, required_sites, sources, input_count, now, required_traces=(), required_gate=None, stability_policy=None, measurement_recovery=None, publication_root=None, untested_subscription=None, tested_selected_count=None, quality_history=None, quality_change=None):
     coverage = {}
     labels = {label for record in records for label in (record.get('websites') or {})}
     for label in sorted(labels):
@@ -23,6 +23,7 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
             'attempt_reason_counts': dict(Counter(a.get('reason', 'unknown') for a in attempts))}
     selected = len(config['proxies'])
     report = {'updated_at': now, 'scope': 'all_subscriptions', 'input_unique_count': input_count,
+        'quality_history': quality_history, 'quality_change': quality_change,
         'untested_subscription': untested_subscription or {},
         'tested_selected_node_count': selected if tested_selected_count is None else tested_selected_count,
         'measurement_recovery': measurement_recovery,
@@ -58,6 +59,15 @@ def write_attempt(root, records, config, required_sites, sources, input_count, n
         'high_speed_target_counts': {url: high_speed.status_counts(records, i) for i, url in enumerate(high_speed.URLS)},
         'website_counts': coverage, 'sources': sources, 'nodes': records}
     from detection_report import write_report, website_access_summary
+    import quality_policy as qp
+    import quality_history as history_module
+    report['selection_policy'] = qp.settings() if any(qp.modern(r) for r in records) else None
+    if report['selection_policy']:
+        report['upload_precheck_policy'] = upload_speed.precheck_settings(True)
+        report['upload_policy'] = upload_speed.settings(True)
+        report['medium_speed_download_settings'] = medium_speed.settings(True)
+        report['high_speed_download_settings'] = high_speed.settings(True)
+    report['quality_history_summary'] = history_module.summary(records)
     report['website_access_summary'] = website_access_summary(records)
     report['service_checks_policy'] = service_probes.settings()
     report['service_checks_summary'] = service_probes.summary(records)
