@@ -1045,6 +1045,7 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
                 **({'default-selected': '⭐ 综合优选'} if name == '🚀 全局选择' else {'tolerance': 50})}
     config['proxies'] = proxies
     choices = ['⭐ 综合优选', medium_speed.GROUP, '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
+    choices.extend(node['name'] for node in proxies)
     config['proxy-groups'] = [
         group('🚀 全局选择', choices),
         group('⭐ 综合优选', recommended), group(medium_speed.GROUP, medium),

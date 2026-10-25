@@ -78,7 +78,9 @@ def append_nodes(config, nodes):
     result['proxy-groups'].append({'name': GROUP, 'type': 'select', 'proxies': private_names})
     for group in result['proxy-groups']:
         if group['name'] == '🚀 全局选择':
-            group['proxies'].insert(max(0, len(group['proxies']) - 1), GROUP)
+            position = group['proxies'].index('DIRECT') if 'DIRECT' in group['proxies'] else len(group['proxies'])
+            group['proxies'].insert(position, GROUP)
+            group['proxies'].extend(name for name in private_names if name not in group['proxies'])
     info = {'status': 'appended_without_testing', 'group': GROUP, 'source_node_count': len(nodes),
             'node_count': len(private_names), 'added_node_count': added, 'duplicates': duplicates,
             'tested': False, 'names_preserved_with_source_prefix': True}
