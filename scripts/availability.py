@@ -448,7 +448,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['exit'] = s.query_exit(port, {'id': record['id']})
                         except (s.requests.RequestException, ValueError, KeyError):
                             record['exit_reason'] = '出口 IP/地区未确认'
-                    if required_websites_passed(record) and not destination_tls_failure(record):
+                    if required_websites_passed(record) and not pre_application_tls_failure(record):
                         record['app_tls'] = app_tls.check(port, **({'retry_transient': True} if modern else {}))
                         if app_tls.passed(record['app_tls']):
                             if modern:
@@ -596,7 +596,9 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                 evidence = record.get('website_tls') or {}
                 if evidence.get('sites') != failed_sites or evidence.get('status') != ('failed' if failed_sites else 'passed'):
                     raise ValueError('网站TLS硬筛选记录与原始请求不一致')
-            should_tls = should_web and required_websites_passed(record) and not destination_tls_failure(record)
+            # Eligibility here is based only on evidence available before this stage.
+            # Later TLS failures still reject the node, but cannot erase a completed handshake.
+            should_tls = should_web and required_websites_passed(record) and not pre_application_tls_failure(record)
             tls = record.get('app_tls') or {}
             if tls.get('status') not in (('passed', 'failed') if should_tls else ('skipped',)):
                 raise ValueError('应用TLS阶段漏测或顺序异常')
@@ -766,6 +768,11 @@ def destination_tls_failure(record):
     return destination_certificate_failure(record) or bool(website_tls_failures(record)) or (qp.modern(record) and any(
         qp.tls_errors(record.get(key)) for key in ('upload_precheck', 'upload', 'download',
             'medium_speed_download', 'high_speed_download', 'application_quality', 'post_upload_tls')))
+
+
+def pre_application_tls_failure(record):
+    """Only the website and early-upload evidence exists at application-TLS entry."""
+    return bool(website_tls_failures(record)) or (qp.modern(record) and qp.tls_errors(record.get('upload_precheck')))
 
 
 def web_quality_eligible(record):
