@@ -5,6 +5,7 @@ engine. It is not a byte-by-byte receipt or a measurement of China's uplink.
 """
 import concurrent.futures as futures
 import hashlib
+import heapq
 import json
 import math
 import os
@@ -47,6 +48,7 @@ def settings(stability_first=False):
             'rounds': ROUNDS, 'budget_seconds_per_round': BUDGET,
             'precheck_bytes': PRECHECK_BYTES, 'precheck_budget_seconds': PRECHECK_BUDGET,
             'minimum_idle_seconds_between_rounds': GAP_SECONDS, 'workers': WORKERS,
+            'repeat_wait_occupies_transfer_worker': not stability_first,
             'payload': 'random_synthetic_bytes', 'strict_destination_tls': True,
             'redirects_allowed': False, 'includes_handshake': True,
             'requires_loaded_204_each_round': True, 'loaded_204_budget_ms': 5000,
@@ -207,6 +209,65 @@ def check(port, directory=None, precheck=None, stability_first=False):
     return result
 
 
+def observe_scheduled(records, ports, root, reuse_precheck=False, checkpoint=None):
+    """Sleeping repeat measurements never occupy the four transfer workers."""
+    state = {}
+    pending = [(time.monotonic(), i, r['id'], 1) for i, r in enumerate(records)]
+    heapq.heapify(pending)
+    by_id = {r['id']: r for r in records}
+    running = {}
+    sequence = len(records)
+    completed = 0
+
+    def first(id):
+        row = by_id[id]
+        precheck = row.get('upload_precheck') if reuse_precheck else None
+        if precheck is None:
+            precheck = sample(ports[id], PRECHECK_BYTES, PRECHECK_BUDGET, root)
+        measured = loaded_sample(ports[id], root)
+        return precheck, measured, time.monotonic()
+
+    def second(id):
+        precheck, initial, ended = state[id]
+        idle = time.monotonic() - ended
+        measured = loaded_sample(ports[id], root)
+        result = summarize(precheck, [initial, measured], idle)
+        result['selection_policy_version'] = 2
+        speeds = [a['speed_mbps'] for a in (initial, measured) if sample_passed(a)]
+        result['observed_speed_mbps'] = min(speeds) if speeds else None
+        if not speeds and not sample_passed(precheck, PRECHECK_BYTES, PRECHECK_BUDGET):
+            result['basic_write'] = sample(ports[id], 64_000, PRECHECK_BUDGET, root)
+        return result, app_tls.check(ports[id], retry_transient=True)
+
+    with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
+        while pending or running:
+            while pending and pending[0][0] <= time.monotonic() and len(running) < WORKERS:
+                _, _, id, stage = heapq.heappop(pending)
+                running[pool.submit(first if stage == 1 else second, id)] = (id, stage)
+            done = [job for job in running if job.done()]
+            for job in done:
+                id, stage = running.pop(job)
+                measured = job.result()
+                if stage == 1:
+                    state[id] = measured
+                    heapq.heappush(pending, (measured[2] + GAP_SECONDS, sequence, id, 2))
+                    sequence += 1
+                else:
+                    row = by_id[id]
+                    row['upload'], row['post_upload_tls'] = measured
+                    state.pop(id)
+                    completed += 1
+                    print('上传复测完成 ' + id + '：' + row['upload']['status'], flush=True)
+                    if checkpoint is not None and (completed % 10 == 0 or completed == len(records)):
+                        checkpoint()
+            if running:
+                futures.wait(running, timeout=.1, return_when=futures.FIRST_COMPLETED)
+            elif pending:
+                delay = pending[0][0] - time.monotonic()
+                if delay > 0:
+                    time.sleep(delay)
+
+
 def recheck(records, mapping, binary, root, reuse_precheck=False):
     root = Path(root); root.mkdir(parents=True, exist_ok=True)
     if not records:
@@ -221,16 +282,38 @@ def recheck(records, mapping, binary, root, reuse_precheck=False):
                 **({'stability_first': True} if qp.modern(row) else {}))
             tls = app_tls.check(ports[row['id']], **({'retry_transient': True} if qp.modern(row) else {}))
             return result, tls
-        with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
-            jobs = {pool.submit(measure, r): r for r in records}
-            for job in futures.as_completed(jobs):
-                row = jobs[job]; row['upload'], row['post_upload_tls'] = job.result()
-                print('上传复测完成 ' + row['id'] + '：' + row['upload']['status'], flush=True)
+        import quality_policy as qp
+        stability_first = all(qp.modern(r) for r in records)
+        if stability_first:
+            for row in records:
+                row.pop('upload', None)
+                row.pop('post_upload_tls', None)
+            def checkpoint():
+                measured = [r for r in records if 'upload' in r and 'post_upload_tls' in r]
+                partial = {'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
+                    'settings': settings(True), 'node_count': len(records), 'measured_node_count': len(measured),
+                    'complete': False, 'controls_valid': False,
+                    'nodes': [{'id': r['id'], 'upload': r['upload'], 'post_upload_tls': r['post_upload_tls']} for r in measured]}
+                temporary = root / 'upload-results.tmp'
+                temporary.write_text(json.dumps(partial, ensure_ascii=False))
+                temporary.replace(root / 'upload-results.json')
+            checkpoint()
+            try:
+                observe_scheduled(records, ports, root, reuse_precheck, checkpoint)
+            finally:
+                checkpoint()
+        else:
+            with futures.ThreadPoolExecutor(max_workers=WORKERS) as pool:
+                jobs = {pool.submit(measure, r): r for r in records}
+                for job in futures.as_completed(jobs):
+                    row = jobs[job]; row['upload'], row['post_upload_tls'] = job.result()
+                    print('上传复测完成 ' + row['id'] + '：' + row['upload']['status'], flush=True)
         control_after = check(None, root)
         import stability
         health = stability.core_health(core, root)
     diagnostic = {'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
-        'settings': settings(), 'node_count': len(records), 'core_health': health,
+        'complete': True,
+        'settings': settings(stability_first), 'node_count': len(records), 'core_health': health,
         'controls': {'before': control_before, 'after': control_after},
         'controls_valid': passed(control_before) and passed(control_after) and stability.core_healthy(health),
         'nodes': [{'id': r['id'], 'upload': r['upload'], 'post_upload_tls': r['post_upload_tls']} for r in records]}
