@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-28T09:21:26+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-28T20:02:58+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -537,66 +537,41 @@ sniffer:
   - +.push.apple.com
 proxies:
 - port: 443
-  server: 172.64.68.89
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国01|164ms|265Mbps|非住宅|纯净度未知
-- port: 443
   server: 172.64.69.89
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国02|228ms|271Mbps|非住宅|纯净度未知
-- port: 8443
-  server: 54.190.176.228
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国03|240ms|183Mbps|非住宅|纯净度98.9%
-- password: None
-  port: 443
+  name: 美国01|160ms|180Mbps|非住宅|纯净度未知
+- port: 443
   server: 172.64.68.89
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国04|173ms|269Mbps|非住宅|纯净度未知
-- type: http
-  server: 54.190.176.228
-  port: 8443
-  tls: true
+  name: 美国02|220ms|193Mbps|非住宅|纯净度未知
+- password: None
+  port: 443
+  server: 64.98.50.100
   skip-cert-verify: true
-  name: 美国05|250ms|203Mbps|非住宅|纯净度98.9%
-- type: http
-  server: 162.243.146.243
-  port: 443
-  username: testuser1
-  password: e4b72b531a2d10900519
-  tls: true
-  sni: a2f392f3.acsnet.co
-  name: 美国06|339ms|4Mbps|非住宅|纯净度95.5%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 162.243.146.243
-  sni: a2f392f3.acsnet.co
-  sub_tag: R002-260618
   tls: true
   type: http
-  username: testuser1
-  udp: true
-  name: 美国07|346ms|4Mbps|非住宅|纯净度95.5%
+  name: 美国03|233ms|114Mbps|非住宅|纯净度100.0%
 - port: 443
-  server: 23.133.176.14
+  server: 172.64.68.89
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国08|374ms|101Mbps|非住宅|纯净度99.6%
+  name: 美国04|226ms|192Mbps|非住宅|纯净度未知
+- port: 443
+  server: 64.98.50.100
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 美国05|219ms|123Mbps|非住宅|纯净度100.0%
 - password: None
   port: 443
   server: 64.98.50.100
@@ -606,29 +581,62 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 美国09|482ms|142Mbps|非住宅|纯净度100.0%
-- password: None
-  port: 443
+  name: 美国06|228ms|130Mbps|非住宅|纯净度100.0%
+- port: 443
   server: 64.98.50.100
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国10|491ms|157Mbps|非住宅|纯净度100.0%
+  name: 美国07|218ms|126Mbps|非住宅|纯净度100.0%
 - port: 443
-  server: 64.98.50.100
+  server: 23.133.176.14
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国11|484ms|118Mbps|非住宅|纯净度100.0%
-- port: 443
-  server: 64.98.50.100
+  name: 美国08|334ms|105Mbps|非住宅|纯净度99.6%
+- port: 8443
+  server: 35.84.133.236
   skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国12|482ms|125Mbps|非住宅|纯净度100.0%
+  name: 美国09|356ms|14Mbps|非住宅|纯净度98.4%
+- port: 8443
+  server: 44.248.167.117
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国10|358ms|107Mbps|非住宅|纯净度99.2%
+- port: 8443
+  server: 44.229.69.166
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国11|360ms|166Mbps|非住宅|纯净度99.2%
+- password: None
+  port: 8443
+  server: 44.229.69.166
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国12|358ms|159Mbps|非住宅|纯净度99.2%
+- type: http
+  server: 35.84.133.236
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 美国13|361ms|14Mbps|非住宅|纯净度98.4%
+- type: http
+  server: 44.229.69.166
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 美国14|350ms|152Mbps|非住宅|纯净度99.2%
 - password: None
   port: 8443
   server: 44.248.167.117
@@ -637,102 +645,461 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国13|554ms|48Mbps|非住宅|纯净度99.2%
-- password: None
-  port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国14|562ms|56Mbps|非住宅|纯净度99.2%
-- type: http
-  server: 44.229.69.166
-  port: 8443
-  tls: true
-  skip-cert-verify: true
-  name: 美国15|555ms|160Mbps|非住宅|纯净度99.2%
+  name: 美国15|360ms|124Mbps|非住宅|纯净度99.2%
 - port: 8443
   server: 44.248.167.117
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 美国16|569ms|48Mbps|非住宅|纯净度99.2%
-- port: 8443
-  server: 44.229.69.166
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国17|552ms|163Mbps|非住宅|纯净度99.2%
-- port: 8443
-  server: 35.84.133.236
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国18|556ms|24Mbps|非住宅|纯净度98.4%
-- port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国19|565ms|51Mbps|非住宅|纯净度99.2%
-- type: http
-  server: 35.84.133.236
-  port: 8443
-  tls: true
-  skip-cert-verify: true
-  name: 美国20|568ms|24Mbps|非住宅|纯净度98.4%
+  name: 美国16|348ms|110Mbps|非住宅|纯净度99.2%
 - port: 443
   server: 64.98.50.100
   skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国21|477ms|115Mbps|非住宅|纯净度100.0%
-- password: None
-  port: 8443
-  server: 44.229.69.166
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国22|548ms|141Mbps|非住宅|纯净度99.2%
-- port: 443
-  server: 45.134.9.41
-  skip-cert-verify: true
-  sni: 991cc80f13caf81d3426ddebb2da7f49-240d6105b6ef86f0.apache-iv.com
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: MX01|602ms|50Mbps|非住宅|纯净度97.7%
-- port: 443
-  server: 172.64.68.89
+  name: 美国17|227ms|143Mbps|非住宅|纯净度100.0%
+- port: 8443
+  server: 44.248.167.117
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国23|167ms|257Mbps|非住宅|纯净度未知
-- port: 443
-  server: 87.106.223.158
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国01|750ms|15Mbps|非住宅|纯净度98.4%
+  name: 美国18|350ms|101Mbps|非住宅|纯净度99.2%
 - password: None
   port: 443
-  server: 87.106.223.158
+  server: 18.200.158.139
   skip-cert-verify: true
   tls: true
   type: http
-  name: 德国02|767ms|99Mbps|非住宅|纯净度98.4%
+  name: 爱尔兰01|497ms|81Mbps|非住宅|纯净度99.5%
+- type: http
+  server: 18.200.158.139
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 爱尔兰02|547ms|80Mbps|非住宅|纯净度99.5%
+- type: http
+  server: 54.190.176.228
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 美国19|565ms|119Mbps|非住宅|纯净度98.9%
+- port: 8443
+  server: 54.190.176.228
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国20|564ms|119Mbps|非住宅|纯净度98.9%
+- port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰01|610ms|73Mbps|非住宅|纯净度99.6%
+- password: 'null'
+  port: 443
+  server: 51.158.243.91
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 荷兰02|611ms|70Mbps|非住宅|纯净度94.8%
+- password: 'null'
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰03|596ms|73Mbps|非住宅|纯净度99.6%
+- type: http
+  server: 162.243.146.243
+  port: 443
+  username: testuser1
+  password: e4b72b531a2d10900519
+  tls: true
+  sni: a2f392f3.acsnet.co
+  name: 美国21|621ms|4Mbps|非住宅|纯净度95.5%
+- password: None
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰04|610ms|73Mbps|非住宅|纯净度99.6%
+- port: 443
+  server: 51.210.167.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 法国01|640ms|71Mbps|非住宅|纯净度100.0%
+- password: None
+  port: 443
+  server: 51.158.243.91
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰05|606ms|70Mbps|非住宅|纯净度94.8%
+- port: 443
+  server: 51.158.243.91
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰06|619ms|71Mbps|非住宅|纯净度94.8%
+- type: http
+  server: 51.158.243.91
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰07|620ms|71Mbps|非住宅|纯净度94.8%
+- type: http
+  server: 84.17.47.125
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰08|641ms|99Mbps|非住宅|纯净度74.5%
+- port: 443
+  server: 103.82.101.43
+  skip-cert-verify: true
+  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
+  tls: true
+  type: http
+  name: 法国02|622ms|57Mbps|非住宅|纯净度99.2%
+- password: 'null'
+  port: 443
+  server: 51.158.243.91
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰09|623ms|72Mbps|非住宅|纯净度94.8%
+- server: 84.17.47.125
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 1579
+  name: 荷兰10|647ms|100Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.150
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰11|647ms|97Mbps|非住宅|纯净度74.5%
+- server: 84.17.47.146
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 996
+  name: 荷兰12|641ms|97Mbps|非住宅|纯净度74.5%
+- server: 84.17.47.150
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 889
+  name: 荷兰13|645ms|100Mbps|非住宅|纯净度74.5%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 162.243.146.243
+  sni: a2f392f3.acsnet.co
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 美国22|632ms|4Mbps|非住宅|纯净度95.5%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 荷兰14|644ms|100Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰15|599ms|73Mbps|非住宅|纯净度99.6%
+- server: 84.17.47.146
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 1067
+  name: 荷兰16|641ms|99Mbps|非住宅|纯净度74.5%
+- server: 84.17.47.150
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 1726
+  name: 荷兰17|646ms|99Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.124
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰18|638ms|105Mbps|非住宅|纯净度74.5%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 82.196.9.7
+  sni: 52c40907.acsnet.co
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 荷兰19|684ms|89Mbps|非住宅|纯净度98.0%
+- port: 443
+  server: 159.69.94.125
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国01|693ms|18Mbps|非住宅|纯净度100.0%
+- type: http
+  server: 159.69.94.125
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 德国02|687ms|68Mbps|非住宅|纯净度100.0%
+- server: 84.17.47.149
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 1037
+  name: 荷兰20|633ms|107Mbps|非住宅|纯净度74.5%
+- type: http
+  server: 84.17.47.149
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰21|632ms|105Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 443
+  server: 213.109.163.119
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 德国03|697ms|114Mbps|非住宅|纯净度97.7%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 82.196.9.7
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 荷兰22|682ms|86Mbps|非住宅|纯净度98.0%
+- port: 443
+  server: 213.109.163.119
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国04|710ms|140Mbps|非住宅|纯净度97.7%
+- port: 443
+  server: 91.92.250.33
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 波兰01|628ms|96Mbps|非住宅|纯净度81.2%
+- password: 'null'
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  username: 'null'
+  name: 荷兰23|600ms|72Mbps|非住宅|纯净度99.6%
+- server: 84.17.47.149
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 2001
+  name: 荷兰24|645ms|100Mbps|非住宅|纯净度74.5%
+- port: 443
+  server: 176.94.74.21
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国05|812ms|11Mbps|住宅未知|纯净度98.4%
+- password: None
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰25|836ms|106Mbps|非住宅|纯净度74.5%
+- server: 84.17.47.148
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 2413
+  name: 荷兰26|842ms|105Mbps|非住宅|纯净度74.5%
+- type: http
+  server: 84.17.47.148
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰27|836ms|100Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰28|839ms|86Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰29|836ms|103Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 443
+  server: 151.115.54.133
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 波兰02|778ms|81Mbps|非住宅|纯净度97.3%
+- password: 'null'
+  port: 443
+  server: 151.115.54.133
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 波兰03|784ms|80Mbps|非住宅|纯净度97.3%
+- type: http
+  server: 151.115.54.133
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 波兰04|776ms|80Mbps|非住宅|纯净度97.3%
+- type: http
+  server: 84.17.47.147
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰30|842ms|103Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 443
+  server: 151.115.54.133
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 波兰05|778ms|80Mbps|非住宅|纯净度97.3%
+- port: 443
+  server: 151.115.54.133
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 波兰06|786ms|81Mbps|非住宅|纯净度97.3%
+- port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰31|844ms|105Mbps|非住宅|纯净度74.5%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 荷兰32|845ms|103Mbps|非住宅|纯净度74.5%
+- port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: BR01|897ms|93Mbps|非住宅|纯净度100.0%
+- port: 8443
+  server: 77.221.136.60
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国06|880ms|5Mbps|非住宅|纯净度100.0%
+- type: http
+  server: 84.17.47.148
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰33|846ms|101Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 193.176.84.22
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚01|902ms|91Mbps|非住宅|纯净度86.7%
+- server: 84.17.47.148
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 1640
+  name: 荷兰34|840ms|106Mbps|非住宅|纯净度74.5%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 167.172.172.190
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  username: testuser1
+  name: 德国07|1046ms|3Mbps|非住宅|纯净度92.2%
 - password: e4b72b531a2d10900519
   port: 443
   server: 167.172.172.190
@@ -743,299 +1110,77 @@ proxies:
   type: http
   username: testuser1
   udp: true
-  name: 德国03|753ms|4Mbps|非住宅|纯净度92.2%
-- port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国24|565ms|61Mbps|非住宅|纯净度99.2%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 167.172.172.190
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  username: testuser1
-  name: 德国04|778ms|4Mbps|非住宅|纯净度92.2%
-- password: None
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰01|842ms|74Mbps|非住宅|纯净度99.6%
-- port: 19362
-  server: 51.159.225.197
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰02|866ms|71Mbps|非住宅|纯净度99.6%
-- password: 'null'
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  username: 'null'
-  name: 荷兰03|874ms|74Mbps|非住宅|纯净度99.6%
-- type: http
-  server: 159.69.94.125
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 德国05|926ms|20Mbps|非住宅|纯净度100.0%
-- port: 443
-  server: 159.69.94.125
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国06|928ms|44Mbps|非住宅|纯净度100.0%
+  name: 德国08|1056ms|4Mbps|非住宅|纯净度92.2%
 - password: None
   port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰04|921ms|70Mbps|非住宅|纯净度94.8%
-- type: http
-  server: 18.200.158.139
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 爱尔兰01|878ms|56Mbps|非住宅|纯净度99.5%
-- password: None
-  port: 443
-  server: 18.200.158.139
+  server: 87.106.223.158
   skip-cert-verify: true
   tls: true
   type: http
-  name: 爱尔兰02|829ms|55Mbps|非住宅|纯净度99.5%
-- type: http
-  server: 51.158.243.91
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰05|921ms|70Mbps|非住宅|纯净度94.8%
-- password: 'null'
-  port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰06|924ms|89Mbps|非住宅|纯净度94.8%
+  name: 德国09|1076ms|110Mbps|非住宅|纯净度98.4%
 - port: 443
-  server: 51.210.167.149
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 法国01|988ms|72Mbps|非住宅|纯净度100.0%
-- port: 443
-  server: 213.109.163.119
+  server: 87.106.223.158
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 德国07|1043ms|98Mbps|非住宅|纯净度97.7%
-- password: None
-  port: 443
-  server: 151.115.54.133
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 波兰01|1074ms|81Mbps|非住宅|纯净度97.3%
-- password: 'null'
-  port: 443
-  server: 151.115.54.133
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 波兰02|1072ms|82Mbps|非住宅|纯净度97.3%
-- port: 443
-  server: 91.92.250.33
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 波兰03|874ms|100Mbps|非住宅|纯净度81.2%
-- port: 443
-  server: 151.115.54.133
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 波兰04|1063ms|80Mbps|非住宅|纯净度97.3%
-- type: http
-  server: 151.115.54.133
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 波兰05|1072ms|82Mbps|非住宅|纯净度97.3%
-- password: None
-  port: 443
-  server: 213.109.163.119
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 德国08|1050ms|102Mbps|非住宅|纯净度97.7%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 82.196.9.7
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: testuser1
-  udp: true
-  name: 荷兰07|1099ms|81Mbps|非住宅|纯净度98.0%
-- port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰08|923ms|85Mbps|非住宅|纯净度94.8%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 82.196.9.7
-  sni: 52c40907.acsnet.co
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: testuser1
-  udp: true
-  name: 荷兰09|1108ms|89Mbps|非住宅|纯净度98.0%
-- password: None
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰10|874ms|89Mbps|非住宅|纯净度99.6%
-- port: 443
-  server: 176.94.74.21
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国09|1000ms|12Mbps|住宅未知|纯净度98.4%
-- password: 'null'
-  port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 荷兰11|917ms|84Mbps|非住宅|纯净度94.8%
-- port: 8443
-  server: 77.221.136.60
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国10|1186ms|3Mbps|非住宅|纯净度100.0%
-- port: 9002
-  server: 193.176.84.22
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚01|1277ms|48Mbps|非住宅|纯净度86.7%
-- port: 443
-  server: 134.65.17.77
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: BR01|1272ms|90Mbps|非住宅|纯净度100.0%
+  name: 德国10|1078ms|20Mbps|非住宅|纯净度98.4%
 - port: 443
   server: 62.90.77.30
   skip-cert-verify: true
   tls: true
   type: http
-  name: 以色列01|1236ms|51Mbps|住宅未知|纯净度99.6%
-- password: 'null'
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰12|868ms|72Mbps|非住宅|纯净度99.6%
+  name: 以色列01|1084ms|49Mbps|住宅未知|纯净度99.6%
 - port: 443
-  server: 103.86.117.202
+  server: 154.26.139.24
   skip-cert-verify: true
-  tls: true
-  type: http
-  name: 印度尼西亚01|1514ms|12Mbps|住宅|纯净度96.9%
-- port: 9002
-  server: 193.176.84.22
-  skip-cert-verify: true
-  sni: www.bing.com
+  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚02|1269ms|88Mbps|非住宅|纯净度86.7%
-- server: 66.163.122.7
+  name: 新加坡01|1623ms|80Mbps|非住宅|纯净度97.6%
+- type: http
+  server: jewelscollecti.icu
   port: 443
-  type: trojan
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  sni: www.searchnationwidecareerchangehelperandguidancetoday.com
+  tls: true
+  sni: jewelscollecti.icu
   skip-cert-verify: true
-  udp: true
-  name: 美国25|252ms|136Mbps|非住宅|纯净度未知
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.122.7
-  skip-cert-verify: false
-  sni: www.searchnationwidecareerchangehelperandguidancetoday.com
-  type: trojan
-  udp: true
-  name: 美国26|251ms|145Mbps|非住宅|纯净度未知
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.122.7
-  skip-cert-verify: false
-  sni: www.searchnationwidecareerchangehelperandguidancetoday.com
-  type: trojan
-  name: 美国27|226ms|138Mbps|非住宅|纯净度未知
-- port: 9480
-  server: 104.129.203.85
+  name: 美国23|327ms|120Mbps|住宅|纯净度99.7%
+- port: 443
+  server: 34.249.214.108
   skip-cert-verify: true
+  tls: true
   type: http
-  name: 美国28|285ms|55Mbps|非住宅|纯净度98.4%
+  udp: true
+  name: 爱尔兰03|541ms|58Mbps|非住宅|纯净度99.6%
 - type: http
   server: jgwynphotoarts.pro
   port: 443
   username: 'null'
   password: 'null'
   tls: true
-  name: 美国29|316ms|125Mbps|住宅|纯净度99.7%
+  name: 美国24|577ms|125Mbps|住宅|纯净度99.6%
+- password: None
+  port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 爱尔兰04|516ms|84Mbps|非住宅|纯净度99.6%
+- type: http
+  server: jgwynphotoarts.pro
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 美国25|565ms|125Mbps|住宅|纯净度99.6%
+- port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰35|597ms|73Mbps|非住宅|纯净度99.6%
 - type: http
   server: 162.243.146.243
   port: 443
@@ -1044,41 +1189,83 @@ proxies:
   tls: true
   sni: a2f392f3.acsnet.co
   skip-cert-verify: true
-  name: 美国30|337ms|4Mbps|非住宅|纯净度95.5%
-- type: http
-  server: jgwynphotoarts.pro
-  port: 443
-  tls: true
+  name: 美国26|627ms|2Mbps|非住宅|纯净度95.5%
+- port: 9002
+  server: 84.17.47.146
   skip-cert-verify: true
-  name: 美国31|315ms|129Mbps|住宅|纯净度99.7%
-- type: trojan
-  server: 185.18.250.252
-  port: 443
-  password: humanity
-  udp: true
   tls: true
-  servername: www.calmlunch.com
-  sni: www.calmlunch.com
-  skip-cert-verify: false
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /assignment
-  name: 法国02|481ms|114Mbps|非住宅|纯净度97.9%
-- network: tcp
-  port: 8447
-  server: 171.22.119.74
+  type: http
+  name: 荷兰36|638ms|96Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 443
+  server: 51.210.167.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 法国03|646ms|71Mbps|非住宅|纯净度100.0%
+- port: 19362
+  server: 51.159.225.197
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰37|608ms|73Mbps|非住宅|纯净度99.6%
+- port: 443
+  server: 84.235.228.156
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 法国04|681ms|16Mbps|非住宅|纯净度99.2%
+- client-fingerprint: ios
+  network: grpc
+  port: 8444
+  reality-opts:
+    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
+    short-id: 457fab2ac885dbe0
+  server: 62.133.63.45
+  servername: github.com
+  tls: true
   type: vless
   udp: true
-  uuid: 6aed42ba-cd2d-4671-87d9-c949b6876888
-  name: 德国11|565ms|104Mbps|非住宅|纯净度98.0%
-- type: http
-  server: jewelscollecti.icu
-  port: 443
-  tls: true
-  sni: jewelscollecti.icu
+  uuid: a346c521-7a7f-452b-9356-a4893feb5982
+  name: TR01|500ms|43Mbps|非住宅|纯净度81.2%
+- port: 443
+  server: 185.246.153.42
   skip-cert-verify: true
-  name: 美国32|571ms|126Mbps|住宅|纯净度99.5%
+  sni: 482c8436a1f7c908b48a1757abb5dd79-3791fb4df2db250b.apache-iv.com
+  tls: true
+  type: http
+  name: 荷兰38|842ms|18Mbps|非住宅|纯净度99.2%
+- password: None
+  port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: BR02|898ms|16Mbps|非住宅|纯净度100.0%
+- server: 185.178.208.140
+  port: 443
+  type: vless
+  uuid: ea277838-a188-44f1-a2e8-94aa110c4f27
+  tls: true
+  servername: static.bakarova-top.ru
+  client-fingerprint: firefox
+  network: xhttp
+  xhttp-opts:
+    path: /api/v2/events
+    host: static.bakarova-top.ru
+    mode: packet-up
+  udp: true
+  name: 波兰07|769ms|4Mbps|非住宅|纯净度96.9%
+- type: http
+  server: 167.172.172.190
+  port: 443
+  username: testuser1
+  password: e4b72b531a2d10900519
+  tls: true
+  sni: a7acacbe.acsnet.co
+  skip-cert-verify: true
+  name: 德国11|1048ms|3Mbps|非住宅|纯净度92.2%
 - client-fingerprint: firefox
   flow: xtls-rprx-vision
   network: tcp
@@ -1092,224 +1279,68 @@ proxies:
   type: vless
   udp: true
   uuid: f5e70ce3-cfb4-4df1-b25c-d19bfae627c0
-  name: 意大利01|616ms|109Mbps|非住宅|纯净度85.9%
-- type: trojan
-  server: 162.159.133.152
+  name: 意大利01|1030ms|114Mbps|非住宅|纯净度85.9%
+- password: None
   port: 443
-  password: humanity
-  udp: true
-  tls: true
-  servername: www.pleadcourt.org
-  sni: www.pleadcourt.org
+  server: zebpay.site
   skip-cert-verify: false
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /assignment
-  name: 荷兰13|771ms|49Mbps|非住宅|纯净度97.1%
-- client-fingerprint: chrome
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 8443
-  reality-opts:
-    public-key: Q0dPyF2hFWgxL7hxntJWJammcb6zcRCyA-NOiOFrsAo
-    short-id: 1433a38abea1191c
-  server: 185.14.30.98
-  servername: twitch.tv
+  sub_tag: P002-260618
   tls: true
-  type: vless
-  udp: true
-  uuid: f5e70ce3-cfb4-4df1-b25c-d19bfae627c0
-  name: 荷兰14|791ms|54Mbps|非住宅|纯净度100.0%
-- port: 1080
-  server: 144.24.94.153
-  skip-cert-verify: true
   type: http
-  name: 韩国01|786ms|97Mbps|非住宅|纯净度98.5%
-- type: http
-  server: 167.172.172.190
+  udp: true
+  sni: zebpay.site
+  name: 美国27|330ms|124Mbps|住宅|纯净度99.7%
+- password: ''
   port: 443
-  username: testuser1
-  password: e4b72b531a2d10900519
-  tls: true
-  sni: a7acacbe.acsnet.co
+  server: zebpay.site
   skip-cert-verify: true
-  name: 德国12|779ms|2Mbps|非住宅|纯净度92.2%
-- type: http
-  server: 167.172.172.190
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  sni: zebpay.site
+  name: 美国28|331ms|124Mbps|住宅|纯净度99.7%
+- password: 'null'
   port: 443
-  username: testuser1
-  password: e4b72b531a2d10900519
+  server: zebpay.site
+  sub_tag: R002-260618
   tls: true
-  skip-cert-verify: true
-  name: 德国13|779ms|4Mbps|非住宅|纯净度92.2%
+  type: http
+  username: 'null'
+  udp: true
+  sni: zebpay.site
+  name: 美国29|332ms|125Mbps|住宅|纯净度99.7%
 - port: 443
-  server: 34.249.214.108
+  server: jewelscollecti.icu
   skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 爱尔兰03|750ms|54Mbps|非住宅|纯净度99.6%
-- password: None
-  port: 443
-  server: 34.249.214.108
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 爱尔兰04|812ms|87Mbps|非住宅|纯净度99.6%
-- port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰15|866ms|88Mbps|非住宅|纯净度99.6%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 188.114.97.3
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: B007-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like
-        Gecko) Chrome/32.0.1700.107 Safari/537.36
-    path: /assignment
-  name: 荷兰16|846ms|64Mbps|非住宅|纯净度97.1%
-- port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰17|870ms|74Mbps|非住宅|纯净度99.6%
-- port: 19362
-  server: 51.159.225.197
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰18|873ms|73Mbps|非住宅|纯净度99.6%
-- password: None
-  port: 443
-  server: 51.210.167.149
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国03|989ms|71Mbps|非住宅|纯净度100.0%
-- port: 443
-  server: 103.82.101.43
-  skip-cert-verify: true
-  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
-  tls: true
-  type: http
-  name: 法国04|994ms|55Mbps|非住宅|纯净度99.2%
-- type: vless
-  server: 199.232.239.239
-  port: 443
-  uuid: 71a195c5-df47-47ad-81be-f4d3a3a21be3
-  network: xhttp
-  servername: ssl.fastly.com
-  tls: true
-  client-fingerprint: firefox
-  alpn:
-  - h2
-  xhttp-opts:
-    path: /@CloudVPNchannel/@CloudVPNchannel/@CloudVPNchannel
-    host: cloudnet2026.global.ssl.fastly.net
-    mode: auto
-  skip-cert-verify: false
-  udp: true
-  name: 芬兰01|627ms|67Mbps|非住宅|纯净度100.0%
-- password: None
-  port: 443
-  server: 151.115.54.133
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 波兰06|1076ms|79Mbps|非住宅|纯净度97.3%
-- port: 443
-  server: 84.235.228.156
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国05|1036ms|19Mbps|非住宅|纯净度99.2%
-- type: trojan
-  server: 45.128.76.242
-  port: 443
-  password: humanity
-  udp: true
-  tls: true
-  servername: www.pleadcourt.org
-  sni: www.pleadcourt.org
-  skip-cert-verify: false
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /assignment
-  name: 荷兰19|520ms|57Mbps|非住宅|纯净度94.8%
-- type: vless
-  server: 5.75.195.83
-  port: 56879
-  uuid: 7b0f8733-03cc-472b-9c50-ed159b48ef59
-  network: ws
-  servername: jln31qtswdkut5.60kohcognywybguuq3ouc818oofnxfvn35daott.workers.dev
-  tls: true
-  client-fingerprint: chrome
-  ws-opts:
-    path: /@Marisa_kristi
-    headers:
-      Host: jln31qtswdkut5.60kohcognywybguuq3ouc818oofnxfvn35daott.workers.dev
-  skip-cert-verify: true
-  udp: true
-  name: 日本01|1065ms|114Mbps|非住宅|纯净度未知
-- type: trojan
-  server: 185.220.100.168
-  port: 443
-  password: humanity
-  udp: true
-  tls: true
-  servername: www.calmlunch.com
-  sni: www.calmlunch.com
-  skip-cert-verify: false
-  network: ws
-  ws-opts:
-    path: /assignment
-    headers:
-      Host: www.calmlunch.com
-  name: 法国06|1093ms|94Mbps|非住宅|纯净度97.9%
-- port: 9002
-  server: 193.176.84.22
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚03|1273ms|46Mbps|非住宅|纯净度86.7%
-- password: None
-  port: 443
-  server: 134.65.17.77
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: BR02|1275ms|18Mbps|非住宅|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.22
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 罗马尼亚04|1271ms|52Mbps|非住宅|纯净度86.7%
-- port: 443
-  server: crosscards.site
-  sni: crosscards.site
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国33|274ms|124Mbps|住宅|纯净度99.6%
+  sni: jewelscollecti.icu
+  name: 美国30|341ms|123Mbps|住宅|纯净度99.7%
+- password: 'null'
+  port: 443
+  server: jewelscollecti.icu
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: jewelscollecti.icu
+  name: 美国31|331ms|124Mbps|住宅|纯净度99.7%
+- password: None
+  port: 443
+  server: jewelscollecti.icu
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: jewelscollecti.icu
+  name: 美国32|330ms|120Mbps|住宅|纯净度99.7%
 - port: 443
   server: mmgr.club
   skip-cert-verify: true
@@ -1318,15 +1349,106 @@ proxies:
   type: http
   udp: true
   sni: mmgr.club
-  name: 美国34|322ms|124Mbps|住宅|纯净度99.7%
+  name: 美国33|564ms|121Mbps|住宅|纯净度99.6%
 - port: 443
-  server: voteshirleysew.club
+  server: jgwynphotoarts.pro
+  skip-cert-verify: false
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: jgwynphotoarts.pro
+  name: 美国34|575ms|125Mbps|住宅|纯净度99.7%
+- password: sni=\"goedkoopgeluid.icu\"
+  port: 443
+  server: goedkoopgeluid.icu
+  sni: goedkoopgeluid.icu
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: None
+  udp: true
+  name: 美国35|569ms|121Mbps|住宅|纯净度99.7%
+- password: 'null'
+  port: 443
+  server: jgwynphotoarts.pro
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: jgwynphotoarts.pro
+  name: 美国36|563ms|125Mbps|住宅|纯净度99.7%
+- password: sni="goedkoopgeluid.icu"
+  port: 443
+  server: goedkoopgeluid.icu
+  skip-cert-verify: true
+  sni: goedkoopgeluid.icu
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: None
+  udp: true
+  name: 美国37|566ms|124Mbps|住宅|纯净度99.7%
+- port: 443
+  server: goedkoopgeluid.icu
+  skip-cert-verify: true
+  sni: goedkoopgeluid.icu
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国38|567ms|121Mbps|住宅|纯净度99.7%
+- password: None
+  port: 443
+  server: crosscards.site
+  skip-cert-verify: false
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  sni: voteshirleysew.club
-  name: 美国35|284ms|121Mbps|住宅|纯净度99.7%
+  sni: crosscards.site
+  name: 美国39|575ms|124Mbps|住宅|纯净度99.6%
+- password: 'null'
+  port: 443
+  server: purposebydesig.club
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: purposebydesig.club
+  name: 美国40|583ms|120Mbps|住宅|纯净度99.7%
+- port: 443
+  server: crosscards.site
+  sni: crosscards.site
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国41|569ms|124Mbps|住宅|纯净度99.6%
+- password: 'null'
+  port: 443
+  server: crosscards.site
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: crosscards.site
+  name: 美国42|573ms|121Mbps|住宅|纯净度99.6%
+- password: 'null'
+  port: 443
+  server: crosscards.site
+  sni: crosscards.site
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 美国43|575ms|125Mbps|住宅|纯净度99.6%
 - password: 'null'
   port: 443
   server: mmgr.club
@@ -1336,213 +1458,25 @@ proxies:
   username: 'null'
   udp: true
   sni: mmgr.club
-  name: 美国36|321ms|122Mbps|住宅|纯净度99.7%
+  name: 美国44|572ms|120Mbps|住宅|纯净度99.6%
 - port: 443
-  server: jgwynphotoarts.pro
-  sni: jgwynphotoarts.pro
+  server: purposebydesig.club
+  sni: purposebydesig.club
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国37|327ms|124Mbps|住宅|纯净度99.7%
-- port: 443
-  server: voteshirleysew.club
-  sni: voteshirleysew.club
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国38|294ms|124Mbps|住宅|纯净度99.7%
+  name: 美国45|579ms|124Mbps|住宅|纯净度99.7%
 - password: None
   port: 443
-  server: kimberlymilano.icu
-  skip-cert-verify: false
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: kimberlymilano.icu
-  name: 美国39|327ms|127Mbps|住宅|纯净度99.5%
-- port: 443
-  server: jgwynphotoarts.pro
+  server: purposebydesig.club
   skip-cert-verify: false
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  sni: jgwynphotoarts.pro
-  name: 美国40|332ms|125Mbps|住宅|纯净度99.7%
-- password: None
-  port: 443
-  server: crosscards.site
-  skip-cert-verify: false
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: crosscards.site
-  name: 美国41|295ms|121Mbps|住宅|纯净度99.7%
-- port: 443
-  server: kimberlymilano.icu
-  skip-cert-verify: false
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: kimberlymilano.icu
-  name: 美国42|338ms|123Mbps|住宅|纯净度99.5%
-- password: 'null'
-  port: 443
-  server: crosscards.site
-  sni: crosscards.site
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 美国43|302ms|124Mbps|住宅|纯净度99.6%
-- password: 'null'
-  port: 443
-  server: jgwynphotoarts.pro
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: jgwynphotoarts.pro
-  name: 美国44|313ms|128Mbps|住宅|纯净度99.7%
-- type: http
-  server: voteshirleysew.club
-  port: 443
-  tls: true
-  sni: voteshirleysew.club
-  skip-cert-verify: true
-  name: 美国45|277ms|120Mbps|住宅|纯净度99.6%
-- password: 'null'
-  port: 443
-  server: jewelscollecti.icu
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: jewelscollecti.icu
-  name: 美国46|558ms|127Mbps|住宅|纯净度99.5%
-- port: 443
-  server: jewelscollecti.icu
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: jewelscollecti.icu
-  name: 美国47|576ms|121Mbps|住宅|纯净度99.7%
-- password: ''
-  port: 443
-  server: zebpay.site
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  sni: zebpay.site
-  name: 美国48|565ms|124Mbps|住宅|纯净度99.7%
-- type: http
-  server: zebpay.site
-  port: 443
-  username: bnVsbDpudWxs
-  tls: true
-  name: 美国49|580ms|123Mbps|住宅|纯净度99.5%
-- password: None
-  port: 443
-  server: zebpay.site
-  skip-cert-verify: false
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: zebpay.site
-  name: 美国50|588ms|123Mbps|住宅|纯净度99.7%
-- password: 'null'
-  port: 443
-  server: zebpay.site
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: zebpay.site
-  name: 美国51|589ms|126Mbps|住宅|纯净度99.7%
-- password: None
-  port: 443
-  server: jewelscollecti.icu
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: jewelscollecti.icu
-  name: 美国52|574ms|123Mbps|住宅|纯净度99.7%
-- password: 'null'
-  port: 443
-  server: voteshirleysew.club
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: voteshirleysew.club
-  name: 美国53|286ms|120Mbps|住宅|纯净度99.7%
-- password: 'null'
-  port: 443
-  server: crosscards.site
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: crosscards.site
-  name: 美国54|290ms|125Mbps|住宅|纯净度99.7%
-- type: http
-  server: tzoa.fun
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 美国55|308ms|127Mbps|住宅|纯净度99.7%
-- port: 443
-  server: berniesbodybla.fun
-  sni: berniesbodybla.fun
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国56|285ms|123Mbps|住宅|纯净度99.7%
-- password: ''
-  port: 443
-  server: berniesbodybla.fun
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  sni: berniesbodybla.fun
-  name: 美国57|263ms|124Mbps|住宅|纯净度99.7%
-- password: None
-  port: 443
-  server: berniesbodybla.fun
-  skip-cert-verify: false
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: berniesbodybla.fun
-  name: 美国58|272ms|121Mbps|住宅|纯净度99.7%
+  sni: purposebydesig.club
+  name: 美国46|561ms|121Mbps|住宅|纯净度99.7%
 - password: 'null'
   port: 443
   server: berniesbodybla.fun
@@ -1552,38 +1486,7 @@ proxies:
   username: 'null'
   udp: true
   sni: berniesbodybla.fun
-  name: 美国59|299ms|123Mbps|住宅|纯净度99.7%
-- password: ''
-  port: 443
-  server: tzoa.fun
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  sni: tzoa.fun
-  name: 美国60|320ms|127Mbps|住宅|纯净度99.7%
-- password: None
-  port: 443
-  server: tzoa.fun
-  skip-cert-verify: false
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: tzoa.fun
-  name: 美国61|331ms|126Mbps|住宅|纯净度99.7%
-- password: None
-  port: 443
-  server: purecambogiasl.live
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: purecambogiasl.live
-  name: 美国62|317ms|127Mbps|住宅|纯净度99.6%
+  name: 美国47|573ms|121Mbps|住宅|纯净度99.7%
 - password: 'null'
   port: 443
   server: fullmanfirm.icu
@@ -1593,7 +1496,36 @@ proxies:
   username: 'null'
   udp: true
   sni: fullmanfirm.icu
-  name: 美国63|316ms|122Mbps|住宅|纯净度99.7%
+  name: 美国48|575ms|119Mbps|住宅|纯净度99.7%
+- password: None
+  port: 443
+  server: berniesbodybla.fun
+  skip-cert-verify: false
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: berniesbodybla.fun
+  name: 美国49|579ms|120Mbps|住宅|纯净度99.7%
+- port: 443
+  server: berniesbodybla.fun
+  sni: berniesbodybla.fun
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国50|568ms|125Mbps|住宅|纯净度99.7%
+- password: ''
+  port: 443
+  server: berniesbodybla.fun
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  sni: berniesbodybla.fun
+  name: 美国51|572ms|120Mbps|住宅|纯净度99.7%
 - port: 443
   server: fullmanfirm.icu
   skip-cert-verify: true
@@ -1602,62 +1534,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国64|323ms|127Mbps|住宅|纯净度99.7%
-- port: 443
-  server: tzoa.fun
-  sni: tzoa.fun
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国65|327ms|123Mbps|住宅|纯净度99.7%
-- password: 'null'
-  port: 443
-  server: purecambogiasl.live
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: purecambogiasl.live
-  name: 美国66|343ms|124Mbps|住宅|纯净度99.6%
-- password: 'null'
-  port: 443
-  server: webdrone.club
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: webdrone.club
-  name: 美国67|586ms|126Mbps|住宅|纯净度99.6%
-- password: None
-  port: 443
-  server: webdrone.club
-  skip-cert-verify: false
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: webdrone.club
-  name: 美国68|579ms|126Mbps|住宅|纯净度99.6%
-- port: 443
-  server: webdrone.club
-  sni: webdrone.club
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国69|585ms|123Mbps|住宅|纯净度99.6%
-- port: 443
-  server: webdrone.club
-  skip-cert-verify: false
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: webdrone.club
-  name: 美国70|578ms|127Mbps|住宅|纯净度99.6%
+  name: 美国52|569ms|123Mbps|住宅|纯净度99.7%
 - password: sni="webdrone.club"
   port: 443
   server: webdrone.club
@@ -1667,13 +1544,56 @@ proxies:
   type: http
   username: None
   udp: true
-  name: 美国71|597ms|123Mbps|住宅|纯净度99.6%
+  name: 美国53|325ms|125Mbps|住宅|纯净度99.5%
+- password: None
+  port: 443
+  server: webdrone.club
+  skip-cert-verify: false
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: webdrone.club
+  name: 美国54|340ms|120Mbps|住宅|纯净度99.5%
+- port: 443
+  server: webdrone.club
+  sni: webdrone.club
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国55|320ms|123Mbps|住宅|纯净度99.5%
+- password: 'null'
+  port: 443
+  server: webdrone.club
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: webdrone.club
+  name: 美国56|336ms|121Mbps|住宅|纯净度99.5%
+- port: 443
+  server: webdrone.club
+  skip-cert-verify: false
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: webdrone.club
+  name: 美国57|329ms|121Mbps|住宅|纯净度99.5%
 - port: 443
   server: 172.64.69.89
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国72|223ms|252Mbps|非住宅|纯净度未知
+  name: 美国58|154ms|189Mbps|非住宅|纯净度未知
+- port: 443
+  server: 116.202.172.99
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 德国12|706ms|18Mbps|非住宅|纯净度100.0%
 - alpn:
   - http/1.1
   network: ws
@@ -1687,7 +1607,7 @@ proxies:
     headers:
       Host: www.trusteeforward.com
     path: '%2Fassignment'
-  name: 荷兰20|771ms|85Mbps|非住宅|纯净度97.1%
+  name: 荷兰39|571ms|86Mbps|非住宅|纯净度94.8%
 - port: 443
   server: 116.202.172.99
   skip-cert-verify: true
@@ -1695,7 +1615,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 德国14|1089ms|59Mbps|非住宅|纯净度100.0%
+  name: 德国13|704ms|20Mbps|非住宅|纯净度100.0%
 - port: 443
   server: 134.65.17.77
   skip-cert-verify: true
@@ -1703,7 +1623,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: BR03|1270ms|86Mbps|非住宅|纯净度100.0%
+  name: BR03|894ms|91Mbps|非住宅|纯净度100.0%
 - password: None
   port: 443
   server: mmgr.club
@@ -1713,7 +1633,7 @@ proxies:
   type: http
   udp: true
   sni: mmgr.club
-  name: 美国73|311ms|123Mbps|住宅|纯净度99.7%
+  name: 美国59|570ms|124Mbps|住宅|纯净度99.6%
 - password: ''
   port: 443
   server: carolinafreigh.fun
@@ -1724,7 +1644,25 @@ proxies:
   username: ''
   udp: true
   sni: carolinafreigh.fun
-  name: 美国74|320ms|127Mbps|住宅|纯净度99.6%
+  name: 美国60|568ms|125Mbps|住宅|纯净度99.7%
+- password: None
+  port: 443
+  server: goedkoopgeluid.icu
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: goedkoopgeluid.icu
+  name: 美国61|567ms|124Mbps|住宅|纯净度99.7%
+- password: None
+  port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰40|642ms|100Mbps|非住宅|纯净度74.5%
 - password: 'null'
   port: 443
   server: carolinafreigh.fun
@@ -1734,7 +1672,26 @@ proxies:
   username: 'null'
   udp: true
   sni: carolinafreigh.fun
-  name: 美国75|325ms|124Mbps|住宅|纯净度99.6%
+  name: 美国62|571ms|125Mbps|住宅|纯净度99.7%
+- server: 84.17.47.125
+  port: 9002
+  type: http
+  password: None
+  tls: true
+  skip-cert-verify: true
+  delay: 1006
+  name: 荷兰41|631ms|106Mbps|非住宅|纯净度74.5%
+- password: 'null'
+  port: 443
+  server: goedkoopgeluid.icu
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: goedkoopgeluid.icu
+  name: 美国63|564ms|125Mbps|住宅|纯净度99.7%
 - port: 443
   server: carolinafreigh.fun
   sni: carolinafreigh.fun
@@ -1742,30 +1699,30 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国76|322ms|122Mbps|住宅|纯净度99.6%
+  name: 美国64|566ms|121Mbps|住宅|纯净度99.7%
 - type: http
   server: 23.133.176.14
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 美国77|364ms|100Mbps|非住宅|纯净度99.6%
-- password: 'null'
+  name: 美国65|343ms|104Mbps|非住宅|纯净度99.6%
+- password: None
   port: 443
-  server: tzoa.fun
-  sub_tag: R002-260618
+  server: fullmanfirm.icu
+  skip-cert-verify: true
+  sub_tag: P002-260618
   tls: true
   type: http
-  username: 'null'
   udp: true
-  sni: tzoa.fun
-  name: 美国78|327ms|123Mbps|住宅|纯净度99.7%
+  sni: fullmanfirm.icu
+  name: 美国66|564ms|124Mbps|住宅|纯净度99.7%
 - port: 443
   server: 51.158.243.91
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 荷兰21|919ms|71Mbps|非住宅|纯净度94.8%
+  name: 荷兰42|628ms|71Mbps|非住宅|纯净度94.8%
 - port: 443
   server: 18.200.158.139
   skip-cert-verify: true
@@ -1773,15 +1730,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 爱尔兰05|821ms|83Mbps|非住宅|纯净度99.5%
-- password: None
-  port: 443
-  server: 213.109.163.119
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 德国15|1043ms|102Mbps|非住宅|纯净度97.7%
+  name: 爱尔兰05|540ms|83Mbps|非住宅|纯净度99.5%
 - port: 9002
   server: 193.176.84.22
   skip-cert-verify: true
@@ -1789,35 +1738,27 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚05|1263ms|48Mbps|非住宅|纯净度86.7%
-- port: 443
-  server: 103.86.117.202
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 印度尼西亚02|1353ms|12Mbps|住宅|纯净度96.9%
+  name: 罗马尼亚02|907ms|46Mbps|非住宅|纯净度86.7%
 - port: 443
   server: 213.109.163.119
   skip-cert-verify: true
   tls: true
   type: http
-  name: 德国16|1047ms|125Mbps|非住宅|纯净度97.7%
+  name: 德国14|683ms|138Mbps|非住宅|纯净度97.7%
 - port: 443
   server: 18.200.158.139
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 爱尔兰06|823ms|81Mbps|非住宅|纯净度99.5%
+  name: 爱尔兰06|492ms|80Mbps|非住宅|纯净度99.5%
 - password: None
   port: 443
   server: 51.158.243.91
   skip-cert-verify: true
   tls: true
   type: http
-  name: 荷兰22|925ms|85Mbps|非住宅|纯净度94.8%
+  name: 荷兰43|617ms|72Mbps|非住宅|纯净度94.8%
 - port: 443
   server: 51.210.167.149
   skip-cert-verify: true
@@ -1825,23 +1766,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 法国07|992ms|73Mbps|非住宅|纯净度100.0%
-- port: 19362
-  server: 51.159.225.197
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰23|878ms|75Mbps|非住宅|纯净度99.6%
-- port: 443
-  server: 82.66.235.221
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 法国08|950ms|84Mbps|住宅|纯净度100.0%
+  name: 法国05|636ms|71Mbps|非住宅|纯净度100.0%
 - type: http
   server: 51.158.243.91
   port: 443
@@ -1849,7 +1774,23 @@ proxies:
   password: None
   tls: true
   skip-cert-verify: true
-  name: 荷兰24|921ms|87Mbps|非住宅|纯净度94.8%
+  name: 荷兰44|634ms|70Mbps|非住宅|纯净度94.8%
+- port: 443
+  server: 82.66.235.221
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 法国06|715ms|84Mbps|住宅|纯净度100.0%
+- port: 19362
+  server: 51.159.225.197
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰45|608ms|72Mbps|非住宅|纯净度99.6%
 - password: 'null'
   port: 23856
   server: 51.159.225.196
@@ -1857,13 +1798,13 @@ proxies:
   tls: true
   type: http
   username: 'null'
-  name: 荷兰25|874ms|73Mbps|非住宅|纯净度99.6%
-- type: http
-  server: 193.176.84.22
-  port: 9002
-  tls: true
+  name: 荷兰46|590ms|73Mbps|非住宅|纯净度99.6%
+- port: 443
+  server: 51.210.167.149
   skip-cert-verify: true
-  name: 罗马尼亚06|1258ms|13Mbps|非住宅|纯净度86.7%
+  tls: true
+  type: http
+  name: 法国07|646ms|72Mbps|非住宅|纯净度100.0%
 - password: 'null'
   port: 23856
   server: 51.159.225.196
@@ -1874,20 +1815,7 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 荷兰26|866ms|73Mbps|非住宅|纯净度99.6%
-- port: 443
-  server: 51.210.167.149
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国09|992ms|72Mbps|非住宅|纯净度100.0%
-- server: 217.210.129.243
-  port: 443
-  type: http
-  tls: true
-  skip-cert-verify: true
-  delay: 1384
-  name: 瑞典01|1108ms|13Mbps|住宅|纯净度99.9%
+  name: 荷兰47|620ms|73Mbps|非住宅|纯净度99.6%
 - password: None
   port: 9002
   server: 193.176.84.22
@@ -1896,43 +1824,60 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚07|1281ms|47Mbps|非住宅|纯净度86.7%
-- password: 'null'
-  port: 23856
-  server: 51.159.225.196
+  name: 罗马尼亚03|894ms|13Mbps|非住宅|纯净度86.7%
+- type: http
+  server: 91.92.250.33
+  port: 443
+  tls: true
   skip-cert-verify: true
-  sni: 51.159.225.196
+  name: 波兰08|637ms|96Mbps|非住宅|纯净度81.2%
+- password: None
+  port: 9002
+  server: 84.17.47.123
+  skip-cert-verify: true
   tls: true
   type: http
-  udp: true
-  username: 'null'
-  name: 荷兰27|867ms|91Mbps|非住宅|纯净度99.6%
-- port: 38182
-  server: 69.55.49.177
-  skip-cert-verify: true
-  type: socks5
-  name: 美国79|477ms|88Mbps|非住宅|纯净度95.9%
-- port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰28|870ms|90Mbps|非住宅|纯净度99.6%
+  name: 荷兰48|634ms|99Mbps|非住宅|纯净度74.5%
 - port: 443
   server: 62.90.77.30
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 以色列02|1240ms|80Mbps|住宅未知|纯净度99.6%
+  name: 以色列02|1083ms|51Mbps|住宅未知|纯净度99.6%
+- port: 38182
+  server: 69.55.49.177
+  skip-cert-verify: true
+  type: socks5
+  name: 美国67|706ms|69Mbps|非住宅|纯净度95.9%
+- server: 84.17.47.146
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 994
+  name: 荷兰49|645ms|93Mbps|非住宅|纯净度74.5%
 - port: 443
   server: 82.66.235.221
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国10|950ms|79Mbps|住宅|纯净度100.0%
+  name: 法国08|716ms|81Mbps|住宅|纯净度100.0%
+- server: 84.17.47.148
+  port: 9002
+  type: http
+  password: None
+  tls: true
+  skip-cert-verify: true
+  delay: 2285
+  name: 荷兰50|839ms|104Mbps|非住宅|纯净度74.5%
+- server: 84.17.47.146
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 2056
+  name: 荷兰51|635ms|94Mbps|非住宅|纯净度74.5%
 - port: 443
   server: zebpay.site
   sni: zebpay.site
@@ -1940,13 +1885,16 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国80|577ms|128Mbps|住宅|纯净度99.7%
-- port: 443
-  server: 87.106.223.158
+  name: 美国68|332ms|121Mbps|住宅|纯净度99.7%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.147
   skip-cert-verify: true
+  sni: 84.17.47.147
   tls: true
   type: http
-  name: 德国17|763ms|94Mbps|非住宅|纯净度98.4%
+  username: 'null'
+  name: 荷兰52|849ms|106Mbps|非住宅|纯净度74.5%
 - password: None
   port: 443
   server: jgwynphotoarts.pro
@@ -1956,28 +1904,19 @@ proxies:
   type: http
   udp: true
   sni: jgwynphotoarts.pro
-  name: 美国81|320ms|124Mbps|住宅|纯净度99.7%
-- alpn:
-  - http/1.1
-  network: ws
-  password: humanity
-  port: 443
-  server: 104.18.45.38
+  name: 美国69|561ms|125Mbps|住宅|纯净度99.7%
+- port: 443
+  server: 87.106.223.158
   skip-cert-verify: true
-  sni: www.trusteeforward.com
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      Host: www.trusteeforward.com
-    path: /assignment
-  name: 荷兰29|758ms|87Mbps|非住宅|纯净度97.1%
+  tls: true
+  type: http
+  name: 德国15|1118ms|19Mbps|非住宅|纯净度98.4%
 - port: 443
   server: 79.76.126.155
   skip-cert-verify: true
   tls: true
   type: http
-  name: 德国18|632ms|6Mbps|非住宅|纯净度99.8%
+  name: 德国16|900ms|21Mbps|非住宅|纯净度99.8%
 - port: 443
   server: crosscards.site
   skip-cert-verify: false
@@ -1986,7 +1925,7 @@ proxies:
   type: http
   udp: true
   sni: crosscards.site
-  name: 美国82|289ms|124Mbps|住宅|纯净度99.6%
+  name: 美国70|575ms|125Mbps|住宅|纯净度99.6%
 - port: 443
   server: 34.249.214.108
   skip-cert-verify: true
@@ -1994,7 +1933,14 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 爱尔兰07|789ms|83Mbps|非住宅|纯净度99.6%
+  name: 爱尔兰07|542ms|59Mbps|非住宅|纯净度99.6%
+- port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰53|634ms|101Mbps|非住宅|纯净度74.5%
 - password: 'null'
   port: 23856
   server: 51.159.225.196
@@ -2003,13 +1949,13 @@ proxies:
   tls: true
   type: http
   username: 'null'
-  name: 荷兰30|871ms|92Mbps|非住宅|纯净度99.6%
+  name: 荷兰54|605ms|72Mbps|非住宅|纯净度99.6%
 - type: http
   server: 34.249.214.108
   port: 443
   tls: true
   skip-cert-verify: true
-  name: 爱尔兰08|815ms|41Mbps|非住宅|纯净度99.6%
+  name: 爱尔兰08|476ms|54Mbps|非住宅|纯净度99.6%
 - password: None
   port: 443
   server: 213.109.163.119
@@ -2018,7 +1964,15 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 德国19|1041ms|139Mbps|非住宅|纯净度97.7%
+  name: 德国17|681ms|141Mbps|非住宅|纯净度97.7%
+- type: http
+  server: 84.17.47.148
+  port: 9002
+  username: 'null'
+  password: None
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰55|844ms|105Mbps|非住宅|纯净度74.5%
 - password: None
   port: 443
   server: 18.200.158.139
@@ -2028,7 +1982,16 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 爱尔兰09|822ms|54Mbps|非住宅|纯净度99.5%
+  name: 爱尔兰09|483ms|81Mbps|非住宅|纯净度99.5%
+- port: 443
+  server: purposebydesig.club
+  skip-cert-verify: false
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: purposebydesig.club
+  name: 美国71|575ms|124Mbps|住宅|纯净度99.7%
 - password: None
   port: 443
   server: 82.66.235.221
@@ -2038,7 +2001,13 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 法国11|948ms|89Mbps|住宅|纯净度100.0%
+  name: 法国09|719ms|85Mbps|住宅|纯净度100.0%
+- type: http
+  server: carolinafreigh.fun
+  port: 443
+  username: Ok5vbmU=
+  tls: true
+  name: 美国72|572ms|124Mbps|住宅|纯净度99.7%
 - password: None
   port: 443
   server: carolinafreigh.fun
@@ -2048,29 +2017,13 @@ proxies:
   type: http
   udp: true
   sni: carolinafreigh.fun
-  name: 美国83|333ms|124Mbps|住宅|纯净度99.6%
-- port: 443
-  server: 103.82.101.44
-  skip-cert-verify: true
-  sni: f3a61d8406d537345747f99f8a281007-3f754ed5da1bba09.apache-iv.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 法国12|585ms|42Mbps|非住宅|纯净度99.2%
+  name: 美国73|568ms|120Mbps|住宅|纯净度99.7%
 - port: 443
   server: 141.94.16.4
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国13|1120ms|62Mbps|非住宅|纯净度95.3%
-- port: 443
-  server: 103.82.101.44
-  skip-cert-verify: true
-  sni: f3a61d8406d537345747f99f8a281007-3f754ed5da1bba09.apache-iv.com
-  tls: true
-  type: http
-  name: 法国14|587ms|59Mbps|非住宅|纯净度99.2%
+  name: 法国10|708ms|15Mbps|非住宅|纯净度95.3%
 - password: e4b72b531a2d10900519
   port: 443
   server: 82.196.9.7
@@ -2078,40 +2031,58 @@ proxies:
   tls: true
   type: http
   username: testuser1
-  name: 荷兰31|1097ms|82Mbps|非住宅|纯净度98.0%
-- password: None
-  port: 443
-  server: 82.66.235.221
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国15|946ms|86Mbps|住宅|纯净度100.0%
+  name: 荷兰56|685ms|82Mbps|非住宅|纯净度98.0%
 - port: 443
   server: 213.109.163.119
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 德国20|1042ms|92Mbps|非住宅|纯净度97.7%
-- password: 'null'
+  name: 德国18|694ms|141Mbps|非住宅|纯净度97.7%
+- password: None
   port: 443
-  server: kimberlymilano.icu
+  server: 82.66.235.221
   skip-cert-verify: true
-  sub_tag: K001-260618
   tls: true
   type: http
-  username: 'null'
-  udp: true
-  sni: kimberlymilano.icu
-  name: 美国84|322ms|124Mbps|住宅|纯净度99.5%
+  name: 法国11|714ms|85Mbps|住宅|纯净度100.0%
 - port: 443
-  server: kimberlymilano.icu
-  sni: kimberlymilano.icu
+  server: 62.90.77.30
+  skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国85|328ms|123Mbps|住宅|纯净度99.5%
+  name: 以色列03|1088ms|56Mbps|住宅未知|纯净度99.6%
+- password: None
+  port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国74|337ms|103Mbps|非住宅|纯净度99.6%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰57|636ms|105Mbps|非住宅|纯净度74.5%
+- type: http
+  server: 84.17.47.123
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰58|638ms|14Mbps|非住宅|纯净度74.5%
+- type: http
+  server: 77.221.136.60
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 德国19|891ms|4Mbps|非住宅|纯净度100.0%
 - port: 6103
   server: 87.98.174.157
   skip-cert-verify: true
@@ -2119,13 +2090,21 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 法国16|946ms|70Mbps|非住宅|纯净度98.3%
-- type: http
-  server: 77.221.136.60
-  port: 8443
+  name: 法国12|622ms|61Mbps|非住宅|纯净度98.3%
+- server: 84.17.47.150
+  port: 9002
+  type: http
   tls: true
   skip-cert-verify: true
-  name: 德国21|1150ms|3Mbps|非住宅|纯净度100.0%
+  delay: 2258
+  name: 荷兰59|644ms|96Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰60|840ms|106Mbps|非住宅|纯净度74.5%
 - alpn:
   - http/1.1
   client-fingerprint: chrome
@@ -2142,7 +2121,7 @@ proxies:
       User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML,
         like Gecko) Chrome/53.0.2785.143 Safari/537.36
     path: /assignment
-  name: 荷兰32|773ms|104Mbps|非住宅|纯净度97.1%
+  name: 荷兰61|571ms|83Mbps|非住宅|纯净度94.8%
 - port: 443
   server: 216.107.139.82
   skip-cert-verify: true
@@ -2151,7 +2130,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国86|527ms|54Mbps|非住宅|纯净度93.8%
+  name: 美国75|225ms|37Mbps|非住宅|纯净度93.8%
 - port: 443
   server: 142.44.210.129
   skip-cert-verify: true
@@ -2159,46 +2138,103 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 加拿大01|605ms|80Mbps|非住宅|纯净度95.5%
+  name: 加拿大01|278ms|85Mbps|非住宅|纯净度95.5%
 - password: None
-  port: 443
-  server: 23.133.176.14
+  port: 9002
+  server: 84.17.47.125
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国87|370ms|103Mbps|非住宅|纯净度99.6%
-- type: http
-  server: kimberlymilano.icu
-  port: 443
-  tls: true
-  sni: kimberlymilano.icu
-  name: 美国88|309ms|124Mbps|住宅|纯净度99.7%
+  name: 荷兰62|644ms|105Mbps|非住宅|纯净度74.5%
 - password: None
   port: 443
   server: 79.76.126.155
   skip-cert-verify: true
   tls: true
   type: http
-  name: 德国22|628ms|17Mbps|非住宅|纯净度99.8%
+  name: 德国20|903ms|20Mbps|非住宅|纯净度99.8%
+- password: ''
+  port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 荷兰63|643ms|98Mbps|非住宅|纯净度74.5%
+- type: http
+  server: 44.217.145.28
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 美国76|208ms|29Mbps|非住宅|纯净度99.5%
+- port: 9002
+  server: 84.17.47.150
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰64|644ms|96Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰65|841ms|105Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰66|630ms|96Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.123
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰67|646ms|98Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.123
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰68|628ms|97Mbps|非住宅|纯净度74.5%
 - password: None
   port: 6103
   server: 87.98.174.157
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国17|952ms|74Mbps|非住宅|纯净度98.3%
-- network: ws
-  password: humanity
-  port: 2053
-  server: 185.114.72.31
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国18|940ms|4Mbps|非住宅|纯净度98.7%
+  name: 法国13|630ms|58Mbps|非住宅|纯净度98.3%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰69|634ms|103Mbps|非住宅|纯净度74.5%
+- server: 84.17.47.148
+  port: 9002
+  type: http
+  tls: true
+  skip-cert-verify: true
+  delay: 1004
+  name: 荷兰70|846ms|100Mbps|非住宅|纯净度74.5%
 - port: 443
   server: 185.246.153.42
   skip-cert-verify: true
@@ -2207,7 +2243,14 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 荷兰33|625ms|42Mbps|非住宅|纯净度99.2%
+  name: 荷兰71|837ms|19Mbps|非住宅|纯净度99.2%
+- port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰72|636ms|106Mbps|非住宅|纯净度74.5%
 - port: 8443
   server: 44.217.145.28
   skip-cert-verify: true
@@ -2215,13 +2258,111 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国89|542ms|55Mbps|非住宅|纯净度99.5%
-- port: 443
-  server: 217.210.129.243
+  name: 美国77|164ms|84Mbps|非住宅|纯净度99.5%
+- password: None
+  port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰73|647ms|102Mbps|非住宅|纯净度74.5%
+- password: ''
+  port: 9002
+  server: 84.17.47.147
   skip-cert-verify: true
   tls: true
   type: http
-  name: 瑞典02|1124ms|7Mbps|住宅|纯净度99.9%
+  username: ''
+  udp: true
+  name: 荷兰74|838ms|102Mbps|非住宅|纯净度74.5%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.150
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰75|641ms|94Mbps|非住宅|纯净度74.5%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰76|845ms|105Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰77|636ms|97Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰78|833ms|95Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰79|842ms|106Mbps|非住宅|纯净度74.5%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰80|644ms|97Mbps|非住宅|纯净度74.5%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰81|835ms|100Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.124
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰82|634ms|102Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰83|642ms|102Mbps|非住宅|纯净度74.5%
+- port: 9002
+  server: 84.17.47.124
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰84|636ms|101Mbps|非住宅|纯净度74.5%
 - port: 443
   server: 79.76.126.155
   skip-cert-verify: true
@@ -2229,28 +2370,39 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 德国23|638ms|17Mbps|非住宅|纯净度99.8%
-- port: 443
-  server: 217.210.129.243
+  name: 德国21|906ms|21Mbps|非住宅|纯净度99.8%
+- server: 84.17.47.148
+  port: 9002
+  type: http
+  tls: true
   skip-cert-verify: true
+  delay: 1603
+  name: 荷兰85|840ms|106Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰86|643ms|102Mbps|非住宅|纯净度74.5%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  sni: 84.17.47.147
   sub_tag: R002-260618
   tls: true
   type: http
+  username: 'null'
   udp: true
-  name: 瑞典03|1088ms|10Mbps|住宅|纯净度99.9%
-- port: 443
-  server: 217.210.129.243
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 瑞典04|1107ms|9Mbps|住宅|纯净度99.9%
+  name: 荷兰87|835ms|93Mbps|非住宅|纯净度74.5%
 - port: 6103
   server: 87.98.174.157
   skip-cert-verify: true
   tls: true
   type: http
-  name: 法国19|947ms|72Mbps|非住宅|纯净度98.3%
+  name: 法国14|628ms|73Mbps|非住宅|纯净度98.3%
 - port: 443
   server: 103.82.101.43
   skip-cert-verify: true
@@ -2259,14 +2411,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 法国20|984ms|41Mbps|非住宅|纯净度99.2%
-- port: 443
-  server: 185.246.153.28
-  skip-cert-verify: true
-  sni: 4a8c2906c96058315dffbc2b0e7ff19b-0c66a58858a795df.apache-iv.com
-  tls: true
-  type: http
-  name: 荷兰34|928ms|15Mbps|非住宅|纯净度99.2%
+  name: 法国15|620ms|52Mbps|非住宅|纯净度99.2%
 - port: 8443
   server: 18.206.28.143
   skip-cert-verify: true
@@ -2274,31 +2419,52 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国90|188ms|81Mbps|非住宅|纯净度99.5%
+  name: 美国78|455ms|30Mbps|非住宅|纯净度99.5%
+- port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰88|846ms|104Mbps|非住宅|纯净度74.5%
+- type: http
+  server: 84.17.47.150
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰89|647ms|96Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰90|838ms|106Mbps|非住宅|纯净度74.5%
+- password: None
+  port: 9002
+  server: 84.17.47.123
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰91|639ms|95Mbps|非住宅|纯净度74.5%
 - port: 8443
   server: 18.206.28.143
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国91|183ms|37Mbps|非住宅|纯净度99.5%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.90
-  type: ss
-  udp: true
-  delay: 1422
-  name: 意大利02|662ms|169Mbps|非住宅|纯净度88.3%
-- password: 'null'
-  port: 443
-  server: 5.255.118.82
+  name: 美国79|436ms|71Mbps|非住宅|纯净度99.5%
+- port: 9002
+  server: 84.17.47.125
   skip-cert-verify: true
-  sub_tag: P002-260618
+  sub_tag: R002-260618
   tls: true
   type: http
-  username: 'null'
   udp: true
-  name: 荷兰35|884ms|88Mbps|非住宅|纯净度90.6%
+  name: 荷兰92|640ms|101Mbps|非住宅|纯净度74.5%
 - port: 443
   server: 162.217.114.50
   skip-cert-verify: true
@@ -2306,23 +2472,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国92|453ms|47Mbps|非住宅|纯净度100.0%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 195.181.244.216
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  sub_tag: M003-260806
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like
-        Gecko) Chrome/31.0.1650.57 Safari/537.36
-    path: /assignment
-  name: 法国21|989ms|93Mbps|非住宅|纯净度97.9%
+  name: 美国80|204ms|47Mbps|非住宅|纯净度100.0%
 - port: 443
   server: 185.140.209.235
   skip-cert-verify: true
@@ -2331,211 +2481,37 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 荷兰36|886ms|19Mbps|非住宅|纯净度98.8%
-- password: '1234'
-  port: 2080
-  server: 13.212.235.123
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  type: http
-  username: '1234'
-  udp: true
-  name: 新加坡01|774ms|2Mbps|非住宅|纯净度100.0%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 2053
-  server: 82.117.245.125
+  name: 荷兰93|633ms|14Mbps|非住宅|纯净度98.8%
+- network: tcp
+  port: 22222
+  server: th001.zestapp778.com
+  servername: th001.zestapp778.com
   skip-cert-verify: false
-  sni: www.calmlunch.com
-  sub_tag: M003-260806
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko)
-        Chrome/49.0.2623.112 Safari/537.36
-    path: /assignment
-  name: 法国22|1189ms|71Mbps|非住宅|纯净度97.7%
-- network: ws
-  password: humanity
-  port: 443
-  server: 185.18.250.252
-  skip-cert-verify: true
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国23|481ms|114Mbps|非住宅|纯净度97.9%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.63
-  type: ss
-  udp: true
-  name: 意大利03|602ms|176Mbps|非住宅|纯净度88.3%
-- password: '1234'
-  port: 2080
-  server: 13.229.57.163
-  skip-cert-verify: true
-  type: http
-  username: '1234'
-  udp: true
-  name: 新加坡02|780ms|4Mbps|非住宅|纯净度100.0%
-- type: ss
-  server: 202.50.253.63
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 意大利04|644ms|200Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.36
-  type: ss
-  name: 意大利05|613ms|192Mbps|非住宅|纯净度88.3%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 2053
-  server: 91.245.225.79
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  sub_tag: M003-260806
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/69.0.3497.100 Safari/537.36
-    path: /assignment
-  name: 法国24|1116ms|94Mbps|非住宅|纯净度98.7%
-- port: 8443
-  server: 154.81.36.92
-  skip-cert-verify: true
   tls: true
-  type: http
-  name: 美国93|370ms|52Mbps|住宅|纯净度98.4%
-- type: ss
-  server: 202.50.253.72
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 意大利06|667ms|171Mbps|非住宅|纯净度88.3%
-- server: 823bcb90.con.fernarchive.online
-  port: 443
   type: vless
-  uuid: abca037b-bee5-41cc-a888-0668e4c66176
-  tls: true
-  servername: 823bcb90.con.fernarchive.online
-  client-fingerprint: chrome
-  network: xhttp
-  xhttp-opts:
-    path: /conv4/stream/77dd2aeeb94331fbff325bb48850392b
-    host: 823bcb90.con.fernarchive.online
-    mode: auto
   udp: true
-  name: 芬兰02|920ms|79Mbps|非住宅|纯净度93.0%
-- type: trojan
-  network: ws
-  server: 104.18.9.83
+  uuid: e9a8144e-5237-488a-afb1-9ca3d8d54c80
+  name: 泰国01|1172ms|67Mbps|非住宅|纯净度98.9%
+- type: anytls
+  server: 56481.df6h451rh.xin
   port: 443
-  password: humanity
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国25|486ms|112Mbps|非住宅|纯净度97.9%
-- type: ss
-  server: 202.50.253.54
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利07|453ms|183Mbps|非住宅|纯净度88.3%
-- type: ss
-  server: 202.50.253.45
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利08|707ms|197Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.72
-  type: ss
-  udp: true
-  name: 意大利09|648ms|184Mbps|非住宅|纯净度88.3%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 85.31.102.163
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  sub_tag: F003-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/62.0.3202.94 Safari/537.36
-    path: /assignment
-  name: 法国26|923ms|101Mbps|非住宅|纯净度98.7%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 2053
-  server: 89.150.34.41
+  password: 0324fbc29561
+  sni: images.ctfassets.net
+  alpn:
+  - http/1.1
   skip-cert-verify: true
-  sni: www.calmlunch.com
-  sub_tag: X001-260618
-  type: trojan
+  tls: true
   udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/58.0.3029.110 Safari/537.36
-    path: /assignment
-  name: 法国27|971ms|72Mbps|非住宅|纯净度97.9%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.63
-  type: ss
-  name: 意大利10|666ms|185Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.54
-  type: ss
+  client-fingerprint: chrome
+  name: 台湾01|658ms|20Mbps|住宅未知|纯净度未知
+- port: 8443
+  server: 188.120.225.125
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
   udp: true
-  delay: 1398
-  name: 意大利11|455ms|193Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.45
-  type: ss
-  udp: true
-  name: 意大利12|627ms|183Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.81
-  type: ss
-  udp: true
-  name: 意大利13|654ms|210Mbps|非住宅|纯净度88.3%
+  name: 德国22|1236ms|14Mbps|非住宅|纯净度100.0%
 - password: '1234'
   port: 2080
   server: 47.129.155.166
@@ -2544,236 +2520,7 @@ proxies:
   type: http
   username: '1234'
   udp: true
-  name: 新加坡03|824ms|8Mbps|非住宅|纯净度100.0%
-- password: '1234'
-  port: 2080
-  server: 54.151.242.187
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  type: http
-  username: '1234'
-  udp: true
-  name: 新加坡04|1020ms|14Mbps|非住宅|纯净度100.0%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 104.16.6.70
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: B007-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Linux; Android 7.0; Redmi Note 4 Build/NRD90M) AppleWebKit/537.36
-        (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36
-    path: /assignment
-  name: 荷兰37|778ms|86Mbps|非住宅|纯净度94.8%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 2053
-  server: 185.114.72.31
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  sub_tag: A003-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko)
-        Chrome/49.0.2623.112 Safari/537.36
-    path: /assignment
-  name: 法国28|951ms|5Mbps|非住宅|纯净度98.7%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.63
-  sub_tag: A004-260618
-  type: ss
-  udp: true
-  name: 意大利14|609ms|174Mbps|非住宅|纯净度88.3%
-- type: ss
-  server: 202.50.253.36
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 意大利15|607ms|214Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.36
-  sub_tag: B007-260618
-  type: ss
-  udp: true
-  name: 意大利16|610ms|208Mbps|非住宅|纯净度88.3%
-- network: ws
-  password: humanity
-  port: 443
-  server: 172.64.145.133
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: B007-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/65.0.3325.181 Safari/537.36
-    path: /assignment
-  name: 荷兰38|774ms|20Mbps|非住宅|纯净度97.1%
-- port: 443
-  server: 110.173.188.221
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 印度01|2037ms|4Mbps|住宅|纯净度99.7%
-- type: trojan
-  network: ws
-  server: 104.16.71.213
-  port: 443
-  password: humanity
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国29|747ms|113Mbps|非住宅|纯净度95.1%
-- type: trojan
-  network: ws
-  server: 185.18.250.245
-  port: 443
-  password: humanity
-  skip-cert-verify: true
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国30|768ms|110Mbps|非住宅|纯净度95.1%
-- network: ws
-  password: humanity
-  port: 443
-  server: 212.183.88.136
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国31|489ms|110Mbps|非住宅|纯净度97.9%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 185.220.100.168
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  sub_tag: T001-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/54.0.2840.99 Safari/537.36
-    path: /assignment
-  name: 法国32|1092ms|19Mbps|非住宅|纯净度97.9%
-- type: trojan
-  network: ws
-  server: 104.19.64.105
-  port: 443
-  password: humanity
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国33|492ms|114Mbps|非住宅|纯净度97.9%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.54
-  type: ss
-  udp: true
-  name: 意大利17|481ms|186Mbps|非住宅|纯净度88.3%
-- type: trojan
-  network: ws
-  server: 185.220.100.168
-  port: 443
-  password: humanity
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国34|1103ms|114Mbps|非住宅|纯净度97.9%
-- type: ss
-  server: 202.50.253.54
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 意大利18|447ms|186Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.45
-  sub_tag: A004-260618
-  type: ss
-  udp: true
-  name: 意大利19|614ms|202Mbps|非住宅|纯净度88.3%
-- network: ws
-  password: humanity
-  port: 443
-  server: www.calmlunch.com
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国35|770ms|115Mbps|非住宅|纯净度95.1%
-- type: ss
-  server: 202.50.253.63
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利20|615ms|183Mbps|非住宅|纯净度88.3%
-- network: ws
-  password: humanity
-  port: 443
-  server: 185.220.100.168
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  type: trojan
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: '%2Fassignment'
-  name: 法国36|1088ms|74Mbps|非住宅|纯净度97.9%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.54
-  type: ss
-  name: 意大利21|471ms|183Mbps|非住宅|纯净度88.3%
-- server: 202.50.253.36
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  udp: true
-  name: 意大利22|625ms|176Mbps|非住宅|纯净度88.3%
+  name: 新加坡02|1052ms|13Mbps|非住宅|纯净度100.0%
 - port: 443
   server: 207.5.30.9
   skip-cert-verify: true
@@ -2781,360 +2528,130 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国94|717ms|47Mbps|住宅|纯净度99.9%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 153.92.127.26
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: B007-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/63.0.3239.84 Safari/537.36
-    path: /assignment
-  name: 荷兰39|584ms|5Mbps|非住宅|纯净度94.8%
-- client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 190.93.245.148
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: S004-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Linux; Android 4.4.2; SM-G7102 Build/KOT49H) AppleWebKit/537.36
-        (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36
-    path: /assignment
-  name: 荷兰40|783ms|16Mbps|非住宅|纯净度97.1%
-- type: trojan
-  network: ws
-  server: 212.183.88.136
-  port: 443
-  password: humanity
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国37|492ms|113Mbps|非住宅|纯净度97.9%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.90
-  type: ss
-  name: 意大利23|776ms|189Mbps|非住宅|纯净度88.3%
-- type: trojan
-  network: ws
-  server: 162.159.253.41
-  port: 443
-  password: humanity
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国38|746ms|111Mbps|非住宅|纯净度98.7%
-- type: trojan
-  network: ws
-  server: 104.17.121.71
-  port: 443
-  password: humanity
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国39|747ms|116Mbps|非住宅|纯净度98.7%
-- type: trojan
-  network: ws
-  server: 104.18.8.83
-  port: 443
-  password: humanity
-  skip-cert-verify: true
-  sni: www.calmlunch.com
-  client-fingerprint: chrome
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国40|748ms|114Mbps|非住宅|纯净度98.7%
-- type: trojan
-  network: ws
-  server: 162.159.91.211
-  port: 443
-  password: humanity
-  skip-cert-verify: false
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国41|756ms|115Mbps|非住宅|纯净度98.7%
-- alpn:
-  - http/1.1
-  client-fingerprint: chrome
-  network: ws
-  password: humanity
-  port: 443
-  server: 188.114.98.0
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: B007-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/63.0.3239.132 Safari/537.36
-    path: /assignment
-  name: 荷兰41|793ms|108Mbps|非住宅|纯净度97.1%
-- type: http
-  server: carolinafreigh.fun
-  port: 443
-  username: Ok5vbmU=
+  name: 美国81|398ms|48Mbps|住宅|纯净度99.9%
+- client-fingerprint: firefox
+  network: grpc
+  port: 8444
+  reality-opts:
+    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
+    short-id: 457fab2ac885dbe0
+  server: 62.133.63.45
+  servername: github.com
   tls: true
-  name: 美国95|315ms|124Mbps|住宅|纯净度99.7%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.81
-  sub_tag: A004-260618
-  type: ss
+  type: vless
   udp: true
-  name: 意大利24|670ms|209Mbps|非住宅|纯净度88.3%
-- password: None
-  port: 443
-  server: fullmanfirm.icu
-  skip-cert-verify: true
-  sub_tag: P002-260618
+  uuid: a346c521-7a7f-452b-9356-a4893feb5982
+  name: TR02|507ms|41Mbps|非住宅|纯净度81.2%
+- client-fingerprint: firefox
+  network: grpc
+  port: 8444
+  reality-opts:
+    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
+    short-id: ''
+  server: 62.133.63.45
+  servername: github.com
   tls: true
-  type: http
+  type: vless
   udp: true
-  sni: fullmanfirm.icu
-  name: 美国96|339ms|128Mbps|住宅|纯净度99.7%
-- port: 443
-  server: purecambogiasl.live
-  skip-cert-verify: true
-  sni: purecambogiasl.live
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国97|307ms|125Mbps|住宅|纯净度99.6%
+  uuid: a346c521-7a7f-452b-9356-a4893feb5982
+  name: TR03|506ms|41Mbps|非住宅|纯净度81.2%
 - port: 443
   server: 5.255.118.82
   skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
   type: http
-  udp: true
-  name: 荷兰42|867ms|82Mbps|非住宅|纯净度90.6%
-- password: None
+  name: 荷兰94|626ms|22Mbps|非住宅|纯净度90.6%
+- password: 'null'
   port: 443
   server: 5.255.118.82
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
+  username: 'null'
   udp: true
-  name: 荷兰43|868ms|72Mbps|非住宅|纯净度90.6%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.81
-  type: ss
-  name: 意大利25|655ms|198Mbps|非住宅|纯净度88.3%
-- alpn:
-  - http/1.1
-  network: ws
-  password: humanity
-  port: 443
-  server: 172.66.1.36
-  skip-cert-verify: true
-  sni: www.pleadcourt.org
-  type: trojan
+  name: 荷兰95|634ms|62Mbps|非住宅|纯净度90.6%
+- port: 443
+  server: jgwynphotoarts.pro
+  sni: jgwynphotoarts.pro
+  sub_tag: R002-260618
+  tls: true
+  type: http
   udp: true
-  ws-opts:
-    headers:
-      Host: www.pleadcourt.org
-    path: /assignment
-  name: 荷兰44|767ms|43Mbps|非住宅|纯净度97.1%
-- password: None
+  name: 美国82|583ms|127Mbps|住宅|纯净度99.7%
+- server: 84.17.47.150
   port: 9002
-  server: 193.176.84.18
-  skip-cert-verify: true
-  tls: true
   type: http
-  name: 罗马尼亚08|1267ms|91Mbps|非住宅|纯净度86.7%
-- port: 9002
-  server: 193.176.84.18
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚09|1262ms|93Mbps|非住宅|纯净度86.7%
-- network: ws
-  password: humanity
-  port: 443
-  server: 95.85.54.197
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: B007-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like
-        Gecko) Chrome/41.0.2272.101 Safari/537.36
-    path: /assignment
-  name: 荷兰45|649ms|85Mbps|非住宅|纯净度94.8%
-- alpn:
-  - http/1.1
-  network: ws
-  password: humanity
-  port: 443
-  server: 64.227.115.28
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: S004-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like
-        Gecko) Chrome/45.0.2454.101 Safari/537.36
-    path: /assignment
-  name: 荷兰46|794ms|103Mbps|非住宅|纯净度94.8%
-- port: 8443
-  server: 188.120.225.125
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国24|1008ms|45Mbps|非住宅|纯净度100.0%
-- type: trojan
-  server: 193.239.160.134
-  port: 443
-  password: humanity
-  udp: true
-  tls: true
-  servername: www.calmlunch.com
-  sni: www.calmlunch.com
-  skip-cert-verify: false
-  network: ws
-  ws-opts:
-    path: /assignment
-  name: 法国42|980ms|69Mbps|非住宅|纯净度95.1%
-- type: ss
-  server: 202.50.253.36
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利26|613ms|201Mbps|非住宅|纯净度88.3%
-- network: ws
-  password: humanity
-  port: 443
-  server: 95.85.32.57
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: S004-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/60.0.3112.113 Safari/537.36
-    path: /assignment
-  name: 荷兰47|987ms|16Mbps|非住宅|纯净度94.8%
-- alpn:
-  - http/1.1
-  network: ws
-  password: humanity
-  port: 443
-  server: 209.38.99.120
-  skip-cert-verify: false
-  sni: www.pleadcourt.org
-  sub_tag: T001-260618
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36
-        (KHTML, like Gecko) Chrome/41.0.2272.89 Safari/537.36
-    path: /assignment
-  name: 荷兰48|988ms|85Mbps|非住宅|纯净度94.8%
-- type: trojan
-  server: 64.227.115.28
-  port: 443
-  password: humanity
-  udp: true
-  tls: true
-  servername: www.pleadcourt.org
-  sni: www.pleadcourt.org
-  skip-cert-verify: false
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /assignment
-  name: 荷兰49|790ms|84Mbps|非住宅|纯净度94.8%
-- type: http
-  server: 44.217.145.28
-  port: 8443
   tls: true
   skip-cert-verify: true
-  name: 美国98|559ms|81Mbps|非住宅|纯净度99.5%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.90
-  sub_tag: C001-260618
-  type: ss
-  udp: true
-  name: 意大利27|758ms|185Mbps|非住宅|纯净度88.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.72
-  sub_tag: A004-260618
-  type: ss
-  udp: true
-  name: 意大利28|709ms|186Mbps|非住宅|纯净度88.3%
-- type: http
-  server: 91.92.250.33
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 波兰07|876ms|99Mbps|非住宅|纯净度81.2%
-- type: ss
-  server: 202.50.253.72
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利29|658ms|182Mbps|非住宅|纯净度88.3%
+  delay: 2294
+  name: 荷兰96|646ms|100Mbps|非住宅|纯净度74.5%
 - port: 443
-  server: 62.90.77.30
+  server: 5.255.118.82
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 以色列03|1246ms|73Mbps|住宅未知|纯净度99.6%
+  name: 荷兰97|605ms|49Mbps|非住宅|纯净度90.6%
+- password: None
+  port: 443
+  server: 213.109.163.119
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 德国23|687ms|138Mbps|非住宅|纯净度97.7%
+- alpn:
+  - http/1.1
+  network: ws
+  password: humanity
+  port: 443
+  server: 104.18.45.38
+  skip-cert-verify: true
+  sni: www.trusteeforward.com
+  type: trojan
+  udp: true
+  ws-opts:
+    headers:
+      Host: www.trusteeforward.com
+    path: /assignment
+  name: 荷兰98|1064ms|4Mbps|非住宅|纯净度94.8%
+- port: 443
+  server: 45.134.9.41
+  skip-cert-verify: true
+  sni: 991cc80f13caf81d3426ddebb2da7f49-240d6105b6ef86f0.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: MX01|499ms|55Mbps|非住宅|纯净度97.7%
+- port: 19362
+  server: 51.159.225.197
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰99|611ms|69Mbps|非住宅|纯净度99.6%
+- password: 'null'
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  sni: 51.159.225.196
+  tls: true
+  type: http
+  udp: true
+  username: 'null'
+  name: 荷兰100|602ms|72Mbps|非住宅|纯净度99.6%
+- type: anytls
+  server: 56481.df6h451rh.xin
+  port: 443
+  password: 0324fbc29561
+  sni: images.ctfassets.net
+  skip-cert-verify: true
+  tls: true
+  udp: true
+  client-fingerprint: chrome
+  name: 台湾02|659ms|9Mbps|住宅未知|纯净度未知
 - password: ''
   port: 38182
   server: 69.55.49.177
@@ -3143,117 +2660,35 @@ proxies:
   type: socks5
   username: ''
   udp: true
-  name: 美国99|435ms|85Mbps|非住宅|纯净度95.9%
-- type: vless
-  server: 57.129.130.34
-  port: 52014
-  uuid: 53367702-4b8d-431a-a193-34d7d057a065
-  network: ws
-  servername: jln31qtswdkut5.60kohcognywybguuq3ouc818oofnxfvn35daott.workers.dev
-  tls: true
-  client-fingerprint: chrome
-  ws-opts:
-    path: /@Marisa_kristi
-    headers:
-      Host: jln31qtswdkut5.60kohcognywybguuq3ouc818oofnxfvn35daott.workers.dev
+  name: 美国83|508ms|72Mbps|非住宅|纯净度95.9%
+- port: 23856
+  server: 51.159.225.196
   skip-cert-verify: true
-  udp: true
-  name: 日本02|853ms|87Mbps|非住宅|纯净度未知
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.45
-  type: ss
-  name: 意大利30|616ms|178Mbps|非住宅|纯净度88.3%
-- port: 443
-  server: 185.246.153.28
-  skip-cert-verify: true
-  sni: 4a8c2906c96058315dffbc2b0e7ff19b-0c66a58858a795df.apache-iv.com
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 荷兰50|936ms|46Mbps|非住宅|纯净度99.2%
-- type: ss
-  server: 202.50.253.90
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利31|715ms|185Mbps|非住宅|纯净度88.3%
-- type: ss
-  server: 202.50.253.45
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  name: 荷兰101|611ms|72Mbps|非住宅|纯净度99.6%
+- port: 9480
+  server: 104.129.203.85
   skip-cert-verify: true
-  udp: true
-  name: 意大利32|623ms|190Mbps|非住宅|纯净度88.3%
-- password: 'null'
+  type: http
+  name: 美国84|1393ms|4Mbps|非住宅|纯净度98.4%
+- password: None
   port: 443
-  server: 185.140.209.235
+  server: 5.255.118.82
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
-  username: 'null'
   udp: true
-  name: 荷兰51|882ms|42Mbps|非住宅|纯净度98.8%
+  name: 荷兰102|614ms|20Mbps|非住宅|纯净度90.6%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
-  server: 202.50.253.36
+  server: 202.50.253.27
   type: ss
-  udp: true
-  delay: 612
-  name: 意大利33|597ms|204Mbps|非住宅|纯净度88.3%
-- alpn:
-  - h2
-  client-fingerprint: chrome
-  grpc-opts:
-    grpc-service-name: VideoRenderer
-  network: grpc
-  port: 443
-  server: renderer-bridge-1-881.mirra.now
-  servername: renderer-bridge-1-881.mirra.now
-  tls: true
-  type: vless
-  uuid: 27653b37-603c-4c90-b1f5-25c4d23f8932
-  name: 荷兰52|766ms|120Mbps|非住宅|纯净度88.7%
-- network: ws
-  password: e20fd145-65f1-4aa3-96be-da0524bbb16e
-  port: 20230
-  server: us003.421421.xyz
-  skip-cert-verify: true
-  sni: www.alibaba.com
-  sub_tag: R002-260618
-  type: trojan
-  ws-opts:
-    path: /
-  udp: true
-  name: 美国100|248ms|10Mbps|非住宅|纯净度99.2%
-- type: ss
-  server: 202.50.253.81
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 意大利34|751ms|176Mbps|非住宅|纯净度88.3%
-- password: None
-  port: 9002
-  server: 84.17.47.125
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰53|1032ms|102Mbps|非住宅|纯净度74.5%
-- port: 443
-  server: 5.255.118.82
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰54|882ms|65Mbps|非住宅|纯净度90.6%
+  name: 意大利02|610ms|137Mbps|非住宅|纯净度88.3%
 - cipher: aes-128-gcm
   name: 🍓 请前往官网重新获取订阅
   password: subscription-unavailable
@@ -3272,309 +2707,268 @@ proxy-groups:
   - 🌏 台湾／新加坡
   - 🍓 小草莓（免测）
   - DIRECT
-  - 美国01|164ms|265Mbps|非住宅|纯净度未知
-  - 美国02|228ms|271Mbps|非住宅|纯净度未知
-  - 美国03|240ms|183Mbps|非住宅|纯净度98.9%
-  - 美国04|173ms|269Mbps|非住宅|纯净度未知
-  - 美国05|250ms|203Mbps|非住宅|纯净度98.9%
-  - 美国06|339ms|4Mbps|非住宅|纯净度95.5%
-  - 美国07|346ms|4Mbps|非住宅|纯净度95.5%
-  - 美国08|374ms|101Mbps|非住宅|纯净度99.6%
-  - 美国09|482ms|142Mbps|非住宅|纯净度100.0%
-  - 美国10|491ms|157Mbps|非住宅|纯净度100.0%
-  - 美国11|484ms|118Mbps|非住宅|纯净度100.0%
-  - 美国12|482ms|125Mbps|非住宅|纯净度100.0%
-  - 美国13|554ms|48Mbps|非住宅|纯净度99.2%
-  - 美国14|562ms|56Mbps|非住宅|纯净度99.2%
-  - 美国15|555ms|160Mbps|非住宅|纯净度99.2%
-  - 美国16|569ms|48Mbps|非住宅|纯净度99.2%
-  - 美国17|552ms|163Mbps|非住宅|纯净度99.2%
-  - 美国18|556ms|24Mbps|非住宅|纯净度98.4%
-  - 美国19|565ms|51Mbps|非住宅|纯净度99.2%
-  - 美国20|568ms|24Mbps|非住宅|纯净度98.4%
-  - 美国21|477ms|115Mbps|非住宅|纯净度100.0%
-  - 美国22|548ms|141Mbps|非住宅|纯净度99.2%
-  - MX01|602ms|50Mbps|非住宅|纯净度97.7%
-  - 美国23|167ms|257Mbps|非住宅|纯净度未知
-  - 德国01|750ms|15Mbps|非住宅|纯净度98.4%
-  - 德国02|767ms|99Mbps|非住宅|纯净度98.4%
-  - 德国03|753ms|4Mbps|非住宅|纯净度92.2%
-  - 美国24|565ms|61Mbps|非住宅|纯净度99.2%
-  - 德国04|778ms|4Mbps|非住宅|纯净度92.2%
-  - 荷兰01|842ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰02|866ms|71Mbps|非住宅|纯净度99.6%
-  - 荷兰03|874ms|74Mbps|非住宅|纯净度99.6%
-  - 德国05|926ms|20Mbps|非住宅|纯净度100.0%
-  - 德国06|928ms|44Mbps|非住宅|纯净度100.0%
-  - 荷兰04|921ms|70Mbps|非住宅|纯净度94.8%
-  - 爱尔兰01|878ms|56Mbps|非住宅|纯净度99.5%
-  - 爱尔兰02|829ms|55Mbps|非住宅|纯净度99.5%
-  - 荷兰05|921ms|70Mbps|非住宅|纯净度94.8%
-  - 荷兰06|924ms|89Mbps|非住宅|纯净度94.8%
-  - 法国01|988ms|72Mbps|非住宅|纯净度100.0%
-  - 德国07|1043ms|98Mbps|非住宅|纯净度97.7%
-  - 波兰01|1074ms|81Mbps|非住宅|纯净度97.3%
-  - 波兰02|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 波兰03|874ms|100Mbps|非住宅|纯净度81.2%
-  - 波兰04|1063ms|80Mbps|非住宅|纯净度97.3%
-  - 波兰05|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 德国08|1050ms|102Mbps|非住宅|纯净度97.7%
-  - 荷兰07|1099ms|81Mbps|非住宅|纯净度98.0%
-  - 荷兰08|923ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰09|1108ms|89Mbps|非住宅|纯净度98.0%
-  - 荷兰10|874ms|89Mbps|非住宅|纯净度99.6%
-  - 德国09|1000ms|12Mbps|住宅未知|纯净度98.4%
-  - 荷兰11|917ms|84Mbps|非住宅|纯净度94.8%
-  - 德国10|1186ms|3Mbps|非住宅|纯净度100.0%
-  - 罗马尼亚01|1277ms|48Mbps|非住宅|纯净度86.7%
-  - BR01|1272ms|90Mbps|非住宅|纯净度100.0%
-  - 以色列01|1236ms|51Mbps|住宅未知|纯净度99.6%
-  - 荷兰12|868ms|72Mbps|非住宅|纯净度99.6%
-  - 印度尼西亚01|1514ms|12Mbps|住宅|纯净度96.9%
-  - 罗马尼亚02|1269ms|88Mbps|非住宅|纯净度86.7%
-  - 美国25|252ms|136Mbps|非住宅|纯净度未知
-  - 美国26|251ms|145Mbps|非住宅|纯净度未知
-  - 美国27|226ms|138Mbps|非住宅|纯净度未知
-  - 美国28|285ms|55Mbps|非住宅|纯净度98.4%
-  - 美国29|316ms|125Mbps|住宅|纯净度99.7%
-  - 美国30|337ms|4Mbps|非住宅|纯净度95.5%
-  - 美国31|315ms|129Mbps|住宅|纯净度99.7%
-  - 法国02|481ms|114Mbps|非住宅|纯净度97.9%
-  - 德国11|565ms|104Mbps|非住宅|纯净度98.0%
-  - 美国32|571ms|126Mbps|住宅|纯净度99.5%
-  - 意大利01|616ms|109Mbps|非住宅|纯净度85.9%
-  - 荷兰13|771ms|49Mbps|非住宅|纯净度97.1%
-  - 荷兰14|791ms|54Mbps|非住宅|纯净度100.0%
-  - 韩国01|786ms|97Mbps|非住宅|纯净度98.5%
-  - 德国12|779ms|2Mbps|非住宅|纯净度92.2%
-  - 德国13|779ms|4Mbps|非住宅|纯净度92.2%
-  - 爱尔兰03|750ms|54Mbps|非住宅|纯净度99.6%
-  - 爱尔兰04|812ms|87Mbps|非住宅|纯净度99.6%
-  - 荷兰15|866ms|88Mbps|非住宅|纯净度99.6%
-  - 荷兰16|846ms|64Mbps|非住宅|纯净度97.1%
-  - 荷兰17|870ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰18|873ms|73Mbps|非住宅|纯净度99.6%
-  - 法国03|989ms|71Mbps|非住宅|纯净度100.0%
-  - 法国04|994ms|55Mbps|非住宅|纯净度99.2%
-  - 芬兰01|627ms|67Mbps|非住宅|纯净度100.0%
-  - 波兰06|1076ms|79Mbps|非住宅|纯净度97.3%
-  - 法国05|1036ms|19Mbps|非住宅|纯净度99.2%
-  - 荷兰19|520ms|57Mbps|非住宅|纯净度94.8%
-  - 日本01|1065ms|114Mbps|非住宅|纯净度未知
-  - 法国06|1093ms|94Mbps|非住宅|纯净度97.9%
-  - 罗马尼亚03|1273ms|46Mbps|非住宅|纯净度86.7%
-  - BR02|1275ms|18Mbps|非住宅|纯净度100.0%
-  - 罗马尼亚04|1271ms|52Mbps|非住宅|纯净度86.7%
-  - 美国33|274ms|124Mbps|住宅|纯净度99.6%
-  - 美国34|322ms|124Mbps|住宅|纯净度99.7%
-  - 美国35|284ms|121Mbps|住宅|纯净度99.7%
-  - 美国36|321ms|122Mbps|住宅|纯净度99.7%
-  - 美国37|327ms|124Mbps|住宅|纯净度99.7%
-  - 美国38|294ms|124Mbps|住宅|纯净度99.7%
-  - 美国39|327ms|127Mbps|住宅|纯净度99.5%
-  - 美国40|332ms|125Mbps|住宅|纯净度99.7%
-  - 美国41|295ms|121Mbps|住宅|纯净度99.7%
-  - 美国42|338ms|123Mbps|住宅|纯净度99.5%
-  - 美国43|302ms|124Mbps|住宅|纯净度99.6%
-  - 美国44|313ms|128Mbps|住宅|纯净度99.7%
-  - 美国45|277ms|120Mbps|住宅|纯净度99.6%
-  - 美国46|558ms|127Mbps|住宅|纯净度99.5%
-  - 美国47|576ms|121Mbps|住宅|纯净度99.7%
-  - 美国48|565ms|124Mbps|住宅|纯净度99.7%
-  - 美国49|580ms|123Mbps|住宅|纯净度99.5%
-  - 美国50|588ms|123Mbps|住宅|纯净度99.7%
-  - 美国51|589ms|126Mbps|住宅|纯净度99.7%
-  - 美国52|574ms|123Mbps|住宅|纯净度99.7%
-  - 美国53|286ms|120Mbps|住宅|纯净度99.7%
-  - 美国54|290ms|125Mbps|住宅|纯净度99.7%
-  - 美国55|308ms|127Mbps|住宅|纯净度99.7%
-  - 美国56|285ms|123Mbps|住宅|纯净度99.7%
-  - 美国57|263ms|124Mbps|住宅|纯净度99.7%
-  - 美国58|272ms|121Mbps|住宅|纯净度99.7%
-  - 美国59|299ms|123Mbps|住宅|纯净度99.7%
-  - 美国60|320ms|127Mbps|住宅|纯净度99.7%
-  - 美国61|331ms|126Mbps|住宅|纯净度99.7%
-  - 美国62|317ms|127Mbps|住宅|纯净度99.6%
-  - 美国63|316ms|122Mbps|住宅|纯净度99.7%
-  - 美国64|323ms|127Mbps|住宅|纯净度99.7%
-  - 美国65|327ms|123Mbps|住宅|纯净度99.7%
-  - 美国66|343ms|124Mbps|住宅|纯净度99.6%
-  - 美国67|586ms|126Mbps|住宅|纯净度99.6%
-  - 美国68|579ms|126Mbps|住宅|纯净度99.6%
-  - 美国69|585ms|123Mbps|住宅|纯净度99.6%
-  - 美国70|578ms|127Mbps|住宅|纯净度99.6%
-  - 美国71|597ms|123Mbps|住宅|纯净度99.6%
-  - 美国72|223ms|252Mbps|非住宅|纯净度未知
-  - 荷兰20|771ms|85Mbps|非住宅|纯净度97.1%
-  - 德国14|1089ms|59Mbps|非住宅|纯净度100.0%
-  - BR03|1270ms|86Mbps|非住宅|纯净度100.0%
-  - 美国73|311ms|123Mbps|住宅|纯净度99.7%
-  - 美国74|320ms|127Mbps|住宅|纯净度99.6%
-  - 美国75|325ms|124Mbps|住宅|纯净度99.6%
-  - 美国76|322ms|122Mbps|住宅|纯净度99.6%
-  - 美国77|364ms|100Mbps|非住宅|纯净度99.6%
-  - 美国78|327ms|123Mbps|住宅|纯净度99.7%
-  - 荷兰21|919ms|71Mbps|非住宅|纯净度94.8%
-  - 爱尔兰05|821ms|83Mbps|非住宅|纯净度99.5%
-  - 德国15|1043ms|102Mbps|非住宅|纯净度97.7%
-  - 罗马尼亚05|1263ms|48Mbps|非住宅|纯净度86.7%
-  - 印度尼西亚02|1353ms|12Mbps|住宅|纯净度96.9%
-  - 德国16|1047ms|125Mbps|非住宅|纯净度97.7%
-  - 爱尔兰06|823ms|81Mbps|非住宅|纯净度99.5%
-  - 荷兰22|925ms|85Mbps|非住宅|纯净度94.8%
-  - 法国07|992ms|73Mbps|非住宅|纯净度100.0%
-  - 荷兰23|878ms|75Mbps|非住宅|纯净度99.6%
-  - 法国08|950ms|84Mbps|住宅|纯净度100.0%
-  - 荷兰24|921ms|87Mbps|非住宅|纯净度94.8%
-  - 荷兰25|874ms|73Mbps|非住宅|纯净度99.6%
-  - 罗马尼亚06|1258ms|13Mbps|非住宅|纯净度86.7%
-  - 荷兰26|866ms|73Mbps|非住宅|纯净度99.6%
-  - 法国09|992ms|72Mbps|非住宅|纯净度100.0%
-  - 瑞典01|1108ms|13Mbps|住宅|纯净度99.9%
-  - 罗马尼亚07|1281ms|47Mbps|非住宅|纯净度86.7%
-  - 荷兰27|867ms|91Mbps|非住宅|纯净度99.6%
-  - 美国79|477ms|88Mbps|非住宅|纯净度95.9%
-  - 荷兰28|870ms|90Mbps|非住宅|纯净度99.6%
-  - 以色列02|1240ms|80Mbps|住宅未知|纯净度99.6%
-  - 法国10|950ms|79Mbps|住宅|纯净度100.0%
-  - 美国80|577ms|128Mbps|住宅|纯净度99.7%
-  - 德国17|763ms|94Mbps|非住宅|纯净度98.4%
-  - 美国81|320ms|124Mbps|住宅|纯净度99.7%
-  - 荷兰29|758ms|87Mbps|非住宅|纯净度97.1%
-  - 德国18|632ms|6Mbps|非住宅|纯净度99.8%
-  - 美国82|289ms|124Mbps|住宅|纯净度99.6%
-  - 爱尔兰07|789ms|83Mbps|非住宅|纯净度99.6%
-  - 荷兰30|871ms|92Mbps|非住宅|纯净度99.6%
-  - 爱尔兰08|815ms|41Mbps|非住宅|纯净度99.6%
-  - 德国19|1041ms|139Mbps|非住宅|纯净度97.7%
-  - 爱尔兰09|822ms|54Mbps|非住宅|纯净度99.5%
-  - 法国11|948ms|89Mbps|住宅|纯净度100.0%
-  - 美国83|333ms|124Mbps|住宅|纯净度99.6%
-  - 法国12|585ms|42Mbps|非住宅|纯净度99.2%
-  - 法国13|1120ms|62Mbps|非住宅|纯净度95.3%
-  - 法国14|587ms|59Mbps|非住宅|纯净度99.2%
-  - 荷兰31|1097ms|82Mbps|非住宅|纯净度98.0%
-  - 法国15|946ms|86Mbps|住宅|纯净度100.0%
-  - 德国20|1042ms|92Mbps|非住宅|纯净度97.7%
-  - 美国84|322ms|124Mbps|住宅|纯净度99.5%
-  - 美国85|328ms|123Mbps|住宅|纯净度99.5%
-  - 法国16|946ms|70Mbps|非住宅|纯净度98.3%
-  - 德国21|1150ms|3Mbps|非住宅|纯净度100.0%
-  - 荷兰32|773ms|104Mbps|非住宅|纯净度97.1%
-  - 美国86|527ms|54Mbps|非住宅|纯净度93.8%
-  - 加拿大01|605ms|80Mbps|非住宅|纯净度95.5%
-  - 美国87|370ms|103Mbps|非住宅|纯净度99.6%
-  - 美国88|309ms|124Mbps|住宅|纯净度99.7%
-  - 德国22|628ms|17Mbps|非住宅|纯净度99.8%
-  - 法国17|952ms|74Mbps|非住宅|纯净度98.3%
-  - 法国18|940ms|4Mbps|非住宅|纯净度98.7%
-  - 荷兰33|625ms|42Mbps|非住宅|纯净度99.2%
-  - 美国89|542ms|55Mbps|非住宅|纯净度99.5%
-  - 瑞典02|1124ms|7Mbps|住宅|纯净度99.9%
-  - 德国23|638ms|17Mbps|非住宅|纯净度99.8%
-  - 瑞典03|1088ms|10Mbps|住宅|纯净度99.9%
-  - 瑞典04|1107ms|9Mbps|住宅|纯净度99.9%
-  - 法国19|947ms|72Mbps|非住宅|纯净度98.3%
-  - 法国20|984ms|41Mbps|非住宅|纯净度99.2%
-  - 荷兰34|928ms|15Mbps|非住宅|纯净度99.2%
-  - 美国90|188ms|81Mbps|非住宅|纯净度99.5%
-  - 美国91|183ms|37Mbps|非住宅|纯净度99.5%
-  - 意大利02|662ms|169Mbps|非住宅|纯净度88.3%
-  - 荷兰35|884ms|88Mbps|非住宅|纯净度90.6%
-  - 美国92|453ms|47Mbps|非住宅|纯净度100.0%
-  - 法国21|989ms|93Mbps|非住宅|纯净度97.9%
-  - 荷兰36|886ms|19Mbps|非住宅|纯净度98.8%
-  - 新加坡01|774ms|2Mbps|非住宅|纯净度100.0%
-  - 法国22|1189ms|71Mbps|非住宅|纯净度97.7%
-  - 法国23|481ms|114Mbps|非住宅|纯净度97.9%
-  - 意大利03|602ms|176Mbps|非住宅|纯净度88.3%
-  - 新加坡02|780ms|4Mbps|非住宅|纯净度100.0%
-  - 意大利04|644ms|200Mbps|非住宅|纯净度88.3%
-  - 意大利05|613ms|192Mbps|非住宅|纯净度88.3%
-  - 法国24|1116ms|94Mbps|非住宅|纯净度98.7%
-  - 美国93|370ms|52Mbps|住宅|纯净度98.4%
-  - 意大利06|667ms|171Mbps|非住宅|纯净度88.3%
-  - 芬兰02|920ms|79Mbps|非住宅|纯净度93.0%
-  - 法国25|486ms|112Mbps|非住宅|纯净度97.9%
-  - 意大利07|453ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利08|707ms|197Mbps|非住宅|纯净度88.3%
-  - 意大利09|648ms|184Mbps|非住宅|纯净度88.3%
-  - 法国26|923ms|101Mbps|非住宅|纯净度98.7%
-  - 法国27|971ms|72Mbps|非住宅|纯净度97.9%
-  - 意大利10|666ms|185Mbps|非住宅|纯净度88.3%
-  - 意大利11|455ms|193Mbps|非住宅|纯净度88.3%
-  - 意大利12|627ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利13|654ms|210Mbps|非住宅|纯净度88.3%
-  - 新加坡03|824ms|8Mbps|非住宅|纯净度100.0%
-  - 新加坡04|1020ms|14Mbps|非住宅|纯净度100.0%
-  - 荷兰37|778ms|86Mbps|非住宅|纯净度94.8%
-  - 法国28|951ms|5Mbps|非住宅|纯净度98.7%
-  - 意大利14|609ms|174Mbps|非住宅|纯净度88.3%
-  - 意大利15|607ms|214Mbps|非住宅|纯净度88.3%
-  - 意大利16|610ms|208Mbps|非住宅|纯净度88.3%
-  - 荷兰38|774ms|20Mbps|非住宅|纯净度97.1%
-  - 印度01|2037ms|4Mbps|住宅|纯净度99.7%
-  - 法国29|747ms|113Mbps|非住宅|纯净度95.1%
-  - 法国30|768ms|110Mbps|非住宅|纯净度95.1%
-  - 法国31|489ms|110Mbps|非住宅|纯净度97.9%
-  - 法国32|1092ms|19Mbps|非住宅|纯净度97.9%
-  - 法国33|492ms|114Mbps|非住宅|纯净度97.9%
-  - 意大利17|481ms|186Mbps|非住宅|纯净度88.3%
-  - 法国34|1103ms|114Mbps|非住宅|纯净度97.9%
-  - 意大利18|447ms|186Mbps|非住宅|纯净度88.3%
-  - 意大利19|614ms|202Mbps|非住宅|纯净度88.3%
-  - 法国35|770ms|115Mbps|非住宅|纯净度95.1%
-  - 意大利20|615ms|183Mbps|非住宅|纯净度88.3%
-  - 法国36|1088ms|74Mbps|非住宅|纯净度97.9%
-  - 意大利21|471ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利22|625ms|176Mbps|非住宅|纯净度88.3%
-  - 美国94|717ms|47Mbps|住宅|纯净度99.9%
-  - 荷兰39|584ms|5Mbps|非住宅|纯净度94.8%
-  - 荷兰40|783ms|16Mbps|非住宅|纯净度97.1%
-  - 法国37|492ms|113Mbps|非住宅|纯净度97.9%
-  - 意大利23|776ms|189Mbps|非住宅|纯净度88.3%
-  - 法国38|746ms|111Mbps|非住宅|纯净度98.7%
-  - 法国39|747ms|116Mbps|非住宅|纯净度98.7%
-  - 法国40|748ms|114Mbps|非住宅|纯净度98.7%
-  - 法国41|756ms|115Mbps|非住宅|纯净度98.7%
-  - 荷兰41|793ms|108Mbps|非住宅|纯净度97.1%
-  - 美国95|315ms|124Mbps|住宅|纯净度99.7%
-  - 意大利24|670ms|209Mbps|非住宅|纯净度88.3%
-  - 美国96|339ms|128Mbps|住宅|纯净度99.7%
-  - 美国97|307ms|125Mbps|住宅|纯净度99.6%
-  - 荷兰42|867ms|82Mbps|非住宅|纯净度90.6%
-  - 荷兰43|868ms|72Mbps|非住宅|纯净度90.6%
-  - 意大利25|655ms|198Mbps|非住宅|纯净度88.3%
-  - 荷兰44|767ms|43Mbps|非住宅|纯净度97.1%
-  - 罗马尼亚08|1267ms|91Mbps|非住宅|纯净度86.7%
-  - 罗马尼亚09|1262ms|93Mbps|非住宅|纯净度86.7%
-  - 荷兰45|649ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰46|794ms|103Mbps|非住宅|纯净度94.8%
-  - 德国24|1008ms|45Mbps|非住宅|纯净度100.0%
-  - 法国42|980ms|69Mbps|非住宅|纯净度95.1%
-  - 意大利26|613ms|201Mbps|非住宅|纯净度88.3%
-  - 荷兰47|987ms|16Mbps|非住宅|纯净度94.8%
-  - 荷兰48|988ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰49|790ms|84Mbps|非住宅|纯净度94.8%
-  - 美国98|559ms|81Mbps|非住宅|纯净度99.5%
-  - 意大利27|758ms|185Mbps|非住宅|纯净度88.3%
-  - 意大利28|709ms|186Mbps|非住宅|纯净度88.3%
-  - 波兰07|876ms|99Mbps|非住宅|纯净度81.2%
-  - 意大利29|658ms|182Mbps|非住宅|纯净度88.3%
-  - 以色列03|1246ms|73Mbps|住宅未知|纯净度99.6%
-  - 美国99|435ms|85Mbps|非住宅|纯净度95.9%
-  - 日本02|853ms|87Mbps|非住宅|纯净度未知
-  - 意大利30|616ms|178Mbps|非住宅|纯净度88.3%
-  - 荷兰50|936ms|46Mbps|非住宅|纯净度99.2%
-  - 意大利31|715ms|185Mbps|非住宅|纯净度88.3%
-  - 意大利32|623ms|190Mbps|非住宅|纯净度88.3%
-  - 荷兰51|882ms|42Mbps|非住宅|纯净度98.8%
-  - 意大利33|597ms|204Mbps|非住宅|纯净度88.3%
-  - 荷兰52|766ms|120Mbps|非住宅|纯净度88.7%
-  - 美国100|248ms|10Mbps|非住宅|纯净度99.2%
-  - 意大利34|751ms|176Mbps|非住宅|纯净度88.3%
-  - 荷兰53|1032ms|102Mbps|非住宅|纯净度74.5%
-  - 荷兰54|882ms|65Mbps|非住宅|纯净度90.6%
+  - 美国01|160ms|180Mbps|非住宅|纯净度未知
+  - 美国02|220ms|193Mbps|非住宅|纯净度未知
+  - 美国03|233ms|114Mbps|非住宅|纯净度100.0%
+  - 美国04|226ms|192Mbps|非住宅|纯净度未知
+  - 美国05|219ms|123Mbps|非住宅|纯净度100.0%
+  - 美国06|228ms|130Mbps|非住宅|纯净度100.0%
+  - 美国07|218ms|126Mbps|非住宅|纯净度100.0%
+  - 美国08|334ms|105Mbps|非住宅|纯净度99.6%
+  - 美国09|356ms|14Mbps|非住宅|纯净度98.4%
+  - 美国10|358ms|107Mbps|非住宅|纯净度99.2%
+  - 美国11|360ms|166Mbps|非住宅|纯净度99.2%
+  - 美国12|358ms|159Mbps|非住宅|纯净度99.2%
+  - 美国13|361ms|14Mbps|非住宅|纯净度98.4%
+  - 美国14|350ms|152Mbps|非住宅|纯净度99.2%
+  - 美国15|360ms|124Mbps|非住宅|纯净度99.2%
+  - 美国16|348ms|110Mbps|非住宅|纯净度99.2%
+  - 美国17|227ms|143Mbps|非住宅|纯净度100.0%
+  - 美国18|350ms|101Mbps|非住宅|纯净度99.2%
+  - 爱尔兰01|497ms|81Mbps|非住宅|纯净度99.5%
+  - 爱尔兰02|547ms|80Mbps|非住宅|纯净度99.5%
+  - 美国19|565ms|119Mbps|非住宅|纯净度98.9%
+  - 美国20|564ms|119Mbps|非住宅|纯净度98.9%
+  - 荷兰01|610ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰02|611ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰03|596ms|73Mbps|非住宅|纯净度99.6%
+  - 美国21|621ms|4Mbps|非住宅|纯净度95.5%
+  - 荷兰04|610ms|73Mbps|非住宅|纯净度99.6%
+  - 法国01|640ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰05|606ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰06|619ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰07|620ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰08|641ms|99Mbps|非住宅|纯净度74.5%
+  - 法国02|622ms|57Mbps|非住宅|纯净度99.2%
+  - 荷兰09|623ms|72Mbps|非住宅|纯净度94.8%
+  - 荷兰10|647ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰11|647ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰12|641ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰13|645ms|100Mbps|非住宅|纯净度74.5%
+  - 美国22|632ms|4Mbps|非住宅|纯净度95.5%
+  - 荷兰14|644ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰15|599ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰16|641ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰17|646ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰18|638ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰19|684ms|89Mbps|非住宅|纯净度98.0%
+  - 德国01|693ms|18Mbps|非住宅|纯净度100.0%
+  - 德国02|687ms|68Mbps|非住宅|纯净度100.0%
+  - 荷兰20|633ms|107Mbps|非住宅|纯净度74.5%
+  - 荷兰21|632ms|105Mbps|非住宅|纯净度74.5%
+  - 德国03|697ms|114Mbps|非住宅|纯净度97.7%
+  - 荷兰22|682ms|86Mbps|非住宅|纯净度98.0%
+  - 德国04|710ms|140Mbps|非住宅|纯净度97.7%
+  - 波兰01|628ms|96Mbps|非住宅|纯净度81.2%
+  - 荷兰23|600ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰24|645ms|100Mbps|非住宅|纯净度74.5%
+  - 德国05|812ms|11Mbps|住宅未知|纯净度98.4%
+  - 荷兰25|836ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰26|842ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰27|836ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰28|839ms|86Mbps|非住宅|纯净度74.5%
+  - 荷兰29|836ms|103Mbps|非住宅|纯净度74.5%
+  - 波兰02|778ms|81Mbps|非住宅|纯净度97.3%
+  - 波兰03|784ms|80Mbps|非住宅|纯净度97.3%
+  - 波兰04|776ms|80Mbps|非住宅|纯净度97.3%
+  - 荷兰30|842ms|103Mbps|非住宅|纯净度74.5%
+  - 波兰05|778ms|80Mbps|非住宅|纯净度97.3%
+  - 波兰06|786ms|81Mbps|非住宅|纯净度97.3%
+  - 荷兰31|844ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰32|845ms|103Mbps|非住宅|纯净度74.5%
+  - BR01|897ms|93Mbps|非住宅|纯净度100.0%
+  - 德国06|880ms|5Mbps|非住宅|纯净度100.0%
+  - 荷兰33|846ms|101Mbps|非住宅|纯净度74.5%
+  - 罗马尼亚01|902ms|91Mbps|非住宅|纯净度86.7%
+  - 荷兰34|840ms|106Mbps|非住宅|纯净度74.5%
+  - 德国07|1046ms|3Mbps|非住宅|纯净度92.2%
+  - 德国08|1056ms|4Mbps|非住宅|纯净度92.2%
+  - 德国09|1076ms|110Mbps|非住宅|纯净度98.4%
+  - 德国10|1078ms|20Mbps|非住宅|纯净度98.4%
+  - 以色列01|1084ms|49Mbps|住宅未知|纯净度99.6%
+  - 新加坡01|1623ms|80Mbps|非住宅|纯净度97.6%
+  - 美国23|327ms|120Mbps|住宅|纯净度99.7%
+  - 爱尔兰03|541ms|58Mbps|非住宅|纯净度99.6%
+  - 美国24|577ms|125Mbps|住宅|纯净度99.6%
+  - 爱尔兰04|516ms|84Mbps|非住宅|纯净度99.6%
+  - 美国25|565ms|125Mbps|住宅|纯净度99.6%
+  - 荷兰35|597ms|73Mbps|非住宅|纯净度99.6%
+  - 美国26|627ms|2Mbps|非住宅|纯净度95.5%
+  - 荷兰36|638ms|96Mbps|非住宅|纯净度74.5%
+  - 法国03|646ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰37|608ms|73Mbps|非住宅|纯净度99.6%
+  - 法国04|681ms|16Mbps|非住宅|纯净度99.2%
+  - TR01|500ms|43Mbps|非住宅|纯净度81.2%
+  - 荷兰38|842ms|18Mbps|非住宅|纯净度99.2%
+  - BR02|898ms|16Mbps|非住宅|纯净度100.0%
+  - 波兰07|769ms|4Mbps|非住宅|纯净度96.9%
+  - 德国11|1048ms|3Mbps|非住宅|纯净度92.2%
+  - 意大利01|1030ms|114Mbps|非住宅|纯净度85.9%
+  - 美国27|330ms|124Mbps|住宅|纯净度99.7%
+  - 美国28|331ms|124Mbps|住宅|纯净度99.7%
+  - 美国29|332ms|125Mbps|住宅|纯净度99.7%
+  - 美国30|341ms|123Mbps|住宅|纯净度99.7%
+  - 美国31|331ms|124Mbps|住宅|纯净度99.7%
+  - 美国32|330ms|120Mbps|住宅|纯净度99.7%
+  - 美国33|564ms|121Mbps|住宅|纯净度99.6%
+  - 美国34|575ms|125Mbps|住宅|纯净度99.7%
+  - 美国35|569ms|121Mbps|住宅|纯净度99.7%
+  - 美国36|563ms|125Mbps|住宅|纯净度99.7%
+  - 美国37|566ms|124Mbps|住宅|纯净度99.7%
+  - 美国38|567ms|121Mbps|住宅|纯净度99.7%
+  - 美国39|575ms|124Mbps|住宅|纯净度99.6%
+  - 美国40|583ms|120Mbps|住宅|纯净度99.7%
+  - 美国41|569ms|124Mbps|住宅|纯净度99.6%
+  - 美国42|573ms|121Mbps|住宅|纯净度99.6%
+  - 美国43|575ms|125Mbps|住宅|纯净度99.6%
+  - 美国44|572ms|120Mbps|住宅|纯净度99.6%
+  - 美国45|579ms|124Mbps|住宅|纯净度99.7%
+  - 美国46|561ms|121Mbps|住宅|纯净度99.7%
+  - 美国47|573ms|121Mbps|住宅|纯净度99.7%
+  - 美国48|575ms|119Mbps|住宅|纯净度99.7%
+  - 美国49|579ms|120Mbps|住宅|纯净度99.7%
+  - 美国50|568ms|125Mbps|住宅|纯净度99.7%
+  - 美国51|572ms|120Mbps|住宅|纯净度99.7%
+  - 美国52|569ms|123Mbps|住宅|纯净度99.7%
+  - 美国53|325ms|125Mbps|住宅|纯净度99.5%
+  - 美国54|340ms|120Mbps|住宅|纯净度99.5%
+  - 美国55|320ms|123Mbps|住宅|纯净度99.5%
+  - 美国56|336ms|121Mbps|住宅|纯净度99.5%
+  - 美国57|329ms|121Mbps|住宅|纯净度99.5%
+  - 美国58|154ms|189Mbps|非住宅|纯净度未知
+  - 德国12|706ms|18Mbps|非住宅|纯净度100.0%
+  - 荷兰39|571ms|86Mbps|非住宅|纯净度94.8%
+  - 德国13|704ms|20Mbps|非住宅|纯净度100.0%
+  - BR03|894ms|91Mbps|非住宅|纯净度100.0%
+  - 美国59|570ms|124Mbps|住宅|纯净度99.6%
+  - 美国60|568ms|125Mbps|住宅|纯净度99.7%
+  - 美国61|567ms|124Mbps|住宅|纯净度99.7%
+  - 荷兰40|642ms|100Mbps|非住宅|纯净度74.5%
+  - 美国62|571ms|125Mbps|住宅|纯净度99.7%
+  - 荷兰41|631ms|106Mbps|非住宅|纯净度74.5%
+  - 美国63|564ms|125Mbps|住宅|纯净度99.7%
+  - 美国64|566ms|121Mbps|住宅|纯净度99.7%
+  - 美国65|343ms|104Mbps|非住宅|纯净度99.6%
+  - 美国66|564ms|124Mbps|住宅|纯净度99.7%
+  - 荷兰42|628ms|71Mbps|非住宅|纯净度94.8%
+  - 爱尔兰05|540ms|83Mbps|非住宅|纯净度99.5%
+  - 罗马尼亚02|907ms|46Mbps|非住宅|纯净度86.7%
+  - 德国14|683ms|138Mbps|非住宅|纯净度97.7%
+  - 爱尔兰06|492ms|80Mbps|非住宅|纯净度99.5%
+  - 荷兰43|617ms|72Mbps|非住宅|纯净度94.8%
+  - 法国05|636ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰44|634ms|70Mbps|非住宅|纯净度94.8%
+  - 法国06|715ms|84Mbps|住宅|纯净度100.0%
+  - 荷兰45|608ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰46|590ms|73Mbps|非住宅|纯净度99.6%
+  - 法国07|646ms|72Mbps|非住宅|纯净度100.0%
+  - 荷兰47|620ms|73Mbps|非住宅|纯净度99.6%
+  - 罗马尼亚03|894ms|13Mbps|非住宅|纯净度86.7%
+  - 波兰08|637ms|96Mbps|非住宅|纯净度81.2%
+  - 荷兰48|634ms|99Mbps|非住宅|纯净度74.5%
+  - 以色列02|1083ms|51Mbps|住宅未知|纯净度99.6%
+  - 美国67|706ms|69Mbps|非住宅|纯净度95.9%
+  - 荷兰49|645ms|93Mbps|非住宅|纯净度74.5%
+  - 法国08|716ms|81Mbps|住宅|纯净度100.0%
+  - 荷兰50|839ms|104Mbps|非住宅|纯净度74.5%
+  - 荷兰51|635ms|94Mbps|非住宅|纯净度74.5%
+  - 美国68|332ms|121Mbps|住宅|纯净度99.7%
+  - 荷兰52|849ms|106Mbps|非住宅|纯净度74.5%
+  - 美国69|561ms|125Mbps|住宅|纯净度99.7%
+  - 德国15|1118ms|19Mbps|非住宅|纯净度98.4%
+  - 德国16|900ms|21Mbps|非住宅|纯净度99.8%
+  - 美国70|575ms|125Mbps|住宅|纯净度99.6%
+  - 爱尔兰07|542ms|59Mbps|非住宅|纯净度99.6%
+  - 荷兰53|634ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰54|605ms|72Mbps|非住宅|纯净度99.6%
+  - 爱尔兰08|476ms|54Mbps|非住宅|纯净度99.6%
+  - 德国17|681ms|141Mbps|非住宅|纯净度97.7%
+  - 荷兰55|844ms|105Mbps|非住宅|纯净度74.5%
+  - 爱尔兰09|483ms|81Mbps|非住宅|纯净度99.5%
+  - 美国71|575ms|124Mbps|住宅|纯净度99.7%
+  - 法国09|719ms|85Mbps|住宅|纯净度100.0%
+  - 美国72|572ms|124Mbps|住宅|纯净度99.7%
+  - 美国73|568ms|120Mbps|住宅|纯净度99.7%
+  - 法国10|708ms|15Mbps|非住宅|纯净度95.3%
+  - 荷兰56|685ms|82Mbps|非住宅|纯净度98.0%
+  - 德国18|694ms|141Mbps|非住宅|纯净度97.7%
+  - 法国11|714ms|85Mbps|住宅|纯净度100.0%
+  - 以色列03|1088ms|56Mbps|住宅未知|纯净度99.6%
+  - 美国74|337ms|103Mbps|非住宅|纯净度99.6%
+  - 荷兰57|636ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰58|638ms|14Mbps|非住宅|纯净度74.5%
+  - 德国19|891ms|4Mbps|非住宅|纯净度100.0%
+  - 法国12|622ms|61Mbps|非住宅|纯净度98.3%
+  - 荷兰59|644ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰60|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰61|571ms|83Mbps|非住宅|纯净度94.8%
+  - 美国75|225ms|37Mbps|非住宅|纯净度93.8%
+  - 加拿大01|278ms|85Mbps|非住宅|纯净度95.5%
+  - 荷兰62|644ms|105Mbps|非住宅|纯净度74.5%
+  - 德国20|903ms|20Mbps|非住宅|纯净度99.8%
+  - 荷兰63|643ms|98Mbps|非住宅|纯净度74.5%
+  - 美国76|208ms|29Mbps|非住宅|纯净度99.5%
+  - 荷兰64|644ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰65|841ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰66|630ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰67|646ms|98Mbps|非住宅|纯净度74.5%
+  - 荷兰68|628ms|97Mbps|非住宅|纯净度74.5%
+  - 法国13|630ms|58Mbps|非住宅|纯净度98.3%
+  - 荷兰69|634ms|103Mbps|非住宅|纯净度74.5%
+  - 荷兰70|846ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰71|837ms|19Mbps|非住宅|纯净度99.2%
+  - 荷兰72|636ms|106Mbps|非住宅|纯净度74.5%
+  - 美国77|164ms|84Mbps|非住宅|纯净度99.5%
+  - 荷兰73|647ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰74|838ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰75|641ms|94Mbps|非住宅|纯净度74.5%
+  - 荷兰76|845ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰77|636ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰78|833ms|95Mbps|非住宅|纯净度74.5%
+  - 荷兰79|842ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰80|644ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰81|835ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰82|634ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰83|642ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰84|636ms|101Mbps|非住宅|纯净度74.5%
+  - 德国21|906ms|21Mbps|非住宅|纯净度99.8%
+  - 荷兰85|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰86|643ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰87|835ms|93Mbps|非住宅|纯净度74.5%
+  - 法国14|628ms|73Mbps|非住宅|纯净度98.3%
+  - 法国15|620ms|52Mbps|非住宅|纯净度99.2%
+  - 美国78|455ms|30Mbps|非住宅|纯净度99.5%
+  - 荷兰88|846ms|104Mbps|非住宅|纯净度74.5%
+  - 荷兰89|647ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰90|838ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰91|639ms|95Mbps|非住宅|纯净度74.5%
+  - 美国79|436ms|71Mbps|非住宅|纯净度99.5%
+  - 荷兰92|640ms|101Mbps|非住宅|纯净度74.5%
+  - 美国80|204ms|47Mbps|非住宅|纯净度100.0%
+  - 荷兰93|633ms|14Mbps|非住宅|纯净度98.8%
+  - 泰国01|1172ms|67Mbps|非住宅|纯净度98.9%
+  - 台湾01|658ms|20Mbps|住宅未知|纯净度未知
+  - 德国22|1236ms|14Mbps|非住宅|纯净度100.0%
+  - 新加坡02|1052ms|13Mbps|非住宅|纯净度100.0%
+  - 美国81|398ms|48Mbps|住宅|纯净度99.9%
+  - TR02|507ms|41Mbps|非住宅|纯净度81.2%
+  - TR03|506ms|41Mbps|非住宅|纯净度81.2%
+  - 荷兰94|626ms|22Mbps|非住宅|纯净度90.6%
+  - 荷兰95|634ms|62Mbps|非住宅|纯净度90.6%
+  - 美国82|583ms|127Mbps|住宅|纯净度99.7%
+  - 荷兰96|646ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰97|605ms|49Mbps|非住宅|纯净度90.6%
+  - 德国23|687ms|138Mbps|非住宅|纯净度97.7%
+  - 荷兰98|1064ms|4Mbps|非住宅|纯净度94.8%
+  - MX01|499ms|55Mbps|非住宅|纯净度97.7%
+  - 荷兰99|611ms|69Mbps|非住宅|纯净度99.6%
+  - 荷兰100|602ms|72Mbps|非住宅|纯净度99.6%
+  - 台湾02|659ms|9Mbps|住宅未知|纯净度未知
+  - 美国83|508ms|72Mbps|非住宅|纯净度95.9%
+  - 荷兰101|611ms|72Mbps|非住宅|纯净度99.6%
+  - 美国84|1393ms|4Mbps|非住宅|纯净度98.4%
+  - 荷兰102|614ms|20Mbps|非住宅|纯净度90.6%
+  - 意大利02|610ms|137Mbps|非住宅|纯净度88.3%
   - 🍓 请前往官网重新获取订阅
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
@@ -3585,148 +2979,161 @@ proxy-groups:
 - name: ⭐ 综合优选
   type: url-test
   proxies:
-  - 美国01|164ms|265Mbps|非住宅|纯净度未知
-  - 美国02|228ms|271Mbps|非住宅|纯净度未知
-  - 美国03|240ms|183Mbps|非住宅|纯净度98.9%
-  - 美国04|173ms|269Mbps|非住宅|纯净度未知
-  - 美国05|250ms|203Mbps|非住宅|纯净度98.9%
-  - 美国06|339ms|4Mbps|非住宅|纯净度95.5%
-  - 美国07|346ms|4Mbps|非住宅|纯净度95.5%
-  - 美国08|374ms|101Mbps|非住宅|纯净度99.6%
-  - 美国09|482ms|142Mbps|非住宅|纯净度100.0%
-  - 美国10|491ms|157Mbps|非住宅|纯净度100.0%
-  - 美国11|484ms|118Mbps|非住宅|纯净度100.0%
-  - 美国12|482ms|125Mbps|非住宅|纯净度100.0%
-  - 美国13|554ms|48Mbps|非住宅|纯净度99.2%
-  - 美国14|562ms|56Mbps|非住宅|纯净度99.2%
-  - 美国15|555ms|160Mbps|非住宅|纯净度99.2%
-  - 美国16|569ms|48Mbps|非住宅|纯净度99.2%
-  - 美国17|552ms|163Mbps|非住宅|纯净度99.2%
-  - 美国18|556ms|24Mbps|非住宅|纯净度98.4%
-  - 美国19|565ms|51Mbps|非住宅|纯净度99.2%
-  - 美国20|568ms|24Mbps|非住宅|纯净度98.4%
-  - 美国21|477ms|115Mbps|非住宅|纯净度100.0%
-  - 美国22|548ms|141Mbps|非住宅|纯净度99.2%
-  - MX01|602ms|50Mbps|非住宅|纯净度97.7%
-  - 美国23|167ms|257Mbps|非住宅|纯净度未知
-  - 德国01|750ms|15Mbps|非住宅|纯净度98.4%
-  - 德国02|767ms|99Mbps|非住宅|纯净度98.4%
-  - 德国03|753ms|4Mbps|非住宅|纯净度92.2%
-  - 美国24|565ms|61Mbps|非住宅|纯净度99.2%
-  - 德国04|778ms|4Mbps|非住宅|纯净度92.2%
-  - 荷兰01|842ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰02|866ms|71Mbps|非住宅|纯净度99.6%
-  - 荷兰03|874ms|74Mbps|非住宅|纯净度99.6%
-  - 德国05|926ms|20Mbps|非住宅|纯净度100.0%
-  - 德国06|928ms|44Mbps|非住宅|纯净度100.0%
-  - 荷兰04|921ms|70Mbps|非住宅|纯净度94.8%
-  - 爱尔兰01|878ms|56Mbps|非住宅|纯净度99.5%
-  - 爱尔兰02|829ms|55Mbps|非住宅|纯净度99.5%
-  - 荷兰05|921ms|70Mbps|非住宅|纯净度94.8%
-  - 荷兰06|924ms|89Mbps|非住宅|纯净度94.8%
-  - 法国01|988ms|72Mbps|非住宅|纯净度100.0%
-  - 德国07|1043ms|98Mbps|非住宅|纯净度97.7%
-  - 波兰01|1074ms|81Mbps|非住宅|纯净度97.3%
-  - 波兰02|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 波兰03|874ms|100Mbps|非住宅|纯净度81.2%
-  - 波兰04|1063ms|80Mbps|非住宅|纯净度97.3%
-  - 波兰05|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 德国08|1050ms|102Mbps|非住宅|纯净度97.7%
-  - 荷兰07|1099ms|81Mbps|非住宅|纯净度98.0%
-  - 荷兰08|923ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰09|1108ms|89Mbps|非住宅|纯净度98.0%
-  - 荷兰10|874ms|89Mbps|非住宅|纯净度99.6%
-  - 德国09|1000ms|12Mbps|住宅未知|纯净度98.4%
-  - 荷兰11|917ms|84Mbps|非住宅|纯净度94.8%
-  - 德国10|1186ms|3Mbps|非住宅|纯净度100.0%
-  - 罗马尼亚01|1277ms|48Mbps|非住宅|纯净度86.7%
-  - BR01|1272ms|90Mbps|非住宅|纯净度100.0%
-  - 以色列01|1236ms|51Mbps|住宅未知|纯净度99.6%
-  - 荷兰12|868ms|72Mbps|非住宅|纯净度99.6%
-  - 印度尼西亚01|1514ms|12Mbps|住宅|纯净度96.9%
-  - 罗马尼亚02|1269ms|88Mbps|非住宅|纯净度86.7%
-  - 美国25|252ms|136Mbps|非住宅|纯净度未知
-  - 美国26|251ms|145Mbps|非住宅|纯净度未知
-  - 美国27|226ms|138Mbps|非住宅|纯净度未知
-  - 美国28|285ms|55Mbps|非住宅|纯净度98.4%
-  - 美国29|316ms|125Mbps|住宅|纯净度99.7%
-  - 美国30|337ms|4Mbps|非住宅|纯净度95.5%
-  - 美国31|315ms|129Mbps|住宅|纯净度99.7%
-  - 法国02|481ms|114Mbps|非住宅|纯净度97.9%
-  - 德国11|565ms|104Mbps|非住宅|纯净度98.0%
-  - 美国32|571ms|126Mbps|住宅|纯净度99.5%
-  - 意大利01|616ms|109Mbps|非住宅|纯净度85.9%
-  - 荷兰13|771ms|49Mbps|非住宅|纯净度97.1%
-  - 荷兰14|791ms|54Mbps|非住宅|纯净度100.0%
-  - 韩国01|786ms|97Mbps|非住宅|纯净度98.5%
-  - 德国12|779ms|2Mbps|非住宅|纯净度92.2%
-  - 德国13|779ms|4Mbps|非住宅|纯净度92.2%
-  - 爱尔兰03|750ms|54Mbps|非住宅|纯净度99.6%
-  - 爱尔兰04|812ms|87Mbps|非住宅|纯净度99.6%
-  - 荷兰15|866ms|88Mbps|非住宅|纯净度99.6%
-  - 荷兰16|846ms|64Mbps|非住宅|纯净度97.1%
-  - 荷兰17|870ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰18|873ms|73Mbps|非住宅|纯净度99.6%
-  - 法国03|989ms|71Mbps|非住宅|纯净度100.0%
-  - 法国04|994ms|55Mbps|非住宅|纯净度99.2%
-  - 芬兰01|627ms|67Mbps|非住宅|纯净度100.0%
-  - 波兰06|1076ms|79Mbps|非住宅|纯净度97.3%
-  - 法国05|1036ms|19Mbps|非住宅|纯净度99.2%
-  - 荷兰19|520ms|57Mbps|非住宅|纯净度94.8%
-  - 日本01|1065ms|114Mbps|非住宅|纯净度未知
-  - 法国06|1093ms|94Mbps|非住宅|纯净度97.9%
-  - 罗马尼亚03|1273ms|46Mbps|非住宅|纯净度86.7%
-  - BR02|1275ms|18Mbps|非住宅|纯净度100.0%
-  - 罗马尼亚04|1271ms|52Mbps|非住宅|纯净度86.7%
-  - 美国72|223ms|252Mbps|非住宅|纯净度未知
-  - 荷兰20|771ms|85Mbps|非住宅|纯净度97.1%
-  - 德国14|1089ms|59Mbps|非住宅|纯净度100.0%
-  - BR03|1270ms|86Mbps|非住宅|纯净度100.0%
-  - 美国77|364ms|100Mbps|非住宅|纯净度99.6%
-  - 荷兰21|919ms|71Mbps|非住宅|纯净度94.8%
-  - 爱尔兰05|821ms|83Mbps|非住宅|纯净度99.5%
-  - 德国15|1043ms|102Mbps|非住宅|纯净度97.7%
-  - 罗马尼亚05|1263ms|48Mbps|非住宅|纯净度86.7%
-  - 印度尼西亚02|1353ms|12Mbps|住宅|纯净度96.9%
-  - 德国16|1047ms|125Mbps|非住宅|纯净度97.7%
-  - 爱尔兰06|823ms|81Mbps|非住宅|纯净度99.5%
-  - 荷兰22|925ms|85Mbps|非住宅|纯净度94.8%
-  - 法国07|992ms|73Mbps|非住宅|纯净度100.0%
-  - 荷兰23|878ms|75Mbps|非住宅|纯净度99.6%
-  - 法国08|950ms|84Mbps|住宅|纯净度100.0%
-  - 荷兰24|921ms|87Mbps|非住宅|纯净度94.8%
-  - 荷兰25|874ms|73Mbps|非住宅|纯净度99.6%
-  - 罗马尼亚06|1258ms|13Mbps|非住宅|纯净度86.7%
-  - 荷兰26|866ms|73Mbps|非住宅|纯净度99.6%
-  - 法国09|992ms|72Mbps|非住宅|纯净度100.0%
-  - 瑞典01|1108ms|13Mbps|住宅|纯净度99.9%
-  - 罗马尼亚07|1281ms|47Mbps|非住宅|纯净度86.7%
-  - 荷兰27|867ms|91Mbps|非住宅|纯净度99.6%
-  - 美国79|477ms|88Mbps|非住宅|纯净度95.9%
-  - 荷兰28|870ms|90Mbps|非住宅|纯净度99.6%
-  - 以色列02|1240ms|80Mbps|住宅未知|纯净度99.6%
-  - 法国10|950ms|79Mbps|住宅|纯净度100.0%
-  - 德国17|763ms|94Mbps|非住宅|纯净度98.4%
-  - 荷兰29|758ms|87Mbps|非住宅|纯净度97.1%
-  - 德国18|632ms|6Mbps|非住宅|纯净度99.8%
-  - 爱尔兰07|789ms|83Mbps|非住宅|纯净度99.6%
-  - 荷兰30|871ms|92Mbps|非住宅|纯净度99.6%
-  - 爱尔兰08|815ms|41Mbps|非住宅|纯净度99.6%
-  - 德国19|1041ms|139Mbps|非住宅|纯净度97.7%
-  - 爱尔兰09|822ms|54Mbps|非住宅|纯净度99.5%
-  - 法国11|948ms|89Mbps|住宅|纯净度100.0%
-  - 法国12|585ms|42Mbps|非住宅|纯净度99.2%
-  - 法国13|1120ms|62Mbps|非住宅|纯净度95.3%
-  - 法国14|587ms|59Mbps|非住宅|纯净度99.2%
-  - 荷兰31|1097ms|82Mbps|非住宅|纯净度98.0%
-  - 法国15|946ms|86Mbps|住宅|纯净度100.0%
-  - 德国20|1042ms|92Mbps|非住宅|纯净度97.7%
-  - 法国16|946ms|70Mbps|非住宅|纯净度98.3%
-  - 德国21|1150ms|3Mbps|非住宅|纯净度100.0%
-  - 荷兰32|773ms|104Mbps|非住宅|纯净度97.1%
-  - 美国86|527ms|54Mbps|非住宅|纯净度93.8%
-  - 加拿大01|605ms|80Mbps|非住宅|纯净度95.5%
-  - 美国87|370ms|103Mbps|非住宅|纯净度99.6%
+  - 美国01|160ms|180Mbps|非住宅|纯净度未知
+  - 美国02|220ms|193Mbps|非住宅|纯净度未知
+  - 美国03|233ms|114Mbps|非住宅|纯净度100.0%
+  - 美国04|226ms|192Mbps|非住宅|纯净度未知
+  - 美国05|219ms|123Mbps|非住宅|纯净度100.0%
+  - 美国06|228ms|130Mbps|非住宅|纯净度100.0%
+  - 美国07|218ms|126Mbps|非住宅|纯净度100.0%
+  - 美国08|334ms|105Mbps|非住宅|纯净度99.6%
+  - 美国09|356ms|14Mbps|非住宅|纯净度98.4%
+  - 美国10|358ms|107Mbps|非住宅|纯净度99.2%
+  - 美国11|360ms|166Mbps|非住宅|纯净度99.2%
+  - 美国12|358ms|159Mbps|非住宅|纯净度99.2%
+  - 美国13|361ms|14Mbps|非住宅|纯净度98.4%
+  - 美国14|350ms|152Mbps|非住宅|纯净度99.2%
+  - 美国15|360ms|124Mbps|非住宅|纯净度99.2%
+  - 美国16|348ms|110Mbps|非住宅|纯净度99.2%
+  - 美国17|227ms|143Mbps|非住宅|纯净度100.0%
+  - 美国18|350ms|101Mbps|非住宅|纯净度99.2%
+  - 爱尔兰01|497ms|81Mbps|非住宅|纯净度99.5%
+  - 爱尔兰02|547ms|80Mbps|非住宅|纯净度99.5%
+  - 美国19|565ms|119Mbps|非住宅|纯净度98.9%
+  - 美国20|564ms|119Mbps|非住宅|纯净度98.9%
+  - 荷兰01|610ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰02|611ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰03|596ms|73Mbps|非住宅|纯净度99.6%
+  - 美国21|621ms|4Mbps|非住宅|纯净度95.5%
+  - 荷兰04|610ms|73Mbps|非住宅|纯净度99.6%
+  - 法国01|640ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰05|606ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰06|619ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰07|620ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰08|641ms|99Mbps|非住宅|纯净度74.5%
+  - 法国02|622ms|57Mbps|非住宅|纯净度99.2%
+  - 荷兰09|623ms|72Mbps|非住宅|纯净度94.8%
+  - 荷兰10|647ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰11|647ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰12|641ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰13|645ms|100Mbps|非住宅|纯净度74.5%
+  - 美国22|632ms|4Mbps|非住宅|纯净度95.5%
+  - 荷兰14|644ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰15|599ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰16|641ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰17|646ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰18|638ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰19|684ms|89Mbps|非住宅|纯净度98.0%
+  - 德国01|693ms|18Mbps|非住宅|纯净度100.0%
+  - 德国02|687ms|68Mbps|非住宅|纯净度100.0%
+  - 荷兰20|633ms|107Mbps|非住宅|纯净度74.5%
+  - 荷兰21|632ms|105Mbps|非住宅|纯净度74.5%
+  - 德国03|697ms|114Mbps|非住宅|纯净度97.7%
+  - 荷兰22|682ms|86Mbps|非住宅|纯净度98.0%
+  - 德国04|710ms|140Mbps|非住宅|纯净度97.7%
+  - 波兰01|628ms|96Mbps|非住宅|纯净度81.2%
+  - 荷兰23|600ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰24|645ms|100Mbps|非住宅|纯净度74.5%
+  - 德国05|812ms|11Mbps|住宅未知|纯净度98.4%
+  - 荷兰25|836ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰26|842ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰27|836ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰28|839ms|86Mbps|非住宅|纯净度74.5%
+  - 荷兰29|836ms|103Mbps|非住宅|纯净度74.5%
+  - 波兰02|778ms|81Mbps|非住宅|纯净度97.3%
+  - 波兰03|784ms|80Mbps|非住宅|纯净度97.3%
+  - 波兰04|776ms|80Mbps|非住宅|纯净度97.3%
+  - 荷兰30|842ms|103Mbps|非住宅|纯净度74.5%
+  - 波兰05|778ms|80Mbps|非住宅|纯净度97.3%
+  - 波兰06|786ms|81Mbps|非住宅|纯净度97.3%
+  - 荷兰31|844ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰32|845ms|103Mbps|非住宅|纯净度74.5%
+  - BR01|897ms|93Mbps|非住宅|纯净度100.0%
+  - 德国06|880ms|5Mbps|非住宅|纯净度100.0%
+  - 荷兰33|846ms|101Mbps|非住宅|纯净度74.5%
+  - 罗马尼亚01|902ms|91Mbps|非住宅|纯净度86.7%
+  - 荷兰34|840ms|106Mbps|非住宅|纯净度74.5%
+  - 德国07|1046ms|3Mbps|非住宅|纯净度92.2%
+  - 德国08|1056ms|4Mbps|非住宅|纯净度92.2%
+  - 德国09|1076ms|110Mbps|非住宅|纯净度98.4%
+  - 德国10|1078ms|20Mbps|非住宅|纯净度98.4%
+  - 以色列01|1084ms|49Mbps|住宅未知|纯净度99.6%
+  - 新加坡01|1623ms|80Mbps|非住宅|纯净度97.6%
+  - 美国23|327ms|120Mbps|住宅|纯净度99.7%
+  - 爱尔兰03|541ms|58Mbps|非住宅|纯净度99.6%
+  - 美国24|577ms|125Mbps|住宅|纯净度99.6%
+  - 爱尔兰04|516ms|84Mbps|非住宅|纯净度99.6%
+  - 美国25|565ms|125Mbps|住宅|纯净度99.6%
+  - 荷兰35|597ms|73Mbps|非住宅|纯净度99.6%
+  - 美国26|627ms|2Mbps|非住宅|纯净度95.5%
+  - 荷兰36|638ms|96Mbps|非住宅|纯净度74.5%
+  - 法国03|646ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰37|608ms|73Mbps|非住宅|纯净度99.6%
+  - 法国04|681ms|16Mbps|非住宅|纯净度99.2%
+  - TR01|500ms|43Mbps|非住宅|纯净度81.2%
+  - 荷兰38|842ms|18Mbps|非住宅|纯净度99.2%
+  - BR02|898ms|16Mbps|非住宅|纯净度100.0%
+  - 波兰07|769ms|4Mbps|非住宅|纯净度96.9%
+  - 德国11|1048ms|3Mbps|非住宅|纯净度92.2%
+  - 意大利01|1030ms|114Mbps|非住宅|纯净度85.9%
+  - 美国58|154ms|189Mbps|非住宅|纯净度未知
+  - 德国12|706ms|18Mbps|非住宅|纯净度100.0%
+  - 荷兰39|571ms|86Mbps|非住宅|纯净度94.8%
+  - 德国13|704ms|20Mbps|非住宅|纯净度100.0%
+  - BR03|894ms|91Mbps|非住宅|纯净度100.0%
+  - 荷兰40|642ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰41|631ms|106Mbps|非住宅|纯净度74.5%
+  - 美国65|343ms|104Mbps|非住宅|纯净度99.6%
+  - 荷兰42|628ms|71Mbps|非住宅|纯净度94.8%
+  - 爱尔兰05|540ms|83Mbps|非住宅|纯净度99.5%
+  - 罗马尼亚02|907ms|46Mbps|非住宅|纯净度86.7%
+  - 德国14|683ms|138Mbps|非住宅|纯净度97.7%
+  - 爱尔兰06|492ms|80Mbps|非住宅|纯净度99.5%
+  - 荷兰43|617ms|72Mbps|非住宅|纯净度94.8%
+  - 法国05|636ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰44|634ms|70Mbps|非住宅|纯净度94.8%
+  - 法国06|715ms|84Mbps|住宅|纯净度100.0%
+  - 荷兰45|608ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰46|590ms|73Mbps|非住宅|纯净度99.6%
+  - 法国07|646ms|72Mbps|非住宅|纯净度100.0%
+  - 荷兰47|620ms|73Mbps|非住宅|纯净度99.6%
+  - 罗马尼亚03|894ms|13Mbps|非住宅|纯净度86.7%
+  - 波兰08|637ms|96Mbps|非住宅|纯净度81.2%
+  - 荷兰48|634ms|99Mbps|非住宅|纯净度74.5%
+  - 以色列02|1083ms|51Mbps|住宅未知|纯净度99.6%
+  - 美国67|706ms|69Mbps|非住宅|纯净度95.9%
+  - 荷兰49|645ms|93Mbps|非住宅|纯净度74.5%
+  - 法国08|716ms|81Mbps|住宅|纯净度100.0%
+  - 荷兰50|839ms|104Mbps|非住宅|纯净度74.5%
+  - 荷兰51|635ms|94Mbps|非住宅|纯净度74.5%
+  - 荷兰52|849ms|106Mbps|非住宅|纯净度74.5%
+  - 德国15|1118ms|19Mbps|非住宅|纯净度98.4%
+  - 德国16|900ms|21Mbps|非住宅|纯净度99.8%
+  - 爱尔兰07|542ms|59Mbps|非住宅|纯净度99.6%
+  - 荷兰53|634ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰54|605ms|72Mbps|非住宅|纯净度99.6%
+  - 爱尔兰08|476ms|54Mbps|非住宅|纯净度99.6%
+  - 德国17|681ms|141Mbps|非住宅|纯净度97.7%
+  - 荷兰55|844ms|105Mbps|非住宅|纯净度74.5%
+  - 爱尔兰09|483ms|81Mbps|非住宅|纯净度99.5%
+  - 法国09|719ms|85Mbps|住宅|纯净度100.0%
+  - 法国10|708ms|15Mbps|非住宅|纯净度95.3%
+  - 荷兰56|685ms|82Mbps|非住宅|纯净度98.0%
+  - 德国18|694ms|141Mbps|非住宅|纯净度97.7%
+  - 法国11|714ms|85Mbps|住宅|纯净度100.0%
+  - 以色列03|1088ms|56Mbps|住宅未知|纯净度99.6%
+  - 美国74|337ms|103Mbps|非住宅|纯净度99.6%
+  - 荷兰57|636ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰58|638ms|14Mbps|非住宅|纯净度74.5%
+  - 德国19|891ms|4Mbps|非住宅|纯净度100.0%
+  - 法国12|622ms|61Mbps|非住宅|纯净度98.3%
+  - 荷兰59|644ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰60|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰61|571ms|83Mbps|非住宅|纯净度94.8%
+  - 美国75|225ms|37Mbps|非住宅|纯净度93.8%
+  - 加拿大01|278ms|85Mbps|非住宅|纯净度95.5%
+  - 荷兰62|644ms|105Mbps|非住宅|纯净度74.5%
+  - 德国20|903ms|20Mbps|非住宅|纯净度99.8%
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
@@ -3736,300 +3143,262 @@ proxy-groups:
 - name: 🚄 中速下载
   type: url-test
   proxies:
-  - 美国37|327ms|124Mbps|住宅|纯净度99.7%
-  - 美国29|316ms|125Mbps|住宅|纯净度99.7%
-  - 美国44|313ms|128Mbps|住宅|纯净度99.7%
-  - 美国81|320ms|124Mbps|住宅|纯净度99.7%
-  - 美国40|332ms|125Mbps|住宅|纯净度99.7%
-  - 美国31|315ms|129Mbps|住宅|纯净度99.7%
-  - 美国02|228ms|271Mbps|非住宅|纯净度未知
-  - 美国72|223ms|252Mbps|非住宅|纯净度未知
-  - 美国04|173ms|269Mbps|非住宅|纯净度未知
-  - 美国74|320ms|127Mbps|住宅|纯净度99.6%
-  - 美国01|164ms|265Mbps|非住宅|纯净度未知
-  - 美国64|323ms|127Mbps|住宅|纯净度99.7%
-  - 美国73|311ms|123Mbps|住宅|纯净度99.7%
-  - 美国95|315ms|124Mbps|住宅|纯净度99.7%
-  - 美国96|339ms|128Mbps|住宅|纯净度99.7%
-  - 美国63|316ms|122Mbps|住宅|纯净度99.7%
-  - 美国61|331ms|126Mbps|住宅|纯净度99.7%
-  - 美国55|308ms|127Mbps|住宅|纯净度99.7%
-  - 美国65|327ms|123Mbps|住宅|纯净度99.7%
-  - 美国84|322ms|124Mbps|住宅|纯净度99.5%
-  - 美国62|317ms|127Mbps|住宅|纯净度99.6%
-  - 美国34|322ms|124Mbps|住宅|纯净度99.7%
-  - 美国42|338ms|123Mbps|住宅|纯净度99.5%
-  - 美国76|322ms|122Mbps|住宅|纯净度99.6%
-  - 美国78|327ms|123Mbps|住宅|纯净度99.7%
-  - 美国60|320ms|127Mbps|住宅|纯净度99.7%
-  - 美国88|309ms|124Mbps|住宅|纯净度99.7%
-  - 美国75|325ms|124Mbps|住宅|纯净度99.6%
-  - 美国97|307ms|125Mbps|住宅|纯净度99.6%
-  - 美国36|321ms|122Mbps|住宅|纯净度99.7%
-  - 美国85|328ms|123Mbps|住宅|纯净度99.5%
-  - 美国28|285ms|55Mbps|非住宅|纯净度98.4%
-  - 美国39|327ms|127Mbps|住宅|纯净度99.5%
-  - 美国23|167ms|257Mbps|非住宅|纯净度未知
-  - 美国46|558ms|127Mbps|住宅|纯净度99.5%
-  - 美国67|586ms|126Mbps|住宅|纯净度99.6%
-  - 美国68|579ms|126Mbps|住宅|纯净度99.6%
-  - 美国80|577ms|128Mbps|住宅|纯净度99.7%
-  - 美国50|588ms|123Mbps|住宅|纯净度99.7%
-  - 美国51|589ms|126Mbps|住宅|纯净度99.7%
-  - 美国69|585ms|123Mbps|住宅|纯净度99.6%
-  - 美国48|565ms|124Mbps|住宅|纯净度99.7%
-  - 美国70|578ms|127Mbps|住宅|纯净度99.6%
-  - 美国49|580ms|123Mbps|住宅|纯净度99.5%
-  - 美国52|574ms|123Mbps|住宅|纯净度99.7%
-  - 美国71|597ms|123Mbps|住宅|纯净度99.6%
-  - 美国66|343ms|124Mbps|住宅|纯净度99.6%
-  - 美国32|571ms|126Mbps|住宅|纯净度99.5%
-  - 美国47|576ms|121Mbps|住宅|纯净度99.7%
-  - 美国99|435ms|85Mbps|非住宅|纯净度95.9%
-  - 美国08|374ms|101Mbps|非住宅|纯净度99.6%
-  - 美国79|477ms|88Mbps|非住宅|纯净度95.9%
-  - 美国03|240ms|183Mbps|非住宅|纯净度98.9%
-  - 美国05|250ms|203Mbps|非住宅|纯净度98.9%
-  - 美国87|370ms|103Mbps|非住宅|纯净度99.6%
-  - 美国77|364ms|100Mbps|非住宅|纯净度99.6%
-  - 美国17|552ms|163Mbps|非住宅|纯净度99.2%
-  - 美国22|548ms|141Mbps|非住宅|纯净度99.2%
-  - 美国15|555ms|160Mbps|非住宅|纯净度99.2%
-  - 美国09|482ms|142Mbps|非住宅|纯净度100.0%
-  - 美国21|477ms|115Mbps|非住宅|纯净度100.0%
-  - 美国12|482ms|125Mbps|非住宅|纯净度100.0%
-  - 美国11|484ms|118Mbps|非住宅|纯净度100.0%
-  - 美国19|565ms|51Mbps|非住宅|纯净度99.2%
-  - 美国10|491ms|157Mbps|非住宅|纯净度100.0%
-  - 美国14|562ms|56Mbps|非住宅|纯净度99.2%
-  - 美国13|554ms|48Mbps|非住宅|纯净度99.2%
-  - 美国24|565ms|61Mbps|非住宅|纯净度99.2%
-  - 美国25|252ms|136Mbps|非住宅|纯净度未知
-  - 美国58|272ms|121Mbps|住宅|纯净度99.7%
-  - 美国26|251ms|145Mbps|非住宅|纯净度未知
-  - 美国59|299ms|123Mbps|住宅|纯净度99.7%
-  - 美国43|302ms|124Mbps|住宅|纯净度99.6%
-  - 美国38|294ms|124Mbps|住宅|纯净度99.7%
-  - 美国27|226ms|138Mbps|非住宅|纯净度未知
-  - 美国41|295ms|121Mbps|住宅|纯净度99.7%
-  - 美国33|274ms|124Mbps|住宅|纯净度99.6%
-  - 美国54|290ms|125Mbps|住宅|纯净度99.7%
-  - 美国94|717ms|47Mbps|住宅|纯净度99.9%
-  - 美国82|289ms|124Mbps|住宅|纯净度99.6%
-  - 美国45|277ms|120Mbps|住宅|纯净度99.6%
-  - 美国56|285ms|123Mbps|住宅|纯净度99.7%
-  - 美国57|263ms|124Mbps|住宅|纯净度99.7%
-  - 美国35|284ms|121Mbps|住宅|纯净度99.7%
-  - 美国53|286ms|120Mbps|住宅|纯净度99.7%
-  - 美国16|569ms|48Mbps|非住宅|纯净度99.2%
-  - 美国90|188ms|81Mbps|非住宅|纯净度99.5%
-  - 荷兰52|766ms|120Mbps|非住宅|纯净度88.7%
-  - 美国91|183ms|37Mbps|非住宅|纯净度99.5%
-  - 加拿大01|605ms|80Mbps|非住宅|纯净度95.5%
-  - 法国40|748ms|114Mbps|非住宅|纯净度98.7%
-  - 美国89|542ms|55Mbps|非住宅|纯净度99.5%
-  - 荷兰41|793ms|108Mbps|非住宅|纯净度97.1%
-  - 美国98|559ms|81Mbps|非住宅|纯净度99.5%
-  - 法国41|756ms|115Mbps|非住宅|纯净度98.7%
-  - 法国38|746ms|111Mbps|非住宅|纯净度98.7%
-  - 法国39|747ms|116Mbps|非住宅|纯净度98.7%
-  - 美国92|453ms|47Mbps|非住宅|纯净度100.0%
-  - 美国20|568ms|24Mbps|非住宅|纯净度98.4%
-  - 美国93|370ms|52Mbps|住宅|纯净度98.4%
-  - 荷兰02|866ms|71Mbps|非住宅|纯净度99.6%
-  - 爱尔兰03|750ms|54Mbps|非住宅|纯净度99.6%
-  - 荷兰17|870ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰12|868ms|72Mbps|非住宅|纯净度99.6%
-  - 美国18|556ms|24Mbps|非住宅|纯净度98.4%
-  - 荷兰25|874ms|73Mbps|非住宅|纯净度99.6%
-  - 荷兰28|870ms|90Mbps|非住宅|纯净度99.6%
-  - 荷兰30|871ms|92Mbps|非住宅|纯净度99.6%
-  - 荷兰18|873ms|73Mbps|非住宅|纯净度99.6%
-  - 荷兰10|874ms|89Mbps|非住宅|纯净度99.6%
-  - 德国11|565ms|104Mbps|非住宅|纯净度98.0%
-  - 荷兰35|884ms|88Mbps|非住宅|纯净度90.6%
-  - 荷兰27|867ms|91Mbps|非住宅|纯净度99.6%
-  - 荷兰43|868ms|72Mbps|非住宅|纯净度90.6%
-  - 荷兰23|878ms|75Mbps|非住宅|纯净度99.6%
-  - 爱尔兰04|812ms|87Mbps|非住宅|纯净度99.6%
-  - 荷兰54|882ms|65Mbps|非住宅|纯净度90.6%
-  - 荷兰42|867ms|82Mbps|非住宅|纯净度90.6%
-  - 意大利25|655ms|198Mbps|非住宅|纯净度88.3%
-  - 荷兰01|842ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰53|1032ms|102Mbps|非住宅|纯净度74.5%
-  - 爱尔兰07|789ms|83Mbps|非住宅|纯净度99.6%
-  - 荷兰26|866ms|73Mbps|非住宅|纯净度99.6%
-  - 荷兰03|874ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰15|866ms|88Mbps|非住宅|纯净度99.6%
-  - 意大利04|644ms|200Mbps|非住宅|纯净度88.3%
-  - 意大利14|609ms|174Mbps|非住宅|纯净度88.3%
-  - 意大利26|613ms|201Mbps|非住宅|纯净度88.3%
-  - 意大利12|627ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利33|597ms|204Mbps|非住宅|纯净度88.3%
-  - 意大利10|666ms|185Mbps|非住宅|纯净度88.3%
-  - 意大利32|623ms|190Mbps|非住宅|纯净度88.3%
-  - 荷兰14|791ms|54Mbps|非住宅|纯净度100.0%
-  - 意大利19|614ms|202Mbps|非住宅|纯净度88.3%
-  - 意大利34|751ms|176Mbps|非住宅|纯净度88.3%
-  - 意大利03|602ms|176Mbps|非住宅|纯净度88.3%
-  - 意大利24|670ms|209Mbps|非住宅|纯净度88.3%
-  - 荷兰29|758ms|87Mbps|非住宅|纯净度97.1%
-  - 意大利05|613ms|192Mbps|非住宅|纯净度88.3%
-  - 德国14|1089ms|59Mbps|非住宅|纯净度100.0%
-  - 美国86|527ms|54Mbps|非住宅|纯净度93.8%
-  - 意大利08|707ms|197Mbps|非住宅|纯净度88.3%
-  - 意大利30|616ms|178Mbps|非住宅|纯净度88.3%
-  - 意大利20|615ms|183Mbps|非住宅|纯净度88.3%
-  - 法国19|947ms|72Mbps|非住宅|纯净度98.3%
-  - 意大利16|610ms|208Mbps|非住宅|纯净度88.3%
-  - 意大利22|625ms|176Mbps|非住宅|纯净度88.3%
-  - 意大利15|607ms|214Mbps|非住宅|纯净度88.3%
-  - 法国37|492ms|113Mbps|非住宅|纯净度97.9%
-  - 法国23|481ms|114Mbps|非住宅|纯净度97.9%
-  - 法国04|994ms|55Mbps|非住宅|纯净度99.2%
-  - 法国15|946ms|86Mbps|住宅|纯净度100.0%
-  - 爱尔兰08|815ms|41Mbps|非住宅|纯净度99.6%
-  - 法国29|747ms|113Mbps|非住宅|纯净度95.1%
-  - 法国27|971ms|72Mbps|非住宅|纯净度97.9%
-  - 意大利13|654ms|210Mbps|非住宅|纯净度88.3%
-  - 荷兰20|771ms|85Mbps|非住宅|纯净度97.1%
-  - 荷兰37|778ms|86Mbps|非住宅|纯净度94.8%
-  - 荷兰44|767ms|43Mbps|非住宅|纯净度97.1%
-  - 法国10|950ms|79Mbps|住宅|纯净度100.0%
-  - 法国30|768ms|110Mbps|非住宅|纯净度95.1%
-  - 法国35|770ms|115Mbps|非住宅|纯净度95.1%
-  - 芬兰01|627ms|67Mbps|非住宅|纯净度100.0%
-  - 法国31|489ms|110Mbps|非住宅|纯净度97.9%
-  - 法国08|950ms|84Mbps|住宅|纯净度100.0%
-  - 法国20|984ms|41Mbps|非住宅|纯净度99.2%
-  - 波兰03|874ms|100Mbps|非住宅|纯净度81.2%
-  - 荷兰13|771ms|49Mbps|非住宅|纯净度97.1%
-  - 德国05|926ms|20Mbps|非住宅|纯净度100.0%
-  - 德国06|928ms|44Mbps|非住宅|纯净度100.0%
-  - 法国33|492ms|114Mbps|非住宅|纯净度97.9%
-  - 荷兰38|774ms|20Mbps|非住宅|纯净度97.1%
-  - 荷兰16|846ms|64Mbps|非住宅|纯净度97.1%
-  - 法国25|486ms|112Mbps|非住宅|纯净度97.9%
-  - 荷兰32|773ms|104Mbps|非住宅|纯净度97.1%
-  - 荷兰19|520ms|57Mbps|非住宅|纯净度94.8%
-  - 法国34|1103ms|114Mbps|非住宅|纯净度97.9%
-  - 荷兰36|886ms|19Mbps|非住宅|纯净度98.8%
-  - 法国05|1036ms|19Mbps|非住宅|纯净度99.2%
-  - 法国06|1093ms|94Mbps|非住宅|纯净度97.9%
-  - 罗马尼亚09|1262ms|93Mbps|非住宅|纯净度86.7%
-  - 法国17|952ms|74Mbps|非住宅|纯净度98.3%
-  - 法国32|1092ms|19Mbps|非住宅|纯净度97.9%
-  - BR03|1270ms|86Mbps|非住宅|纯净度100.0%
-  - 罗马尼亚08|1267ms|91Mbps|非住宅|纯净度86.7%
-  - BR02|1275ms|18Mbps|非住宅|纯净度100.0%
-  - 美国83|333ms|124Mbps|住宅|纯净度99.6%
-  - 法国02|481ms|114Mbps|非住宅|纯净度97.9%
-  - 波兰07|876ms|99Mbps|非住宅|纯净度81.2%
-  - 爱尔兰02|829ms|55Mbps|非住宅|纯净度99.5%
-  - 法国11|948ms|89Mbps|住宅|纯净度100.0%
-  - MX01|602ms|50Mbps|非住宅|纯净度97.7%
-  - 法国14|587ms|59Mbps|非住宅|纯净度99.2%
-  - 荷兰45|649ms|85Mbps|非住宅|纯净度94.8%
-  - 德国22|628ms|17Mbps|非住宅|纯净度99.8%
-  - 法国12|585ms|42Mbps|非住宅|纯净度99.2%
-  - 法国36|1088ms|74Mbps|非住宅|纯净度97.9%
-  - BR01|1272ms|90Mbps|非住宅|纯净度100.0%
-  - 以色列01|1236ms|51Mbps|住宅未知|纯净度99.6%
-  - 德国23|638ms|17Mbps|非住宅|纯净度99.8%
-  - 意大利18|447ms|186Mbps|非住宅|纯净度88.3%
-  - 意大利07|453ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利21|471ms|183Mbps|非住宅|纯净度88.3%
-  - 爱尔兰05|821ms|83Mbps|非住宅|纯净度99.5%
-  - 意大利11|455ms|193Mbps|非住宅|纯净度88.3%
-  - 以色列03|1246ms|73Mbps|住宅未知|纯净度99.6%
-  - 意大利27|758ms|185Mbps|非住宅|纯净度88.3%
-  - 荷兰48|988ms|85Mbps|非住宅|纯净度94.8%
-  - 芬兰02|920ms|79Mbps|非住宅|纯净度93.0%
-  - 意大利06|667ms|171Mbps|非住宅|纯净度88.3%
-  - 意大利31|715ms|185Mbps|非住宅|纯净度88.3%
-  - 荷兰22|925ms|85Mbps|非住宅|纯净度94.8%
-  - 以色列02|1240ms|80Mbps|住宅未知|纯净度99.6%
-  - 意大利29|658ms|182Mbps|非住宅|纯净度88.3%
-  - 意大利09|648ms|184Mbps|非住宅|纯净度88.3%
-  - 爱尔兰09|822ms|54Mbps|非住宅|纯净度99.5%
-  - 意大利23|776ms|189Mbps|非住宅|纯净度88.3%
-  - 德国17|763ms|94Mbps|非住宅|纯净度98.4%
-  - 意大利28|709ms|186Mbps|非住宅|纯净度88.3%
-  - 荷兰21|919ms|71Mbps|非住宅|纯净度94.8%
-  - 荷兰04|921ms|70Mbps|非住宅|纯净度94.8%
-  - 荷兰51|882ms|42Mbps|非住宅|纯净度98.8%
-  - 法国07|992ms|73Mbps|非住宅|纯净度100.0%
-  - 荷兰46|794ms|103Mbps|非住宅|纯净度94.8%
-  - 意大利02|662ms|169Mbps|非住宅|纯净度88.3%
-  - 法国01|988ms|72Mbps|非住宅|纯净度100.0%
-  - 荷兰40|783ms|16Mbps|非住宅|纯净度97.1%
-  - 荷兰24|921ms|87Mbps|非住宅|纯净度94.8%
-  - 荷兰47|987ms|16Mbps|非住宅|纯净度94.8%
-  - 荷兰08|923ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰06|924ms|89Mbps|非住宅|纯净度94.8%
-  - 荷兰11|917ms|84Mbps|非住宅|纯净度94.8%
-  - 意大利17|481ms|186Mbps|非住宅|纯净度88.3%
-  - 德国02|767ms|99Mbps|非住宅|纯净度98.4%
-  - 荷兰05|921ms|70Mbps|非住宅|纯净度94.8%
-  - 爱尔兰06|823ms|81Mbps|非住宅|纯净度99.5%
-  - 法国03|989ms|71Mbps|非住宅|纯净度100.0%
-  - 意大利01|616ms|109Mbps|非住宅|纯净度85.9%
-  - 法国09|992ms|72Mbps|非住宅|纯净度100.0%
-  - 爱尔兰01|878ms|56Mbps|非住宅|纯净度99.5%
-  - 荷兰49|790ms|84Mbps|非住宅|纯净度94.8%
-  - 荷兰34|928ms|15Mbps|非住宅|纯净度99.2%
-  - 法国24|1116ms|94Mbps|非住宅|纯净度98.7%
-  - 荷兰07|1099ms|81Mbps|非住宅|纯净度98.0%
-  - 德国20|1042ms|92Mbps|非住宅|纯净度97.7%
-  - 德国01|750ms|15Mbps|非住宅|纯净度98.4%
-  - 德国15|1043ms|102Mbps|非住宅|纯净度97.7%
-  - 荷兰31|1097ms|82Mbps|非住宅|纯净度98.0%
-  - 德国19|1041ms|139Mbps|非住宅|纯净度97.7%
-  - 德国16|1047ms|125Mbps|非住宅|纯净度97.7%
-  - 荷兰09|1108ms|89Mbps|非住宅|纯净度98.0%
-  - 波兰05|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 波兰06|1076ms|79Mbps|非住宅|纯净度97.3%
-  - 波兰02|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 波兰01|1074ms|81Mbps|非住宅|纯净度97.3%
-  - 新加坡04|1020ms|14Mbps|非住宅|纯净度100.0%
-  - 德国07|1043ms|98Mbps|非住宅|纯净度97.7%
-  - 法国26|923ms|101Mbps|非住宅|纯净度98.7%
-  - 荷兰33|625ms|42Mbps|非住宅|纯净度99.2%
-  - 德国08|1050ms|102Mbps|非住宅|纯净度97.7%
-  - 法国42|980ms|69Mbps|非住宅|纯净度95.1%
-  - 罗马尼亚04|1271ms|52Mbps|非住宅|纯净度86.7%
-  - 罗马尼亚02|1269ms|88Mbps|非住宅|纯净度86.7%
-  - 波兰04|1063ms|80Mbps|非住宅|纯净度97.3%
-  - 罗马尼亚01|1277ms|48Mbps|非住宅|纯净度86.7%
-  - 罗马尼亚07|1281ms|47Mbps|非住宅|纯净度86.7%
-  - 法国21|989ms|93Mbps|非住宅|纯净度97.9%
-  - 罗马尼亚03|1273ms|46Mbps|非住宅|纯净度86.7%
-  - 罗马尼亚06|1258ms|13Mbps|非住宅|纯净度86.7%
-  - 罗马尼亚05|1263ms|48Mbps|非住宅|纯净度86.7%
-  - 荷兰50|936ms|46Mbps|非住宅|纯净度99.2%
-  - 韩国01|786ms|97Mbps|非住宅|纯净度98.5%
-  - 瑞典01|1108ms|13Mbps|住宅|纯净度99.9%
-  - 德国24|1008ms|45Mbps|非住宅|纯净度100.0%
-  - 印度尼西亚02|1353ms|12Mbps|住宅|纯净度96.9%
-  - 印度尼西亚01|1514ms|12Mbps|住宅|纯净度96.9%
-  - 德国09|1000ms|12Mbps|住宅未知|纯净度98.4%
-  - 日本02|853ms|87Mbps|非住宅|纯净度未知
-  - 美国100|248ms|10Mbps|非住宅|纯净度99.2%
-  - 法国16|946ms|70Mbps|非住宅|纯净度98.3%
-  - 瑞典03|1088ms|10Mbps|住宅|纯净度99.9%
-  - 法国22|1189ms|71Mbps|非住宅|纯净度97.7%
-  - 瑞典04|1107ms|9Mbps|住宅|纯净度99.9%
-  - 法国13|1120ms|62Mbps|非住宅|纯净度95.3%
-  - 新加坡03|824ms|8Mbps|非住宅|纯净度100.0%
-  - 瑞典02|1124ms|7Mbps|住宅|纯净度99.9%
-  - 德国18|632ms|6Mbps|非住宅|纯净度99.8%
-  - 法国28|951ms|5Mbps|非住宅|纯净度98.7%
-  - 美国06|339ms|4Mbps|非住宅|纯净度95.5%
-  - 美国30|337ms|4Mbps|非住宅|纯净度95.5%
-  - 印度01|2037ms|4Mbps|住宅|纯净度99.7%
-  - 美国07|346ms|4Mbps|非住宅|纯净度95.5%
-  - 德国13|779ms|4Mbps|非住宅|纯净度92.2%
-  - 德国03|753ms|4Mbps|非住宅|纯净度92.2%
+  - 美国34|575ms|125Mbps|住宅|纯净度99.7%
+  - 美国82|583ms|127Mbps|住宅|纯净度99.7%
+  - 美国24|577ms|125Mbps|住宅|纯净度99.6%
+  - 美国69|561ms|125Mbps|住宅|纯净度99.7%
+  - 美国25|565ms|125Mbps|住宅|纯净度99.6%
+  - 美国36|563ms|125Mbps|住宅|纯净度99.7%
+  - 美国04|226ms|192Mbps|非住宅|纯净度未知
+  - 美国02|220ms|193Mbps|非住宅|纯净度未知
+  - 美国01|160ms|180Mbps|非住宅|纯净度未知
+  - 美国58|154ms|189Mbps|非住宅|纯净度未知
+  - 美国08|334ms|105Mbps|非住宅|纯净度99.6%
+  - 美国65|343ms|104Mbps|非住宅|纯净度99.6%
+  - 美国74|337ms|103Mbps|非住宅|纯净度99.6%
+  - 美国79|436ms|71Mbps|非住宅|纯净度99.5%
+  - 美国38|567ms|121Mbps|住宅|纯净度99.7%
+  - 美国73|568ms|120Mbps|住宅|纯净度99.7%
+  - 美国70|575ms|125Mbps|住宅|纯净度99.6%
+  - 美国50|568ms|125Mbps|住宅|纯净度99.7%
+  - 美国39|575ms|124Mbps|住宅|纯净度99.6%
+  - 美国61|567ms|124Mbps|住宅|纯净度99.7%
+  - 美国62|571ms|125Mbps|住宅|纯净度99.7%
+  - 美国41|569ms|124Mbps|住宅|纯净度99.6%
+  - TR02|507ms|41Mbps|非住宅|纯净度81.2%
+  - 美国47|573ms|121Mbps|住宅|纯净度99.7%
+  - 美国35|569ms|121Mbps|住宅|纯净度99.7%
+  - 美国48|575ms|119Mbps|住宅|纯净度99.7%
+  - 美国43|575ms|125Mbps|住宅|纯净度99.6%
+  - 美国46|561ms|121Mbps|住宅|纯净度99.7%
+  - 美国42|573ms|121Mbps|住宅|纯净度99.6%
+  - 美国45|579ms|124Mbps|住宅|纯净度99.7%
+  - 美国66|564ms|124Mbps|住宅|纯净度99.7%
+  - 美国44|572ms|120Mbps|住宅|纯净度99.6%
+  - 美国64|566ms|121Mbps|住宅|纯净度99.7%
+  - TR03|506ms|41Mbps|非住宅|纯净度81.2%
+  - 美国40|583ms|120Mbps|住宅|纯净度99.7%
+  - 美国51|572ms|120Mbps|住宅|纯净度99.7%
+  - 美国33|564ms|121Mbps|住宅|纯净度99.6%
+  - 美国72|572ms|124Mbps|住宅|纯净度99.7%
+  - 美国60|568ms|125Mbps|住宅|纯净度99.7%
+  - 美国49|579ms|120Mbps|住宅|纯净度99.7%
+  - 美国52|569ms|123Mbps|住宅|纯净度99.7%
+  - 美国37|566ms|124Mbps|住宅|纯净度99.7%
+  - 美国27|330ms|124Mbps|住宅|纯净度99.7%
+  - 美国59|570ms|124Mbps|住宅|纯净度99.6%
+  - 美国56|336ms|121Mbps|住宅|纯净度99.5%
+  - 美国31|331ms|124Mbps|住宅|纯净度99.7%
+  - 美国53|325ms|125Mbps|住宅|纯净度99.5%
+  - 美国23|327ms|120Mbps|住宅|纯净度99.7%
+  - 美国57|329ms|121Mbps|住宅|纯净度99.5%
+  - 美国63|564ms|125Mbps|住宅|纯净度99.7%
+  - 美国71|575ms|124Mbps|住宅|纯净度99.7%
+  - 美国28|331ms|124Mbps|住宅|纯净度99.7%
+  - 加拿大01|278ms|85Mbps|非住宅|纯净度95.5%
+  - 美国54|340ms|120Mbps|住宅|纯净度99.5%
+  - 美国32|330ms|120Mbps|住宅|纯净度99.7%
+  - 美国29|332ms|125Mbps|住宅|纯净度99.7%
+  - 美国68|332ms|121Mbps|住宅|纯净度99.7%
+  - 美国55|320ms|123Mbps|住宅|纯净度99.5%
+  - 美国30|341ms|123Mbps|住宅|纯净度99.7%
+  - 美国19|565ms|119Mbps|非住宅|纯净度98.9%
+  - 美国17|227ms|143Mbps|非住宅|纯净度100.0%
+  - 美国20|564ms|119Mbps|非住宅|纯净度98.9%
+  - 美国05|219ms|123Mbps|非住宅|纯净度100.0%
+  - 美国81|398ms|48Mbps|住宅|纯净度99.9%
+  - 美国11|360ms|166Mbps|非住宅|纯净度99.2%
+  - 美国07|218ms|126Mbps|非住宅|纯净度100.0%
+  - 美国75|225ms|37Mbps|非住宅|纯净度93.8%
+  - 美国14|350ms|152Mbps|非住宅|纯净度99.2%
+  - 美国16|348ms|110Mbps|非住宅|纯净度99.2%
+  - 美国03|233ms|114Mbps|非住宅|纯净度100.0%
+  - 美国12|358ms|159Mbps|非住宅|纯净度99.2%
+  - 美国10|358ms|107Mbps|非住宅|纯净度99.2%
+  - 美国15|360ms|124Mbps|非住宅|纯净度99.2%
+  - 美国18|350ms|101Mbps|非住宅|纯净度99.2%
+  - 美国06|228ms|130Mbps|非住宅|纯净度100.0%
+  - 美国77|164ms|84Mbps|非住宅|纯净度99.5%
+  - 美国78|455ms|30Mbps|非住宅|纯净度99.5%
+  - 美国76|208ms|29Mbps|非住宅|纯净度99.5%
+  - 美国67|706ms|69Mbps|非住宅|纯净度95.9%
+  - 美国83|508ms|72Mbps|非住宅|纯净度95.9%
+  - 美国80|204ms|47Mbps|非住宅|纯净度100.0%
+  - 荷兰61|571ms|83Mbps|非住宅|纯净度94.8%
+  - 荷兰39|571ms|86Mbps|非住宅|纯净度94.8%
+  - 爱尔兰04|516ms|84Mbps|非住宅|纯净度99.6%
+  - 荷兰79|842ms|106Mbps|非住宅|纯净度74.5%
+  - 爱尔兰07|542ms|59Mbps|非住宅|纯净度99.6%
+  - 荷兰28|839ms|86Mbps|非住宅|纯净度74.5%
+  - 荷兰90|838ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰26|842ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰52|849ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰33|846ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰30|842ms|103Mbps|非住宅|纯净度74.5%
+  - 荷兰31|844ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰74|838ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰27|836ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰25|836ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰29|836ms|103Mbps|非住宅|纯净度74.5%
+  - 荷兰76|845ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰65|841ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰101|611ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰95|634ms|62Mbps|非住宅|纯净度90.6%
+  - 荷兰47|620ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰81|835ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰94|626ms|22Mbps|非住宅|纯净度90.6%
+  - 荷兰32|845ms|103Mbps|非住宅|纯净度74.5%
+  - 荷兰85|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰37|608ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰78|833ms|95Mbps|非住宅|纯净度74.5%
+  - 爱尔兰03|541ms|58Mbps|非住宅|纯净度99.6%
+  - 荷兰60|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰87|835ms|93Mbps|非住宅|纯净度74.5%
+  - 荷兰53|634ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰55|844ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰88|846ms|104Mbps|非住宅|纯净度74.5%
+  - 荷兰34|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰54|605ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰03|596ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰50|839ms|104Mbps|非住宅|纯净度74.5%
+  - 荷兰57|636ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰35|597ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰69|634ms|103Mbps|非住宅|纯净度74.5%
+  - 德国16|900ms|21Mbps|非住宅|纯净度99.8%
+  - 荷兰08|641ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰01|610ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰82|634ms|102Mbps|非住宅|纯净度74.5%
+  - 德国21|906ms|21Mbps|非住宅|纯净度99.8%
+  - 荷兰99|611ms|69Mbps|非住宅|纯净度99.6%
+  - 荷兰97|605ms|49Mbps|非住宅|纯净度90.6%
+  - 荷兰46|590ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰84|636ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰92|640ms|101Mbps|非住宅|纯净度74.5%
+  - 爱尔兰08|476ms|54Mbps|非住宅|纯净度99.6%
+  - 荷兰83|642ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰18|638ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰45|608ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰20|633ms|107Mbps|非住宅|纯净度74.5%
+  - 荷兰86|643ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰73|647ms|102Mbps|非住宅|纯净度74.5%
+  - 法国12|622ms|61Mbps|非住宅|纯净度98.3%
+  - 荷兰70|846ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰24|645ms|100Mbps|非住宅|纯净度74.5%
+  - 台湾01|658ms|20Mbps|住宅未知|纯净度未知
+  - 德国10|1078ms|20Mbps|非住宅|纯净度98.4%
+  - 荷兰41|631ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰100|602ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰15|599ms|73Mbps|非住宅|纯净度99.6%
+  - 意大利01|1030ms|114Mbps|非住宅|纯净度85.9%
+  - 荷兰62|644ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰04|610ms|73Mbps|非住宅|纯净度99.6%
+  - 德国20|903ms|20Mbps|非住宅|纯净度99.8%
+  - 法国02|622ms|57Mbps|非住宅|纯净度99.2%
+  - 德国13|704ms|20Mbps|非住宅|纯净度100.0%
+  - 荷兰102|614ms|20Mbps|非住宅|纯净度90.6%
+  - 荷兰40|642ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰10|647ms|100Mbps|非住宅|纯净度74.5%
+  - 德国09|1076ms|110Mbps|非住宅|纯净度98.4%
+  - 荷兰72|636ms|106Mbps|非住宅|纯净度74.5%
+  - 法国11|714ms|85Mbps|住宅|纯净度100.0%
+  - 德国15|1118ms|19Mbps|非住宅|纯净度98.4%
+  - 波兰01|628ms|96Mbps|非住宅|纯净度81.2%
+  - 荷兰71|837ms|19Mbps|非住宅|纯净度99.2%
+  - 荷兰21|632ms|105Mbps|非住宅|纯净度74.5%
+  - 德国02|687ms|68Mbps|非住宅|纯净度100.0%
+  - 荷兰23|600ms|72Mbps|非住宅|纯净度99.6%
+  - 法国09|719ms|85Mbps|住宅|纯净度100.0%
+  - 法国06|715ms|84Mbps|住宅|纯净度100.0%
+  - 荷兰38|842ms|18Mbps|非住宅|纯净度99.2%
+  - 德国01|693ms|18Mbps|非住宅|纯净度100.0%
+  - 德国12|706ms|18Mbps|非住宅|纯净度100.0%
+  - 法国15|620ms|52Mbps|非住宅|纯净度99.2%
+  - 波兰08|637ms|96Mbps|非住宅|纯净度81.2%
+  - 法国08|716ms|81Mbps|住宅|纯净度100.0%
+  - MX01|499ms|55Mbps|非住宅|纯净度97.7%
+  - 爱尔兰05|540ms|83Mbps|非住宅|纯净度99.5%
+  - 爱尔兰06|492ms|80Mbps|非住宅|纯净度99.5%
+  - 爱尔兰09|483ms|81Mbps|非住宅|纯净度99.5%
+  - 爱尔兰02|547ms|80Mbps|非住宅|纯净度99.5%
+  - BR02|898ms|16Mbps|非住宅|纯净度100.0%
+  - BR01|897ms|93Mbps|非住宅|纯净度100.0%
+  - 法国04|681ms|16Mbps|非住宅|纯净度99.2%
+  - 荷兰11|647ms|97Mbps|非住宅|纯净度74.5%
+  - 意大利02|610ms|137Mbps|非住宅|纯净度88.3%
+  - 法国05|636ms|71Mbps|非住宅|纯净度100.0%
+  - BR03|894ms|91Mbps|非住宅|纯净度100.0%
+  - 法国07|646ms|72Mbps|非住宅|纯净度100.0%
+  - 荷兰19|684ms|89Mbps|非住宅|纯净度98.0%
+  - 荷兰56|685ms|82Mbps|非住宅|纯净度98.0%
+  - 荷兰06|619ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰02|611ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰49|645ms|93Mbps|非住宅|纯净度74.5%
+  - 荷兰14|644ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰07|620ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰09|623ms|72Mbps|非住宅|纯净度94.8%
+  - 荷兰44|634ms|70Mbps|非住宅|纯净度94.8%
+  - 法国01|640ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰51|635ms|94Mbps|非住宅|纯净度74.5%
+  - 荷兰91|639ms|95Mbps|非住宅|纯净度74.5%
+  - 荷兰64|644ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰16|641ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰05|606ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰68|628ms|97Mbps|非住宅|纯净度74.5%
+  - 德国23|687ms|138Mbps|非住宅|纯净度97.7%
+  - 荷兰36|638ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰48|634ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰67|646ms|98Mbps|非住宅|纯净度74.5%
+  - 荷兰43|617ms|72Mbps|非住宅|纯净度94.8%
+  - 荷兰89|647ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰42|628ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰63|643ms|98Mbps|非住宅|纯净度74.5%
+  - 荷兰96|646ms|100Mbps|非住宅|纯净度74.5%
+  - 法国03|646ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰66|630ms|96Mbps|非住宅|纯净度74.5%
+  - 法国10|708ms|15Mbps|非住宅|纯净度95.3%
+  - 荷兰22|682ms|86Mbps|非住宅|纯净度98.0%
+  - 荷兰80|644ms|97Mbps|非住宅|纯净度74.5%
+  - 波兰03|784ms|80Mbps|非住宅|纯净度97.3%
+  - 德国14|683ms|138Mbps|非住宅|纯净度97.7%
+  - 波兰06|786ms|81Mbps|非住宅|纯净度97.3%
+  - 德国04|710ms|140Mbps|非住宅|纯净度97.7%
+  - 美国13|361ms|14Mbps|非住宅|纯净度98.4%
+  - 美国09|356ms|14Mbps|非住宅|纯净度98.4%
+  - 荷兰12|641ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰75|641ms|94Mbps|非住宅|纯净度74.5%
+  - 荷兰59|644ms|96Mbps|非住宅|纯净度74.5%
+  - 法国13|630ms|58Mbps|非住宅|纯净度98.3%
+  - 荷兰58|638ms|14Mbps|非住宅|纯净度74.5%
+  - 荷兰93|633ms|14Mbps|非住宅|纯净度98.8%
+  - 德国18|694ms|141Mbps|非住宅|纯净度97.7%
+  - 波兰02|778ms|81Mbps|非住宅|纯净度97.3%
+  - 德国22|1236ms|14Mbps|非住宅|纯净度100.0%
+  - 荷兰77|636ms|97Mbps|非住宅|纯净度74.5%
+  - 德国17|681ms|141Mbps|非住宅|纯净度97.7%
+  - 爱尔兰01|497ms|81Mbps|非住宅|纯净度99.5%
+  - 波兰04|776ms|80Mbps|非住宅|纯净度97.3%
+  - 荷兰13|645ms|100Mbps|非住宅|纯净度74.5%
+  - 法国14|628ms|73Mbps|非住宅|纯净度98.3%
+  - 以色列02|1083ms|51Mbps|住宅未知|纯净度99.6%
+  - 德国03|697ms|114Mbps|非住宅|纯净度97.7%
+  - 波兰05|778ms|80Mbps|非住宅|纯净度97.3%
+  - 荷兰17|646ms|99Mbps|非住宅|纯净度74.5%
+  - 新加坡02|1052ms|13Mbps|非住宅|纯净度100.0%
+  - 新加坡01|1623ms|80Mbps|非住宅|纯净度97.6%
+  - 罗马尼亚03|894ms|13Mbps|非住宅|纯净度86.7%
+  - 罗马尼亚01|902ms|91Mbps|非住宅|纯净度86.7%
+  - 以色列03|1088ms|56Mbps|住宅未知|纯净度99.6%
+  - 以色列01|1084ms|49Mbps|住宅未知|纯净度99.6%
+  - 泰国01|1172ms|67Mbps|非住宅|纯净度98.9%
+  - 德国05|812ms|11Mbps|住宅未知|纯净度98.4%
+  - 罗马尼亚02|907ms|46Mbps|非住宅|纯净度86.7%
+  - 台湾02|659ms|9Mbps|住宅未知|纯净度未知
+  - 德国06|880ms|5Mbps|非住宅|纯净度100.0%
+  - 德国08|1056ms|4Mbps|非住宅|纯净度92.2%
+  - 美国22|632ms|4Mbps|非住宅|纯净度95.5%
+  - 美国21|621ms|4Mbps|非住宅|纯净度95.5%
+  - 美国84|1393ms|4Mbps|非住宅|纯净度98.4%
+  - 德国19|891ms|4Mbps|非住宅|纯净度100.0%
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
@@ -4039,267 +3408,229 @@ proxy-groups:
 - name: ⚡ 高速下载
   type: url-test
   proxies:
-  - 美国02|228ms|271Mbps|非住宅|纯净度未知
-  - 美国04|173ms|269Mbps|非住宅|纯净度未知
-  - 美国01|164ms|265Mbps|非住宅|纯净度未知
-  - 美国23|167ms|257Mbps|非住宅|纯净度未知
-  - 美国72|223ms|252Mbps|非住宅|纯净度未知
-  - 意大利15|607ms|214Mbps|非住宅|纯净度88.3%
-  - 意大利13|654ms|210Mbps|非住宅|纯净度88.3%
-  - 意大利24|670ms|209Mbps|非住宅|纯净度88.3%
-  - 意大利16|610ms|208Mbps|非住宅|纯净度88.3%
-  - 意大利33|597ms|204Mbps|非住宅|纯净度88.3%
-  - 美国05|250ms|203Mbps|非住宅|纯净度98.9%
-  - 意大利19|614ms|202Mbps|非住宅|纯净度88.3%
-  - 意大利26|613ms|201Mbps|非住宅|纯净度88.3%
-  - 意大利04|644ms|200Mbps|非住宅|纯净度88.3%
-  - 意大利25|655ms|198Mbps|非住宅|纯净度88.3%
-  - 意大利08|707ms|197Mbps|非住宅|纯净度88.3%
-  - 意大利11|455ms|193Mbps|非住宅|纯净度88.3%
-  - 意大利05|613ms|192Mbps|非住宅|纯净度88.3%
-  - 意大利32|623ms|190Mbps|非住宅|纯净度88.3%
-  - 意大利23|776ms|189Mbps|非住宅|纯净度88.3%
-  - 意大利28|709ms|186Mbps|非住宅|纯净度88.3%
-  - 意大利17|481ms|186Mbps|非住宅|纯净度88.3%
-  - 意大利18|447ms|186Mbps|非住宅|纯净度88.3%
-  - 意大利31|715ms|185Mbps|非住宅|纯净度88.3%
-  - 意大利27|758ms|185Mbps|非住宅|纯净度88.3%
-  - 意大利10|666ms|185Mbps|非住宅|纯净度88.3%
-  - 意大利09|648ms|184Mbps|非住宅|纯净度88.3%
-  - 意大利07|453ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利20|615ms|183Mbps|非住宅|纯净度88.3%
-  - 美国03|240ms|183Mbps|非住宅|纯净度98.9%
-  - 意大利12|627ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利21|471ms|183Mbps|非住宅|纯净度88.3%
-  - 意大利29|658ms|182Mbps|非住宅|纯净度88.3%
-  - 意大利30|616ms|178Mbps|非住宅|纯净度88.3%
-  - 意大利34|751ms|176Mbps|非住宅|纯净度88.3%
-  - 意大利03|602ms|176Mbps|非住宅|纯净度88.3%
-  - 意大利22|625ms|176Mbps|非住宅|纯净度88.3%
-  - 意大利14|609ms|174Mbps|非住宅|纯净度88.3%
-  - 意大利06|667ms|171Mbps|非住宅|纯净度88.3%
-  - 意大利02|662ms|169Mbps|非住宅|纯净度88.3%
-  - 美国17|552ms|163Mbps|非住宅|纯净度99.2%
-  - 美国15|555ms|160Mbps|非住宅|纯净度99.2%
-  - 美国10|491ms|157Mbps|非住宅|纯净度100.0%
-  - 美国26|251ms|145Mbps|非住宅|纯净度未知
-  - 美国09|482ms|142Mbps|非住宅|纯净度100.0%
-  - 美国22|548ms|141Mbps|非住宅|纯净度99.2%
-  - 德国19|1041ms|139Mbps|非住宅|纯净度97.7%
-  - 美国27|226ms|138Mbps|非住宅|纯净度未知
-  - 美国25|252ms|136Mbps|非住宅|纯净度未知
-  - 美国31|315ms|129Mbps|住宅|纯净度99.7%
-  - 美国44|313ms|128Mbps|住宅|纯净度99.7%
-  - 美国80|577ms|128Mbps|住宅|纯净度99.7%
-  - 美国96|339ms|128Mbps|住宅|纯净度99.7%
-  - 美国60|320ms|127Mbps|住宅|纯净度99.7%
-  - 美国55|308ms|127Mbps|住宅|纯净度99.7%
-  - 美国74|320ms|127Mbps|住宅|纯净度99.6%
-  - 美国62|317ms|127Mbps|住宅|纯净度99.6%
-  - 美国39|327ms|127Mbps|住宅|纯净度99.5%
-  - 美国46|558ms|127Mbps|住宅|纯净度99.5%
-  - 美国64|323ms|127Mbps|住宅|纯净度99.7%
-  - 美国70|578ms|127Mbps|住宅|纯净度99.6%
-  - 美国67|586ms|126Mbps|住宅|纯净度99.6%
-  - 美国68|579ms|126Mbps|住宅|纯净度99.6%
-  - 美国51|589ms|126Mbps|住宅|纯净度99.7%
-  - 美国32|571ms|126Mbps|住宅|纯净度99.5%
-  - 美国61|331ms|126Mbps|住宅|纯净度99.7%
-  - 美国29|316ms|125Mbps|住宅|纯净度99.7%
-  - 美国12|482ms|125Mbps|非住宅|纯净度100.0%
-  - 美国40|332ms|125Mbps|住宅|纯净度99.7%
-  - 德国16|1047ms|125Mbps|非住宅|纯净度97.7%
-  - 美国97|307ms|125Mbps|住宅|纯净度99.6%
-  - 美国54|290ms|125Mbps|住宅|纯净度99.7%
-  - 美国33|274ms|124Mbps|住宅|纯净度99.6%
-  - 美国84|322ms|124Mbps|住宅|纯净度99.5%
-  - 美国43|302ms|124Mbps|住宅|纯净度99.6%
-  - 美国38|294ms|124Mbps|住宅|纯净度99.7%
-  - 美国37|327ms|124Mbps|住宅|纯净度99.7%
-  - 美国95|315ms|124Mbps|住宅|纯净度99.7%
-  - 美国88|309ms|124Mbps|住宅|纯净度99.7%
-  - 美国34|322ms|124Mbps|住宅|纯净度99.7%
-  - 美国66|343ms|124Mbps|住宅|纯净度99.6%
-  - 美国75|325ms|124Mbps|住宅|纯净度99.6%
-  - 美国82|289ms|124Mbps|住宅|纯净度99.6%
-  - 美国81|320ms|124Mbps|住宅|纯净度99.7%
-  - 美国83|333ms|124Mbps|住宅|纯净度99.6%
-  - 美国48|565ms|124Mbps|住宅|纯净度99.7%
-  - 美国57|263ms|124Mbps|住宅|纯净度99.7%
-  - 美国50|588ms|123Mbps|住宅|纯净度99.7%
-  - 美国71|597ms|123Mbps|住宅|纯净度99.6%
-  - 美国69|585ms|123Mbps|住宅|纯净度99.6%
-  - 美国73|311ms|123Mbps|住宅|纯净度99.7%
-  - 美国78|327ms|123Mbps|住宅|纯净度99.7%
-  - 美国85|328ms|123Mbps|住宅|纯净度99.5%
-  - 美国65|327ms|123Mbps|住宅|纯净度99.7%
-  - 美国56|285ms|123Mbps|住宅|纯净度99.7%
-  - 美国59|299ms|123Mbps|住宅|纯净度99.7%
-  - 美国52|574ms|123Mbps|住宅|纯净度99.7%
-  - 美国49|580ms|123Mbps|住宅|纯净度99.5%
-  - 美国42|338ms|123Mbps|住宅|纯净度99.5%
-  - 美国76|322ms|122Mbps|住宅|纯净度99.6%
-  - 美国63|316ms|122Mbps|住宅|纯净度99.7%
-  - 美国36|321ms|122Mbps|住宅|纯净度99.7%
-  - 美国47|576ms|121Mbps|住宅|纯净度99.7%
-  - 美国58|272ms|121Mbps|住宅|纯净度99.7%
-  - 美国35|284ms|121Mbps|住宅|纯净度99.7%
-  - 美国41|295ms|121Mbps|住宅|纯净度99.7%
-  - 美国45|277ms|120Mbps|住宅|纯净度99.6%
-  - 荷兰52|766ms|120Mbps|非住宅|纯净度88.7%
-  - 美国53|286ms|120Mbps|住宅|纯净度99.7%
-  - 美国11|484ms|118Mbps|非住宅|纯净度100.0%
-  - 法国39|747ms|116Mbps|非住宅|纯净度98.7%
-  - 法国35|770ms|115Mbps|非住宅|纯净度95.1%
-  - 美国21|477ms|115Mbps|非住宅|纯净度100.0%
-  - 法国41|756ms|115Mbps|非住宅|纯净度98.7%
-  - 法国02|481ms|114Mbps|非住宅|纯净度97.9%
-  - 法国33|492ms|114Mbps|非住宅|纯净度97.9%
-  - 法国34|1103ms|114Mbps|非住宅|纯净度97.9%
-  - 日本01|1065ms|114Mbps|非住宅|纯净度未知
-  - 法国23|481ms|114Mbps|非住宅|纯净度97.9%
-  - 法国40|748ms|114Mbps|非住宅|纯净度98.7%
-  - 法国37|492ms|113Mbps|非住宅|纯净度97.9%
-  - 法国29|747ms|113Mbps|非住宅|纯净度95.1%
-  - 法国25|486ms|112Mbps|非住宅|纯净度97.9%
-  - 法国38|746ms|111Mbps|非住宅|纯净度98.7%
-  - 法国30|768ms|110Mbps|非住宅|纯净度95.1%
-  - 法国31|489ms|110Mbps|非住宅|纯净度97.9%
-  - 意大利01|616ms|109Mbps|非住宅|纯净度85.9%
-  - 荷兰41|793ms|108Mbps|非住宅|纯净度97.1%
-  - 德国11|565ms|104Mbps|非住宅|纯净度98.0%
-  - 荷兰32|773ms|104Mbps|非住宅|纯净度97.1%
-  - 美国87|370ms|103Mbps|非住宅|纯净度99.6%
-  - 荷兰46|794ms|103Mbps|非住宅|纯净度94.8%
-  - 荷兰53|1032ms|102Mbps|非住宅|纯净度74.5%
-  - 德国15|1043ms|102Mbps|非住宅|纯净度97.7%
-  - 德国08|1050ms|102Mbps|非住宅|纯净度97.7%
-  - 美国08|374ms|101Mbps|非住宅|纯净度99.6%
-  - 法国26|923ms|101Mbps|非住宅|纯净度98.7%
-  - 波兰03|874ms|100Mbps|非住宅|纯净度81.2%
-  - 美国77|364ms|100Mbps|非住宅|纯净度99.6%
-  - 波兰07|876ms|99Mbps|非住宅|纯净度81.2%
-  - 德国02|767ms|99Mbps|非住宅|纯净度98.4%
-  - 德国07|1043ms|98Mbps|非住宅|纯净度97.7%
-  - 韩国01|786ms|97Mbps|非住宅|纯净度98.5%
-  - 法国06|1093ms|94Mbps|非住宅|纯净度97.9%
-  - 法国24|1116ms|94Mbps|非住宅|纯净度98.7%
-  - 德国17|763ms|94Mbps|非住宅|纯净度98.4%
-  - 罗马尼亚09|1262ms|93Mbps|非住宅|纯净度86.7%
-  - 法国21|989ms|93Mbps|非住宅|纯净度97.9%
-  - 荷兰30|871ms|92Mbps|非住宅|纯净度99.6%
-  - 德国20|1042ms|92Mbps|非住宅|纯净度97.7%
-  - 荷兰27|867ms|91Mbps|非住宅|纯净度99.6%
-  - 罗马尼亚08|1267ms|91Mbps|非住宅|纯净度86.7%
-  - BR01|1272ms|90Mbps|非住宅|纯净度100.0%
-  - 荷兰28|870ms|90Mbps|非住宅|纯净度99.6%
-  - 法国11|948ms|89Mbps|住宅|纯净度100.0%
-  - 荷兰10|874ms|89Mbps|非住宅|纯净度99.6%
-  - 荷兰09|1108ms|89Mbps|非住宅|纯净度98.0%
-  - 荷兰06|924ms|89Mbps|非住宅|纯净度94.8%
-  - 美国79|477ms|88Mbps|非住宅|纯净度95.9%
-  - 荷兰15|866ms|88Mbps|非住宅|纯净度99.6%
-  - 荷兰35|884ms|88Mbps|非住宅|纯净度90.6%
-  - 罗马尼亚02|1269ms|88Mbps|非住宅|纯净度86.7%
-  - 日本02|853ms|87Mbps|非住宅|纯净度未知
-  - 荷兰29|758ms|87Mbps|非住宅|纯净度97.1%
-  - 爱尔兰04|812ms|87Mbps|非住宅|纯净度99.6%
-  - 荷兰24|921ms|87Mbps|非住宅|纯净度94.8%
-  - BR03|1270ms|86Mbps|非住宅|纯净度100.0%
-  - 荷兰37|778ms|86Mbps|非住宅|纯净度94.8%
-  - 法国15|946ms|86Mbps|住宅|纯净度100.0%
-  - 荷兰22|925ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰20|771ms|85Mbps|非住宅|纯净度97.1%
-  - 美国99|435ms|85Mbps|非住宅|纯净度95.9%
-  - 荷兰48|988ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰45|649ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰08|923ms|85Mbps|非住宅|纯净度94.8%
-  - 荷兰11|917ms|84Mbps|非住宅|纯净度94.8%
-  - 荷兰49|790ms|84Mbps|非住宅|纯净度94.8%
-  - 法国08|950ms|84Mbps|住宅|纯净度100.0%
-  - 爱尔兰05|821ms|83Mbps|非住宅|纯净度99.5%
-  - 爱尔兰07|789ms|83Mbps|非住宅|纯净度99.6%
-  - 波兰02|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 波兰05|1072ms|82Mbps|非住宅|纯净度97.3%
-  - 荷兰31|1097ms|82Mbps|非住宅|纯净度98.0%
-  - 荷兰42|867ms|82Mbps|非住宅|纯净度90.6%
-  - 美国98|559ms|81Mbps|非住宅|纯净度99.5%
-  - 荷兰07|1099ms|81Mbps|非住宅|纯净度98.0%
-  - 爱尔兰06|823ms|81Mbps|非住宅|纯净度99.5%
-  - 美国90|188ms|81Mbps|非住宅|纯净度99.5%
-  - 波兰01|1074ms|81Mbps|非住宅|纯净度97.3%
-  - 波兰04|1063ms|80Mbps|非住宅|纯净度97.3%
-  - 以色列02|1240ms|80Mbps|住宅未知|纯净度99.6%
-  - 加拿大01|605ms|80Mbps|非住宅|纯净度95.5%
-  - 法国10|950ms|79Mbps|住宅|纯净度100.0%
-  - 芬兰02|920ms|79Mbps|非住宅|纯净度93.0%
-  - 波兰06|1076ms|79Mbps|非住宅|纯净度97.3%
-  - 荷兰23|878ms|75Mbps|非住宅|纯净度99.6%
-  - 荷兰17|870ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰03|874ms|74Mbps|非住宅|纯净度99.6%
-  - 法国36|1088ms|74Mbps|非住宅|纯净度97.9%
-  - 法国17|952ms|74Mbps|非住宅|纯净度98.3%
-  - 荷兰01|842ms|74Mbps|非住宅|纯净度99.6%
-  - 荷兰18|873ms|73Mbps|非住宅|纯净度99.6%
-  - 荷兰25|874ms|73Mbps|非住宅|纯净度99.6%
-  - 荷兰26|866ms|73Mbps|非住宅|纯净度99.6%
-  - 法国07|992ms|73Mbps|非住宅|纯净度100.0%
-  - 以色列03|1246ms|73Mbps|住宅未知|纯净度99.6%
-  - 法国01|988ms|72Mbps|非住宅|纯净度100.0%
-  - 法国09|992ms|72Mbps|非住宅|纯净度100.0%
-  - 法国27|971ms|72Mbps|非住宅|纯净度97.9%
-  - 荷兰43|868ms|72Mbps|非住宅|纯净度90.6%
-  - 荷兰12|868ms|72Mbps|非住宅|纯净度99.6%
-  - 法国19|947ms|72Mbps|非住宅|纯净度98.3%
-  - 荷兰02|866ms|71Mbps|非住宅|纯净度99.6%
-  - 法国03|989ms|71Mbps|非住宅|纯净度100.0%
-  - 荷兰21|919ms|71Mbps|非住宅|纯净度94.8%
-  - 法国22|1189ms|71Mbps|非住宅|纯净度97.7%
-  - 荷兰05|921ms|70Mbps|非住宅|纯净度94.8%
-  - 荷兰04|921ms|70Mbps|非住宅|纯净度94.8%
-  - 法国16|946ms|70Mbps|非住宅|纯净度98.3%
-  - 法国42|980ms|69Mbps|非住宅|纯净度95.1%
-  - 芬兰01|627ms|67Mbps|非住宅|纯净度100.0%
-  - 荷兰54|882ms|65Mbps|非住宅|纯净度90.6%
-  - 荷兰16|846ms|64Mbps|非住宅|纯净度97.1%
-  - 法国13|1120ms|62Mbps|非住宅|纯净度95.3%
-  - 美国24|565ms|61Mbps|非住宅|纯净度99.2%
-  - 德国14|1089ms|59Mbps|非住宅|纯净度100.0%
-  - 法国14|587ms|59Mbps|非住宅|纯净度99.2%
-  - 荷兰19|520ms|57Mbps|非住宅|纯净度94.8%
-  - 爱尔兰01|878ms|56Mbps|非住宅|纯净度99.5%
-  - 美国14|562ms|56Mbps|非住宅|纯净度99.2%
-  - 美国28|285ms|55Mbps|非住宅|纯净度98.4%
-  - 法国04|994ms|55Mbps|非住宅|纯净度99.2%
-  - 美国89|542ms|55Mbps|非住宅|纯净度99.5%
-  - 爱尔兰02|829ms|55Mbps|非住宅|纯净度99.5%
-  - 爱尔兰09|822ms|54Mbps|非住宅|纯净度99.5%
-  - 爱尔兰03|750ms|54Mbps|非住宅|纯净度99.6%
-  - 荷兰14|791ms|54Mbps|非住宅|纯净度100.0%
-  - 美国86|527ms|54Mbps|非住宅|纯净度93.8%
-  - 美国93|370ms|52Mbps|住宅|纯净度98.4%
-  - 罗马尼亚04|1271ms|52Mbps|非住宅|纯净度86.7%
-  - 美国19|565ms|51Mbps|非住宅|纯净度99.2%
-  - 以色列01|1236ms|51Mbps|住宅未知|纯净度99.6%
-  - MX01|602ms|50Mbps|非住宅|纯净度97.7%
-  - 荷兰13|771ms|49Mbps|非住宅|纯净度97.1%
-  - 美国13|554ms|48Mbps|非住宅|纯净度99.2%
-  - 罗马尼亚01|1277ms|48Mbps|非住宅|纯净度86.7%
-  - 罗马尼亚05|1263ms|48Mbps|非住宅|纯净度86.7%
-  - 美国16|569ms|48Mbps|非住宅|纯净度99.2%
-  - 罗马尼亚07|1281ms|47Mbps|非住宅|纯净度86.7%
-  - 美国94|717ms|47Mbps|住宅|纯净度99.9%
-  - 美国92|453ms|47Mbps|非住宅|纯净度100.0%
-  - 荷兰50|936ms|46Mbps|非住宅|纯净度99.2%
-  - 罗马尼亚03|1273ms|46Mbps|非住宅|纯净度86.7%
-  - 德国24|1008ms|45Mbps|非住宅|纯净度100.0%
-  - 德国06|928ms|44Mbps|非住宅|纯净度100.0%
-  - 荷兰44|767ms|43Mbps|非住宅|纯净度97.1%
-  - 荷兰51|882ms|42Mbps|非住宅|纯净度98.8%
-  - 法国12|585ms|42Mbps|非住宅|纯净度99.2%
-  - 荷兰33|625ms|42Mbps|非住宅|纯净度99.2%
-  - 法国20|984ms|41Mbps|非住宅|纯净度99.2%
-  - 爱尔兰08|815ms|41Mbps|非住宅|纯净度99.6%
+  - 美国02|220ms|193Mbps|非住宅|纯净度未知
+  - 美国04|226ms|192Mbps|非住宅|纯净度未知
+  - 美国58|154ms|189Mbps|非住宅|纯净度未知
+  - 美国01|160ms|180Mbps|非住宅|纯净度未知
+  - 美国11|360ms|166Mbps|非住宅|纯净度99.2%
+  - 美国12|358ms|159Mbps|非住宅|纯净度99.2%
+  - 美国14|350ms|152Mbps|非住宅|纯净度99.2%
+  - 美国17|227ms|143Mbps|非住宅|纯净度100.0%
+  - 德国18|694ms|141Mbps|非住宅|纯净度97.7%
+  - 德国17|681ms|141Mbps|非住宅|纯净度97.7%
+  - 德国04|710ms|140Mbps|非住宅|纯净度97.7%
+  - 德国14|683ms|138Mbps|非住宅|纯净度97.7%
+  - 德国23|687ms|138Mbps|非住宅|纯净度97.7%
+  - 意大利02|610ms|137Mbps|非住宅|纯净度88.3%
+  - 美国06|228ms|130Mbps|非住宅|纯净度100.0%
+  - 美国82|583ms|127Mbps|住宅|纯净度99.7%
+  - 美国07|218ms|126Mbps|非住宅|纯净度100.0%
+  - 美国43|575ms|125Mbps|住宅|纯净度99.6%
+  - 美国24|577ms|125Mbps|住宅|纯净度99.6%
+  - 美国25|565ms|125Mbps|住宅|纯净度99.6%
+  - 美国36|563ms|125Mbps|住宅|纯净度99.7%
+  - 美国60|568ms|125Mbps|住宅|纯净度99.7%
+  - 美国50|568ms|125Mbps|住宅|纯净度99.7%
+  - 美国70|575ms|125Mbps|住宅|纯净度99.6%
+  - 美国29|332ms|125Mbps|住宅|纯净度99.7%
+  - 美国53|325ms|125Mbps|住宅|纯净度99.5%
+  - 美国69|561ms|125Mbps|住宅|纯净度99.7%
+  - 美国63|564ms|125Mbps|住宅|纯净度99.7%
+  - 美国62|571ms|125Mbps|住宅|纯净度99.7%
+  - 美国34|575ms|125Mbps|住宅|纯净度99.7%
+  - 美国37|566ms|124Mbps|住宅|纯净度99.7%
+  - 美国66|564ms|124Mbps|住宅|纯净度99.7%
+  - 美国41|569ms|124Mbps|住宅|纯净度99.6%
+  - 美国72|572ms|124Mbps|住宅|纯净度99.7%
+  - 美国31|331ms|124Mbps|住宅|纯净度99.7%
+  - 美国59|570ms|124Mbps|住宅|纯净度99.6%
+  - 美国71|575ms|124Mbps|住宅|纯净度99.7%
+  - 美国15|360ms|124Mbps|非住宅|纯净度99.2%
+  - 美国45|579ms|124Mbps|住宅|纯净度99.7%
+  - 美国27|330ms|124Mbps|住宅|纯净度99.7%
+  - 美国39|575ms|124Mbps|住宅|纯净度99.6%
+  - 美国28|331ms|124Mbps|住宅|纯净度99.7%
+  - 美国61|567ms|124Mbps|住宅|纯净度99.7%
+  - 美国30|341ms|123Mbps|住宅|纯净度99.7%
+  - 美国55|320ms|123Mbps|住宅|纯净度99.5%
+  - 美国52|569ms|123Mbps|住宅|纯净度99.7%
+  - 美国05|219ms|123Mbps|非住宅|纯净度100.0%
+  - 美国38|567ms|121Mbps|住宅|纯净度99.7%
+  - 美国46|561ms|121Mbps|住宅|纯净度99.7%
+  - 美国56|336ms|121Mbps|住宅|纯净度99.5%
+  - 美国42|573ms|121Mbps|住宅|纯净度99.6%
+  - 美国35|569ms|121Mbps|住宅|纯净度99.7%
+  - 美国33|564ms|121Mbps|住宅|纯净度99.6%
+  - 美国68|332ms|121Mbps|住宅|纯净度99.7%
+  - 美国47|573ms|121Mbps|住宅|纯净度99.7%
+  - 美国64|566ms|121Mbps|住宅|纯净度99.7%
+  - 美国57|329ms|121Mbps|住宅|纯净度99.5%
+  - 美国49|579ms|120Mbps|住宅|纯净度99.7%
+  - 美国44|572ms|120Mbps|住宅|纯净度99.6%
+  - 美国23|327ms|120Mbps|住宅|纯净度99.7%
+  - 美国73|568ms|120Mbps|住宅|纯净度99.7%
+  - 美国54|340ms|120Mbps|住宅|纯净度99.5%
+  - 美国51|572ms|120Mbps|住宅|纯净度99.7%
+  - 美国32|330ms|120Mbps|住宅|纯净度99.7%
+  - 美国40|583ms|120Mbps|住宅|纯净度99.7%
+  - 美国48|575ms|119Mbps|住宅|纯净度99.7%
+  - 美国19|565ms|119Mbps|非住宅|纯净度98.9%
+  - 美国20|564ms|119Mbps|非住宅|纯净度98.9%
+  - 美国03|233ms|114Mbps|非住宅|纯净度100.0%
+  - 德国03|697ms|114Mbps|非住宅|纯净度97.7%
+  - 意大利01|1030ms|114Mbps|非住宅|纯净度85.9%
+  - 美国16|348ms|110Mbps|非住宅|纯净度99.2%
+  - 德国09|1076ms|110Mbps|非住宅|纯净度98.4%
+  - 荷兰20|633ms|107Mbps|非住宅|纯净度74.5%
+  - 美国10|358ms|107Mbps|非住宅|纯净度99.2%
+  - 荷兰41|631ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰60|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰52|849ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰25|836ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰85|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰34|840ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰72|636ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰90|838ms|106Mbps|非住宅|纯净度74.5%
+  - 荷兰79|842ms|106Mbps|非住宅|纯净度74.5%
+  - 美国08|334ms|105Mbps|非住宅|纯净度99.6%
+  - 荷兰76|845ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰18|638ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰62|644ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰57|636ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰55|844ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰26|842ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰65|841ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰21|632ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰31|844ms|105Mbps|非住宅|纯净度74.5%
+  - 荷兰88|846ms|104Mbps|非住宅|纯净度74.5%
+  - 荷兰50|839ms|104Mbps|非住宅|纯净度74.5%
+  - 美国65|343ms|104Mbps|非住宅|纯净度99.6%
+  - 荷兰29|836ms|103Mbps|非住宅|纯净度74.5%
+  - 美国74|337ms|103Mbps|非住宅|纯净度99.6%
+  - 荷兰30|842ms|103Mbps|非住宅|纯净度74.5%
+  - 荷兰32|845ms|103Mbps|非住宅|纯净度74.5%
+  - 荷兰69|634ms|103Mbps|非住宅|纯净度74.5%
+  - 荷兰82|634ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰83|642ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰86|643ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰74|838ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰73|647ms|102Mbps|非住宅|纯净度74.5%
+  - 荷兰84|636ms|101Mbps|非住宅|纯净度74.5%
+  - 美国18|350ms|101Mbps|非住宅|纯净度99.2%
+  - 荷兰92|640ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰33|846ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰53|634ms|101Mbps|非住宅|纯净度74.5%
+  - 荷兰10|647ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰27|836ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰24|645ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰14|644ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰40|642ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰70|846ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰13|645ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰81|835ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰96|646ms|100Mbps|非住宅|纯净度74.5%
+  - 荷兰48|634ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰08|641ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰16|641ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰17|646ms|99Mbps|非住宅|纯净度74.5%
+  - 荷兰63|643ms|98Mbps|非住宅|纯净度74.5%
+  - 荷兰67|646ms|98Mbps|非住宅|纯净度74.5%
+  - 荷兰11|647ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰12|641ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰80|644ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰68|628ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰77|636ms|97Mbps|非住宅|纯净度74.5%
+  - 荷兰59|644ms|96Mbps|非住宅|纯净度74.5%
+  - 波兰08|637ms|96Mbps|非住宅|纯净度81.2%
+  - 荷兰36|638ms|96Mbps|非住宅|纯净度74.5%
+  - 波兰01|628ms|96Mbps|非住宅|纯净度81.2%
+  - 荷兰64|644ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰89|647ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰66|630ms|96Mbps|非住宅|纯净度74.5%
+  - 荷兰78|833ms|95Mbps|非住宅|纯净度74.5%
+  - 荷兰91|639ms|95Mbps|非住宅|纯净度74.5%
+  - 荷兰51|635ms|94Mbps|非住宅|纯净度74.5%
+  - 荷兰75|641ms|94Mbps|非住宅|纯净度74.5%
+  - 荷兰87|835ms|93Mbps|非住宅|纯净度74.5%
+  - BR01|897ms|93Mbps|非住宅|纯净度100.0%
+  - 荷兰49|645ms|93Mbps|非住宅|纯净度74.5%
+  - BR03|894ms|91Mbps|非住宅|纯净度100.0%
+  - 罗马尼亚01|902ms|91Mbps|非住宅|纯净度86.7%
+  - 荷兰19|684ms|89Mbps|非住宅|纯净度98.0%
+  - 荷兰22|682ms|86Mbps|非住宅|纯净度98.0%
+  - 荷兰28|839ms|86Mbps|非住宅|纯净度74.5%
+  - 荷兰39|571ms|86Mbps|非住宅|纯净度94.8%
+  - 法国11|714ms|85Mbps|住宅|纯净度100.0%
+  - 加拿大01|278ms|85Mbps|非住宅|纯净度95.5%
+  - 法国09|719ms|85Mbps|住宅|纯净度100.0%
+  - 爱尔兰04|516ms|84Mbps|非住宅|纯净度99.6%
+  - 法国06|715ms|84Mbps|住宅|纯净度100.0%
+  - 美国77|164ms|84Mbps|非住宅|纯净度99.5%
+  - 荷兰61|571ms|83Mbps|非住宅|纯净度94.8%
+  - 爱尔兰05|540ms|83Mbps|非住宅|纯净度99.5%
+  - 荷兰56|685ms|82Mbps|非住宅|纯净度98.0%
+  - 爱尔兰01|497ms|81Mbps|非住宅|纯净度99.5%
+  - 法国08|716ms|81Mbps|住宅|纯净度100.0%
+  - 波兰02|778ms|81Mbps|非住宅|纯净度97.3%
+  - 波兰06|786ms|81Mbps|非住宅|纯净度97.3%
+  - 爱尔兰09|483ms|81Mbps|非住宅|纯净度99.5%
+  - 波兰03|784ms|80Mbps|非住宅|纯净度97.3%
+  - 爱尔兰02|547ms|80Mbps|非住宅|纯净度99.5%
+  - 波兰05|778ms|80Mbps|非住宅|纯净度97.3%
+  - 爱尔兰06|492ms|80Mbps|非住宅|纯净度99.5%
+  - 波兰04|776ms|80Mbps|非住宅|纯净度97.3%
+  - 新加坡01|1623ms|80Mbps|非住宅|纯净度97.6%
+  - 荷兰03|596ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰46|590ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰37|608ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰35|597ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰01|610ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰15|599ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰04|610ms|73Mbps|非住宅|纯净度99.6%
+  - 荷兰47|620ms|73Mbps|非住宅|纯净度99.6%
+  - 法国14|628ms|73Mbps|非住宅|纯净度98.3%
+  - 荷兰54|605ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰23|600ms|72Mbps|非住宅|纯净度99.6%
+  - 美国83|508ms|72Mbps|非住宅|纯净度95.9%
+  - 荷兰101|611ms|72Mbps|非住宅|纯净度99.6%
+  - 法国07|646ms|72Mbps|非住宅|纯净度100.0%
+  - 荷兰43|617ms|72Mbps|非住宅|纯净度94.8%
+  - 荷兰100|602ms|72Mbps|非住宅|纯净度99.6%
+  - 荷兰09|623ms|72Mbps|非住宅|纯净度94.8%
+  - 荷兰45|608ms|72Mbps|非住宅|纯净度99.6%
+  - 法国03|646ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰07|620ms|71Mbps|非住宅|纯净度94.8%
+  - 法国05|636ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰42|628ms|71Mbps|非住宅|纯净度94.8%
+  - 荷兰06|619ms|71Mbps|非住宅|纯净度94.8%
+  - 美国79|436ms|71Mbps|非住宅|纯净度99.5%
+  - 法国01|640ms|71Mbps|非住宅|纯净度100.0%
+  - 荷兰02|611ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰44|634ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰05|606ms|70Mbps|非住宅|纯净度94.8%
+  - 荷兰99|611ms|69Mbps|非住宅|纯净度99.6%
+  - 美国67|706ms|69Mbps|非住宅|纯净度95.9%
+  - 德国02|687ms|68Mbps|非住宅|纯净度100.0%
+  - 泰国01|1172ms|67Mbps|非住宅|纯净度98.9%
+  - 荷兰95|634ms|62Mbps|非住宅|纯净度90.6%
+  - 法国12|622ms|61Mbps|非住宅|纯净度98.3%
+  - 爱尔兰07|542ms|59Mbps|非住宅|纯净度99.6%
+  - 法国13|630ms|58Mbps|非住宅|纯净度98.3%
+  - 爱尔兰03|541ms|58Mbps|非住宅|纯净度99.6%
+  - 法国02|622ms|57Mbps|非住宅|纯净度99.2%
+  - 以色列03|1088ms|56Mbps|住宅未知|纯净度99.6%
+  - MX01|499ms|55Mbps|非住宅|纯净度97.7%
+  - 爱尔兰08|476ms|54Mbps|非住宅|纯净度99.6%
+  - 法国15|620ms|52Mbps|非住宅|纯净度99.2%
+  - 以色列02|1083ms|51Mbps|住宅未知|纯净度99.6%
+  - 以色列01|1084ms|49Mbps|住宅未知|纯净度99.6%
+  - 荷兰97|605ms|49Mbps|非住宅|纯净度90.6%
+  - 美国81|398ms|48Mbps|住宅|纯净度99.9%
+  - 美国80|204ms|47Mbps|非住宅|纯净度100.0%
+  - 罗马尼亚02|907ms|46Mbps|非住宅|纯净度86.7%
+  - TR01|500ms|43Mbps|非住宅|纯净度81.2%
+  - TR02|507ms|41Mbps|非住宅|纯净度81.2%
+  - TR03|506ms|41Mbps|非住宅|纯净度81.2%
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
@@ -4309,24 +3640,21 @@ proxy-groups:
 - name: 🏠 非机房 IP
   type: url-test
   proxies:
-  - 美国09|482ms|142Mbps|非住宅|纯净度100.0%
-  - MX01|602ms|50Mbps|非住宅|纯净度97.7%
-  - 德国09|1000ms|12Mbps|住宅未知|纯净度98.4%
-  - 以色列01|1236ms|51Mbps|住宅未知|纯净度99.6%
-  - 印度尼西亚01|1514ms|12Mbps|住宅|纯净度96.9%
-  - 德国11|565ms|104Mbps|非住宅|纯净度98.0%
-  - 意大利01|616ms|109Mbps|非住宅|纯净度85.9%
-  - 法国04|994ms|55Mbps|非住宅|纯净度99.2%
-  - 法国08|950ms|84Mbps|住宅|纯净度100.0%
-  - 瑞典01|1108ms|13Mbps|住宅|纯净度99.9%
-  - 法国12|585ms|42Mbps|非住宅|纯净度99.2%
-  - 美国86|527ms|54Mbps|非住宅|纯净度93.8%
-  - 美国92|453ms|47Mbps|非住宅|纯净度100.0%
-  - 荷兰36|886ms|19Mbps|非住宅|纯净度98.8%
-  - 美国93|370ms|52Mbps|住宅|纯净度98.4%
-  - 印度01|2037ms|4Mbps|住宅|纯净度99.7%
-  - 美国94|717ms|47Mbps|住宅|纯净度99.9%
-  - 德国24|1008ms|45Mbps|非住宅|纯净度100.0%
+  - 美国03|233ms|114Mbps|非住宅|纯净度100.0%
+  - 法国02|622ms|57Mbps|非住宅|纯净度99.2%
+  - 德国05|812ms|11Mbps|住宅未知|纯净度98.4%
+  - 以色列01|1084ms|49Mbps|住宅未知|纯净度99.6%
+  - TR01|500ms|43Mbps|非住宅|纯净度81.2%
+  - 波兰07|769ms|4Mbps|非住宅|纯净度96.9%
+  - 意大利01|1030ms|114Mbps|非住宅|纯净度85.9%
+  - 法国06|715ms|84Mbps|住宅|纯净度100.0%
+  - 美国75|225ms|37Mbps|非住宅|纯净度93.8%
+  - 美国80|204ms|47Mbps|非住宅|纯净度100.0%
+  - 荷兰93|633ms|14Mbps|非住宅|纯净度98.8%
+  - 泰国01|1172ms|67Mbps|非住宅|纯净度98.9%
+  - 德国22|1236ms|14Mbps|非住宅|纯净度100.0%
+  - 美国81|398ms|48Mbps|住宅|纯净度99.9%
+  - MX01|499ms|55Mbps|非住宅|纯净度97.7%
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
@@ -4336,10 +3664,8 @@ proxy-groups:
 - name: 🌏 台湾／新加坡
   type: url-test
   proxies:
-  - 新加坡01|774ms|2Mbps|非住宅|纯净度100.0%
-  - 新加坡02|780ms|4Mbps|非住宅|纯净度100.0%
-  - 新加坡03|824ms|8Mbps|非住宅|纯净度100.0%
-  - 新加坡04|1020ms|14Mbps|非住宅|纯净度100.0%
+  - 新加坡01|1623ms|80Mbps|非住宅|纯净度97.6%
+  - 新加坡02|1052ms|13Mbps|非住宅|纯净度100.0%
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
