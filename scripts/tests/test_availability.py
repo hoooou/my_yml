@@ -64,7 +64,7 @@ class AvailabilityTests(unittest.TestCase):
             'ip_type': {'status': 'success', 'hosting': False}}
         a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, [record],
             {'n-unique': {'name': 'n-unique', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
-        self.assertEqual(record['name'], '美国01|100ms|84Mbps|住宅未知|纯净度未知')
+        self.assertEqual(record['name'], '美国01|100ms|84Mbps|未知|纯净度未知')
 
     def test_100mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
