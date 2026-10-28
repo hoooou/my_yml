@@ -312,6 +312,31 @@ def quick_download(port):
     return download_sample(port, DOWNLOAD_BYTES, DOWNLOAD_BUDGET)
 
 
+FRONT_CN_URL = 'http://mirrors.tuna.tsinghua.edu.cn/robots.txt'
+FRONT_INTL_URL = 'http://www.gstatic.com/generate_204'
+FRONT_10MB = 'https://hkg.download.datapacket.com/10mb.bin'
+FRONT_100MB = 'https://hkg.download.datapacket.com/100mb.bin'
+FRONT_REGIONS = ('HK', 'JP', 'KR', 'SG')
+
+
+def quick3_download(port):
+    """3MB quick download used as the landing's first bandwidth gate."""
+    return download_sample(port, 3_000_000, 6, 'https://speed.cloudflare.com/__down?bytes=3000000')
+
+
+def probe_front(port):
+    """Cheap-to-expensive front checks: CN return, international, 10MB, 100MB."""
+    cn = [check_site(port, 'cn', FRONT_CN_URL, timeout=(3, 6)) for _ in range(3)]
+    intl = [check_site(port, 'intl', FRONT_INTL_URL, timeout=(2, 3)) for _ in range(3)]
+    result = {'cn': summarize_rounds([{'cn': row} for row in cn], ('cn',))['cn'],
+              'intl': summarize_rounds([{'intl': row} for row in intl], ('intl',))['intl']}
+    ten = download_sample(port, 10_000_000, 10, FRONT_10MB)
+    result['down10'] = ten
+    if ten.get('status') == 'passed':
+        result['down100'] = download_sample(port, 100_000_000, 60, FRONT_100MB)
+    return result
+
+
 def medium_speed_download(port):
     return download_sample(port, medium_speed.BYTES, medium_speed.BUDGET, medium_speed.URL)
 
@@ -325,7 +350,8 @@ def high_speed_download(port):
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
                    site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
                    medium_download=None, upload_precheck=None, upload_controls=None,
-                   preflight_only=False, initial_records=None, service_check=None, policy_version=None):
+                   preflight_only=False, initial_records=None, service_check=None, policy_version=None,
+                   quick3=None):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
     modern = policy_version == qp.VERSION
@@ -384,7 +410,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 record['precheck'] = precheck(port)
             if modern:
                 record['selection_policy_version'] = qp.VERSION
-            if initial_records is None and record['precheck']['status'] == 'passed':
+            if initial_records is None:
                 if not tcp_supported(node):
                     record['entry']['reason'] = 'UDP 协议不适用 TCP 检测，后续阶段未测'
                 else:
@@ -408,7 +434,10 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                     if not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                         record['download']['reason'] = 'TCP通过但3MB上行预检未通过，跳过网站和下载'
             if not preflight_only:
-                if modern and record['entry']['status'] == 'passed':
+                if quick3 and record['precheck']['status'] == 'passed' and 'quick3_download' not in record:
+                    with bandwidth.download():
+                        record['quick3_download'] = quick3(port)
+                if modern and record['precheck']['status'] == 'passed':
                     with bandwidth.upload():
                         if controls['before'] is None:
                             controls['before'] = upload_precheck(None)
@@ -417,7 +446,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         record['upload_precheck'] = upload_precheck(port)
                         record['upload_precheck_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                         controls['node_count'] += 1
-                if record['entry']['status'] == 'passed' and (modern or upload_speed.sample_passed(
+                if record['precheck']['status'] == 'passed' and (modern or upload_speed.sample_passed(
                         record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)):
                     rounds = [site_check(port)]
                     # Only traces get one round; overseas pages get three.
@@ -470,6 +499,8 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
                         record['download']['reason'] = '网站TLS异常或必过网页/API/trace未通过，跳过下载'
+            if not preflight_only and (record.get('exit') or {}).get('country_code') in FRONT_REGIONS:
+                record['front_probe'] = probe_front(port)
             with lock:
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
@@ -1245,7 +1276,7 @@ def main():
             return
         print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)}节点，阶段{args.phase}', flush=True)
         try:
-            records, endpoint_count = probe_pipeline(subset, binary, root,
+            records, endpoint_count = probe_pipeline(subset, binary, root, quick3=quick3_download,
                 interval=.25 * args.shard_count, upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
@@ -1261,7 +1292,7 @@ def main():
     elif args.phase not in repair_modes:
         controls = {}
         try:
-            records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls,
+            records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls, quick3=quick3_download,
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))

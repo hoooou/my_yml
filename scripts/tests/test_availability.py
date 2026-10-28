@@ -302,8 +302,8 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(records[0]['websites']['Google']['round_count'], 3)
         self.assertEqual(records[0]['websites']['ClaudeTrace']['round_count'], 1)
         self.assertIsNone(records[2]['websites'])
-        self.assertEqual(records[2]['entry']['status'], 'unknown')
-        self.assertEqual(records[2]['entry']['attempts'], 0)
+        # entry 与 precheck 已解耦：204 失败的节点仍要测国内 TCP
+        self.assertEqual(records[2]['entry']['status'], 'passed')
         self.assertNotIn(('download', 3), events)
         self.assertNotIn(('100MB', 3), events)
 
