@@ -1551,13 +1551,17 @@ def main():
     # --- @ty.aicoding@1793178193005 ---
     chain_path = Path('链式配置.yaml')
     if args.phase in ('all', 'publish'):
-        chain_config, chain_summary = chain_fronts.build(
-            config, records, mapping,
-            binary=None if args.chain_disable_verify else binary, root=root,
-            limit_per_region=args.chain_front_limit_per_region,
-            total_limit=args.chain_front_total, min_sites=args.chain_front_min_sites,
-            rounds=args.chain_rounds, concurrency=args.chain_concurrency,
-            timeout_ms=args.chain_timeout_ms, gap_seconds=args.chain_gap_seconds)
+        try:
+            chain_config, chain_summary = chain_fronts.build(
+                config, records, mapping,
+                binary=None if args.chain_disable_verify else binary, root=root,
+                limit_per_region=args.chain_front_limit_per_region,
+                total_limit=args.chain_front_total, min_sites=args.chain_front_min_sites,
+                rounds=args.chain_rounds, concurrency=args.chain_concurrency,
+                timeout_ms=args.chain_timeout_ms, gap_seconds=args.chain_gap_seconds)
+        except Exception as error:  # never block the main subscription on the optional chain
+            print(f'链式配置生成失败，保留单跳：{type(error).__name__}: {error}', flush=True)
+            chain_config, chain_summary = None, {'enabled': False, 'reason': 'chain_build_failed'}
         chain_text = candidate.read_text()
         header = (f'# 链式配置；{now}；本轮未挂链（{chain_summary.get("reason", "unknown")}），'
                   f'内容等同优选配置，单跳\n')
