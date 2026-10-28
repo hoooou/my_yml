@@ -199,17 +199,19 @@ def verify_chains(fronts, landings, binary, root, *, rounds=2, concurrency=20,
 
 
 def summarise(fronts, landing_count, pair_results, rounds):
-    """Aggregate per-front reachability across rounds."""
+    """Aggregate per-front reachability across rounds.
+
+    Pair names are P{landing:03d}-{front:02d}, so a suffix matches one front
+    across every landing; successes must be counted per round, not per pair.
+    """
     rows = []
     for index, front in enumerate(fronts):
         observed = [values for name, values in pair_results.items()
-                    if name.endswith(f'-{index:02d}') for values in [values]]
-        reachable = []
-        latencies = []
-        for values in observed:
-            hits = [v for v in values if v.get('ok')]
-            reachable.append(len(hits))
-            latencies.extend(v['latency_ms'] for v in hits if v.get('latency_ms'))
+                    if name.endswith(f'-{index:02d}')]
+        reachable = [sum(1 for values in observed if len(values) > r and values[r].get('ok'))
+                     for r in range(rounds)]
+        latencies = [v['latency_ms'] for values in observed for v in values
+                     if v.get('ok') and v.get('latency_ms')]
         rows.append({
             'front': front,
             'reachable_by_round': reachable,
