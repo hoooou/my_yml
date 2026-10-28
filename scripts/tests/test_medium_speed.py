@@ -122,9 +122,9 @@ class MediumDownloadTests(unittest.TestCase):
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in rows}
         cfg = a.render_comparison({}, rows, mapping)
         byid = {r['id']:r['name'] for r in rows}
-        self.assertEqual(byid['n-a'], '美国01|120ms|42Mbps|非住宅|纯净度99.2%')
+        self.assertEqual(byid['n-a'], '美国01|120ms|42Mbps|机房|纯净度99.2%')
         self.assertEqual(byid['n-b'], '美国02|120ms|84Mbps|住宅|纯净度99.2%')
-        self.assertEqual(byid['n-c'], '日本01|120ms|42Mbps|住宅未知|纯净度未知')
+        self.assertEqual(byid['n-c'], '日本01|120ms|42Mbps|未知|纯净度未知')
         self.assertEqual(len({n['name'] for n in cfg['proxies']}), 3)
         self.assertTrue(all(len(n['name'].split('|')) == 5 for n in cfg['proxies']))
 

@@ -64,7 +64,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 
 全局组使用select、default-selected为综合优选；其他组使用url-test，切换容差50ms。HTTPS 200（claude.ai/cdn-cgi/trace）延迟检查每300秒一次、5秒超时、期望200、关闭lazy。客户端支持时可手动固定节点，节点不可用时可能自动切换出口。[Mihomo分组字段](https://wiki.metacubex.one/config/proxy-groups/)
 
-节点名称：`美国01|120ms|85Mbps|住宅|纯净度99.2%`。延迟使用实际请求中位数；带宽优先双100MB较低值，再用通过的5MB或1MB。未确认的住宅／信誉信息显示未知。非机房不等同住宅，住宅也不保证快速或稳定。
+节点名称：`美国01|120ms|85Mbps|机房|纯净度99.2%`。延迟使用实际请求中位数；带宽优先双100MB较低值，再用通过的5MB或1MB。第四段按出口 IP 的类型显示`机房`／`住宅`／`移动网络`／`未知`：`机房`是 hosting=true 的数据中心地址，`住宅`要求 hosting=false 且运营商类型为 isp，`移动网络`是 is_mobile，其余一律`未知`——**未知不等于住宅**。住宅也不保证快速或稳定。
 
 ## 当前筛选流程
 

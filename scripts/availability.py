@@ -1005,8 +1005,8 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
         bandwidth = (f'{speed * 1048576 * 8 / 1000000:.0f}Mbps'
             if (measured or {}).get('status') == 'passed' and isinstance(speed, (int, float))
             and math.isfinite(speed) and speed > 0 else '?Mbps')
-        housing = {'住宅候选': '住宅', '机房': '非住宅', '移动网络': '非住宅',
-                   '非机房': '住宅未知', '住宅未知': '住宅未知'}[ip_reputation.residence_label(record)]
+        housing = {'住宅候选': '住宅', '机房': '机房', '移动网络': '移动网络',
+                   '非机房': '未知', '住宅未知': '未知'}[ip_reputation.residence_label(record)]
         info = record.get('ip_reputation') or {}
         purity = info.get('network_purity_score') if info.get('status') == 'success' else None
         purity_text = (f'纯净度{purity:.1f}%' if isinstance(purity, (int, float))
@@ -1515,7 +1515,7 @@ def main():
                       and (r.get('exit') or {}).get('country_code') == cc for r in records)
                       for cc in REGIONAL_COUNTRIES}},
               'published_node_count': len(config['proxies']), 'published_node_ids': published_ids,
-              'node_naming_policy': {'format': '地区编号|延迟ms|带宽Mbps|住宅类型|纯净度百分比',
+              'node_naming_policy': {'format': '地区编号|延迟ms|带宽Mbps|机房类型|纯净度百分比',
                   'numbering': 'ranked_per_region_starting_01', 'speed_source_priority': ['100MB_double_minimum', '5MB', '1MB'],
                   'residential_label': 'ipapi_isp_and_not_datacenter', 'unknown_fields_remain_unknown': True},
               'ip_reputation_policy': {'provider': 'ipapi.is', 'scope': 'quick_download_passed_unique_exits',
