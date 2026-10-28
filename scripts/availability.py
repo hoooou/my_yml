@@ -351,7 +351,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                    site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
                    medium_download=None, upload_precheck=None, upload_controls=None,
                    preflight_only=False, initial_records=None, service_check=None, policy_version=None,
-                   quick3=None):
+                   quick3=None, decoupled=False):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
     modern = policy_version == qp.VERSION
@@ -410,7 +410,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 record['precheck'] = precheck(port)
             if modern:
                 record['selection_policy_version'] = qp.VERSION
-            if initial_records is None:
+            if initial_records is None and (decoupled or record['precheck']['status'] == 'passed'):
                 if not tcp_supported(node):
                     record['entry']['reason'] = 'UDP 协议不适用 TCP 检测，后续阶段未测'
                 else:
@@ -437,7 +437,8 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 if quick3 and record['precheck']['status'] == 'passed' and 'quick3_download' not in record:
                     with bandwidth.download():
                         record['quick3_download'] = quick3(port)
-                if modern and record['precheck']['status'] == 'passed':
+                gate = (record['precheck']['status'] == 'passed') if decoupled else (record['entry']['status'] == 'passed')
+                if modern and gate:
                     with bandwidth.upload():
                         if controls['before'] is None:
                             controls['before'] = upload_precheck(None)
@@ -446,7 +447,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         record['upload_precheck'] = upload_precheck(port)
                         record['upload_precheck_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                         controls['node_count'] += 1
-                if record['precheck']['status'] == 'passed' and (modern or upload_speed.sample_passed(
+                if gate and (modern or upload_speed.sample_passed(
                         record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)):
                     rounds = [site_check(port)]
                     # Only traces get one round; overseas pages get three.
@@ -552,11 +553,13 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             if tested and not all(upload_speed.sample_passed(controls.get(k) or {},
                     upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET) for k in ('before', 'after')):
                 raise ValueError('上行预检直连对照未通过，拒绝发布')
-        # entry 与 precheck 已解耦：每个 TCP 可达入口都要探测
-        eligible = {endpoint_key(n) for n in subset if tcp_supported(n)}
+        eligible = {endpoint_key(n) for n in subset if tcp_supported(n) and
+                    (bundle.get('entry_decoupled') is True or
+                     by_id[n['name']].get('precheck', {}).get('status') == 'passed')}
         if part['endpoint_count'] != len(eligible):
             raise ValueError('TCP 入口统计不完整')
         for record in rows:
+            decoupled = bundle.get('entry_decoupled') is True
             if modern and not qp.modern(record):
                 raise ValueError('节点缺少本轮稳定性优先策略版本')
             node = definitions[record['id']]
@@ -582,20 +585,23 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             passed = sum(a.get('status') == 'passed' for a in pre['attempts'])
             if pre.get('passed_count') != passed or (pre.get('status') == 'passed') != (passed == 3):
                 raise ValueError('204 汇总与三轮结果不一致')
-            if record['entry']['status'] != 'unknown' and pre['status'] != 'passed':
-                raise ValueError('204 未通过却进入 TCP 阶段')
-            if pre['status'] != 'passed' and (record['entry'].get('attempts') != 0 or record.get('websites')):
-                raise ValueError('204 未通过却执行后续阶段')
+            # entry 与 precheck 已解耦：204 失败的节点也允许探测国内 TCP
+            if pre['status'] != 'passed' and record.get('websites'):
+                raise ValueError('204 未通过却执行网站阶段')
             early = record.get('upload_precheck') or {}
             uses_early = bundle.get('early_upload_precheck') or 'upload_precheck' in record
             if uses_early:
-                expected_status = ('passed', 'failed') if record['entry']['status'] == 'passed' and not (modern and preflight_only) else ('skipped',)
+                upload_gate = (pre['status'] == 'passed' if decoupled else record['entry']['status'] == 'passed')
+                expected_status = (('passed', 'failed')
+                                   if upload_gate and not (modern and preflight_only) else ('skipped',))
                 if early.get('status') not in expected_status:
                     raise ValueError('上行预检漏测或国内TCP未通过却已测速')
                 if early.get('status') == 'passed' and not upload_speed.sample_passed(
                         early, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                     raise ValueError('3MB上行预检证据不完整或超出预算')
-            should_web = not preflight_only and record['entry']['status'] == 'passed' and (modern or not uses_early or early.get('status') == 'passed')
+            web_gate = (pre['status'] == 'passed' if decoupled else record['entry']['status'] == 'passed')
+            should_web = (not preflight_only and web_gate
+                          and (modern or not uses_early or early.get('status') == 'passed'))
             if not should_web and record.get('websites'):
                 raise ValueError('上行预检或前置阶段未通过却检测了网站')
             if should_web and (not record.get('websites') or any(
@@ -621,8 +627,6 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
                     if item.get('login_required_count', 0) != expected['login_required_count']:
                         raise ValueError('Reddit登录汇总与逐轮响应结果不一致')
-            if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
-                raise ValueError('节点未按阶段筛选')
             if bundle.get('website_tls_hard_gate') and should_web:
                 failed_sites = website_tls_failures(record)
                 evidence = record.get('website_tls') or {}
@@ -640,7 +644,7 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             if record.get('download', {}).get('status') not in (('passed', 'failed') if should_download else ('skipped',)):
                 raise ValueError('下载阶段漏测或顺序异常')
             if record.get('download', {}).get('status') == 'passed' and (
-                    record['entry']['status'] != 'passed' or
+                    (pre['status'] != 'passed' if decoupled else record['entry']['status'] != 'passed') or
                     not required_websites_passed(record) or not app_tls.passed(tls) or
                     record['download'].get('received_bytes') != DOWNLOAD_BYTES or
                     not 0 < record['download'].get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
@@ -1233,6 +1237,7 @@ def main():
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
                   'selection_policy_version': qp.VERSION,
                   'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True, 'website_tls_hard_gate': True,
+                  'entry_decoupled': True,
                   'parallel_observation': args.phase == 'prepare',
                   'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
                   'historical_candidates': historical,
@@ -1277,6 +1282,7 @@ def main():
         print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)}节点，阶段{args.phase}', flush=True)
         try:
             records, endpoint_count = probe_pipeline(subset, binary, root, quick3=quick3_download,
+                decoupled=bundle.get('entry_decoupled', False),
                 interval=.25 * args.shard_count, upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
@@ -1293,6 +1299,7 @@ def main():
         controls = {}
         try:
             records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls, quick3=quick3_download,
+                decoupled=bundle.get('entry_decoupled', False),
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
