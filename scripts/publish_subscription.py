@@ -14,7 +14,8 @@ import tempfile
 from latest_report import REPORT_FILES, readme_fragment, replace_fragment
 from published_report import repository_summary, FILENAME
 
-FILES = ('优选配置.yaml', 'v2rayN.txt', '连通性报告.json', *REPORT_FILES)
+FILES = ('优选配置.yaml', '链式配置.yaml', 'v2rayN.txt', '连通性报告.json', *REPORT_FILES)
+OPTIONAL_FILES = ('链式配置.yaml',)
 REPORT_COMPACT_THRESHOLD = 25 * 1024 * 1024
 
 
@@ -69,6 +70,8 @@ def validated_same_run_rebuild(candidate, remote_latest):
 
 def publish(root, attempts=3, files=FILES):
     root = Path(root).resolve()
+    files = tuple(name for name in files
+                  if name not in OPTIONAL_FILES or (root / name).exists())
     report_name = '最新检测.json' if '最新检测.json' in files else '连通性报告.json'
     candidate = json.loads((root / report_name).read_text())
     measured = measurement_time(candidate)
@@ -85,7 +88,10 @@ def publish(root, attempts=3, files=FILES):
         else:
             compact_report(raw_path)
         # Only generated files may be dirty in this ephemeral checkout.
-        git(root, 'restore', '--', *FILES)
+        tracked = [name for name in FILES
+                   if git(root, 'ls-files', '--error-unmatch', name, check=False).returncode == 0]
+        if tracked:
+            git(root, 'restore', '--', *tracked)
         if git(root, 'diff', '--quiet', check=False).returncode or git(root, 'diff', '--cached', '--quiet', check=False).returncode:
             raise RuntimeError('仓库存在非生成文件修改，拒绝更新提交基点')
         git(root, 'config', 'user.name', 'github-actions[bot]')
