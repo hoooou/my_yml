@@ -19,6 +19,7 @@ import yaml
 import select_nodes as s
 from mobile_pilot import check_site, check_sites, SITES, PAGE_SITES, OVERSEAS_SITES, DOMESTIC_SITES, CONNECTIVITY_SITES, POST_SITES, SITE_WORKERS, WEB_USER_AGENT, UDP_TYPES
 from routing import optimize_routing
+import chain_fronts
 import ip_reputation
 import app_tls
 import published_history
@@ -1146,6 +1147,14 @@ def main():
     parser.add_argument('--source-run', help='Source Actions run for publication recovery')
     parser.add_argument('--uplink-result', default='.node-work/uplink/uplink-stage.json')
     parser.add_argument('--refresh-ip-reputation', action='store_true', help='Refresh optional IP metadata in repair mode')
+    parser.add_argument('--chain-front-limit-per-region', type=int, default=10)
+    parser.add_argument('--chain-front-total', type=int, default=30)
+    parser.add_argument('--chain-front-min-sites', type=int, default=1)
+    parser.add_argument('--chain-rounds', type=int, default=2)
+    parser.add_argument('--chain-concurrency', type=int, default=20)
+    parser.add_argument('--chain-timeout-ms', type=int, default=5000)
+    parser.add_argument('--chain-gap-seconds', type=int, default=60)
+    parser.add_argument('--chain-disable-verify', action='store_true')
     args = parser.parse_args()
     root = Path(args.work_dir).resolve(); root.mkdir(parents=True, exist_ok=True)
     binary = str(Path(args.mihomo).resolve())
@@ -1539,6 +1548,38 @@ def main():
     report['service_checks_summary'] = service_probes.summary(latest_cohort(report))
     subscription = f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text()
     Path('优选配置.yaml').write_text(subscription)
+    # --- @ty.aicoding@1793178193005 ---
+    chain_path = Path('链式配置.yaml')
+    if args.phase in ('all', 'publish'):
+        chain_config, chain_summary = chain_fronts.build(
+            config, records, mapping,
+            binary=None if args.chain_disable_verify else binary, root=root,
+            limit_per_region=args.chain_front_limit_per_region,
+            total_limit=args.chain_front_total, min_sites=args.chain_front_min_sites,
+            rounds=args.chain_rounds, concurrency=args.chain_concurrency,
+            timeout_ms=args.chain_timeout_ms, gap_seconds=args.chain_gap_seconds)
+        chain_text = candidate.read_text()
+        header = (f'# 链式配置；{now}；本轮未挂链（{chain_summary.get("reason", "unknown")}），'
+                  f'内容等同优选配置，单跳\n')
+        if chain_config is not None:
+            s.dump(root / 'chain-selected.yaml', chain_config)
+            chain_checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(root / 'chain-selected.yaml')],
+                                           capture_output=True, text=True, timeout=90)
+            if chain_checked.returncode == 0:
+                chain_text = yaml.safe_dump(chain_config, allow_unicode=True, sort_keys=False)
+                header = (f'# 链式配置；{now}；前置 {chain_summary.get("survivors", 0)} 个，'
+                          f'对 {chain_summary.get("landings_tested", 0)} 个美国落地实连验证；'
+                          f'优选配置未改动\n')
+            else:
+                chain_summary = {**chain_summary, 'enabled': False, 'reason': 'config_validation_failed'}
+        chain_path.write_text(header + chain_text, encoding='utf-8')
+        report['chain'] = chain_summary
+        print(f'链式配置：{chain_summary.get("enabled")}；候选 {chain_summary.get("candidates", 0)}，'
+              f'存活 {chain_summary.get("survivors", 0)}，落地 {chain_summary.get("landings_tested", 0)}；'
+              f'原因 {chain_summary.get("reason", "-")}', flush=True)
+    elif not chain_path.exists():
+        chain_path.write_text(f'# 链式配置；{now}；本阶段未重新生成，沿用单跳\n' + candidate.read_text(),
+                              encoding='utf-8')
     Path('v2rayN.txt').write_text(native_subscription, encoding='utf-8')
     if os.environ.get('GITHUB_RUN_ID'):
         report['source_run'] = os.environ['GITHUB_RUN_ID']
