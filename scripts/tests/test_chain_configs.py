@@ -17,7 +17,12 @@ def record(index, entry='passed', precheck='passed', median=120, server_suffix=N
         'entry': {'status': entry, 'latency_ms': 40 + index},
         'website_tls': {'status': 'passed'},
         'download': {'status': 'passed', 'speed_mib_s': 10 + index},
+        'quick3_download': {'status': 'passed'},
         'upload_precheck': {'status': 'passed'},
+        'front_probe': {'cn': {'status': 'passed'}, 'intl': {'status': 'passed'},
+                        'down10': {'status': 'passed'},
+                        'down100': {'status': 'passed', 'speed_mib_s': 20 + index}},
+        'exit': {'country_code': 'JP'},
         'app_tls': {'status': 'passed'},
         'stability': {'success_rate': 0.99},
     }

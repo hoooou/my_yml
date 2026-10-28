@@ -10,6 +10,7 @@
 
 import copy
 import ipaddress
+import math
 import socket
 from urllib.parse import quote
 
@@ -115,6 +116,8 @@ def _landing_gates(record, mapping):
         return False
     if (record.get('download') or {}).get('status') != 'passed':
         return False
+    if (record.get('quick3_download') or {}).get('status') != 'passed':
+        return False
     if (record.get('upload_precheck') or {}).get('status') != 'passed':
         return False
     if record.get('stability') is not None and not stability.passed(record.get('stability')):
@@ -122,6 +125,15 @@ def _landing_gates(record, mapping):
     if record.get('id') not in mapping:
         return False
     return True
+
+
+def front_region(record, node, countries):
+    """Entry-server country when known; fall back to the measured exit country."""
+    country = (countries or {}).get(str(node.get('server')))
+    if country is not None:
+        return country if country in FRONT_REGIONS else None
+    fallback = (record.get('exit') or {}).get('country_code')
+    return fallback if fallback in FRONT_REGIONS else None
 
 
 def _front_gates(record, mapping, countries):
@@ -132,8 +144,7 @@ def _front_gates(record, mapping, countries):
         return False
     if (record.get('entry') or {}).get('status') != 'passed':
         return False
-    country = countries.get(str(node.get('server')))
-    if country not in FRONT_REGIONS:
+    if front_region(record, node, countries) is None:
         return False
     if (record.get('website_tls') or {}).get('status') != 'passed':
         return False
@@ -141,10 +152,25 @@ def _front_gates(record, mapping, countries):
         return False
     if (record.get('download') or {}).get('status') != 'passed':
         return False
+    probe = record.get('front_probe') or {}
+    if (probe.get('cn') or {}).get('status') != 'passed':
+        return False
+    if (probe.get('intl') or {}).get('status') != 'passed':
+        return False
+    if (probe.get('down10') or {}).get('status') != 'passed':
+        return False
+    if (probe.get('down100') or {}).get('status') != 'passed':
+        return False
     return True
 
 
-def select_fronts(records, mapping, countries):
+def _front_speed(record):
+    speed = ((record.get('front_probe') or {}).get('down100') or {}).get('speed_mib_s')
+    return speed if isinstance(speed, (int, float)) else -1
+
+
+def select_fronts(records, mapping, countries=None, trim=0.2, min_sample=5):
+    """Keep every front that passes; trim the slowest 20% inside each region."""
     picked, seen = [], set()
     for record in records:
         if not _front_gates(record, mapping, countries):
@@ -155,10 +181,18 @@ def select_fronts(records, mapping, countries):
             continue
         seen.add(key)
         picked.append({'record': record, 'node': node,
-                       'region': countries.get(str(node.get('server')))})
-    picked.sort(key=lambda item: (FRONT_REGIONS.index(item['region']),
-                                  (item['record'].get('entry') or {}).get('latency_ms') or 1e9))
-    return picked
+                       'region': front_region(record, node, countries)})
+    kept = []
+    for region in FRONT_REGIONS:
+        bucket = [item for item in picked if item['region'] == region]
+        if len(bucket) >= min_sample and trim > 0:
+            bucket.sort(key=_front_speed, reverse=True)
+            bucket = bucket[:max(1, len(bucket) - math.ceil(len(bucket) * trim))]
+        kept.extend(bucket)
+    kept.sort(key=lambda item: (FRONT_REGIONS.index(item['region']),
+                               -_front_speed(item['record']),
+                               (item['record'].get('entry') or {}).get('latency_ms') or 1e9))
+    return kept
 
 
 def select_landings(records, mapping):
@@ -269,12 +303,17 @@ def render_chain(base):
     return config
 
 
-def build(base, records, mapping, *, countries=None, geo_lookup=lookup_server_countries):
-    """Return (front_config, landing_config, chain_config, summary)."""
-    if countries is None:
+def build(base, records, mapping, *, countries=None, geo_lookup=None):
+    """Return (front_config, landing_config, chain_config, summary).
+
+    Region uses the entry-server country when provided; otherwise the measured
+    exit country is used (documented limitation until server geolocation is wired).
+    """
+    if countries is None and geo_lookup is not None:
         servers = {mapping[r['id']].get('server') for r in records
                    if r.get('id') in mapping and (r.get('entry') or {}).get('status') == 'passed'}
         countries = geo_lookup(servers)
+    countries = countries or {}
     fronts = select_fronts(records, mapping, countries)
     landings = select_landings(records, mapping)
     summary = {
