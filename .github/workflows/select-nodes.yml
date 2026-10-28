@@ -94,7 +94,7 @@ jobs:
     name: 双204 → 国内TCP（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -146,7 +146,7 @@ jobs:
     name: 网站、TLS与下载（分片 ${{ matrix.shard }}）
     needs: [prepare, preflight]
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -310,7 +310,7 @@ jobs:
     name: 合并校验并更新原订阅
     needs: [prepare, probe, uplink, observe]
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 60
     permissions:
       contents: write
       actions: read
