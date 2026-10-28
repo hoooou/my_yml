@@ -115,6 +115,28 @@ def select_candidates(records, mapping, countries, *, limit_per_region=10, total
     return ordered[:total_limit]
 
 
+CF_NETWORKS = ('172.64.0.0/13', '104.16.0.0/13', '162.158.0.0/15', '188.114.96.0/20',
+               '173.245.48.0/20', '103.21.244.0/22', '131.0.72.0/22', '141.101.64.0/18',
+               '108.162.192.0/18', '190.93.240.0/20', '197.234.240.0/22', '198.41.128.0/17',
+               '162.159.0.0/16', '103.22.200.0/22', '103.31.4.0/22', '104.24.0.0/14')
+
+
+def is_cloudflare(server, cache=None):
+    """Cloudflare anycast exits follow the ingress colo, so they must not be chained."""
+    cache = cache if cache is not None else {}
+    host = str(server).lower()
+    if host in cache:
+        return cache[host]
+    result = False
+    try:
+        address = ipaddress.ip_address(socket.gethostbyname(host))
+        result = any(address in ipaddress.ip_network(net) for net in CF_NETWORKS)
+    except (OSError, ValueError):
+        result = False
+    cache[host] = result
+    return result
+
+
 def _free_port():
     with socket.socket() as sock:
         sock.bind(('127.0.0.1', 0))
@@ -240,9 +262,13 @@ def render(base_config, rows):
         copy_node['name'] = name
         front_nodes.append(copy_node)
     config['proxies'] = front_nodes + config['proxies']
+    cache = {}
     for node in config['proxies']:
-        if not str(node.get('name', '')).startswith(FRONT_PREFIX):
-            node['dialer-proxy'] = FRONT_GROUP
+        if str(node.get('name', '')).startswith(FRONT_PREFIX):
+            continue
+        if is_cloudflare(node.get('server'), cache):
+            continue
+        node['dialer-proxy'] = FRONT_GROUP
     group = {
         'name': FRONT_GROUP, 'type': 'url-test', 'url': CHECK_URL,
         'interval': 300, 'timeout': 5000, 'expected-status': 204,

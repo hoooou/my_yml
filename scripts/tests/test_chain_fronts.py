@@ -113,6 +113,18 @@ class SummariseTest(unittest.TestCase):
 
 
 class RenderTest(unittest.TestCase):
+
+    def test_cloudflare_landing_is_not_chained(self):
+        base = base_config()
+        base['proxies'][0]['server'] = '172.64.68.89'
+        rows = [{'front': {'record': record(0), 'node': node(0), 'region': 'JP'},
+                 'reachable_by_round': [3], 'best_reachable': 3, 'median_latency_ms': 90}]
+        with mock.patch.object(cf, 'is_cloudflare', side_effect=lambda host, cache=None: host == '172.64.68.89'):
+            config = cf.render(base, rows)
+        cloudflare = next(p for p in config['proxies'] if p['server'] == '172.64.68.89')
+        self.assertNotIn('dialer-proxy', cloudflare)
+        self.assertEqual(base['proxies'][0].get('name'), '美国01|100ms|50Mbps|住宅|纯净度99%')
+
     def test_render_adds_fronts_group_and_dialer(self):
         base = base_config()
         original = copy.deepcopy(base)
