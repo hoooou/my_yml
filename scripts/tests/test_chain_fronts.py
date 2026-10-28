@@ -87,6 +87,18 @@ class SummariseTest(unittest.TestCase):
         self.assertEqual(rows[0]['best_reachable'], 1)
         self.assertEqual(rows[1]['best_reachable'], 0)
 
+
+    def test_counts_every_landing_per_round(self):
+        fronts = [{'record': record(0), 'node': node(0), 'region': 'JP'}]
+        results = {
+            'P000-00': [{'ok': True, 'latency_ms': 80}, {'ok': True, 'latency_ms': 80}],
+            'P001-00': [{'ok': True, 'latency_ms': 90}, {'ok': False, 'latency_ms': None}],
+            'P002-00': [{'ok': False, 'latency_ms': None}, {'ok': True, 'latency_ms': 100}],
+        }
+        rows = cf.summarise(fronts, 3, results, rounds=2)
+        self.assertEqual(rows[0]['reachable_by_round'], [2, 2])
+        self.assertEqual(rows[0]['best_reachable'], 2)
+
     def test_sorts_by_best_reachable(self):
         fronts = [{'record': record(0), 'node': node(0), 'region': 'JP'},
                   {'record': record(1), 'node': node(1), 'region': 'JP'}]
