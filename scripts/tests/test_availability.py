@@ -296,7 +296,7 @@ class AvailabilityTests(unittest.TestCase):
         with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-0': 1, 'n-1': 2, 'n-2': 3})), \
              patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}):
             records, endpoints = a.probe_pipeline(nodes, 'unused', Path('.'), probe=tcp, precheck=precheck,
-                site_check=websites, download=download, large_download=large_download, upload_precheck=verified_upload_precheck)
+                site_check=websites, download=download, large_download=large_download, upload_precheck=verified_upload_precheck, decoupled=True)
         self.assertEqual(tested, [('8.8.8.8', 443)])
         self.assertEqual(endpoints, 1)
         self.assertEqual(records[0]['websites']['Google']['round_count'], 3)
