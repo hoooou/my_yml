@@ -552,8 +552,8 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             if tested and not all(upload_speed.sample_passed(controls.get(k) or {},
                     upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET) for k in ('before', 'after')):
                 raise ValueError('上行预检直连对照未通过，拒绝发布')
-        eligible = {endpoint_key(n) for n in subset if tcp_supported(n) and
-                    by_id[n['name']].get('precheck', {}).get('status') == 'passed'}
+        # entry 与 precheck 已解耦：每个 TCP 可达入口都要探测
+        eligible = {endpoint_key(n) for n in subset if tcp_supported(n)}
         if part['endpoint_count'] != len(eligible):
             raise ValueError('TCP 入口统计不完整')
         for record in rows:
