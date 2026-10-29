@@ -42,6 +42,9 @@ from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, CLOUDFLARE_204_URL, PAGE_SAMPLE_LIMITS, REDDIT_LOGIN_SAMPLE_BYTES, confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
+# xxapi 文档上限 50 QPS；四片合计留 20% 余量，单个 runner 不超过 10 QPS。
+XXAPI_TOTAL_QPS = 40
+XXAPI_PER_RUNNER_QPS = 10
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
           'unstable': '波动', 'verification_required': 'CF需验证', 'login_required': '登录提示通过', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
 WEBSITE_ROUNDS = 3
@@ -170,7 +173,9 @@ def probe_xxapi(key, pace):
 def service_status():
     """Inspect availability without submitting probes or solving security challenges."""
     services = {'xxapi': {'mode': 'automatic', 'url': 'https://xxapi.cn/doc/tcping',
-                          'status': 'enabled', 'request_rate_per_second': 5},
+                          'status': 'enabled', 'request_rate_per_second': XXAPI_TOTAL_QPS,
+                          'documented_limit_per_second': 50,
+                          'per_runner_per_second': XXAPI_PER_RUNNER_QPS},
                 'itdog': {'mode': 'manual_comparison', 'url': 'https://www.itdog.cn/batch_tcping/'},
                 'tcping_cn': {'mode': 'manual_comparison', 'url': 'https://www.tcping.cn/tcping'}}
     try:
@@ -361,7 +366,8 @@ def high_speed_download(port):
 
 
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
-                   site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
+                   site_check=None, download=quick_download, large_download=high_speed_download,
+                   interval=1 / XXAPI_PER_RUNNER_QPS, workers=16,
                    medium_download=None, upload_precheck=None, upload_controls=None,
                    preflight_only=False, initial_records=None, service_check=None, policy_version=None,
                    quick3=None, decoupled=False):
@@ -1319,7 +1325,8 @@ def main():
         try:
             records, endpoint_count = probe_pipeline(subset, binary, root, quick3=quick3_download,
                 decoupled=bundle.get('entry_decoupled', False),
-                interval=.25 * args.shard_count, upload_controls=controls,
+                interval=max(1 / XXAPI_PER_RUNNER_QPS, args.shard_count / XXAPI_TOTAL_QPS),
+                upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
         finally:
