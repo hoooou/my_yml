@@ -1249,6 +1249,19 @@ def main():
             raise RuntimeError('全部节点未通过手机兼容性检查；保留旧订阅')
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
+        demo_limit = os.environ.get('DEMO_NODES', '').strip()
+        if demo_limit:
+            limit = max(1, int(demo_limit))
+            order, grouped = [], {}
+            for node in nodes:
+                key = endpoint_key(node)
+                if key not in grouped:
+                    grouped[key] = []
+                    order.append(key)
+                grouped[key].append(node)
+            keep = set(order[:limit])
+            nodes = [node for node in nodes if endpoint_key(node) in keep]
+            print(f'调试模式：只保留前 {len(keep)} 个唯一入口，共 {len(nodes)} 个节点', flush=True)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
                   'selection_policy_version': qp.VERSION,
                   'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True, 'website_tls_hard_gate': True,
