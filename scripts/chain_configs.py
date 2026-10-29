@@ -59,24 +59,40 @@ def is_cloudflare(server, cache=None):
     return value
 
 
-def lookup_server_countries(servers, timeout=15, pause=5):
-    """Geolocate entry servers; unknown hosts are skipped."""
+def lookup_server_countries(servers, timeout=15, pause=5, resolve_workers=32, resolve_timeout=120):
+    """Resolve hosts in parallel with a global deadline, then batch-geolocate IPs."""
+    import concurrent.futures as futures
+    import time
+
     import requests
 
-    resolved = {}
-    for server in sorted({str(s) for s in servers if s}):
+    hosts = sorted({str(s).lower() for s in servers if s})
+
+    def resolve(host):
         try:
-            ipaddress.ip_address(server)
-            resolved[server] = server
-            continue
+            ipaddress.ip_address(host)
+            return host, host
         except ValueError:
             pass
         try:
-            info = socket.getaddrinfo(server, None, proto=socket.IPPROTO_TCP)
+            info = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
         except OSError:
-            continue
-        if info:
-            resolved[server] = info[0][4][0]
+            return host, None
+        return host, (info[0][4][0] if info else None)
+
+    resolved = {}
+    pool = futures.ThreadPoolExecutor(max_workers=resolve_workers)
+    try:
+        jobs = {pool.submit(resolve, host): host for host in hosts}
+        for job in futures.as_completed(jobs, timeout=resolve_timeout):
+            host, ip = job.result()
+            if ip:
+                resolved[host] = ip
+    except futures.TimeoutError:
+        pass
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
+
     codes = {}
     unique = sorted(set(resolved.values()))
     for offset in range(0, len(unique), 100):
@@ -92,9 +108,8 @@ def lookup_server_countries(servers, timeout=15, pause=5):
         except (requests.RequestException, ValueError):
             continue
         if offset + 100 < len(unique):
-            import time
             time.sleep(pause)
-    return {server: codes.get(ip) for server, ip in resolved.items() if codes.get(ip)}
+    return {host: codes.get(ip) for host, ip in resolved.items() if codes.get(ip)}
 
 
 def _landing_gates(record, mapping):
