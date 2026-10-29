@@ -392,7 +392,9 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     if initial_records is not None and set(seed) != {n['name'] for n in nodes}:
         raise ValueError('前置记录存在缺失或多余节点')
     active = [n for n in nodes if initial_records is None or
-              (seed[n['name']]['entry']['status'] == 'passed' and (modern or upload_speed.sample_passed(
+              (((seed[n['name']]['precheck']['status'] == 'passed') if decoupled
+                else (seed[n['name']]['entry']['status'] == 'passed'))
+               and (modern or upload_speed.sample_passed(
                   seed[n['name']].get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)))]
     initial_endpoint_count = len({endpoint_key(n) for n in nodes if tcp_supported(n)
         and (decoupled or seed[n['name']]['precheck']['status'] == 'passed')}) if initial_records is not None else None
