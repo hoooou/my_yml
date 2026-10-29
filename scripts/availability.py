@@ -515,7 +515,9 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
                         record['download']['reason'] = '网站TLS异常或必过网页/API/trace未通过，跳过下载'
-            if not preflight_only and (record.get('exit') or {}).get('country_code') in FRONT_REGIONS:
+            name_hint = any(k in str(record.get('id', '')) for k in ('香港', '日本', '韩国', '新加坡'))
+            if not preflight_only and ((record.get('exit') or {}).get('country_code') in FRONT_REGIONS
+                                       or name_hint):
                 record['front_probe'] = probe_front(port)
             with lock:
                 progress['done'] += 1
@@ -1616,7 +1618,7 @@ def main():
     if args.phase in ('all', 'publish'):
         try:
             front_cfg, landing_cfg, chain_cfg, chain_summary = chain_configs.build(
-                config, records, mapping)
+                config, records, mapping, geo_lookup=chain_configs.lookup_server_countries)
         except Exception as error:  # never block the main subscription on the optional chain
             print(f'链式产物生成失败：{type(error).__name__}: {error}', flush=True)
             front_cfg = landing_cfg = chain_cfg = None
