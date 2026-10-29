@@ -10,7 +10,8 @@ from unittest import mock
 import chain_configs as cc
 
 
-def record(index, entry='passed', precheck='passed', median=120, server_suffix=None):
+def record(index, entry='passed', precheck='passed', median=120, server_suffix=None,
+           exit_country='JP'):
     return {
         'id': f'n{index}',
         'precheck': {'status': precheck, 'median_elapsed_ms': median},
@@ -18,12 +19,12 @@ def record(index, entry='passed', precheck='passed', median=120, server_suffix=N
         'website_tls': {'status': 'passed'},
         'download': {'status': 'passed', 'speed_mib_s': 10 + index},
         'quick3_download': {'status': 'passed'},
+        'high_speed_download': {'status': 'passed', 'speed_mib_s': 9 + index},
         'upload_precheck': {'status': 'passed'},
         'front_probe': {'cn': {'status': 'passed'}, 'intl': {'status': 'passed'},
                         'tls': {'status': 'passed'},
-                        'down10': {'status': 'passed'},
-                        'down100': {'status': 'passed', 'speed_mib_s': 20 + index}},
-        'exit': {'country_code': 'JP'},
+                        'down10': {'status': 'passed', 'speed_mib_s': 20 + index}},
+        'exit': {'country_code': exit_country},
         'app_tls': {'status': 'passed'},
         'stability': {'success_rate': 0.99},
     }
@@ -56,6 +57,7 @@ class SelectionTest(unittest.TestCase):
             ('app_tls.passed', None, True),
             ('stability.passed', None, True),
             ('availability.tcp_supported', None, True),
+            ('high_speed.passed', None, True),
         ):
             module, name = target.rsplit('.', 1)
             p = mock.patch(f'{module}.{name}', return_value=value)
@@ -64,7 +66,8 @@ class SelectionTest(unittest.TestCase):
     def test_landing_does_not_require_domestic_tcp(self):
         records = [record(0, entry='failed')]
         mapping = {'n0': node(0)}
-        self.assertEqual(cc.select_landings(records, mapping), [mapping['n0']])
+        landings = cc.select_landings(records, mapping)
+        self.assertEqual([n['server'] for n in landings], [mapping['n0']['server']])
 
     def test_landing_rejects_slow_204(self):
         records = [record(0, median=2500)]
@@ -74,22 +77,48 @@ class SelectionTest(unittest.TestCase):
         records = [record(0, precheck='failed')]
         self.assertEqual(cc.select_landings(records, {'n0': node(0)}), [])
 
+    def test_landing_rejects_udp_protocol(self):
+        records = [record(0)]
+        with mock.patch('availability.tcp_supported',
+                        side_effect=lambda n: n['type'] not in {'hysteria2', 'tuic'}):
+            self.assertEqual(cc.select_landings(records, {'n0': node(0, protocol='hysteria2')}), [])
+            self.assertEqual(len(cc.select_landings(records, {'n0': node(0, protocol='vless')})), 1)
+
+    def test_landing_requires_100mb(self):
+        records = [record(0)]
+        with mock.patch('high_speed.passed', return_value=False):
+            self.assertEqual(cc.select_landings(records, {'n0': node(0)}), [])
+
+    def test_landing_names_use_exit_country_and_speed_order(self):
+        records = [record(0, exit_country='US'), record(1, exit_country='US'),
+                   record(2, exit_country='JP')]
+        mapping = {'n0': node(0), 'n1': node(1), 'n2': node(2)}
+        names = [n['name'] for n in cc.select_landings(records, mapping)]
+        self.assertEqual(names, ['日本01|120ms|92Mbps|未知|纯净度未知',
+                                 '美国01|120ms|84Mbps|未知|纯净度未知',
+                                 '美国02|120ms|75Mbps|未知|纯净度未知'])
+
     def test_landing_dedupes_endpoint(self):
         records = [record(0), record(1)]
         mapping = {'n0': node(0, server='1.2.3.4'), 'n1': node(1, server='1.2.3.4')}
         self.assertEqual(len(cc.select_landings(records, mapping)), 1)
 
-    def test_front_requires_entry_and_region(self):
+    def test_front_keeps_every_region_after_tcp(self):
         records = [record(0), record(1)]
         mapping = {'n0': node(0, server='1.1.1.1'), 'n1': node(1, server='2.2.2.2')}
-        countries = {'1.1.1.1': 'JP', '2.2.2.2': 'US'}
-        fronts = cc.select_fronts(records, mapping, countries)
-        self.assertEqual([f['node']['server'] for f in fronts], ['1.1.1.1'])
+        fronts = cc.select_fronts(records, mapping)
+        self.assertEqual(sorted(f['node']['server'] for f in fronts),
+                         ['1.1.1.1', '2.2.2.2'])
+
+    def test_front_sorted_by_front_probe_speed(self):
+        records = [record(0), record(1)]
+        mapping = {'n0': node(0), 'n1': node(1)}
+        fronts = cc.select_fronts(records, mapping)
+        self.assertEqual([f['node']['name'] for f in fronts], ['n1', 'n0'])
 
     def test_front_rejects_failed_entry(self):
         records = [record(0, entry='failed')]
-        countries = {'10.0.0.1': 'JP'}
-        self.assertEqual(cc.select_fronts(records, {'n0': node(0)}, countries), [])
+        self.assertEqual(cc.select_fronts(records, {'n0': node(0)}), [])
 
 
 class RenderTest(unittest.TestCase):
@@ -115,18 +144,22 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(names['🇺🇸 美国']['filter'], '^美国')
         self.assertIn('英国', names['🇪🇺 欧洲']['filter'])
 
-    def test_front_config_groups_by_region(self):
+    def test_front_config_single_flat_group(self):
         base = base_config()
         fronts = [
-            {'record': record(0), 'node': node(0, server='1.1.1.1'), 'region': 'JP'},
-            {'record': record(1), 'node': node(1, server='2.2.2.2'), 'region': 'HK'},
+            {'record': record(0), 'node': node(0, server='1.1.1.1')},
+            {'record': record(1), 'node': node(1, server='2.2.2.2')},
         ]
         config = cc.render_front(base, fronts)
         self.assertEqual(len(config['proxies']), 2)
         self.assertTrue(all(p['name'].startswith(cc.FRONT_PREFIX) for p in config['proxies']))
         self.assertEqual(config['rules'], base['rules'])
         self.assertFalse(config['ipv6'])
-        self.assertIn(cc.GLOBAL_GROUP, [g['name'] for g in config['proxy-groups']])
+        groups = {g['name']: g for g in config['proxy-groups']}
+        self.assertEqual(set(groups), {cc.GLOBAL_GROUP, cc.FRONT_TEST_GROUP})
+        self.assertEqual(groups[cc.FRONT_TEST_GROUP]['type'], 'url-test')
+        self.assertEqual(len(groups[cc.FRONT_TEST_GROUP]['proxies']), 2)
+        self.assertIn(cc.FRONT_TEST_GROUP, groups[cc.GLOBAL_GROUP]['proxies'])
 
     def test_landing_config_groups_by_region(self):
         base = base_config()
@@ -145,7 +178,7 @@ class RenderTest(unittest.TestCase):
 class BuildTest(unittest.TestCase):
     def setUp(self):
         for target in ('availability.required_websites_passed', 'app_tls.passed',
-                       'stability.passed', 'availability.tcp_supported'):
+                       'stability.passed', 'availability.tcp_supported', 'high_speed.passed'):
             module, name = target.rsplit('.', 1)
             p = mock.patch(f'{module}.{name}', return_value=True)
             p.start(); self.addCleanup(p.stop)
@@ -155,13 +188,11 @@ class BuildTest(unittest.TestCase):
     def test_build_returns_three_configs(self):
         records = [record(0), record(1)]
         mapping = {'n0': node(0, server='1.1.1.1'), 'n1': node(1, server='2.2.2.2')}
-        countries = {'1.1.1.1': 'JP', '2.2.2.2': 'US'}
-        front, landing, chain, summary = cc.build(base_config(), records, mapping,
-                                                  countries=countries)
+        front, landing, chain, summary = cc.build(base_config(), records, mapping)
         self.assertIsNotNone(front)
         self.assertIsNotNone(landing)
         self.assertIsNotNone(chain)
-        self.assertEqual(summary['fronts'], 1)
+        self.assertEqual(summary['fronts'], 2)
         self.assertEqual(summary['landings'], 2)
         self.assertTrue(summary['chain_enabled'])
 

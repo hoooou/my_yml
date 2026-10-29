@@ -45,6 +45,7 @@ class DoubleDownloadTests(unittest.TestCase):
         with patch.object(a.s, 'Core'), patch.object(a.s, 'query_exit', return_value=None), \
              patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1234})), \
              patch.object(a.app_tls, 'check', return_value=verified_tls()), \
+             patch.object(a, 'probe_front', return_value={}), \
              patch.object(a, 'download_sample', side_effect=samples) as measure:
             records, _ = a.probe_pipeline([node], 'unused', Path('.'),
                 precheck=lambda port: {'status': 'passed'}, probe=lambda key, pace: {'status': 'passed'},
