@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the three chain products from the same measurement records.
 
-- 前置配置.yaml : fronts only, grouped by region
+- 前置配置.yaml : fronts only, one flat url-test group
 - 后置配置.yaml : landings only, grouped by region, no CN-reachability gate
 - 链式配置.yaml : no nodes, two proxy-providers + groups, rules copied from 优选配置
 
@@ -14,8 +14,7 @@ import math
 import socket
 from urllib.parse import quote
 
-FRONT_REGIONS = ('HK', 'JP', 'KR', 'SG')
-FRONT_LABELS = {'HK': '香港', 'JP': '日本', 'KR': '韩国', 'SG': '新加坡'}
+# 前置不查归属地：国内 TCP 能过、再通过下面几道实测门槛就收，美国之外的都可以。
 EU_PREFIXES = ('英国', '德国', '法国', '荷兰', '意大利', '西班牙', '葡萄牙', '波兰', '瑞典',
                '瑞士', '芬兰', '挪威', '丹麦', '爱尔兰', '奥地利', '比利时', '捷克',
                '罗马尼亚', '匈牙利', '希腊', '乌克兰', '俄罗斯', '爱沙尼亚', '拉脱维亚',
@@ -25,6 +24,7 @@ BASE_KEYS = ('mixed-port', 'allow-lan', 'mode', 'log-level', 'external-controlle
              'dns', 'rules', 'rule-providers', 'find-process-mode', 'ipv6', 'sniffer')
 CHECK_URL = 'http://www.gstatic.com/generate_204'
 FRONT_PREFIX = '🛫 '
+FRONT_TEST_GROUP = '🛫 前置节点'
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -59,65 +59,18 @@ def is_cloudflare(server, cache=None):
     return value
 
 
-def lookup_server_countries(servers, timeout=15, pause=5, resolve_workers=32, resolve_timeout=120):
-    """Resolve hosts in parallel with a global deadline, then batch-geolocate IPs."""
-    import concurrent.futures as futures
-    import time
-
-    import requests
-
-    hosts = sorted({str(s).lower() for s in servers if s})
-
-    def resolve(host):
-        try:
-            ipaddress.ip_address(host)
-            return host, host
-        except ValueError:
-            pass
-        try:
-            info = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
-        except OSError:
-            return host, None
-        return host, (info[0][4][0] if info else None)
-
-    resolved = {}
-    pool = futures.ThreadPoolExecutor(max_workers=resolve_workers)
-    try:
-        jobs = {pool.submit(resolve, host): host for host in hosts}
-        for job in futures.as_completed(jobs, timeout=resolve_timeout):
-            host, ip = job.result()
-            if ip:
-                resolved[host] = ip
-    except futures.TimeoutError:
-        pass
-    finally:
-        pool.shutdown(wait=False, cancel_futures=True)
-
-    codes = {}
-    unique = sorted(set(resolved.values()))
-    for offset in range(0, len(unique), 100):
-        batch = unique[offset:offset + 100]
-        try:
-            response = requests.post('http://ip-api.com/batch',
-                                     params={'fields': 'query,countryCode,status'},
-                                     json=batch, timeout=timeout)
-            response.raise_for_status()
-            for item in response.json():
-                if isinstance(item, dict) and item.get('status') == 'success':
-                    codes[item.get('query')] = item.get('countryCode')
-        except (requests.RequestException, ValueError):
-            continue
-        if offset + 100 < len(unique):
-            time.sleep(pause)
-    return {host: codes.get(ip) for host, ip in resolved.items() if codes.get(ip)}
-
-
 def _landing_gates(record, mapping):
     """Strict landing gates; domestic TCP reachability is deliberately absent."""
-    from availability import required_websites_passed
+    from availability import required_websites_passed, tcp_supported
     import app_tls
+    import high_speed
     import stability
 
+    # 落地只收 TCP 类型：前置可能是 http/socks5，转发不了 UDP，
+    # hysteria2/tuic/wireguard 这类落地会直接断链。
+    node = mapping.get(record.get('id'))
+    if not node or not tcp_supported(node):
+        return False
     if (record.get('precheck') or {}).get('status') != 'passed':
         return False
     median = (record.get('precheck') or {}).get('median_elapsed_ms')
@@ -133,25 +86,17 @@ def _landing_gates(record, mapping):
         return False
     if (record.get('quick3_download') or {}).get('status') != 'passed':
         return False
+    # 落地是整条链的出口，100MB 双目标不过就不收。
+    if not high_speed.passed(record.get('high_speed_download') or {}):
+        return False
     if (record.get('upload_precheck') or {}).get('status') != 'passed':
         return False
     if record.get('stability') is not None and not stability.passed(record.get('stability')):
         return False
-    if record.get('id') not in mapping:
-        return False
     return True
 
 
-def front_region(record, node, countries):
-    """Entry-server country when known; fall back to the measured exit country."""
-    country = (countries or {}).get(str(node.get('server')))
-    if country is not None:
-        return country if country in FRONT_REGIONS else None
-    fallback = (record.get('exit') or {}).get('country_code')
-    return fallback if fallback in FRONT_REGIONS else None
-
-
-def _front_gates(record, mapping, countries):
+def _front_gates(record, mapping):
     from availability import tcp_supported
 
     node = mapping.get(record.get('id'))
@@ -159,10 +104,8 @@ def _front_gates(record, mapping, countries):
         return False
     if (record.get('entry') or {}).get('status') != 'passed':
         return False
-    if front_region(record, node, countries) is None:
-        return False
-    # 前置轨道只看自己的证据：上传、独立 TLS、回国/出国、10MB/100MB。
-    # 不依赖后置轨道的 26 站、应用 TLS、1MB 下载。
+    # 前置轨道只看自己的证据：上传、独立 TLS、回国/出国、10MB。
+    # 不依赖后置轨道的 26 站、应用 TLS、1MB 下载，也不看入口归属地。
     if (record.get('upload_precheck') or {}).get('status') != 'passed':
         return False
     probe = record.get('front_probe') or {}
@@ -174,52 +117,84 @@ def _front_gates(record, mapping, countries):
         return False
     if (probe.get('down10') or {}).get('status') != 'passed':
         return False
-    if (probe.get('down100') or {}).get('status') != 'passed':
-        return False
     return True
 
 
 def _front_speed(record):
-    speed = ((record.get('front_probe') or {}).get('down100') or {}).get('speed_mib_s')
+    speed = ((record.get('front_probe') or {}).get('down10') or {}).get('speed_mib_s')
     return speed if isinstance(speed, (int, float)) else -1
 
 
-def select_fronts(records, mapping, countries=None, trim=0.2, min_sample=5):
-    """Keep every front that passes; trim the slowest 20% inside each region."""
+def select_fronts(records, mapping):
+    """Every node that passes the front gates; no region filter, fastest first."""
     picked, seen = [], set()
     for record in records:
-        if not _front_gates(record, mapping, countries):
+        if not _front_gates(record, mapping):
             continue
         node = mapping[record['id']]
         key = endpoint(node)
         if key in seen:
             continue
         seen.add(key)
-        picked.append({'record': record, 'node': node,
-                       'region': front_region(record, node, countries)})
-    kept = []
-    for region in FRONT_REGIONS:
-        bucket = [item for item in picked if item['region'] == region]
-        if len(bucket) >= min_sample and trim > 0:
-            bucket.sort(key=_front_speed, reverse=True)
-            bucket = bucket[:max(1, len(bucket) - math.ceil(len(bucket) * trim))]
-        kept.extend(bucket)
-    kept.sort(key=lambda item: (FRONT_REGIONS.index(item['region']),
-                               -_front_speed(item['record']),
-                               (item['record'].get('entry') or {}).get('latency_ms') or 1e9))
-    return kept
+        picked.append({'record': record, 'node': node})
+    picked.sort(key=lambda item: (-_front_speed(item['record']),
+                                  (item['record'].get('entry') or {}).get('latency_ms') or 1e9))
+    return picked
+
+
+def _landing_speed(record):
+    for key in ('high_speed_download', 'medium_speed_download', 'download'):
+        item = record.get(key) or {}
+        speed = item.get('speed_mib_s')
+        if item.get('status') == 'passed' and isinstance(speed, (int, float)):
+            return speed
+    return None
+
+
+def _landing_region(record):
+    from select_nodes import COUNTRIES
+
+    country = (record.get('exit') or {}).get('country_code')
+    return COUNTRIES.get(country, country) if country else '地区未确认'
+
+
+def _landing_name(record, number):
+    from ip_reputation import residence_label
+
+    region = _landing_region(record)
+    median = (record.get('precheck') or {}).get('median_elapsed_ms')
+    delay = f'{median:.0f}ms' if isinstance(median, (int, float)) else '?ms'
+    speed = _landing_speed(record)
+    bandwidth = (f'{speed * 1048576 * 8 / 1000000:.0f}Mbps'
+                 if isinstance(speed, (int, float)) else '?Mbps')
+    housing = {'住宅候选': '住宅', '机房': '机房', '移动网络': '移动网络',
+               '非机房': '未知', '住宅未知': '未知'}[residence_label(record)]
+    info = record.get('ip_reputation') or {}
+    purity = info.get('network_purity_score') if info.get('status') == 'success' else None
+    purity_text = (f'纯净度{purity:.1f}%' if isinstance(purity, (int, float)) and math.isfinite(purity)
+                   else '纯净度未知')
+    return '|'.join([f'{region}{number:02d}', delay, bandwidth, housing, purity_text])
 
 
 def select_landings(records, mapping):
-    nodes, seen = [], set()
+    picked, seen, cf_cache = [], set(), {}
     for record in records:
         if not _landing_gates(record, mapping):
             continue
         node = mapping[record['id']]
         key = endpoint(node)
-        if key in seen or is_cloudflare(node.get('server')):
+        if key in seen or is_cloudflare(node.get('server'), cf_cache):
             continue
         seen.add(key)
+        picked.append({'record': record, 'node': copy.deepcopy(node),
+                       'speed': _landing_speed(record) or -1})
+    picked.sort(key=lambda item: -item['speed'])
+    counters, nodes = {}, []
+    for item in picked:
+        region = _landing_region(item['record'])
+        counters[region] = counters.get(region, 0) + 1
+        node = item['node']
+        node['name'] = _landing_name(item['record'], counters[region])
         nodes.append(node)
     return nodes
 
@@ -238,26 +213,26 @@ def render_front(base, fronts):
     config = _base(base)
     config['ipv6'] = False
     config.setdefault('dns', {})['ipv6'] = False
-    counters, nodes, per_region = {}, [], {}
-    for item in fronts:
-        region = item['region']
-        counters[region] = counters.get(region, 0) + 1
+    nodes, names = [], []
+    for index, item in enumerate(fronts, 1):
         entry = (item['record'].get('entry') or {}).get('latency_ms')
-        speed = (item['record'].get('download') or {}).get('speed_mib_s')
+        probe = item['record'].get('front_probe') or {}
+        speed = (probe.get('down10') or {}).get('speed_mib_s')
+        if not isinstance(speed, (int, float)):
+            speed = (item['record'].get('download') or {}).get('speed_mib_s')
         bandwidth = f"{speed * 8:.0f}Mbps" if isinstance(speed, (int, float)) else '?Mbps'
         entry_text = f"{int(entry)}ms" if isinstance(entry, (int, float)) else '?ms'
-        name = f"{FRONT_PREFIX}{FRONT_LABELS[region]}{counters[region]:02d}|{entry_text}|{bandwidth}"
+        name = f"{FRONT_PREFIX}{index:02d}|{entry_text}|{bandwidth}"
         node = copy.deepcopy(item['node'])
         node['name'] = name
         nodes.append(node)
-        label = {'HK': '🇭🇰 香港', 'JP': '🇯🇵 日本',
-                 'KR': '🇰🇷 韩国', 'SG': '🇸🇬 新加坡'}[region]
-        per_region.setdefault(label, []).append(name)
+        names.append(name)
     config['proxies'] = nodes
     config['proxy-groups'] = [
         {'name': GLOBAL_GROUP, 'type': 'select',
-         'proxies': list(per_region) + ['DIRECT']},
-    ] + [_group(label, members) for label, members in per_region.items()]
+         'proxies': [FRONT_TEST_GROUP, 'DIRECT']},
+        _group(FRONT_TEST_GROUP, names),
+    ]
     return config
 
 
@@ -318,23 +293,12 @@ def render_chain(base):
     return config
 
 
-def build(base, records, mapping, *, countries=None, geo_lookup=None):
-    """Return (front_config, landing_config, chain_config, summary).
-
-    Region uses the entry-server country when provided; otherwise the measured
-    exit country is used (documented limitation until server geolocation is wired).
-    """
-    if countries is None and geo_lookup is not None:
-        servers = {mapping[r['id']].get('server') for r in records
-                   if r.get('id') in mapping and (r.get('entry') or {}).get('status') == 'passed'}
-        countries = geo_lookup(servers)
-    countries = countries or {}
-    fronts = select_fronts(records, mapping, countries)
+def build(base, records, mapping):
+    """Return (front_config, landing_config, chain_config, summary)."""
+    fronts = select_fronts(records, mapping)
     landings = select_landings(records, mapping)
     summary = {
         'fronts': len(fronts),
-        'front_regions': {label: sum(1 for f in fronts if f['region'] == code)
-                          for code, label in FRONT_LABELS.items()},
         'landings': len(landings),
         'chain_enabled': bool(fronts and landings),
     }

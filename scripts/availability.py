@@ -316,8 +316,6 @@ FRONT_CN_URL = 'http://mirrors.tuna.tsinghua.edu.cn/robots.txt'
 FRONT_INTL_URL = 'http://www.gstatic.com/generate_204'
 FRONT_TLS_URL = 'https://cp.cloudflare.com/generate_204'
 FRONT_10MB = 'https://hkg.download.datapacket.com/10mb.bin'
-FRONT_100MB = 'https://hkg.download.datapacket.com/100mb.bin'
-FRONT_REGIONS = ('HK', 'JP', 'KR', 'SG')
 
 
 def quick3_download(port):
@@ -341,17 +339,14 @@ def _front_request(port, url, timeout):
 
 
 def probe_front(port):
-    """Front-only track: CN return, international, TLS, 10MB, 100MB."""
+    """Front-only track: CN return, international, TLS, 10MB."""
     cn = [_front_request(port, FRONT_CN_URL, (3, 6)) for _ in range(3)]
     intl = [_front_request(port, FRONT_INTL_URL, (2, 3)) for _ in range(3)]
     tls = _front_request(port, FRONT_TLS_URL, (3, 6))
     result = {'cn': summarize_rounds([{'cn': row} for row in cn], ('cn',))['cn'],
               'intl': summarize_rounds([{'intl': row} for row in intl], ('intl',))['intl'],
               'tls': tls}
-    ten = download_sample(port, 10_000_000, 10, FRONT_10MB)
-    result['down10'] = ten
-    if ten.get('status') == 'passed':
-        result['down100'] = download_sample(port, 100_000_000, 60, FRONT_100MB)
+    result['down10'] = download_sample(port, 10_000_000, 10, FRONT_10MB)
     return result
 
 
@@ -369,7 +364,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                    site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
                    medium_download=None, upload_precheck=None, upload_controls=None,
                    preflight_only=False, initial_records=None, service_check=None, policy_version=None,
-                   quick3=None, decoupled=False, server_countries=None):
+                   quick3=None, decoupled=False):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
     modern = policy_version == qp.VERSION
@@ -520,9 +515,9 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
                         record['download']['reason'] = '网站TLS异常或必过网页/API/trace未通过，跳过下载'
-            entry_country = (server_countries or {}).get(str(node.get('server')))
-            if not preflight_only and (entry_country in FRONT_REGIONS
-                                       or (record.get('exit') or {}).get('country_code') in FRONT_REGIONS):
+            # 前置不查归属地：国内 TCP 通过的节点都跑一遍前置轨道，
+            # 能不能进前置交给 upload/TLS/回国/出国/10MB 这些实测门槛。
+            if not preflight_only and (record.get('entry') or {}).get('status') == 'passed':
                 record['front_probe'] = probe_front(port)
             with lock:
                 progress['done'] += 1
@@ -1258,12 +1253,6 @@ def main():
             raise RuntimeError('全部节点未通过手机兼容性检查；保留旧订阅')
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
-        server_countries = {}
-        try:
-            server_countries = chain_configs.lookup_server_countries(
-                {node['server'] for node in nodes if tcp_supported(node)})
-        except Exception as error:
-            print(f'入口归属地查询失败，前置地区回退到出口：{type(error).__name__}', flush=True)
         demo_limit = os.environ.get('DEMO_NODES', '').strip()
         if demo_limit:
             limit = max(1, int(demo_limit))
@@ -1284,7 +1273,7 @@ def main():
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
                   'selection_policy_version': qp.VERSION,
                   'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True, 'website_tls_hard_gate': True,
-                  'entry_decoupled': True, 'server_countries': server_countries,
+                  'entry_decoupled': True,
                   'parallel_observation': args.phase == 'prepare',
                   'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
                   'historical_candidates': historical,
@@ -1330,7 +1319,6 @@ def main():
         try:
             records, endpoint_count = probe_pipeline(subset, binary, root, quick3=quick3_download,
                 decoupled=bundle.get('entry_decoupled', False),
-                server_countries=bundle.get('server_countries'),
                 interval=.25 * args.shard_count, upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
@@ -1348,7 +1336,6 @@ def main():
         try:
             records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls, quick3=quick3_download,
                 decoupled=bundle.get('entry_decoupled', False),
-                server_countries=bundle.get('server_countries'),
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
@@ -1631,7 +1618,7 @@ def main():
     if args.phase in ('all', 'publish'):
         try:
             front_cfg, landing_cfg, chain_cfg, chain_summary = chain_configs.build(
-                config, records, mapping, countries=bundle.get('server_countries'))
+                config, records, mapping)
         except Exception as error:  # never block the main subscription on the optional chain
             print(f'链式产物生成失败：{type(error).__name__}: {error}', flush=True)
             front_cfg = landing_cfg = chain_cfg = None
