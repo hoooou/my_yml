@@ -23,9 +23,15 @@ on:
         type: string
         required: false
         default: '38040178745'
+      demo_nodes:
+        description: 调试用：只保留前 N 个唯一入口（留空为全量）
+        type: string
+        required: false
+        default: ''
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DEMO_NODES: ${{ inputs.demo_nodes }}
 permissions:
   actions: read
   contents: read
