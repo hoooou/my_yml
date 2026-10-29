@@ -375,7 +375,7 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
       - name: 更新配置和报告
-        if: always()
+        if: always() && inputs.demo_nodes == ''
         id: publish_subscription
         run: python scripts/publish_subscription.py
       - name: 发布本次摘要

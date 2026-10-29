@@ -133,9 +133,6 @@ def publish(root, attempts=3, files=FILES):
 def main():
     if os.environ.get('GITHUB_ACTIONS') != 'true':
         raise RuntimeError('仅支持GitHub Actions临时工作目录')
-    if os.environ.get('DEMO_NODES', '').strip():
-        print('demo 模式：不发布任何产物', flush=True)
-        return
     parser = argparse.ArgumentParser()
     parser.add_argument('--report-only', action='store_true')
     args = parser.parse_args()
