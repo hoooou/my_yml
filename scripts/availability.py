@@ -562,7 +562,9 @@ def merge_shards(bundle, parts, count, preflight_only=False):
         by_id = {r['id']: r for r in rows}
         if bundle.get('early_upload_precheck'):
             controls = part.get('upload_precheck_controls') or {}
-            tested = 0 if modern and preflight_only else sum(r['entry']['status'] == 'passed' for r in rows)
+            gate_key = 'precheck' if bundle.get('entry_decoupled') is True else 'entry'
+            tested = 0 if modern and preflight_only else sum(
+                (r.get(gate_key) or {}).get('status') == 'passed' for r in rows)
             if controls.get('valid') is not True or controls.get('node_count') != tested:
                 raise ValueError('上行预检缺少分片对照或检测计数不一致')
             if tested and not all(upload_speed.sample_passed(controls.get(k) or {},
