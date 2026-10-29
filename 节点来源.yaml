@@ -1,9 +1,9 @@
-# 每日从固定分支地址读取最新 YAML；只导入 proxies，不采用来源的规则或分组。
 sources:
 - id: bestclash
-  enabled: true
+  enabled: false
   repository: https://github.com/PuddinCat/BestClash
   url: https://raw.githubusercontent.com/PuddinCat/BestClash/main/proxies.yaml
+  note: 2026-10-29 审计：最后更新 10-25，未达每日更新，先禁用
 - id: au1rxx
   enabled: true
   repository: https://github.com/Au1rxx/free-vpn-subscriptions
@@ -24,3 +24,18 @@ sources:
   enabled: true
   repository: https://github.com/zhuhaiuk/free-nodes
   url: https://raw.githubusercontent.com/zhuhaiuk/free-nodes/main/clash_config.yaml
+- id: dongchengjie
+  enabled: true
+  repository: https://github.com/dongchengjie/airport
+  url: https://raw.githubusercontent.com/dongchengjie/airport/main/subs/merged/tested_within.yaml
+  note: 2026-10-29 新增：每日更新，与现有池重合约 11%
+- id: radikal-light
+  enabled: true
+  repository: https://github.com/0xRadikal/Free-v2ray-Configs
+  url: https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/light/clash.yaml
+  note: 8 个精选/测速上游；3,300 端点；节点级未全部验证
+- id: radikal-fast
+  enabled: true
+  repository: https://github.com/0xRadikal/Free-v2ray-Configs
+  url: https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/fast/clash.yaml
+  note: verified + 延迟 <800ms；473 端点；与 light 有 388 重合，my_yml 自动去重
