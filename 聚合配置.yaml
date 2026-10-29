@@ -621,48 +621,53 @@ p: &p
         lazy: false
 
 proxy-providers:
-    a1:
-      <<: *p
-      override:
-        additional-prefix: "a1:"
-      url: "https://gist.githubusercontent.com/go4sharing/85b8d7efb26dd421edc5ed8bd11a5838/raw/gistfile1.txt"
-      path: proxy-providers/a1.yaml
+    # [disabled 2026-10-29] a1: 源超过 7 天未更新
+    # a1:
+    #       <<: *p
+    #       override:
+    #         additional-prefix: "a1:"
+    #       url: "https://gist.githubusercontent.com/go4sharing/85b8d7efb26dd421edc5ed8bd11a5838/raw/gistfile1.txt"
+    #       path: proxy-providers/a1.yaml
     a2:
       <<: *p
       override:
         additional-prefix: "a2:"
       url: "https://raw.githubusercontent.com/free18/v2ray/main/c.yaml"
       path: proxy-providers/a2.yaml
-    a3:
-      <<: *p
-      override:
-        additional-prefix: "a3:"
-      url: "https://raw.githubusercontent.com/jifeng250/free-nodes/main/clash.yaml"
-      path: proxy-providers/a3.yaml
+    # [disabled 2026-10-29] a3: 源超过 7 天未更新
+    # a3:
+    #       <<: *p
+    #       override:
+    #         additional-prefix: "a3:"
+    #       url: "https://raw.githubusercontent.com/jifeng250/free-nodes/main/clash.yaml"
+    #       path: proxy-providers/a3.yaml
     a4:
       <<: *p
       override:
         additional-prefix: "a4:"
       url: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml"
       path: proxy-providers/a4.yaml
-    a5:
-      <<: *p
-      override:
-        additional-prefix: "a6:"
-      url: "https://raw.githubusercontent.com/ripaojiedian/freenode/main/clash"
-      path: proxy-providers/a6.yaml
-    a6:
-      <<: *p
-      override:
-        additional-prefix: "a7:"
-      url: "https://raw.githubusercontent.com/mai19950/clash_config/refs/heads/main/sub/clash.yaml"
-      path: proxy-providers/a7.yaml
-    a7:
-      <<: *p
-      override:
-        additional-prefix: "a8:"
-      url: "https://raw.githubusercontent.com/vxiaov/free_proxies/main/clash/clash.provider.yaml"
-      path: proxy-providers/a8.yaml
+    # [disabled 2026-10-29] a5: 源超过 7 天未更新
+    # a5:
+    #       <<: *p
+    #       override:
+    #         additional-prefix: "a6:"
+    #       url: "https://raw.githubusercontent.com/ripaojiedian/freenode/main/clash"
+    #       path: proxy-providers/a6.yaml
+    # [disabled 2026-10-29] a6: 源超过 7 天未更新
+    # a6:
+    #       <<: *p
+    #       override:
+    #         additional-prefix: "a7:"
+    #       url: "https://raw.githubusercontent.com/mai19950/clash_config/refs/heads/main/sub/clash.yaml"
+    #       path: proxy-providers/a7.yaml
+    # [disabled 2026-10-29] a7: 源超过 7 天未更新
+    # a7:
+    #       <<: *p
+    #       override:
+    #         additional-prefix: "a8:"
+    #       url: "https://raw.githubusercontent.com/vxiaov/free_proxies/main/clash/clash.provider.yaml"
+    #       path: proxy-providers/a8.yaml
     a8:
       <<: *p
       override:
@@ -675,15 +680,17 @@ proxy-providers:
         additional-prefix: "a15:"
       url: "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml"
       path: proxy-providers/a15.yaml
-    a10:
-      <<: *p
-      override:
-        additional-prefix: "a16:"
-      url: "https://raw.githubusercontent.com/go4sharing/sub/main/sub.yaml"
-      path: proxy-providers/a16.yaml
-    a11:
-      <<: *p
-      override:
-        additional-prefix: "a17:"
-      url: "https://raw.githubusercontent.com/mfbpn/tg_mfbpn_sub/main/trial.yaml"
-      path: proxy-providers/a17.yaml
+    # [disabled 2026-10-29] a10: 源超过 7 天未更新
+    # a10:
+    #       <<: *p
+    #       override:
+    #         additional-prefix: "a16:"
+    #       url: "https://raw.githubusercontent.com/go4sharing/sub/main/sub.yaml"
+    #       path: proxy-providers/a16.yaml
+    # [disabled 2026-10-29] a11: 源超过 7 天未更新
+    # a11:
+    #       <<: *p
+    #       override:
+    #         additional-prefix: "a17:"
+    #       url: "https://raw.githubusercontent.com/mfbpn/tg_mfbpn_sub/main/trial.yaml"
+    #       path: proxy-providers/a17.yaml
