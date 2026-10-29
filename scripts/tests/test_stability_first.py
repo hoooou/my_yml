@@ -161,9 +161,10 @@ class PipelineTests(unittest.TestCase):
 
 
 class StabilityTests(unittest.TestCase):
-    def test_ten_minute_window_reuse_and_raw_failures_are_required(self):
+    def test_raw_failures_are_required_and_window_is_not_a_gate(self):
         self.assertTrue(cs.passed(evidence()))
-        self.assertFalse(cs.passed(evidence(count=3)))
+        # 观察窗口改为跟随主筛选，短窗口不再单独否决
+        self.assertTrue(cs.passed(evidence(count=3)))
         self.assertTrue(cs.passed(evidence(3)))
         self.assertFalse(cs.passed(evidence(4)))
         x = evidence(); x['attempts'][0]['connection_reuse']['error_type'] = 'certificate_verification_failed'
