@@ -19,6 +19,7 @@ import yaml
 import select_nodes as s
 from mobile_pilot import check_site, check_sites, SITES, PAGE_SITES, OVERSEAS_SITES, DOMESTIC_SITES, CONNECTIVITY_SITES, POST_SITES, SITE_WORKERS, WEB_USER_AGENT, UDP_TYPES
 from routing import optimize_routing
+import chain_configs
 import ip_reputation
 import app_tls
 import published_history
@@ -311,6 +312,44 @@ def quick_download(port):
     return download_sample(port, DOWNLOAD_BYTES, DOWNLOAD_BUDGET)
 
 
+FRONT_CN_URL = 'http://mirrors.tuna.tsinghua.edu.cn/robots.txt'
+FRONT_INTL_URL = 'http://www.gstatic.com/generate_204'
+FRONT_TLS_URL = 'https://cp.cloudflare.com/generate_204'
+FRONT_10MB = 'https://hkg.download.datapacket.com/10mb.bin'
+
+
+def quick3_download(port):
+    """3MB quick download used as the landing's first bandwidth gate."""
+    return download_sample(port, 3_000_000, 6, 'https://speed.cloudflare.com/__down?bytes=3000000')
+
+
+def _front_request(port, url, timeout):
+    """Plain HTTP check through a local proxy port; no page markers involved."""
+    started = time.perf_counter()
+    try:
+        with s.session() as client:
+            client.proxies = {'http': f'http://127.0.0.1:{port}',
+                              'https': f'http://127.0.0.1:{port}'}
+            response = client.get(url, timeout=timeout)
+        return {'status': 'passed' if response.status_code in (200, 204) else 'failed',
+                'elapsed_ms': round((time.perf_counter() - started) * 1000, 1),
+                'http_status': response.status_code}
+    except s.requests.RequestException as error:
+        return {'status': 'failed', 'elapsed_ms': None, 'reason': type(error).__name__}
+
+
+def probe_front(port):
+    """Front-only track: CN return, international, TLS, 10MB."""
+    cn = [_front_request(port, FRONT_CN_URL, (3, 6)) for _ in range(3)]
+    intl = [_front_request(port, FRONT_INTL_URL, (2, 3)) for _ in range(3)]
+    tls = _front_request(port, FRONT_TLS_URL, (3, 6))
+    result = {'cn': summarize_rounds([{'cn': row} for row in cn], ('cn',))['cn'],
+              'intl': summarize_rounds([{'intl': row} for row in intl], ('intl',))['intl'],
+              'tls': tls}
+    result['down10'] = download_sample(port, 10_000_000, 10, FRONT_10MB)
+    return result
+
+
 def medium_speed_download(port):
     return download_sample(port, medium_speed.BYTES, medium_speed.BUDGET, medium_speed.URL)
 
@@ -324,7 +363,8 @@ def high_speed_download(port):
 def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204,
                    site_check=None, download=quick_download, large_download=high_speed_download, interval=.25, workers=16,
                    medium_download=None, upload_precheck=None, upload_controls=None,
-                   preflight_only=False, initial_records=None, service_check=None, policy_version=None):
+                   preflight_only=False, initial_records=None, service_check=None, policy_version=None,
+                   quick3=None, decoupled=False):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
     modern = policy_version == qp.VERSION
@@ -350,10 +390,12 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     if initial_records is not None and set(seed) != {n['name'] for n in nodes}:
         raise ValueError('前置记录存在缺失或多余节点')
     active = [n for n in nodes if initial_records is None or
-              (seed[n['name']]['entry']['status'] == 'passed' and (modern or upload_speed.sample_passed(
+              (((seed[n['name']]['precheck']['status'] == 'passed') if decoupled
+                else (seed[n['name']]['entry']['status'] == 'passed'))
+               and (modern or upload_speed.sample_passed(
                   seed[n['name']].get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)))]
     initial_endpoint_count = len({endpoint_key(n) for n in nodes if tcp_supported(n)
-        and seed[n['name']]['precheck']['status'] == 'passed'}) if initial_records is not None else None
+        and (decoupled or seed[n['name']]['precheck']['status'] == 'passed')}) if initial_records is not None else None
     if not active:
         controls['valid'] = True
         return copy.deepcopy(initial_records), initial_endpoint_count
@@ -383,7 +425,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 record['precheck'] = precheck(port)
             if modern:
                 record['selection_policy_version'] = qp.VERSION
-            if initial_records is None and record['precheck']['status'] == 'passed':
+            if initial_records is None and (decoupled or record['precheck']['status'] == 'passed'):
                 if not tcp_supported(node):
                     record['entry']['reason'] = 'UDP 协议不适用 TCP 检测，后续阶段未测'
                 else:
@@ -407,7 +449,11 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                     if not upload_speed.sample_passed(record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                         record['download']['reason'] = 'TCP通过但3MB上行预检未通过，跳过网站和下载'
             if not preflight_only:
-                if modern and record['entry']['status'] == 'passed':
+                if quick3 and record['precheck']['status'] == 'passed' and 'quick3_download' not in record:
+                    with bandwidth.download():
+                        record['quick3_download'] = quick3(port)
+                gate = (record['precheck']['status'] == 'passed') if decoupled else (record['entry']['status'] == 'passed')
+                if modern and gate:
                     with bandwidth.upload():
                         if controls['before'] is None:
                             controls['before'] = upload_precheck(None)
@@ -416,7 +462,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         record['upload_precheck'] = upload_precheck(port)
                         record['upload_precheck_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
                         controls['node_count'] += 1
-                if record['entry']['status'] == 'passed' and (modern or upload_speed.sample_passed(
+                if gate and (modern or upload_speed.sample_passed(
                         record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)):
                     rounds = [site_check(port)]
                     # Only traces get one round; overseas pages get three.
@@ -469,6 +515,10 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
                         record['download']['reason'] = '网站TLS异常或必过网页/API/trace未通过，跳过下载'
+            # 前置不查归属地：国内 TCP 通过的节点都跑一遍前置轨道，
+            # 能不能进前置交给 upload/TLS/回国/出国/10MB 这些实测门槛。
+            if not preflight_only and (record.get('entry') or {}).get('status') == 'passed':
+                record['front_probe'] = probe_front(port)
             with lock:
                 progress['done'] += 1
                 progress['precheck'] += record['precheck']['status'] == 'passed'
@@ -514,17 +564,21 @@ def merge_shards(bundle, parts, count, preflight_only=False):
         by_id = {r['id']: r for r in rows}
         if bundle.get('early_upload_precheck'):
             controls = part.get('upload_precheck_controls') or {}
-            tested = 0 if modern and preflight_only else sum(r['entry']['status'] == 'passed' for r in rows)
+            gate_key = 'precheck' if bundle.get('entry_decoupled') is True else 'entry'
+            tested = 0 if modern and preflight_only else sum(
+                (r.get(gate_key) or {}).get('status') == 'passed' for r in rows)
             if controls.get('valid') is not True or controls.get('node_count') != tested:
                 raise ValueError('上行预检缺少分片对照或检测计数不一致')
             if tested and not all(upload_speed.sample_passed(controls.get(k) or {},
                     upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET) for k in ('before', 'after')):
                 raise ValueError('上行预检直连对照未通过，拒绝发布')
         eligible = {endpoint_key(n) for n in subset if tcp_supported(n) and
-                    by_id[n['name']].get('precheck', {}).get('status') == 'passed'}
+                    (bundle.get('entry_decoupled') is True or
+                     by_id[n['name']].get('precheck', {}).get('status') == 'passed')}
         if part['endpoint_count'] != len(eligible):
             raise ValueError('TCP 入口统计不完整')
         for record in rows:
+            decoupled = bundle.get('entry_decoupled') is True
             if modern and not qp.modern(record):
                 raise ValueError('节点缺少本轮稳定性优先策略版本')
             node = definitions[record['id']]
@@ -550,20 +604,23 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             passed = sum(a.get('status') == 'passed' for a in pre['attempts'])
             if pre.get('passed_count') != passed or (pre.get('status') == 'passed') != (passed == 3):
                 raise ValueError('204 汇总与三轮结果不一致')
-            if record['entry']['status'] != 'unknown' and pre['status'] != 'passed':
-                raise ValueError('204 未通过却进入 TCP 阶段')
-            if pre['status'] != 'passed' and (record['entry'].get('attempts') != 0 or record.get('websites')):
-                raise ValueError('204 未通过却执行后续阶段')
+            # entry 与 precheck 已解耦：204 失败的节点也允许探测国内 TCP
+            if pre['status'] != 'passed' and record.get('websites'):
+                raise ValueError('204 未通过却执行网站阶段')
             early = record.get('upload_precheck') or {}
             uses_early = bundle.get('early_upload_precheck') or 'upload_precheck' in record
             if uses_early:
-                expected_status = ('passed', 'failed') if record['entry']['status'] == 'passed' and not (modern and preflight_only) else ('skipped',)
+                upload_gate = (pre['status'] == 'passed' if decoupled else record['entry']['status'] == 'passed')
+                expected_status = (('passed', 'failed')
+                                   if upload_gate and not (modern and preflight_only) else ('skipped',))
                 if early.get('status') not in expected_status:
                     raise ValueError('上行预检漏测或国内TCP未通过却已测速')
                 if early.get('status') == 'passed' and not upload_speed.sample_passed(
                         early, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET):
                     raise ValueError('3MB上行预检证据不完整或超出预算')
-            should_web = not preflight_only and record['entry']['status'] == 'passed' and (modern or not uses_early or early.get('status') == 'passed')
+            web_gate = (pre['status'] == 'passed' if decoupled else record['entry']['status'] == 'passed')
+            should_web = (not preflight_only and web_gate
+                          and (modern or not uses_early or early.get('status') == 'passed'))
             if not should_web and record.get('websites'):
                 raise ValueError('上行预检或前置阶段未通过却检测了网站')
             if should_web and (not record.get('websites') or any(
@@ -589,8 +646,6 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
                     if item.get('login_required_count', 0) != expected['login_required_count']:
                         raise ValueError('Reddit登录汇总与逐轮响应结果不一致')
-            if record['entry']['status'] == 'passed' and pre['status'] != 'passed':
-                raise ValueError('节点未按阶段筛选')
             if bundle.get('website_tls_hard_gate') and should_web:
                 failed_sites = website_tls_failures(record)
                 evidence = record.get('website_tls') or {}
@@ -608,7 +663,7 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             if record.get('download', {}).get('status') not in (('passed', 'failed') if should_download else ('skipped',)):
                 raise ValueError('下载阶段漏测或顺序异常')
             if record.get('download', {}).get('status') == 'passed' and (
-                    record['entry']['status'] != 'passed' or
+                    (pre['status'] != 'passed' if decoupled else record['entry']['status'] != 'passed') or
                     not required_websites_passed(record) or not app_tls.passed(tls) or
                     record['download'].get('received_bytes') != DOWNLOAD_BYTES or
                     not 0 < record['download'].get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
@@ -1004,8 +1059,8 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
         bandwidth = (f'{speed * 1048576 * 8 / 1000000:.0f}Mbps'
             if (measured or {}).get('status') == 'passed' and isinstance(speed, (int, float))
             and math.isfinite(speed) and speed > 0 else '?Mbps')
-        housing = {'住宅候选': '住宅', '机房': '非住宅', '移动网络': '非住宅',
-                   '非机房': '住宅未知', '住宅未知': '住宅未知'}[ip_reputation.residence_label(record)]
+        housing = {'住宅候选': '住宅', '机房': '机房', '移动网络': '移动网络',
+                   '非机房': '未知', '住宅未知': '未知'}[ip_reputation.residence_label(record)]
         info = record.get('ip_reputation') or {}
         purity = info.get('network_purity_score') if info.get('status') == 'success' else None
         purity_text = (f'纯净度{purity:.1f}%' if isinstance(purity, (int, float))
@@ -1198,9 +1253,27 @@ def main():
             raise RuntimeError('全部节点未通过手机兼容性检查；保留旧订阅')
         nodes, rejected = s.Core(binary, root, nodes).validate_nodes()
         rejected += list(mobile_rejections)
+        demo_limit = os.environ.get('DEMO_NODES', '').strip()
+        if demo_limit:
+            limit = max(1, int(demo_limit))
+            order, grouped = [], {}
+            for node in nodes:
+                key = endpoint_key(node)
+                if key not in grouped:
+                    grouped[key] = []
+                    order.append(key)
+                grouped[key].append(node)
+            if len(order) > limit:
+                step = len(order) / limit
+                keep = {order[min(len(order) - 1, int(index * step))] for index in range(limit)}
+            else:
+                keep = set(order)
+            nodes = [node for node in nodes if endpoint_key(node) in keep]
+            print(f'调试模式：均匀抽样 {len(keep)} 个唯一入口，共 {len(nodes)} 个节点', flush=True)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
                   'selection_policy_version': qp.VERSION,
                   'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True, 'website_tls_hard_gate': True,
+                  'entry_decoupled': True,
                   'parallel_observation': args.phase == 'prepare',
                   'stability_policy': continuous_stability.settings() if args.phase == 'prepare' else stability.settings(),
                   'historical_candidates': historical,
@@ -1244,7 +1317,8 @@ def main():
             return
         print(f'分片 {args.shard_index + 1}/{args.shard_count}：{len(subset)}节点，阶段{args.phase}', flush=True)
         try:
-            records, endpoint_count = probe_pipeline(subset, binary, root,
+            records, endpoint_count = probe_pipeline(subset, binary, root, quick3=quick3_download,
+                decoupled=bundle.get('entry_decoupled', False),
                 interval=.25 * args.shard_count, upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
@@ -1260,7 +1334,8 @@ def main():
     elif args.phase not in repair_modes:
         controls = {}
         try:
-            records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls,
+            records, endpoint_count = probe_pipeline(nodes, binary, root, upload_controls=controls, quick3=quick3_download,
+                decoupled=bundle.get('entry_decoupled', False),
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
         finally:
             (root / 'upload-precheck-controls.json').write_text(json.dumps(controls, ensure_ascii=False, indent=2))
@@ -1506,7 +1581,7 @@ def main():
                       and (r.get('exit') or {}).get('country_code') == cc for r in records)
                       for cc in REGIONAL_COUNTRIES}},
               'published_node_count': len(config['proxies']), 'published_node_ids': published_ids,
-              'node_naming_policy': {'format': '地区编号|延迟ms|带宽Mbps|住宅类型|纯净度百分比',
+              'node_naming_policy': {'format': '地区编号|延迟ms|带宽Mbps|机房类型|纯净度百分比',
                   'numbering': 'ranked_per_region_starting_01', 'speed_source_priority': ['100MB_double_minimum', '5MB', '1MB'],
                   'residential_label': 'ipapi_isp_and_not_datacenter', 'unknown_fields_remain_unknown': True},
               'ip_reputation_policy': {'provider': 'ipapi.is', 'scope': 'quick_download_passed_unique_exits',
@@ -1539,6 +1614,39 @@ def main():
     report['service_checks_summary'] = service_probes.summary(latest_cohort(report))
     subscription = f'# 分阶段检测；{now}；检测轮数和下载设置见连通性报告\n' + candidate.read_text()
     Path('优选配置.yaml').write_text(subscription)
+    # --- @ty.aicoding@1793205643486 ---
+    if args.phase in ('all', 'publish'):
+        try:
+            front_cfg, landing_cfg, chain_cfg, chain_summary = chain_configs.build(
+                config, records, mapping)
+        except Exception as error:  # never block the main subscription on the optional chain
+            print(f'链式产物生成失败：{type(error).__name__}: {error}', flush=True)
+            front_cfg = landing_cfg = chain_cfg = None
+            chain_summary = {'chain_enabled': False, 'reason': 'chain_build_failed'}
+        report['chain'] = chain_summary
+        if front_cfg and landing_cfg and chain_cfg:
+            products = (
+                ('前置配置.yaml', front_cfg, f'# 前置配置；{now}；{chain_summary["fronts"]} 个\n'),
+                ('后置配置.yaml', landing_cfg, f'# 后置配置；{now}；{chain_summary["landings"]} 个\n'),
+                ('链式配置.yaml', chain_cfg, f'# 链式配置；{now}；规则复用优选配置，节点由 provider 提供\n'),
+            )
+            valid = True
+            for name, value, _header in products[:2]:
+                s.dump(root / name, value)
+                checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(root / name)],
+                                         capture_output=True, text=True, timeout=90)
+                if checked.returncode:
+                    valid = False
+                    print(f'{name} 校验失败，保留旧版本：{checked.stderr[-300:]}', flush=True)
+            if valid:
+                for name, value, header in products:
+                    Path(name).write_text(header + yaml.safe_dump(value, allow_unicode=True, sort_keys=False),
+                                          encoding='utf-8')
+                print(f'链式产物：前置 {chain_summary["fronts"]}，落地 {chain_summary["landings"]}', flush=True)
+            else:
+                report['chain'] = {**chain_summary, 'chain_enabled': False, 'reason': 'config_validation_failed'}
+        else:
+            print(f'链式产物未更新：{chain_summary}', flush=True)
     Path('v2rayN.txt').write_text(native_subscription, encoding='utf-8')
     if os.environ.get('GITHUB_RUN_ID'):
         report['source_run'] = os.environ['GITHUB_RUN_ID']

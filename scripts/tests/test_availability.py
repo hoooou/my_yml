@@ -64,7 +64,7 @@ class AvailabilityTests(unittest.TestCase):
             'ip_type': {'status': 'success', 'hosting': False}}
         a.render_comparison({'rules': ['MATCH,🚀 全局选择']}, [record],
             {'n-unique': {'name': 'n-unique', 'type': 'http', 'server': '8.8.8.8', 'port': 80}})
-        self.assertEqual(record['name'], '美国01|100ms|84Mbps|住宅未知|纯净度未知')
+        self.assertEqual(record['name'], '美国01|100ms|84Mbps|未知|纯净度未知')
 
     def test_100mb_sample_enforces_20_seconds_and_keeps_all_eligible_nodes(self):
         class Raw:
@@ -296,14 +296,14 @@ class AvailabilityTests(unittest.TestCase):
         with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-0': 1, 'n-1': 2, 'n-2': 3})), \
              patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}):
             records, endpoints = a.probe_pipeline(nodes, 'unused', Path('.'), probe=tcp, precheck=precheck,
-                site_check=websites, download=download, large_download=large_download, upload_precheck=verified_upload_precheck)
+                site_check=websites, download=download, large_download=large_download, upload_precheck=verified_upload_precheck, decoupled=True)
         self.assertEqual(tested, [('8.8.8.8', 443)])
         self.assertEqual(endpoints, 1)
         self.assertEqual(records[0]['websites']['Google']['round_count'], 3)
         self.assertEqual(records[0]['websites']['ClaudeTrace']['round_count'], 1)
         self.assertIsNone(records[2]['websites'])
-        self.assertEqual(records[2]['entry']['status'], 'unknown')
-        self.assertEqual(records[2]['entry']['attempts'], 0)
+        # entry 与 precheck 已解耦：204 失败的节点仍要测国内 TCP
+        self.assertEqual(records[2]['entry']['status'], 'passed')
         self.assertNotIn(('download', 3), events)
         self.assertNotIn(('100MB', 3), events)
 

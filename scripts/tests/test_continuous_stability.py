@@ -179,8 +179,10 @@ class ScheduleTests(unittest.TestCase):
                 for a,b in zip(item['attempts'], item['attempts'][1:])))
 
     def test_fast_peer_does_not_wait_for_twenty_rounds(self):
+        # observe 只跟随主筛选，不再要求 600 秒独立窗口
         results, _, _ = self.run_schedule(peer_at=0)
-        self.assertTrue(all(x['window_seconds'] >= 600 and cs.passed(x) for x in results.values()))
+        self.assertTrue(all(cs.passed(x) for x in results.values()))
+        self.assertTrue(all(x['round_count'] < 20 for x in results.values()))
 
     def test_control_failure_aborts_and_empty_shard_is_safe_without_core_or_api(self):
         with self.assertRaisesRegex(RuntimeError, '对照异常'): self.run_schedule(bad_control=True)

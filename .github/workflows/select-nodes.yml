@@ -23,9 +23,20 @@ on:
         type: string
         required: false
         default: '38040178745'
+      demo_nodes:
+        description: 调试用：只保留前 N 个唯一入口（留空为全量）
+        type: string
+        required: false
+        default: ''
+      publish_demo:
+        description: 调试用：是否允许 demo 发布产物（yes 才发布）
+        type: string
+        required: false
+        default: ''
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DEMO_NODES: ${{ inputs.demo_nodes }}
 permissions:
   actions: read
   contents: read
@@ -94,7 +105,7 @@ jobs:
     name: 双204 → 国内TCP（分片 ${{ matrix.shard }}）
     needs: prepare
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -146,7 +157,7 @@ jobs:
     name: 网站、TLS与下载（分片 ${{ matrix.shard }}）
     needs: [prepare, preflight]
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -310,7 +321,7 @@ jobs:
     name: 合并校验并更新原订阅
     needs: [prepare, probe, uplink, observe]
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 60
     permissions:
       contents: write
       actions: read
@@ -369,7 +380,7 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
       - name: 更新配置和报告
-        if: always()
+        if: always() && (inputs.demo_nodes == '' || inputs.publish_demo == 'yes')
         id: publish_subscription
         run: python scripts/publish_subscription.py
       - name: 发布本次摘要
