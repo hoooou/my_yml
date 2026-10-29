@@ -395,7 +395,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
               (seed[n['name']]['entry']['status'] == 'passed' and (modern or upload_speed.sample_passed(
                   seed[n['name']].get('upload_precheck') or {}, upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)))]
     initial_endpoint_count = len({endpoint_key(n) for n in nodes if tcp_supported(n)
-        and seed[n['name']]['precheck']['status'] == 'passed'}) if initial_records is not None else None
+        and (decoupled or seed[n['name']]['precheck']['status'] == 'passed')}) if initial_records is not None else None
     if not active:
         controls['valid'] = True
         return copy.deepcopy(initial_records), initial_endpoint_count
