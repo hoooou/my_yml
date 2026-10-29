@@ -161,13 +161,13 @@ def _front_gates(record, mapping, countries):
         return False
     if front_region(record, node, countries) is None:
         return False
-    if (record.get('website_tls') or {}).get('status') != 'passed':
-        return False
+    # 前置轨道只看自己的证据：上传、独立 TLS、回国/出国、10MB/100MB。
+    # 不依赖后置轨道的 26 站、应用 TLS、1MB 下载。
     if (record.get('upload_precheck') or {}).get('status') != 'passed':
         return False
-    if (record.get('download') or {}).get('status') != 'passed':
-        return False
     probe = record.get('front_probe') or {}
+    if (probe.get('tls') or {}).get('status') != 'passed':
+        return False
     if (probe.get('cn') or {}).get('status') != 'passed':
         return False
     if (probe.get('intl') or {}).get('status') != 'passed':
