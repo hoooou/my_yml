@@ -314,6 +314,7 @@ def quick_download(port):
 
 FRONT_CN_URL = 'http://mirrors.tuna.tsinghua.edu.cn/robots.txt'
 FRONT_INTL_URL = 'http://www.gstatic.com/generate_204'
+FRONT_TLS_URL = 'https://cp.cloudflare.com/generate_204'
 FRONT_10MB = 'https://hkg.download.datapacket.com/10mb.bin'
 FRONT_100MB = 'https://hkg.download.datapacket.com/100mb.bin'
 FRONT_REGIONS = ('HK', 'JP', 'KR', 'SG')
@@ -340,11 +341,13 @@ def _front_request(port, url, timeout):
 
 
 def probe_front(port):
-    """Cheap-to-expensive front checks: CN return, international, 10MB, 100MB."""
+    """Front-only track: CN return, international, TLS, 10MB, 100MB."""
     cn = [_front_request(port, FRONT_CN_URL, (3, 6)) for _ in range(3)]
     intl = [_front_request(port, FRONT_INTL_URL, (2, 3)) for _ in range(3)]
+    tls = _front_request(port, FRONT_TLS_URL, (3, 6))
     result = {'cn': summarize_rounds([{'cn': row} for row in cn], ('cn',))['cn'],
-              'intl': summarize_rounds([{'intl': row} for row in intl], ('intl',))['intl']}
+              'intl': summarize_rounds([{'intl': row} for row in intl], ('intl',))['intl'],
+              'tls': tls}
     ten = download_sample(port, 10_000_000, 10, FRONT_10MB)
     result['down10'] = ten
     if ten.get('status') == 'passed':

@@ -20,6 +20,7 @@ def record(index, entry='passed', precheck='passed', median=120, server_suffix=N
         'quick3_download': {'status': 'passed'},
         'upload_precheck': {'status': 'passed'},
         'front_probe': {'cn': {'status': 'passed'}, 'intl': {'status': 'passed'},
+                        'tls': {'status': 'passed'},
                         'down10': {'status': 'passed'},
                         'down100': {'status': 'passed', 'speed_mib_s': 20 + index}},
         'exit': {'country_code': 'JP'},
