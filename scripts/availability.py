@@ -324,10 +324,25 @@ def quick3_download(port):
     return download_sample(port, 3_000_000, 6, 'https://speed.cloudflare.com/__down?bytes=3000000')
 
 
+def _front_request(port, url, timeout):
+    """Plain HTTP check through a local proxy port; no page markers involved."""
+    started = time.perf_counter()
+    try:
+        with s.session() as client:
+            client.proxies = {'http': f'http://127.0.0.1:{port}',
+                              'https': f'http://127.0.0.1:{port}'}
+            response = client.get(url, timeout=timeout)
+        return {'status': 'passed' if response.status_code in (200, 204) else 'failed',
+                'elapsed_ms': round((time.perf_counter() - started) * 1000, 1),
+                'http_status': response.status_code}
+    except s.requests.RequestException as error:
+        return {'status': 'failed', 'elapsed_ms': None, 'reason': type(error).__name__}
+
+
 def probe_front(port):
     """Cheap-to-expensive front checks: CN return, international, 10MB, 100MB."""
-    cn = [check_site(port, 'cn', FRONT_CN_URL, timeout=(3, 6)) for _ in range(3)]
-    intl = [check_site(port, 'intl', FRONT_INTL_URL, timeout=(2, 3)) for _ in range(3)]
+    cn = [_front_request(port, FRONT_CN_URL, (3, 6)) for _ in range(3)]
+    intl = [_front_request(port, FRONT_INTL_URL, (2, 3)) for _ in range(3)]
     result = {'cn': summarize_rounds([{'cn': row} for row in cn], ('cn',))['cn'],
               'intl': summarize_rounds([{'intl': row} for row in intl], ('intl',))['intl']}
     ten = download_sample(port, 10_000_000, 10, FRONT_10MB)
