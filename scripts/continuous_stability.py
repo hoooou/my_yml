@@ -20,7 +20,8 @@ import quality_policy as qp
 
 VERSION = 5
 VERSIONS = (2, 3, 4, 5)
-MIN_WINDOW_SECONDS = 600
+# observe 只跟随主筛选，不再要求独立的时间窗口
+MIN_WINDOW_SECONDS = 0
 IDLE_MIN = 3
 IDLE_MAX = 10
 PEER_POLL_SECONDS = 30
@@ -37,7 +38,7 @@ def settings(version=VERSION):
             'minimum_idle_seconds_between_rounds': None, 'node_workers': WORKERS,
             'requires_all_rounds': False, 'minimum_success_rate': .90,
             'parallel_independent_runner': True, 'scope': 'domestic_TCP_passed',
-            'observes_until': 'uplink_job_completed_and_every_node_sampled_after_completion',
+            'observes_until': 'uplink_job_completed_and_one_sample_after_completion',
             'maximum_runtime_seconds': MAX_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
             'continuous_latency_hard_caps': False, 'explicit_certificate_error_rejects': True,
             'minimum_window_seconds': MIN_WINDOW_SECONDS, 'connection_modes': ['fresh', 'pooled_https'],
