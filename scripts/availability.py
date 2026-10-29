@@ -1261,9 +1261,13 @@ def main():
                     grouped[key] = []
                     order.append(key)
                 grouped[key].append(node)
-            keep = set(order[:limit])
+            if len(order) > limit:
+                step = len(order) / limit
+                keep = {order[min(len(order) - 1, int(index * step))] for index in range(limit)}
+            else:
+                keep = set(order)
             nodes = [node for node in nodes if endpoint_key(node) in keep]
-            print(f'调试模式：只保留前 {len(keep)} 个唯一入口，共 {len(nodes)} 个节点', flush=True)
+            print(f'调试模式：均匀抽样 {len(keep)} 个唯一入口，共 {len(nodes)} 个节点', flush=True)
         bundle = {'base': base, 'nodes': nodes, 'metadata': metadata, 'sources': sources,
                   'selection_policy_version': qp.VERSION,
                   'early_upload_precheck': True, 'service_checks_enabled': True, 'dual_204': True, 'website_tls_hard_gate': True,
