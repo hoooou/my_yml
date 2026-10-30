@@ -716,7 +716,8 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                         raise ValueError('网站汇总与逐轮响应结果不一致')
                     if item.get('login_required_count', 0) != expected['login_required_count']:
                         raise ValueError('Reddit登录汇总与逐轮响应结果不一致')
-            if bundle.get('website_tls_hard_gate') and should_web:
+            # 只有真正跑过网站阶段的节点才有 website_tls 证据（下载或 5MB 未过的不跑网站）。
+            if bundle.get('website_tls_hard_gate') and record.get('websites'):
                 failed_sites = website_tls_failures(record)
                 evidence = record.get('website_tls') or {}
                 if evidence.get('sites') != failed_sites or evidence.get('status') != ('failed' if failed_sites else 'passed'):

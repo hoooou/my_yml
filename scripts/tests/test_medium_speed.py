@@ -75,7 +75,7 @@ class MediumDownloadTests(unittest.TestCase):
             self.assertEqual(calls, expected)
             self.assertEqual(bool(sites), quick_ok and medium_ok)
             part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': 1, 'records': rows}
-            bundle = {'id': 'batch', 'nodes': [node]}
+            bundle = {'id': 'batch', 'nodes': [node], 'website_tls_hard_gate': True}
             a.merge_shards(bundle, [part], 1)
             if quick_ok:
                 rows[0]['medium_speed_download'].pop('requested_bytes')
