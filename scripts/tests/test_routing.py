@@ -56,6 +56,12 @@ class RoutingTests(unittest.TestCase):
                         rules.index('RULE-SET,lancidr,DIRECT,no-resolve'))
         self.assertLess(rules.index('RULE-SET,app-proxy-domains,' + r.GLOBAL),
                         rules.index('RULE-SET,lancidr,DIRECT,no-resolve'))
+        # 拿不到域名的 UDP/QUIC 连接靠 Anthropic 自有网段认出来，不能落到 IP 规则里判直连
+        for rule in ('DOMAIN-SUFFIX,claude.ai,' + r.GLOBAL, 'DOMAIN-SUFFIX,claude.com,' + r.GLOBAL,
+                     'DOMAIN-SUFFIX,anthropic.com,' + r.GLOBAL,
+                     'IP-CIDR,160.79.104.0/23,' + r.GLOBAL + ',no-resolve'):
+            self.assertIn(rule, rules)
+            self.assertLess(rules.index(rule), rules.index('RULE-SET,lancidr,DIRECT,no-resolve'))
         # 局域网仍按显式私有网段先直连，不依赖 lancidr
         self.assertIn('IP-CIDR,192.168.0.0/16,DIRECT,no-resolve', rules)
         self.assertLess(rules.index('IP-CIDR,192.168.0.0/16,DIRECT,no-resolve'),

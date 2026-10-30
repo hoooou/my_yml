@@ -8,6 +8,11 @@ GLOBAL = '🚀 全局选择'
 CHINA_DNS = ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
 PROXY_DNS = [f'https://1.1.1.1/dns-query#{GLOBAL}', f'https://8.8.8.8/dns-query#{GLOBAL}']
 COMPANY_DOMAINS = ('tech.bitauto.com', 'yiche.com', 'bitauto.com', 'bitautotech.com', 'inneryiche.com')
+# Anthropic 自有网段（AS399358）。UDP/QUIC 这类拿不到域名的连接只能靠 IP 认出来，
+# 否则会一路落到后面的 IP 规则里被判直连。
+ANTHROPIC_CIDRS = ('160.79.104.0/23',)
+# 明确把 Claude 全家钉到代理，不依赖规则集缓存是否已经更新。
+CLAUDE_DOMAINS = ('claude.ai', 'claude.com', 'claudeusercontent.com', 'anthropic.com')
 COMPANY_DNS = ['192.168.70.49', '192.168.70.1']
 # Recover the hostname (TLS SNI / HTTP Host / QUIC) for connections that arrive as a bare IP
 # (browser secure DNS, Android Private DNS, cached answers). Without it they skip every domain
@@ -72,8 +77,11 @@ def optimize_routing(config):
                  'IP-CIDR6,::1/128,DIRECT,no-resolve', 'IP-CIDR6,fc00::/7,DIRECT,no-resolve',
                  'IP-CIDR6,fe80::/10,DIRECT,no-resolve', 'IP-CIDR6,fd00::/8,DIRECT,no-resolve',
                  'IP-CIDR6,::/0,REJECT,no-resolve']
+    claude_rules = ([f'DOMAIN-SUFFIX,{domain},{GLOBAL}' for domain in CLAUDE_DOMAINS]
+                    + [f'IP-CIDR,{cidr},{GLOBAL},no-resolve' for cidr in ANTHROPIC_CIDRS])
     rules = (rule_set('company-internal', 'DIRECT')
-             + rule_set('private', 'DIRECT') + lan_rules + rule_set('reject', 'REJECT')
+             + rule_set('private', 'DIRECT') + lan_rules + claude_rules
+             + rule_set('reject', 'REJECT')
              + process_custom + rule_set('app-proxy', GLOBAL) + rule_set('app-direct', 'DIRECT')
              + rule_set('app-proxy-domains', GLOBAL) + rule_set('app-direct-domains', 'DIRECT')
              + rule_set('overseas-services', GLOBAL) + rule_set('domestic-services', 'DIRECT')
