@@ -566,6 +566,10 @@ jobs:
             if [ -f "$f" ]; then cp -f "$f" _site/; fi
           done
           ls -l _site
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: 上传 Pages 产物
         uses: actions/upload-pages-artifact@v3
         with:
