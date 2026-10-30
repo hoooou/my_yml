@@ -24,10 +24,10 @@ BASE_KEYS = ('mixed-port', 'allow-lan', 'mode', 'log-level', 'external-controlle
 CHECK_URL = 'http://www.gstatic.com/generate_204'
 FRONT_PREFIX = '🛫 '
 FRONT_TEST_GROUP = '🛫 前置节点'
-# 用户自己的订阅，作为 proxy-provider 直接并进前置组：不参与检测，客户端自己拉取更新。
-# 注意：provider 地址必须写在公开配置里，token 会随产物一起公开。
-EXT_PROVIDER = 'yieti'
+# 用户自己的订阅：流水线拉下来当免测前置用，直接写进配置；客户端不再需要拉 provider。
+# 注意：地址写在仓库里，token 会随仓库公开。
 EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
+EXT_PREFIX = '🛫 订阅 '
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -218,6 +218,44 @@ def _group(name, nodes):
             'proxies': nodes}
 
 
+_EXTERNAL_CACHE = {}
+
+
+def external_fronts(url=EXT_SUB_URL):
+    """拉取自有的 Clash 订阅，按免测前置返回；拉不到就返回空，不影响其他产物。"""
+    import yaml
+    from select_nodes import session
+
+    if url in _EXTERNAL_CACHE:
+        return copy.deepcopy(_EXTERNAL_CACHE[url])
+    try:
+        with session() as client:
+            response = client.get(url, timeout=8)
+            response.raise_for_status()
+            data = yaml.safe_load(response.text)
+    except Exception:
+        print('自有订阅拉取失败，本轮不含订阅前置', flush=True)
+        _EXTERNAL_CACHE[url] = []
+        return []
+    nodes, seen, names = [], set(), set()
+    for node in (data or {}).get('proxies') or []:
+        if not isinstance(node, dict) or not node.get('server') or not node.get('type'):
+            continue
+        key = (node.get('type'), node.get('server'), node.get('port'))
+        if key in seen:
+            continue
+        seen.add(key)
+        item = copy.deepcopy(node)
+        name = EXT_PREFIX + str(node.get('name') or f'{len(nodes) + 1:02d}')
+        while name in names:
+            name += '·'
+        names.add(name)
+        item['name'] = name
+        nodes.append(item)
+    _EXTERNAL_CACHE[url] = nodes
+    return copy.deepcopy(nodes)
+
+
 def _front_nodes(fronts):
     nodes, names = [], []
     for index, item in enumerate(fronts, 1):
@@ -274,12 +312,14 @@ def render_landing(base, landings):
     return config
 
 
-def render_chain(base, fronts, landings):
-    """节点直接内联，不依赖 proxy-provider：客户端拉不到 provider 时链式会整组为空。"""
+def render_chain(base, fronts, landings, ext_fronts=()):
+    """节点全部内联，不用 proxy-provider：客户端拉不到 provider 时链式会整组为空。"""
     config = _base(base)
     config['ipv6'] = False
     config.setdefault('dns', {})['ipv6'] = False
     front_nodes, front_names = _front_nodes(fronts)
+    ext_nodes = [copy.deepcopy(node) for node in ext_fronts]
+    ext_names = [node['name'] for node in ext_nodes]
     landing_nodes = [copy.deepcopy(node) for node in landings]
     for node in landing_nodes:
         # 原来的 landing provider 用 override 挂前置，内联后逐个节点挂。
@@ -297,27 +337,18 @@ def render_chain(base, fronts, landings):
         _group('🌐 全部节点', names),
     ]
     groups = [g for g in groups if g['proxies']]
-    config['proxies'] = front_nodes + landing_nodes
-    # 自有订阅只挂在前置组上，落地节点仍然内联。
-    # 订阅地址国内直连不通，所以用自动前置组去拉；该组里还有内联的前置节点，
-    # 不依赖 provider 本身就能选出一个可用的来下载，不会绕成环。
-    config['proxy-providers'] = {
-        EXT_PROVIDER: {'type': 'http', 'url': EXT_SUB_URL, 'interval': 3600,
-                       'path': f'./providers/{EXT_PROVIDER}.yaml', 'proxy': AUTO_GROUP},
-    }
-    auto_group = _group(AUTO_GROUP, front_names)
-    auto_group['use'] = [EXT_PROVIDER]
+    config['proxies'] = front_nodes + ext_nodes + landing_nodes
     config['proxy-groups'] = [
-        {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP] + front_names,
-         'use': [EXT_PROVIDER]},
-        auto_group,
+        {'name': FRONT_GROUP, 'type': 'select',
+         'proxies': [AUTO_GROUP] + front_names + ext_names},
+        _group(AUTO_GROUP, front_names + ext_names),
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [g['name'] for g in groups] + ['DIRECT']},
     ] + groups
     return config
 
 
-def build(base, records, mapping):
+def build(base, records, mapping, ext_fronts=()):
     """Return (front_config, landing_config, chain_config, summary)."""
     fronts = select_fronts(records, mapping)
     landings = select_landings(records, mapping)
@@ -328,5 +359,5 @@ def build(base, records, mapping):
     }
     front_config = render_front(base, fronts) if fronts else None
     landing_config = render_landing(base, landings) if landings else None
-    chain_config = render_chain(base, fronts, landings) if (fronts and landings) else None
+    chain_config = render_chain(base, fronts, landings, ext_fronts) if (fronts and landings) else None
     return front_config, landing_config, chain_config, summary

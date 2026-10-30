@@ -1706,7 +1706,7 @@ def main():
     if args.phase in ('all', 'publish'):
         try:
             front_cfg, landing_cfg, chain_cfg, chain_summary = chain_configs.build(
-                config, records, mapping)
+                config, records, mapping, chain_configs.external_fronts())
         except Exception as error:  # never block the main subscription on the optional chain
             print(f'链式产物生成失败：{type(error).__name__}: {error}', flush=True)
             front_cfg = landing_cfg = chain_cfg = None
@@ -1719,7 +1719,7 @@ def main():
                 ('链式配置.yaml', chain_cfg, f'# 链式配置；{now}；规则复用优选配置，节点已内联\n'),
             )
             valid = True
-            for name, value, _header in products[:2]:
+            for name, value, _header in products:
                 s.dump(root / name, value)
                 checked = subprocess.run([binary, '-t', '-d', str(root), '-f', str(root / name)],
                                          capture_output=True, text=True, timeout=90)

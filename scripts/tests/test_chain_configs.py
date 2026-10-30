@@ -60,6 +60,9 @@ def landings_fixture():
         {'name': '德国01|200ms|20Mbps|机房|纯净度未知', 'server': '3.3.3.3', 'port': 80, 'type': 'http'},
     ]
 
+def ext_fixture():
+    return [{'name': '🛫 订阅 美国01', 'server': '9.9.9.9', 'port': 443, 'type': 'vless'}]
+
 class SelectionTest(unittest.TestCase):
     def setUp(self):
         patcher = mock.patch.object(cc, 'is_cloudflare', return_value=False)
@@ -138,11 +141,7 @@ class RenderTest(unittest.TestCase):
         base = base_config()
         original = copy.deepcopy(base)
         config = cc.render_chain(base, fronts_fixture(), landings_fixture())
-        self.assertEqual(list(config['proxy-providers']), [cc.EXT_PROVIDER])
-        self.assertEqual(config['proxy-providers'][cc.EXT_PROVIDER]['url'], cc.EXT_SUB_URL)
-        # 订阅直连不通，改用自动前置组下载；该组本身有内联节点，不会绕成环。
-        self.assertEqual(config['proxy-providers'][cc.EXT_PROVIDER]['proxy'], cc.AUTO_GROUP)
-        self.assertNotIn('use', {k: v for k, v in config.items() if k != 'proxy-groups'})
+        self.assertNotIn('proxy-providers', config)
         self.assertEqual(len(config['proxies']), 4)  # 1 个前置 + 3 个落地
         self.assertTrue(all(node.get('dialer-proxy') in (None, cc.FRONT_GROUP)
                             for node in config['proxies']))
@@ -162,9 +161,16 @@ class RenderTest(unittest.TestCase):
                          ['美国01|100ms|50Mbps|机房|纯净度未知', '美国02|120ms|60Mbps|住宅|纯净度未知'])
         self.assertEqual(names[cc.US_HOSTING_GROUP]['proxies'], ['美国01|100ms|50Mbps|机房|纯净度未知'])
         self.assertEqual(names[cc.US_RESIDENTIAL_GROUP]['proxies'], ['美国02|120ms|60Mbps|住宅|纯净度未知'])
-        # 自有订阅只挂链式的前置组，落地仍然是内联节点。
-        self.assertEqual(names[cc.FRONT_GROUP]['use'], [cc.EXT_PROVIDER])
-        self.assertEqual(names[cc.AUTO_GROUP]['use'], [cc.EXT_PROVIDER])
+        self.assertNotIn('use', names[cc.FRONT_GROUP])
+
+    def test_external_subscription_nodes_are_inlined_into_the_front_groups(self):
+        config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
+        names = {g['name']: g for g in config['proxy-groups']}
+        self.assertNotIn('proxy-providers', config)
+        self.assertEqual([p['name'] for p in config['proxies']][1], '🛫 订阅 美国01')
+        self.assertIn('🛫 订阅 美国01', names[cc.FRONT_GROUP]['proxies'])
+        self.assertIn('🛫 订阅 美国01', names[cc.AUTO_GROUP]['proxies'])
+        self.assertNotIn('🛫 订阅 美国01', names[cc.US_GROUP]['proxies'])
         self.assertIn('德国01|200ms|20Mbps|机房|纯净度未知', names['🇪🇺 欧洲']['proxies'])
         self.assertNotIn('use', names[cc.US_GROUP])
 
