@@ -45,7 +45,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 
 排序：已有的 5MB 下载速度（没有则用 1MB）→ 国内 TCP 延迟。不按地区筛，美国节点同样可以当前置；前置少于 3 个时退回单跳，文件头会注明原因。
 
-落地侧（`后置配置.yaml`）：预检、必过站点、应用 TLS、1MB、3MB、上行预检、100MB 双目标全部通过，稳定性有记录时也要通过；只收 TCP 类型，hysteria2／tuic／wireguard 不收（前置转发不了 UDP），并排除 Cloudflare。名字按出口国家重新编号（`美国01|…`），链式配置的地区组按这个前缀筛。
+落地侧（`后置配置.yaml`）：预检、必过站点、应用 TLS、1MB、3MB、上行预检、100MB 双目标全部通过（5MB 低于 4MiB/s 的节点不提交 100MB，直接排除），稳定性有记录时也要通过；只收 TCP 类型，hysteria2／tuic／wireguard 不收（前置转发不了 UDP），并排除 Cloudflare。名字按出口国家重新编号（`美国01|…`），链式配置的地区组按这个前缀筛。
 
 已知限制：链式必然增加延迟；前置只测自己这一段（回国、出国、TLS），不单独跑下载测速；`v2rayN.txt`不挂链。
 

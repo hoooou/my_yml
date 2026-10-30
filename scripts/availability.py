@@ -512,9 +512,18 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                                     with bandwidth.download():
                                         record['medium_speed_download'] = medium_download(port)
                                 record['medium_speed_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
-                                with large_slots:
-                                    with bandwidth.download():
-                                        record['high_speed_download'] = large_download(port)
+                                medium = record.get('medium_speed_download') or {}
+                                medium_mib_s = medium.get('speed_mib_s')
+                                slow_medium = (medium.get('status') == 'passed'
+                                               and isinstance(medium_mib_s, (int, float))
+                                               and medium_mib_s < high_speed.MIN_MEDIUM_SPEED_MIB_S)
+                                if slow_medium:
+                                    record['high_speed_download']['reason'] = (
+                                        f'5MB 速度低于 {high_speed.MIN_MEDIUM_SPEED_MIB_S} MiB/s，未提交两轮 100MB')
+                                else:
+                                    with large_slots:
+                                        with bandwidth.download():
+                                            record['high_speed_download'] = large_download(port)
                         else:
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:

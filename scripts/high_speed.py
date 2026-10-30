@@ -5,6 +5,8 @@ VERSION = 2
 BYTES = 100_000_000
 BUDGET = 20
 WORKERS = 2
+# 5MB 已通过但低于该速度的节点不提交 100MB：跑满也过不了 20 秒预算。
+MIN_MEDIUM_SPEED_MIB_S = 4.0
 URLS = (
     'https://speed.cloudflare.com/__down?bytes=100000000',
     'http://hkg.download.datapacket.com/100mb.bin',
@@ -18,6 +20,7 @@ def request_headers(url):
 
 def settings(total_deadline=False):
     return {'version': VERSION, 'urls': list(URLS), 'bytes': BYTES,
+            'minimum_medium_speed_mib_s': MIN_MEDIUM_SPEED_MIB_S,
             'budget_seconds': BUDGET, 'rounds': len(URLS), 'sequential_per_node': True,
             'workers_per_shard': WORKERS, 'selection_limit': None,
             'read_timeout_seconds': None if total_deadline else 1, 'includes_handshake': True,
