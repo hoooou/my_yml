@@ -172,14 +172,24 @@ class RenderTest(unittest.TestCase):
         self.assertEqual([n['name'] for n in nodes], ['🛫 订阅 US01'])
         self.assertEqual(client.get.call_args.kwargs['headers']['User-Agent'], 'clash-verge/v1.0')
 
-    def test_external_subscription_nodes_are_inlined_into_the_front_groups(self):
+    def test_external_subscription_nodes_get_their_own_group(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
         names = {g['name']: g for g in config['proxy-groups']}
         self.assertNotIn('proxy-providers', config)
         self.assertEqual([p['name'] for p in config['proxies']][1], '🛫 订阅 美国01')
-        self.assertIn('🛫 订阅 美国01', names[cc.FRONT_GROUP]['proxies'])
-        self.assertIn('🛫 订阅 美国01', names[cc.AUTO_GROUP]['proxies'])
+        # 前置组只有两个选项：自动前置、yieti 分组。
+        self.assertEqual(names[cc.FRONT_GROUP]['proxies'], [cc.AUTO_GROUP, cc.EXT_GROUP])
+        # yieti 是手动选择，不测速。
+        self.assertEqual(names[cc.EXT_GROUP]['type'], 'select')
+        self.assertEqual(names[cc.EXT_GROUP]['proxies'], ['🛫 订阅 美国01'])
+        self.assertNotIn('🛫 订阅 美国01', names[cc.AUTO_GROUP]['proxies'])
         self.assertNotIn('🛫 订阅 美国01', names[cc.US_GROUP]['proxies'])
+
+    def test_front_group_has_no_subscription_choice_when_it_is_empty(self):
+        config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), [])
+        names = {g['name']: g for g in config['proxy-groups']}
+        self.assertEqual(names[cc.FRONT_GROUP]['proxies'], [cc.AUTO_GROUP])
+        self.assertNotIn(cc.EXT_GROUP, names)
         self.assertIn('德国01|200ms|20Mbps|机房|纯净度未知', names['🇪🇺 欧洲']['proxies'])
         self.assertNotIn('use', names[cc.US_GROUP])
 

@@ -28,6 +28,7 @@ FRONT_TEST_GROUP = '🛫 前置节点'
 # 注意：地址写在仓库里，token 会随仓库公开。
 EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
 EXT_PREFIX = '🛫 订阅 '
+EXT_GROUP = '🛫 yieti'
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -339,10 +340,14 @@ def render_chain(base, fronts, landings, ext_fronts=()):
     ]
     groups = [g for g in groups if g['proxies']]
     config['proxies'] = front_nodes + ext_nodes + landing_nodes
+    front_choices = [AUTO_GROUP]
+    if ext_names:
+        # 订阅节点单独一组，手动选择、不参与自动测速。
+        front_choices.append(EXT_GROUP)
     config['proxy-groups'] = [
-        {'name': FRONT_GROUP, 'type': 'select',
-         'proxies': [AUTO_GROUP] + front_names + ext_names},
-        _group(AUTO_GROUP, front_names + ext_names),
+        {'name': FRONT_GROUP, 'type': 'select', 'proxies': front_choices},
+        _group(AUTO_GROUP, front_names),
+        *([{'name': EXT_GROUP, 'type': 'select', 'proxies': ext_names}] if ext_names else []),
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [g['name'] for g in groups] + ['DIRECT']},
     ] + groups
