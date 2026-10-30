@@ -205,7 +205,7 @@ jobs:
     name: 持续稳定性独立观察（分片 ${{ matrix.shard }}）
     needs: [prepare, preflight]
     runs-on: ubuntu-24.04
-    timeout-minutes: 185
+    timeout-minutes: 210
     permissions:
       contents: read
       actions: read

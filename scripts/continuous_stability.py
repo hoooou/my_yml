@@ -27,7 +27,9 @@ IDLE_MAX = 10
 PEER_POLL_SECONDS = 30
 STANDALONE_SECONDS = 600
 WORKERS = 8
-MAX_SECONDS = 165 * 60
+# 主流程完成（flag 置位）后，只允许再跑这么久给每个节点补最后一轮采样；
+# 之前没有 flag 之前不计时，靠作业超时兜底，不再设整轮预算。
+TAIL_SECONDS = 30 * 60
 PEER_JOB = '两轮上行及负载后SSL'
 
 
@@ -39,7 +41,7 @@ def settings(version=VERSION):
             'requires_all_rounds': False, 'minimum_success_rate': .90,
             'parallel_independent_runner': True, 'scope': 'domestic_TCP_passed',
             'observes_until': 'uplink_job_completed_and_one_sample_after_completion',
-            'maximum_runtime_seconds': MAX_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
+            'maximum_tail_seconds': TAIL_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
             'continuous_latency_hard_caps': False, 'explicit_certificate_error_rejects': True,
             'minimum_window_seconds': MIN_WINDOW_SECONDS, 'connection_modes': ['fresh', 'pooled_https'],
             'short_circuit_after_failure': False, 'p99_minimum_success_samples': 100}
@@ -201,17 +203,18 @@ def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=
     attempts = {id: [] for id in ids}
     due = [(origin, id) for id in ids]
     heapq.heapify(due)
-    running, cutoff = {}, None
+    running, cutoff, cutoff_at = {}, None, None
     next_control = next_peer = origin
     try:
         with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             while due or running:
                 now = clock()
-                if now - origin > MAX_SECONDS:
-                    raise RuntimeError('观察时间超出预算，保留原订阅')
+                if cutoff_at is not None and now - cutoff_at > TAIL_SECONDS:
+                    raise RuntimeError('主流程完成后收尾超时，保留原订阅')
                 if now >= next_peer and cutoff is None:
                     if peer():
                         cutoff = clock() - origin
+                        cutoff_at = clock()
                     next_peer = clock() + PEER_POLL_SECONDS
                 if now >= next_control:
                     control(len(attempts), origin)
