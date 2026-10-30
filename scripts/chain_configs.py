@@ -28,6 +28,7 @@ FRONT_TEST_GROUP = '🛫 前置节点'
 # 注意：地址写在仓库里，token 会随仓库公开。
 EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
 EXT_GROUP = '🛫 yieti'
+EXT_AUTO_GROUP = '🛫 yieti 自动'
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -357,10 +358,18 @@ def render_chain(base, fronts, landings, ext_fronts=()):
     if ext_names:
         # 订阅节点单独一组，手动选择、不参与自动测速。
         front_choices.append(EXT_GROUP)
+    # 订阅节点：自动那一项按顺序兜底（fallback，只看通不通），其余节点仍可手动强制。
+    ext_groups = []
+    if ext_names:
+        ext_auto = _group(EXT_AUTO_GROUP, ext_names)
+        ext_auto.update(type='fallback', interval=300)  # 453 个节点，5 分钟一轮够了
+        ext_groups = [ext_auto, {'name': EXT_GROUP, 'type': 'select',
+                                 'proxies': [EXT_AUTO_GROUP] + ext_names,
+                                 'default-selected': EXT_AUTO_GROUP}]
     config['proxy-groups'] = [
         {'name': FRONT_GROUP, 'type': 'select', 'proxies': front_choices},
         _group(AUTO_GROUP, front_names),
-        *([{'name': EXT_GROUP, 'type': 'select', 'proxies': ext_names}] if ext_names else []),
+        *ext_groups,
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [g['name'] for g in groups] + ['DIRECT']},
     ] + groups

@@ -181,9 +181,12 @@ class RenderTest(unittest.TestCase):
         self.assertEqual([p['name'] for p in config['proxies']][1], 'US 官方优选 187ms')
         # 前置组只有两个选项：自动前置、yieti 分组。
         self.assertEqual(names[cc.FRONT_GROUP]['proxies'], [cc.AUTO_GROUP, cc.EXT_GROUP])
-        # yieti 是手动选择，不测速。
+        # yieti：手动组里第一项是按顺序兜底的 fallback，其余节点仍可强制选中。
         self.assertEqual(names[cc.EXT_GROUP]['type'], 'select')
-        self.assertEqual(names[cc.EXT_GROUP]['proxies'], ['US 官方优选 187ms'])
+        self.assertEqual(names[cc.EXT_GROUP]['proxies'], [cc.EXT_AUTO_GROUP, 'US 官方优选 187ms'])
+        self.assertEqual(names[cc.EXT_AUTO_GROUP]['type'], 'fallback')
+        self.assertEqual(names[cc.EXT_GROUP]['default-selected'], cc.EXT_AUTO_GROUP)
+        self.assertEqual(names[cc.EXT_AUTO_GROUP]['proxies'], ['US 官方优选 187ms'])
         self.assertNotIn('US 官方优选 187ms', names[cc.AUTO_GROUP]['proxies'])
         self.assertNotIn('US 官方优选 187ms', names[cc.US_GROUP]['proxies'])
 
@@ -192,6 +195,7 @@ class RenderTest(unittest.TestCase):
         names = {g['name']: g for g in config['proxy-groups']}
         self.assertEqual(names[cc.FRONT_GROUP]['proxies'], [cc.AUTO_GROUP])
         self.assertNotIn(cc.EXT_GROUP, names)
+        self.assertNotIn(cc.EXT_AUTO_GROUP, names)
         self.assertIn('德国01|200ms|20Mbps|机房|纯净度未知', names['🇪🇺 欧洲']['proxies'])
         self.assertNotIn('use', names[cc.US_GROUP])
 
