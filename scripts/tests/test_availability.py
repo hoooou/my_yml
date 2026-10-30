@@ -16,6 +16,8 @@ from upload_fixture import verified_upload_precheck
 from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
 from high_speed_fixture import verified_high
+import os
+os.environ.setdefault('CHAIN_EXTERNAL_SUB', 'off')  # 测试不联网拉自有订阅
 
 
 class AvailabilityTests(unittest.TestCase):

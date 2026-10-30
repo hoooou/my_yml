@@ -165,7 +165,8 @@ class RenderTest(unittest.TestCase):
 
     def test_external_subscription_is_fetched_with_a_clash_user_agent(self):
         payload = 'proxies:\n  - {name: US01, type: vless, server: 9.9.9.9, port: 443}\n'
-        with mock.patch('select_nodes.session') as session:
+        with mock.patch.dict('os.environ', {'CHAIN_EXTERNAL_SUB': 'on'}), \
+                mock.patch('select_nodes.session') as session:
             client = session.return_value.__enter__.return_value
             client.get.return_value.text = payload
             nodes = cc.external_fronts('https://example.invalid/sub')

@@ -223,19 +223,28 @@ _EXTERNAL_CACHE = {}
 
 def external_fronts(url=EXT_SUB_URL):
     """拉取自有的 Clash 订阅，按免测前置返回；拉不到就返回空，不影响其他产物。"""
+    import os
     import yaml
     from select_nodes import session
 
+    if os.environ.get('CHAIN_EXTERNAL_SUB') == 'off':
+        return []
     if url in _EXTERNAL_CACHE:
         return copy.deepcopy(_EXTERNAL_CACHE[url])
-    try:
-        with session() as client:
-            # 面板按 UA 拦人：默认的 python-requests UA 直接 400，要用客户端自己的 UA。
-            response = client.get(url, timeout=8, headers={'User-Agent': 'clash-verge/v1.0'})
-            response.raise_for_status()
-            data = yaml.safe_load(response.text)
-    except Exception:
-        print('自有订阅拉取失败，本轮不含订阅前置', flush=True)
+    data = None
+    for attempt in range(2):
+        try:
+            with session() as client:
+                # 面板按 UA 拦人：默认的 python-requests UA 直接 400，要用客户端自己的 UA。
+                # 订阅有几百 KB，读超时要给够，否则 runner 上会偶发超时。
+                response = client.get(url, timeout=(5, 30), headers={'User-Agent': 'clash-verge/v1.0'})
+                response.raise_for_status()
+                data = yaml.safe_load(response.text)
+            break
+        except Exception:
+            if attempt:
+                print('自有订阅拉取失败，本轮不含订阅前置', flush=True)
+    if data is None:
         _EXTERNAL_CACHE[url] = []
         return []
     nodes, seen, names = [], set(), set()

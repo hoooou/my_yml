@@ -13,6 +13,8 @@ import upload_speed as up
 from tls_fixture import verified_tls
 import availability as a
 import mobile_pilot
+import os
+os.environ.setdefault('CHAIN_EXTERNAL_SUB', 'off')  # 测试不联网拉自有订阅
 
 
 def sample(byte_count=up.BYTES, budget=up.BUDGET, elapsed=1000):

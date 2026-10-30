@@ -24,6 +24,8 @@ from upload_fixture import verified_upload_precheck
 from test_upload_speed import evidence as upload_evidence
 from tls_fixture import verified_tls
 from test_detection_report import fixture, render
+import os
+os.environ.setdefault('CHAIN_EXTERNAL_SUB', 'off')  # 测试不联网拉自有订阅
 
 
 def evidence(failures=0, cutoff=0):
