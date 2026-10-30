@@ -486,17 +486,24 @@ jobs:
           assert meta['workflowName'] == '每日节点连通性分类'
           PYTHON
           gh run download "$SOURCE_RUN" -n availability-input -D .node-work/availability
-          for shard in 0 1 2 3; do
-            gh run download "$SOURCE_RUN" -n "availability-shard-$shard" -D .node-work/shards
-            gh run download "$SOURCE_RUN" -n "availability-observation-$shard" -D .node-work/observations
-          done
+          # 分片数已经从 4 提到 8，按 pattern 取全部分片，别再写死 0..3。
+          gh run download "$SOURCE_RUN" -p 'availability-shard-*' -p 'availability-observation-*' -D .node-work/downloads
+          mkdir -p .node-work/shards .node-work/observations
+          cp -f .node-work/downloads/availability-shard-*/*.json .node-work/shards/
+          cp -f .node-work/downloads/availability-observation-*/*.json .node-work/observations/
           gh run download "$SOURCE_RUN" -p "availability-uplink-*" -D .node-work/uplink
-          gh run download "$SOURCE_RUN" -n full-test-report -D .node-work/original-report
+          # 原报告可能不存在（发布步骤本身失败时不会有这份产物），没有就只按原始证据重建。
+          gh run download "$SOURCE_RUN" -n full-test-report -D .node-work/original-report || true
       - name: 验证原始证据并生成全局手动与其余自动分组
         env:
           SOURCE_RUN: ${{ inputs.diagnostic_run_id }}
           UNTESTED_SUBSCRIPTION_URL: ${{ secrets.UNTESTED_SUBSCRIPTION_URL }}
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 8 --reuse-report .node-work/original-report/full-test-report.json --source-run "$SOURCE_RUN"
+        run: |
+          REUSE=""
+          if [ -f .node-work/original-report/full-test-report.json ]; then
+            REUSE="--reuse-report .node-work/original-report/full-test-report.json"
+          fi
+          python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 8 $REUSE --source-run "$SOURCE_RUN"
       - name: 保存本次全量检测报告
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

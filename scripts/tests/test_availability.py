@@ -134,6 +134,25 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(peak, 2)
         self.assertEqual([r['high_speed_download']['status'] for r in rows], ['passed']*4+['skipped']*2)
 
+    def test_uplink_parts_merge_keeps_fields_publish_reads(self):
+        # 上行分片合并后的诊断必须保持单片形状：发布报告要读 updated_at。
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for index, stamp in ((0, '2026-10-30T07:40:00+08:00'), (1, '2026-10-30T07:47:00+08:00')):
+                part = {'bundle_id': 'batch',
+                        'records': [{'id': f'n-{index}', 'upload': {'status': 'passed'}}],
+                        'diagnostic': {'updated_at': stamp, 'complete': True, 'settings': {'version': 5},
+                                       'node_count': 1, 'controls_valid': True, 'controls': {'before': {'status': 'passed'}},
+                                       'core_health': {'process_alive': True},
+                                       'nodes': [{'id': f'n-{index}', 'upload': {'status': 'passed'}}]}}
+                (root / f'uplink-stage-{index}.json').write_text(json.dumps(part))
+            stage = a.load_uplink_stage(root / 'uplink-stage.json', [{'id': 'n-0'}, {'id': 'n-1'}])
+        diagnostic = stage['diagnostic']
+        self.assertEqual(diagnostic['updated_at'], '2026-10-30T07:47:00+08:00')
+        self.assertEqual(diagnostic['node_count'], 2)
+        self.assertTrue(diagnostic['controls_valid'])
+        self.assertEqual({r['id'] for r in diagnostic['nodes']}, {'n-0', 'n-1'})
+
     def test_merge_rejects_missing_partial_and_over_budget_100mb_results(self):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 1}}]*3, ('Google204',))['Google204']

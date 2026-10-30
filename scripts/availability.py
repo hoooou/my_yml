@@ -249,9 +249,13 @@ def load_uplink_stage(result_path, records):
         by_id.update({r['id']: r for r in part.get('records') or []})
     nodes = [n for part in parts for n in (part.get('diagnostic') or {}).get('nodes') or []]
     first = parts[0].get('diagnostic') or {}
+    # 合并后的诊断要和单片形状一致：updated_at／settings 是发布报告里必读的字段。
     return {'bundle_id': parts[0].get('bundle_id'),
             'records': [by_id.get(r['id'], r) for r in records],
-            'diagnostic': {'node_count': len(nodes), 'nodes': nodes,
+            'diagnostic': {'updated_at': max((p.get('diagnostic') or {}).get('updated_at') or '' for p in parts),
+                           'complete': all((p.get('diagnostic') or {}).get('complete') is True for p in parts),
+                           'settings': first.get('settings') or {},
+                           'node_count': len(nodes), 'nodes': nodes,
                            'controls_valid': all((p.get('diagnostic') or {}).get('controls_valid') is True
                                                  for p in parts),
                            'controls': first.get('controls') or {},
