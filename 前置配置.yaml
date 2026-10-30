@@ -1,4 +1,4 @@
-# 前置配置；2026-10-30T23:51:32+08:00；52 个
+# 前置配置；2026-10-31T00:05:41+08:00；52 个
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -1061,6 +1061,13 @@ proxies:
   skip-cert-verify: true
   udp: true
   name: 🛫 52|246ms|?Mbps
+proxy-providers:
+  yieti:
+    type: http
+    url: https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash
+    interval: 3600
+    path: ./providers/yieti.yaml
+    proxy: DIRECT
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -1128,3 +1135,5 @@ proxy-groups:
   - 🛫 50|253ms|3Mbps
   - 🛫 51|97ms|2Mbps
   - 🛫 52|246ms|?Mbps
+  use:
+  - yieti
