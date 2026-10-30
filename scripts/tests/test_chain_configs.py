@@ -140,6 +140,8 @@ class RenderTest(unittest.TestCase):
         config = cc.render_chain(base, fronts_fixture(), landings_fixture())
         self.assertEqual(list(config['proxy-providers']), [cc.EXT_PROVIDER])
         self.assertEqual(config['proxy-providers'][cc.EXT_PROVIDER]['url'], cc.EXT_SUB_URL)
+        # 订阅直连不通，改用自动前置组下载；该组本身有内联节点，不会绕成环。
+        self.assertEqual(config['proxy-providers'][cc.EXT_PROVIDER]['proxy'], cc.AUTO_GROUP)
         self.assertNotIn('use', {k: v for k, v in config.items() if k != 'proxy-groups'})
         self.assertEqual(len(config['proxies']), 4)  # 1 个前置 + 3 个落地
         self.assertTrue(all(node.get('dialer-proxy') in (None, cc.FRONT_GROUP)

@@ -299,9 +299,11 @@ def render_chain(base, fronts, landings):
     groups = [g for g in groups if g['proxies']]
     config['proxies'] = front_nodes + landing_nodes
     # 自有订阅只挂在前置组上，落地节点仍然内联。
+    # 订阅地址国内直连不通，所以用自动前置组去拉；该组里还有内联的前置节点，
+    # 不依赖 provider 本身就能选出一个可用的来下载，不会绕成环。
     config['proxy-providers'] = {
         EXT_PROVIDER: {'type': 'http', 'url': EXT_SUB_URL, 'interval': 3600,
-                       'path': f'./providers/{EXT_PROVIDER}.yaml', 'proxy': 'DIRECT'},
+                       'path': f'./providers/{EXT_PROVIDER}.yaml', 'proxy': AUTO_GROUP},
     }
     auto_group = _group(AUTO_GROUP, front_names)
     auto_group['use'] = [EXT_PROVIDER]
