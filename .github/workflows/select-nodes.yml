@@ -33,6 +33,11 @@ on:
         type: string
         required: false
         default: ''
+      source_run_id:
+        description: 续跑用：复用该次运行的预检与探测产物，只重跑观察、上行和发布（留空为全量）
+        type: string
+        required: false
+        default: ''
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,7 +53,7 @@ concurrency:
 jobs:
   prepare:
     name: 获取全量订阅并去重
-    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'full'
+    if: (github.event_name != 'workflow_dispatch' || inputs.mode == 'full') && inputs.source_run_id == ''
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -104,6 +109,7 @@ jobs:
   preflight:
     name: 双204 → 国内TCP（分片 ${{ matrix.shard }}）
     needs: prepare
+    if: inputs.source_run_id == ''
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     strategy:
@@ -156,6 +162,7 @@ jobs:
   probe:
     name: 网站、TLS与下载（分片 ${{ matrix.shard }}）
     needs: [prepare, preflight]
+    if: inputs.source_run_id == ''
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     strategy:
@@ -204,6 +211,8 @@ jobs:
   observe:
     name: 持续稳定性独立观察（分片 ${{ matrix.shard }}）
     needs: [prepare, preflight]
+    # 续跑时观察段要重跑：收尾采样是最容易出问题的一段，不能沿用上一轮的半成品。
+    if: always() && (inputs.source_run_id != '' || needs.preflight.result == 'success')
     runs-on: ubuntu-24.04
     timeout-minutes: 210
     permissions:
@@ -228,16 +237,27 @@ jobs:
           python -m pip install -r scripts/requirements.txt
           python scripts/install_tools.py --mihomo-only
       - name: 读取本轮共同输入
+        if: inputs.source_run_id == ''
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: availability-input
           path: .node-work/availability
       - name: 读取本轮前置检测
+        if: inputs.source_run_id == ''
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: availability-preflight-*
           merge-multiple: true
           path: .node-work/preflight
+      - name: 续跑：复用来源运行的输入与前置记录
+        if: inputs.source_run_id != ''
+        env:
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+        run: |
+          mkdir -p .node-work/reuse .node-work/availability .node-work/preflight
+          gh run download "$SOURCE_RUN" -p availability-input -p 'availability-preflight-*' -D .node-work/reuse
+          cp -f .node-work/reuse/availability-input/*.json .node-work/availability/
+          cp -f .node-work/reuse/availability-preflight-*/*.json .node-work/preflight/
       - name: 定时观察至主筛选结束
         env:
           SHARD_INDEX: ${{ matrix.shard }}
@@ -266,6 +286,7 @@ jobs:
   uplink:
     name: 两轮上行及负载后SSL（分片 ${{ matrix.shard }}）
     needs: [prepare, probe]
+    if: inputs.source_run_id != '' || needs.probe.result == 'success'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
@@ -292,16 +313,27 @@ jobs:
           python -m pip install -r scripts/requirements.txt
           python scripts/install_tools.py --mihomo-only
       - name: 读取本轮共同输入
+        if: inputs.source_run_id == ''
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: availability-input
           path: .node-work/availability
       - name: 读取四个分片
+        if: inputs.source_run_id == ''
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: availability-shard-*
           merge-multiple: true
           path: .node-work/shards
+      - name: 续跑：复用来源运行的输入与分片
+        if: inputs.source_run_id != ''
+        env:
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+        run: |
+          mkdir -p .node-work/reuse .node-work/availability .node-work/shards
+          gh run download "$SOURCE_RUN" -p availability-input -p 'availability-shard-*' -D .node-work/reuse
+          cp -f .node-work/reuse/availability-input/*.json .node-work/availability/
+          cp -f .node-work/reuse/availability-shard-*/*.json .node-work/shards/
       - name: 完成两轮上行和负载后证书检查
         env:
           SHARD_INDEX: ${{ matrix.shard }}
@@ -327,6 +359,7 @@ jobs:
   publish:
     name: 合并校验并更新原订阅
     needs: [prepare, probe, uplink, observe]
+    if: always() && needs.uplink.result == 'success' && needs.observe.result == 'success' && (inputs.source_run_id != '' || needs.probe.result == 'success')
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -348,16 +381,27 @@ jobs:
           python -m pip install -r scripts/requirements.txt
           python scripts/install_tools.py --mihomo-only
       - name: 读取本轮共同输入
+        if: inputs.source_run_id == ''
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: availability-input
           path: .node-work/availability
       - name: 读取四个分片
+        if: inputs.source_run_id == ''
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: availability-shard-*
           merge-multiple: true
           path: .node-work/shards
+      - name: 续跑：复用来源运行的输入与分片
+        if: inputs.source_run_id != ''
+        env:
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+        run: |
+          mkdir -p .node-work/reuse .node-work/availability .node-work/shards
+          gh run download "$SOURCE_RUN" -p availability-input -p 'availability-shard-*' -D .node-work/reuse
+          cp -f .node-work/reuse/availability-input/*.json .node-work/availability/
+          cp -f .node-work/reuse/availability-shard-*/*.json .node-work/shards/
       - name: 读取同轮上行结果
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:

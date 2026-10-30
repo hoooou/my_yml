@@ -164,10 +164,11 @@ Google Play包括com.android.vending、com.google.android.gms、com.google.andro
 
 | 入口／代码 | 用途 |
 |---|---|
-| 每日节点连通性分类 / full | 每6小时或手动重新获取所有来源；四片前置、四片网站／下载、独立持续观察及最终上传、合并发布 |
+| 每日节点连通性分类 / full | 每6小时或手动重新获取所有来源；八片前置、八片网站／下载与上行、八片独立持续观察及最终合并发布 |
 | repair | 按已有原始证据重建规则／分组；不是全量重测，不伪造新时间或旧下载轮数 |
 | web／medium／stability／uplink-recheck | 已发布池相应专项复测，保留其他项原测量；新版独立稳定性至少观察10分钟 |
 | publish-retry | 复用指定完整且仍可取得的同轮存档恢复发布，不重新测速，不复用不同节点原始记录 |
+| 续跑（`source_run_id`） | 预检段和探测段不变，只重跑最容易出问题的观察段、上行段与发布：`gh run download` 从指定运行取回 `availability-input`、`availability-preflight-*`、`availability-shard-*`，观察与上行照常跑，发布用本次产出的观察和上行结果。留空时行为与全量一致 |
 | 补充服务小样本验证 | 最多4个当前节点、前后直连对照，验证ChatGPT API／FAST，不发布订阅 |
 | 其他只读诊断 | Claude、网站、上传、持续稳定性、已发布节点、异常阶段以及Hysteria2；不改变订阅 |
 | availability.py / mobile_pilot.py | 阶段编排、必过和地区池／网页、API、trace分类 |
