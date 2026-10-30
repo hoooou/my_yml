@@ -1,0 +1,1642 @@
+# 前置配置；2026-10-30T16:20:20+08:00；106 个
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+dns:
+  enable: true
+  ipv6: false
+  default-nameserver:
+  - 223.5.5.5
+  - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: false
+  nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  proxy-server-nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  direct-nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  nameserver-policy:
+    +.tech.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.yiche.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitauto.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.bitautotech.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    +.inneryiche.com:
+    - 192.168.70.49
+    - 192.168.70.1
+    rule-set:company-internal:
+    - 192.168.70.49
+    - 192.168.70.1
+    rule-set:app-proxy-domains:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:app-direct-domains:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:overseas-services:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:proxy:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:gfw:
+    - https://1.1.1.1/dns-query#🚀 全局选择
+    - https://8.8.8.8/dns-query#🚀 全局选择
+    rule-set:domestic-services:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:direct:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    rule-set:private:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  fake-ip-filter:
+  - '*.lan'
+  - '*.local'
+  - +.msftconnecttest.com
+  - +.msftncsi.com
+  - +.tech.bitauto.com
+  - +.yiche.com
+  - +.bitauto.com
+  - +.bitautotech.com
+  - rule-set:company-internal
+  - +.inneryiche.com
+  direct-nameserver-follow-policy: true
+rules:
+- RULE-SET,company-internal,DIRECT
+- RULE-SET,private,DIRECT
+- RULE-SET,lancidr,DIRECT,no-resolve
+- GEOIP,LAN,DIRECT,no-resolve
+- IP-CIDR6,::1/128,DIRECT,no-resolve
+- IP-CIDR6,fc00::/7,DIRECT,no-resolve
+- IP-CIDR6,fe80::/10,DIRECT,no-resolve
+- IP-CIDR6,fd00::/8,DIRECT,no-resolve
+- IP-CIDR6,::/0,REJECT,no-resolve
+- RULE-SET,reject,REJECT
+- RULE-SET,app-proxy,🚀 全局选择
+- RULE-SET,app-direct,DIRECT
+- RULE-SET,app-proxy-domains,🚀 全局选择
+- RULE-SET,app-direct-domains,DIRECT
+- RULE-SET,overseas-services,🚀 全局选择
+- RULE-SET,domestic-services,DIRECT
+- DOMAIN-SUFFIX,zijieapi.com,DIRECT
+- DOMAIN-SUFFIX,office.com,DIRECT
+- DOMAIN-SUFFIX,outlook.com,DIRECT
+- DOMAIN-SUFFIX,jiuse3.cloud,DIRECT
+- DOMAIN-SUFFIX,onenote.com,DIRECT
+- DOMAIN-SUFFIX,clarivate.cn,DIRECT
+- DOMAIN-SUFFIX,onedrive.com,DIRECT
+- DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+- DOMAIN-SUFFIX,sharepoint.com,DIRECT
+- DOMAIN-SUFFIX,azure.com,DIRECT
+- DOMAIN-SUFFIX,qq.com,DIRECT
+- DOMAIN-SUFFIX,immersivetranslate.com,🚀 全局选择
+- DOMAIN-SUFFIX,smallstrawberry.com,🚀 全局选择
+- DOMAIN-SUFFIX,googleapis.cn,🚀 全局选择
+- DOMAIN-SUFFIX,yiche.com,DIRECT
+- DOMAIN-SUFFIX,bitautotech.com,DIRECT
+- DOMAIN-SUFFIX,live.com,🚀 全局选择
+- DOMAIN-SUFFIX,pbs.twimg.com,🚀 全局选择
+- DOMAIN-SUFFIX,microsoft.com,DIRECT
+- DOMAIN,clash.razord.top,DIRECT
+- DOMAIN,yacd.haishan.me,DIRECT
+- DOMAIN-SUFFIX,jzmedia.xyz,DIRECT
+- DOMAIN-SUFFIX,gitee.com,DIRECT
+- DOMAIN,free886.herokuapp.com,DIRECT
+- RULE-SET,applications,DIRECT
+- RULE-SET,icloud,DIRECT
+- RULE-SET,apple,DIRECT
+- RULE-SET,google,🚀 全局选择
+- RULE-SET,proxy,🚀 全局选择
+- RULE-SET,gfw,🚀 全局选择
+- RULE-SET,direct,DIRECT
+- RULE-SET,telegramcidr,🚀 全局选择,no-resolve
+- RULE-SET,cncidr,DIRECT
+- GEOIP,CN,DIRECT
+- MATCH,🚀 全局选择
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
+    path: ./ruleset/reject_rule.yaml
+    interval: 86400
+  icloud:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+  apple:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
+    path: ./ruleset/apple.yaml
+    interval: 86400
+  google:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
+    path: ./ruleset/google.yaml
+    interval: 86400
+  proxy:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+  direct:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
+    path: ./ruleset/direct.yaml
+    interval: 86400
+  private:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
+    path: ./ruleset/private.yaml
+    interval: 86400
+  gfw:
+    type: http
+    behavior: domain
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+  applications:
+    type: http
+    behavior: classical
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
+    path: ./ruleset/applications.yaml
+    interval: 86400
+  overseas-services:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.aiv-cdn.net
+    - +.amazon.com
+    - +.amazonvideo.com
+    - +.anthropic.com
+    - +.bamgrid.com
+    - +.bing.com
+    - +.cdninstagram.com
+    - +.chatgpt.com
+    - +.claude.ai
+    - +.copilot.microsoft.com
+    - +.cursor.com
+    - +.cursor.sh
+    - +.cursorapi.com
+    - +.discord.com
+    - +.discord.gg
+    - +.discordapp.com
+    - +.discordapp.net
+    - +.disneyplus.com
+    - +.dssott.com
+    - +.facebook.com
+    - +.fb.com
+    - +.fbcdn.net
+    - +.gemini.google.com
+    - +.github.com
+    - +.github.io
+    - +.githubassets.com
+    - +.githubusercontent.com
+    - +.google.com
+    - +.googleapis.cn
+    - +.googleapis.com
+    - +.googleusercontent.com
+    - +.googlevideo.com
+    - +.gstatic.com
+    - +.hf.co
+    - +.huggingface.co
+    - +.instagram.com
+    - +.jtvnw.net
+    - +.messenger.com
+    - +.netflix.com
+    - +.nflxext.com
+    - +.nflximg.com
+    - +.nflximg.net
+    - +.nflxso.net
+    - +.nflxvideo.net
+    - +.oaistatic.com
+    - +.oaiusercontent.com
+    - +.openai.com
+    - +.perplexity.ai
+    - +.primevideo.com
+    - +.redd.it
+    - +.reddit.com
+    - +.redditmedia.com
+    - +.redditstatic.com
+    - +.scdn.co
+    - +.spotify.com
+    - +.spotifycdn.com
+    - +.sstatic.net
+    - +.stackexchange.com
+    - +.stackoverflow.com
+    - +.steamcommunity.com
+    - +.steampowered.com
+    - +.steamstatic.com
+    - +.t.co
+    - +.t.me
+    - +.telegra.ph
+    - +.telegram.me
+    - +.telegram.org
+    - +.tiktok.com
+    - +.tiktokcdn.com
+    - +.tiktokv.com
+    - +.ttvnw.net
+    - +.twimg.com
+    - +.twitch.tv
+    - +.twitter.com
+    - +.wa.me
+    - +.whatsapp.com
+    - +.whatsapp.net
+    - +.wikimedia.org
+    - +.wikipedia.org
+    - +.x.com
+    - +.youtu.be
+    - +.youtube-nocookie.com
+    - +.youtube.com
+    - +.ytimg.com
+  domestic-services:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.126.net
+    - +.163.com
+    - +.360buyimg.com
+    - +.alicdn.com
+    - +.alipay.com
+    - +.baidu.com
+    - +.bdimg.com
+    - +.bdstatic.com
+    - +.bilibili.cn
+    - +.bilibili.com
+    - +.bilivideo.com
+    - +.deepseek.com
+    - +.douyin.com
+    - +.douyincdn.com
+    - +.douyinpic.com
+    - +.douyinvod.com
+    - +.gitee.cn
+    - +.gitee.com
+    - +.hdslb.com
+    - +.iqiyi.com
+    - +.iqiyipic.com
+    - +.jd.com
+    - +.jdcloud.com
+    - +.music.126.net
+    - +.qiyipic.com
+    - +.qlogo.cn
+    - +.qpic.cn
+    - +.qq.com
+    - +.sinaimg.cn
+    - +.taobao.com
+    - +.tencent.com
+    - +.tmall.com
+    - +.ugurl.cn
+    - +.video.qq.com
+    - +.wechat.com
+    - +.weibo.cn
+    - +.weibo.com
+    - +.xhscdn.com
+    - +.xiaohongshu.com
+    - +.zhihu.com
+    - +.zhimg.com
+    - +.zijieapi.com
+  company-internal:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.tech.bitauto.com
+    - +.yiche.com
+    - +.bitauto.com
+    - +.bitautotech.com
+    - +.inneryiche.com
+  app-direct:
+    type: inline
+    behavior: classical
+    format: yaml
+    payload:
+    - PROCESS-NAME,Bilibili
+    - PROCESS-NAME,Meituan
+    - PROCESS-NAME,NeteaseMusic
+    - PROCESS-NAME,QQ
+    - PROCESS-NAME,QQ.exe
+    - PROCESS-NAME,SunloginClient
+    - PROCESS-NAME,SunloginClient.exe
+    - PROCESS-NAME,SunloginClient_Desktop
+    - PROCESS-NAME,SunloginClient_Desktop.exe
+    - PROCESS-NAME,SunloginClient_Helper
+    - PROCESS-NAME,SunloginClient_Service.exe
+    - PROCESS-NAME,TIM
+    - PROCESS-NAME,TIM.exe
+    - PROCESS-NAME,TencentMeeting
+    - PROCESS-NAME,WXWork.exe
+    - PROCESS-NAME,WeChat
+    - PROCESS-NAME,WeChat.exe
+    - PROCESS-NAME,WeChatAppEx
+    - PROCESS-NAME,WeChatAppEx.exe
+    - PROCESS-NAME,WeCom
+    - PROCESS-NAME,Weixin
+    - PROCESS-NAME,Weixin.exe
+    - PROCESS-NAME,cloudmusic.exe
+    - PROCESS-NAME,com.autonavi.minimap
+    - PROCESS-NAME,com.dianping.v1
+    - PROCESS-NAME,com.eg.android.AlipayGphone
+    - PROCESS-NAME,com.jingdong.app.mall
+    - PROCESS-NAME,com.netease.cloudmusic
+    - PROCESS-NAME,com.oray.sunlogin
+    - PROCESS-NAME,com.sankuai.meituan
+    - PROCESS-NAME,com.sina.weibo
+    - PROCESS-NAME,com.ss.android.ugc.aweme
+    - PROCESS-NAME,com.taobao.taobao
+    - PROCESS-NAME,com.tencent.mm
+    - PROCESS-NAME,com.tencent.mobileqq
+    - PROCESS-NAME,com.tencent.wemeet.app
+    - PROCESS-NAME,com.tencent.wework
+    - PROCESS-NAME,com.xingin.xhs
+    - PROCESS-NAME,com.xunmeng.pinduoduo
+    - PROCESS-NAME,sunloginclient
+    - PROCESS-NAME,tv.danmaku.bili
+    - PROCESS-NAME,wemeetapp
+    - PROCESS-NAME,wemeetapp.exe
+    - PROCESS-NAME,企业微信
+    - PROCESS-NAME,哔哩哔哩
+  app-direct-domains:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.360buyimg.com
+    - +.alicdn.com
+    - +.alipay.com
+    - +.alipayobjects.com
+    - +.amap.com
+    - +.autonavi.com
+    - +.bilibili.com
+    - +.bilivideo.com
+    - +.dianping.com
+    - +.douyin.com
+    - +.douyinvod.com
+    - +.hdslb.com
+    - +.jd.com
+    - +.meeting.tencent.com
+    - +.meituan.com
+    - +.meituan.net
+    - +.music.126.net
+    - +.music.163.com
+    - +.oray.com
+    - +.oray.net
+    - +.pddpic.com
+    - +.pinduoduo.com
+    - +.qlogo.cn
+    - +.qpic.cn
+    - +.qq.com
+    - +.sankuai.com
+    - +.servicewechat.com
+    - +.sinaimg.cn
+    - +.taobao.com
+    - +.tbcdn.cn
+    - +.tenpay.com
+    - +.wechat.com
+    - +.weibo.cn
+    - +.weibo.com
+    - +.weibocdn.com
+    - +.weixin.com
+    - +.weixin.qq.com
+    - +.weixinbridge.com
+    - +.wemeet.qq.com
+    - +.work.weixin.qq.com
+    - +.xhscdn.com
+    - +.xiaohongshu.com
+    - +.yangkeduo.com
+  app-proxy:
+    type: inline
+    behavior: classical
+    format: yaml
+    payload:
+    - PROCESS-NAME,Cursor
+    - PROCESS-NAME,Cursor Helper
+    - PROCESS-NAME,Cursor Helper (GPU)
+    - PROCESS-NAME,Cursor Helper (Plugin)
+    - PROCESS-NAME,Cursor Helper (Renderer)
+    - PROCESS-NAME,Cursor.exe
+    - PROCESS-NAME,Discord
+    - PROCESS-NAME,Discord.exe
+    - PROCESS-NAME,Telegram
+    - PROCESS-NAME,Telegram.exe
+    - PROCESS-NAME,com.android.vending
+    - PROCESS-NAME,com.anthropic.claude
+    - PROCESS-NAME,com.discord
+    - PROCESS-NAME,com.google.android.apps.bard
+    - PROCESS-NAME,com.google.android.gms
+    - PROCESS-NAME,com.google.android.gsf
+    - PROCESS-NAME,com.google.android.youtube
+    - PROCESS-NAME,com.instagram.android
+    - PROCESS-NAME,com.instagram.barcelona
+    - PROCESS-NAME,com.openai.chatgpt
+    - PROCESS-NAME,com.twitter.android
+    - PROCESS-NAME,org.telegram.messenger
+  app-proxy-domains:
+    type: inline
+    behavior: domain
+    format: yaml
+    payload:
+    - +.anthropic.com
+    - +.cdninstagram.com
+    - +.chatgpt.com
+    - +.claude.ai
+    - +.cursor.com
+    - +.cursor.sh
+    - +.discord.com
+    - +.discord.gg
+    - +.discordapp.com
+    - +.discordapp.net
+    - +.gemini.google.com
+    - +.generativelanguage.googleapis.com
+    - +.ggpht.com
+    - +.googleplay.com
+    - +.googlevideo.com
+    - +.gvt1.com
+    - +.gvt2.com
+    - +.instagram.com
+    - +.oaistatic.com
+    - +.oaiusercontent.com
+    - +.openai.com
+    - +.play.google.com
+    - +.t.co
+    - +.t.me
+    - +.telegram.me
+    - +.telegram.org
+    - +.threads.com
+    - +.threads.net
+    - +.twimg.com
+    - +.twitter.com
+    - +.x.com
+    - +.youtu.be
+    - +.youtube.com
+    - +.ytimg.com
+find-process-mode: strict
+ipv6: false
+sniffer:
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: false
+  sniff:
+    HTTP:
+      ports:
+      - 80
+      - 8080-8880
+    TLS:
+      ports:
+      - 443
+      - 8443
+    QUIC:
+      ports:
+      - 443
+      - 8443
+  skip-domain:
+  - Mijia Cloud
+  - +.push.apple.com
+proxies:
+- password: None
+  port: 443
+  server: crosscards.site
+  skip-cert-verify: false
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: crosscards.site
+  name: 🛫 01|230ms|211Mbps
+- port: 443
+  server: 172.64.68.89
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 02|209ms|142Mbps
+- port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 03|238ms|129Mbps
+- port: 443
+  server: jgwynphotoarts.pro
+  sni: jgwynphotoarts.pro
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 04|197ms|105Mbps
+- password: None
+  port: 443
+  server: mmgr.club
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: mmgr.club
+  name: 🛫 05|176ms|100Mbps
+- port: 443
+  server: 172.64.69.89
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 06|209ms|99Mbps
+- password: 'null'
+  port: 443
+  server: carolinafreigh.fun
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: carolinafreigh.fun
+  name: 🛫 07|2226ms|93Mbps
+- password: 'null'
+  port: 443
+  server: goedkoopgeluid.icu
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: goedkoopgeluid.icu
+  name: 🛫 08|2197ms|85Mbps
+- password: None
+  port: 443
+  server: jewelscollecti.icu
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: jewelscollecti.icu
+  name: 🛫 09|2241ms|80Mbps
+- port: 8443
+  server: 18.206.28.143
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 10|232ms|67Mbps
+- port: 8443
+  server: 54.190.176.228
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 11|199ms|61Mbps
+- type: trojan
+  network: grpc
+  server: 171.22.119.74
+  port: 8446
+  password: Pass-Client-1
+  skip-cert-verify: true
+  tls: true
+  grpc-opts:
+    grpc-service-name: grpc-video-call
+  name: 🛫 12|167ms|59Mbps
+- password: None
+  port: 443
+  server: zebpay.site
+  skip-cert-verify: false
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: zebpay.site
+  name: 🛫 13|256ms|53Mbps
+- port: 443
+  server: efr-marktplatz.club
+  sni: efr-marktplatz.club
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 14|169ms|52Mbps
+- port: 443
+  server: 96.5.129.85
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 15|206ms|52Mbps
+- server: www.windowsmsidownloads.com
+  port: 443
+  type: vmess
+  uuid: 80be2deb-3b27-4775-9bd1-7f2a2b9c261b
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  network: ws
+  ws-opts:
+    path: /truth
+  name: 🛫 16|202ms|48Mbps
+- port: 8443
+  server: 44.217.145.28
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 17|232ms|47Mbps
+- port: 8443
+  server: 44.229.69.166
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 18|199ms|47Mbps
+- port: 443
+  server: 38.247.141.135
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 19|244ms|45Mbps
+- port: 443
+  server: 162.217.114.50
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 20|257ms|41Mbps
+- port: 8443
+  server: 44.248.167.117
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 21|199ms|39Mbps
+- port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 22|171ms|38Mbps
+- port: 443
+  server: 142.44.210.129
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 23|272ms|38Mbps
+- password: None
+  port: 443
+  server: berniesbodybla.fun
+  skip-cert-verify: false
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: berniesbodybla.fun
+  name: 🛫 24|208ms|38Mbps
+- server: 104.19.95.153
+  port: 443
+  type: trojan
+  password: humanity
+  udp: true
+  sni: www.calmlunch.com
+  network: ws
+  ws-opts:
+    path: /assignment
+    headers:
+      Host: www.calmlunch.com
+  name: 🛫 25|204ms|35Mbps
+- port: 8443
+  server: 35.84.133.236
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 26|192ms|35Mbps
+- server: 104.194.148.125
+  port: 443
+  type: vless
+  uuid: 167539f8-88ff-46b3-955c-4c8f7bf0f296
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: suffolkprimarycare.uk
+  reality-opts:
+    public-key: 5Xgf3UO6yZb7gCK3R3GULk8jyNIp7Sr-26YXZfSW71c
+    short-id: 13975a8e0bd50e7c
+  client-fingerprint: qq
+  network: tcp
+  name: 🛫 27|305ms|34Mbps
+- type: trojan
+  server: 172.64.150.28
+  port: 443
+  alpn:
+  - h2
+  - http/1.1
+  client-fingerprint: chrome
+  network: ws
+  password: humanity
+  sni: www.calmlunch.com
+  ws-opts:
+    path: /assignment
+  name: 🛫 28|196ms|34Mbps
+- type: trojan
+  server: 104.17.121.9
+  port: 443
+  alpn:
+  - http/1.1
+  client-fingerprint: chrome
+  network: ws
+  password: humanity
+  skip-cert-verify: true
+  sni: www.calmlunch.com
+  ws-opts:
+    headers:
+      Host: www.calmlunch.com
+    path: /assignment
+  name: 🛫 29|201ms|34Mbps
+- server: 162.159.91.211
+  port: 443
+  type: trojan
+  password: humanity
+  sni: www.calmlunch.com
+  skip-cert-verify: true
+  network: ws
+  ws-opts:
+    path: /assignment
+    headers:
+      Host: www.calmlunch.com
+  udp: true
+  name: 🛫 30|202ms|33Mbps
+- type: trojan
+  server: 104.21.103.254
+  port: 443
+  alpn:
+  - http/1.1
+  client-fingerprint: chrome
+  network: ws
+  password: humanity
+  skip-cert-verify: true
+  sni: www.calmlunch.com
+  ws-opts:
+    path: /assignment
+  name: 🛫 31|195ms|33Mbps
+- server: www.speedtest.net
+  port: 443
+  type: trojan
+  password: humanity
+  udp: true
+  sni: www.calmlunch.com
+  network: ws
+  ws-opts:
+    path: /assignment
+    headers:
+      Host: www.calmlunch.com
+  name: 🛫 32|176ms|33Mbps
+- type: trojan
+  server: 104.18.8.83
+  port: 443
+  client-fingerprint: chrome
+  network: ws
+  password: humanity
+  skip-cert-verify: true
+  sni: www.calmlunch.com
+  ws-opts:
+    headers:
+      Host: www.calmlunch.com
+    path: /assignment
+  name: 🛫 33|195ms|32Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.36
+  type: ss
+  udp: true
+  name: 🛫 34|265ms|32Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.63
+  type: ss
+  name: 🛫 35|245ms|31Mbps
+- port: 443
+  server: 4.172.245.121
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 36|262ms|31Mbps
+- client-fingerprint: safari
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 8443
+  reality-opts:
+    public-key: Q0dPyF2hFWgxL7hxntJWJammcb6zcRCyA-NOiOFrsAo
+    short-id: 1433a38abea1191c
+  server: 185.14.30.98
+  servername: twitch.tv
+  tls: true
+  type: vless
+  udp: true
+  uuid: f5e70ce3-cfb4-4df1-b25c-d19bfae627c0
+  name: 🛫 37|184ms|31Mbps
+- port: 9002
+  server: 158.173.154.2
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 38|165ms|28Mbps
+- server: 172.67.217.240
+  port: 443
+  type: trojan
+  password: humanity
+  udp: true
+  sni: www.calmlunch.com
+  network: ws
+  ws-opts:
+    path: /assignment
+    headers:
+      Host: www.calmlunch.com
+  name: 🛫 39|196ms|28Mbps
+- server: 188.114.98.0
+  port: 443
+  type: vless
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  tls: true
+  alpn:
+  - http/1.1
+  servername: n.bitpulse.me
+  client-fingerprint: unsafe
+  network: ws
+  ws-opts:
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+    headers:
+      Host: n.bitpulse.me
+  udp: true
+  name: 🛫 40|194ms|26Mbps
+- password: 'null'
+  port: 443
+  server: 185.140.209.235
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 🛫 41|206ms|26Mbps
+- port: 443
+  server: 18.200.158.139
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 42|224ms|25Mbps
+- type: vmess
+  network: ws
+  server: www.gptcloudai.com
+  port: 443
+  uuid: e70a5b70-f63c-4450-af8b-94990cdf80c0
+  skip-cert-verify: true
+  tls: true
+  alterId: 0
+  cipher: auto
+  ws-opts:
+    headers:
+      Host: www.gptcloudai.com
+    path: /truth
+  name: 🛫 43|206ms|24Mbps
+- port: 443
+  server: 62.90.77.30
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 44|264ms|23Mbps
+- password: None
+  port: 443
+  server: 82.66.235.221
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 🛫 45|204ms|23Mbps
+- port: 9002
+  server: 158.173.154.5
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 46|167ms|23Mbps
+- port: 443
+  server: 103.82.101.43
+  skip-cert-verify: true
+  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 47|161ms|22Mbps
+- port: 9002
+  server: 158.173.154.1
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 48|164ms|22Mbps
+- port: 443
+  server: 51.210.167.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 49|168ms|22Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.54
+  type: ss
+  name: 🛫 50|246ms|22Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.27
+  type: ss
+  name: 🛫 51|246ms|21Mbps
+- type: ss
+  server: 202.50.253.72
+  port: 19999
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  skip-cert-verify: true
+  udp: true
+  name: 🛫 52|270ms|21Mbps
+- port: 443
+  server: 116.202.172.99
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 53|143ms|21Mbps
+- port: 443
+  server: 185.246.153.42
+  skip-cert-verify: true
+  sni: 482c8436a1f7c908b48a1757abb5dd79-3791fb4df2db250b.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 54|202ms|21Mbps
+- port: 443
+  server: 103.82.101.44
+  skip-cert-verify: true
+  sni: f3a61d8406d537345747f99f8a281007-3f754ed5da1bba09.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 55|158ms|21Mbps
+- port: 9002
+  server: 158.173.154.3
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 56|165ms|21Mbps
+- port: 443
+  server: 213.109.163.119
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 57|146ms|21Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.99
+  sub_tag: A004-260618
+  type: ss
+  udp: true
+  name: 🛫 58|241ms|21Mbps
+- port: 443
+  server: 193.233.75.115
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 59|179ms|21Mbps
+- server: www.ubuntuupdates.com
+  port: 443
+  type: vmess
+  uuid: 83b09a64-1eaf-4c4d-89ed-866d4b6b8115
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  servername: www.ubuntuupdates.com
+  network: ws
+  ws-opts:
+    path: /truth
+    headers:
+      Host: www.ubuntuupdates.com
+  name: 🛫 60|203ms|21Mbps
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 82.196.9.7
+  sni: 52c40907.acsnet.co
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 🛫 61|261ms|21Mbps
+- port: 9002
+  server: 158.173.154.4
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 62|160ms|20Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.18
+  sub_tag: B007-260618
+  type: ss
+  udp: true
+  name: 🛫 63|252ms|20Mbps
+- type: ss
+  server: 202.50.253.45
+  port: 19999
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  skip-cert-verify: true
+  udp: true
+  name: 🛫 64|249ms|20Mbps
+- port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 65|360ms|19Mbps
+- password: '1234'
+  port: 2080
+  server: 54.151.242.187
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  type: http
+  username: '1234'
+  udp: true
+  name: 🛫 66|76ms|19Mbps
+- port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 67|220ms|19Mbps
+- port: 443
+  server: 87.106.223.158
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 68|199ms|19Mbps
+- password: '1234'
+  port: 2080
+  server: 52.221.234.145
+  skip-cert-verify: true
+  type: http
+  username: '1234'
+  name: 🛫 69|83ms|19Mbps
+- port: 443
+  server: 79.76.126.155
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 70|165ms|19Mbps
+- port: 443
+  server: 185.238.168.20
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 71|167ms|19Mbps
+- type: ss
+  server: 202.50.253.81
+  port: 19999
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  skip-cert-verify: true
+  udp: true
+  name: 🛫 72|246ms|18Mbps
+- port: 443
+  server: 216.107.139.82
+  skip-cert-verify: true
+  sni: 991cc80f13caf81d3426ddebb2da7f49-92ff472ddc24e5b7.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 73|263ms|18Mbps
+- port: 443
+  server: 91.92.250.33
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 74|235ms|18Mbps
+- port: 443
+  server: 185.238.170.10
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 75|221ms|18Mbps
+- type: trojan
+  server: 193.239.160.134
+  port: 443
+  password: humanity
+  udp: true
+  tls: true
+  servername: www.calmlunch.com
+  sni: www.calmlunch.com
+  skip-cert-verify: true
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /assignment
+  name: 🛫 76|256ms|17Mbps
+- type: vless
+  server: saas.sin.fan
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  udp: true
+  tls: true
+  servername: n.bitpulse.me
+  sni: n.bitpulse.me
+  skip-cert-verify: true
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+    headers:
+      Host: n.bitpulse.me
+  name: 🛫 77|209ms|17Mbps
+- server: 155.212.240.10
+  port: 443
+  type: vless
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  tls: true
+  servername: n.bitpulse.me
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+    headers:
+      Host: n.bitpulse.me
+  udp: true
+  name: 🛫 78|143ms|17Mbps
+- port: 343
+  server: 133.18.200.207
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 79|119ms|17Mbps
+- port: 9090
+  server: 167.172.76.176
+  sub_tag: R002-260618
+  type: http
+  udp: true
+  name: 🛫 80|231ms|17Mbps
+- port: 443
+  server: 217.92.132.233
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 81|288ms|17Mbps
+- port: 443
+  server: 185.219.159.16
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 82|227ms|16Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.90
+  type: ss
+  udp: true
+  name: 🛫 83|250ms|16Mbps
+- port: 443
+  server: 103.86.117.202
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 84|223ms|16Mbps
+- port: 443
+  server: 82.65.162.76
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 85|210ms|16Mbps
+- password: '1234'
+  port: 2080
+  server: 13.250.6.200
+  skip-cert-verify: true
+  type: http
+  udp: true
+  username: '1234'
+  name: 🛫 86|100ms|15Mbps
+- port: 443
+  server: 103.86.116.118
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 87|222ms|14Mbps
+- port: 443
+  server: 217.210.129.243
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 88|297ms|14Mbps
+- port: 8443
+  server: 188.120.225.125
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 89|287ms|14Mbps
+- password: 'null'
+  port: 443
+  server: 103.97.88.154
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 🛫 90|146ms|14Mbps
+- port: 443
+  server: 176.94.74.21
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 91|273ms|13Mbps
+- port: 443
+  server: 31.186.220.204
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 92|238ms|13Mbps
+- port: 4443
+  server: 83.172.143.53
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 93|247ms|12Mbps
+- password: '8888'
+  port: 1080
+  server: 47.236.168.243
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  type: socks5
+  username: '8888'
+  udp: true
+  name: 🛫 94|100ms|12Mbps
+- server: 104.25.239.113
+  port: 2053
+  type: trojan
+  password: gHQP0D7D15
+  udp: true
+  sni: marvdasht.phonecomparisonblog.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: marvdasht.phonecomparisonblog.org
+  name: 🛫 95|206ms|11Mbps
+- type: vless
+  server: 185.78.76.166
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  udp: true
+  tls: true
+  servername: n.bitpulse.me
+  sni: n.bitpulse.me
+  skip-cert-verify: true
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+    headers:
+      Host: n.bitpulse.me
+  name: 🛫 96|270ms|11Mbps
+- port: 443
+  server: 154.26.139.24
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 97|129ms|9Mbps
+- password: 0324fbc29561
+  port: 443
+  server: 56481.df6h451rh.xin
+  skip-cert-verify: true
+  sni: images.ctfassets.net
+  type: anytls
+  udp: true
+  name: 🛫 98|236ms|8Mbps
+- server: nickgus.cc.cd
+  port: 443
+  type: vmess
+  uuid: 56eee791-99e8-4e11-9d27-539b46c14368
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  network: ws
+  ws-opts:
+    path: /photos
+  name: 🛫 99|220ms|6Mbps
+- port: 443
+  server: 185.246.153.28
+  skip-cert-verify: true
+  sni: 4a8c2906c96058315dffbc2b0e7ff19b-0c66a58858a795df.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 100|209ms|5Mbps
+- port: 443
+  server: 194.186.179.62
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 101|340ms|5Mbps
+- password: None
+  port: 443
+  server: 148.135.10.80
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 102|193ms|5Mbps
+- password: exaxgqkKkd0TAMrCxeonWg==
+  port: 1443
+  server: twmoon1-cdn-route.couldflare-cdn.com
+  sni: twmoon1-cdn-route.couldflare-cdn.com
+  tls: true
+  type: http
+  udp: true
+  username: mrwdfNTD8M79LCukCieldrqZWqs=
+  name: 🛫 103|92ms|4Mbps
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 162.243.146.243
+  sni: a2f392f3.acsnet.co
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 🛫 104|210ms|4Mbps
+- client-fingerprint: firefox
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 8443
+  reality-opts:
+    public-key: dPa581kev2x9-st7VQ-DTh3NjXlHJ2830YDySuI8n2U
+    short-id: e723d26df67888b9
+  server: 147.45.51.171
+  servername: twitch.tv
+  tls: true
+  type: vless
+  udp: true
+  uuid: f5e70ce3-cfb4-4df1-b25c-d19bfae627c0
+  name: 🛫 105|244ms|4Mbps
+- port: 3128
+  server: 119.28.24.235
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 106|51ms|3Mbps
+proxy-groups:
+- name: 🚀 全局选择
+  type: select
+  proxies:
+  - 🛫 前置节点
+  - DIRECT
+- name: 🛫 前置节点
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+  interval: 180
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
+  lazy: false
+  proxies:
+  - 🛫 01|230ms|211Mbps
+  - 🛫 02|209ms|142Mbps
+  - 🛫 03|238ms|129Mbps
+  - 🛫 04|197ms|105Mbps
+  - 🛫 05|176ms|100Mbps
+  - 🛫 06|209ms|99Mbps
+  - 🛫 07|2226ms|93Mbps
+  - 🛫 08|2197ms|85Mbps
+  - 🛫 09|2241ms|80Mbps
+  - 🛫 10|232ms|67Mbps
+  - 🛫 11|199ms|61Mbps
+  - 🛫 12|167ms|59Mbps
+  - 🛫 13|256ms|53Mbps
+  - 🛫 14|169ms|52Mbps
+  - 🛫 15|206ms|52Mbps
+  - 🛫 16|202ms|48Mbps
+  - 🛫 17|232ms|47Mbps
+  - 🛫 18|199ms|47Mbps
+  - 🛫 19|244ms|45Mbps
+  - 🛫 20|257ms|41Mbps
+  - 🛫 21|199ms|39Mbps
+  - 🛫 22|171ms|38Mbps
+  - 🛫 23|272ms|38Mbps
+  - 🛫 24|208ms|38Mbps
+  - 🛫 25|204ms|35Mbps
+  - 🛫 26|192ms|35Mbps
+  - 🛫 27|305ms|34Mbps
+  - 🛫 28|196ms|34Mbps
+  - 🛫 29|201ms|34Mbps
+  - 🛫 30|202ms|33Mbps
+  - 🛫 31|195ms|33Mbps
+  - 🛫 32|176ms|33Mbps
+  - 🛫 33|195ms|32Mbps
+  - 🛫 34|265ms|32Mbps
+  - 🛫 35|245ms|31Mbps
+  - 🛫 36|262ms|31Mbps
+  - 🛫 37|184ms|31Mbps
+  - 🛫 38|165ms|28Mbps
+  - 🛫 39|196ms|28Mbps
+  - 🛫 40|194ms|26Mbps
+  - 🛫 41|206ms|26Mbps
+  - 🛫 42|224ms|25Mbps
+  - 🛫 43|206ms|24Mbps
+  - 🛫 44|264ms|23Mbps
+  - 🛫 45|204ms|23Mbps
+  - 🛫 46|167ms|23Mbps
+  - 🛫 47|161ms|22Mbps
+  - 🛫 48|164ms|22Mbps
+  - 🛫 49|168ms|22Mbps
+  - 🛫 50|246ms|22Mbps
+  - 🛫 51|246ms|21Mbps
+  - 🛫 52|270ms|21Mbps
+  - 🛫 53|143ms|21Mbps
+  - 🛫 54|202ms|21Mbps
+  - 🛫 55|158ms|21Mbps
+  - 🛫 56|165ms|21Mbps
+  - 🛫 57|146ms|21Mbps
+  - 🛫 58|241ms|21Mbps
+  - 🛫 59|179ms|21Mbps
+  - 🛫 60|203ms|21Mbps
+  - 🛫 61|261ms|21Mbps
+  - 🛫 62|160ms|20Mbps
+  - 🛫 63|252ms|20Mbps
+  - 🛫 64|249ms|20Mbps
+  - 🛫 65|360ms|19Mbps
+  - 🛫 66|76ms|19Mbps
+  - 🛫 67|220ms|19Mbps
+  - 🛫 68|199ms|19Mbps
+  - 🛫 69|83ms|19Mbps
+  - 🛫 70|165ms|19Mbps
+  - 🛫 71|167ms|19Mbps
+  - 🛫 72|246ms|18Mbps
+  - 🛫 73|263ms|18Mbps
+  - 🛫 74|235ms|18Mbps
+  - 🛫 75|221ms|18Mbps
+  - 🛫 76|256ms|17Mbps
+  - 🛫 77|209ms|17Mbps
+  - 🛫 78|143ms|17Mbps
+  - 🛫 79|119ms|17Mbps
+  - 🛫 80|231ms|17Mbps
+  - 🛫 81|288ms|17Mbps
+  - 🛫 82|227ms|16Mbps
+  - 🛫 83|250ms|16Mbps
+  - 🛫 84|223ms|16Mbps
+  - 🛫 85|210ms|16Mbps
+  - 🛫 86|100ms|15Mbps
+  - 🛫 87|222ms|14Mbps
+  - 🛫 88|297ms|14Mbps
+  - 🛫 89|287ms|14Mbps
+  - 🛫 90|146ms|14Mbps
+  - 🛫 91|273ms|13Mbps
+  - 🛫 92|238ms|13Mbps
+  - 🛫 93|247ms|12Mbps
+  - 🛫 94|100ms|12Mbps
+  - 🛫 95|206ms|11Mbps
+  - 🛫 96|270ms|11Mbps
+  - 🛫 97|129ms|9Mbps
+  - 🛫 98|236ms|8Mbps
+  - 🛫 99|220ms|6Mbps
+  - 🛫 100|209ms|5Mbps
+  - 🛫 101|340ms|5Mbps
+  - 🛫 102|193ms|5Mbps
+  - 🛫 103|92ms|4Mbps
+  - 🛫 104|210ms|4Mbps
+  - 🛫 105|244ms|4Mbps
+  - 🛫 106|51ms|3Mbps
