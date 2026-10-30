@@ -27,7 +27,6 @@ FRONT_TEST_GROUP = '🛫 前置节点'
 # 用户自己的订阅：流水线拉下来当免测前置用，直接写进配置；客户端不再需要拉 provider。
 # 注意：地址写在仓库里，token 会随仓库公开。
 EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
-EXT_PREFIX = '🛫 订阅 '
 EXT_GROUP = '🛫 yieti'
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
@@ -248,7 +247,7 @@ def external_fronts(url=EXT_SUB_URL):
             continue
         seen.add(key)
         item = copy.deepcopy(node)
-        name = EXT_PREFIX + str(node.get('name') or f'{len(nodes) + 1:02d}')
+        name = str(node.get('name') or f'{len(nodes) + 1:02d}')
         while name in names:
             name += '·'
         names.add(name)
@@ -320,9 +319,14 @@ def render_chain(base, fronts, landings, ext_fronts=()):
     config['ipv6'] = False
     config.setdefault('dns', {})['ipv6'] = False
     front_nodes, front_names = _front_nodes(fronts)
-    ext_nodes = [copy.deepcopy(node) for node in ext_fronts]
-    ext_names = [node['name'] for node in ext_nodes]
     landing_nodes = [copy.deepcopy(node) for node in landings]
+    ext_nodes = [copy.deepcopy(node) for node in ext_fronts]
+    taken = set(front_names) | {node['name'] for node in landing_nodes}
+    for node in ext_nodes:
+        while node['name'] in taken:
+            node['name'] += '·'
+        taken.add(node['name'])
+    ext_names = [node['name'] for node in ext_nodes]
     for node in landing_nodes:
         # 原来的 landing provider 用 override 挂前置，内联后逐个节点挂。
         node['dialer-proxy'] = FRONT_GROUP

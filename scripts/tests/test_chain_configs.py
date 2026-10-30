@@ -61,7 +61,7 @@ def landings_fixture():
     ]
 
 def ext_fixture():
-    return [{'name': '🛫 订阅 美国01', 'server': '9.9.9.9', 'port': 443, 'type': 'vless'}]
+    return [{'name': 'US 官方优选 187ms', 'server': '9.9.9.9', 'port': 443, 'type': 'vless'}]
 
 class SelectionTest(unittest.TestCase):
     def setUp(self):
@@ -169,21 +169,22 @@ class RenderTest(unittest.TestCase):
             client = session.return_value.__enter__.return_value
             client.get.return_value.text = payload
             nodes = cc.external_fronts('https://example.invalid/sub')
-        self.assertEqual([n['name'] for n in nodes], ['🛫 订阅 US01'])
+        self.assertEqual([n['name'] for n in nodes], ['US01'])
         self.assertEqual(client.get.call_args.kwargs['headers']['User-Agent'], 'clash-verge/v1.0')
 
     def test_external_subscription_nodes_get_their_own_group(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
         names = {g['name']: g for g in config['proxy-groups']}
         self.assertNotIn('proxy-providers', config)
-        self.assertEqual([p['name'] for p in config['proxies']][1], '🛫 订阅 美国01')
+        # 名字保留订阅里的原样，不加前缀。
+        self.assertEqual([p['name'] for p in config['proxies']][1], 'US 官方优选 187ms')
         # 前置组只有两个选项：自动前置、yieti 分组。
         self.assertEqual(names[cc.FRONT_GROUP]['proxies'], [cc.AUTO_GROUP, cc.EXT_GROUP])
         # yieti 是手动选择，不测速。
         self.assertEqual(names[cc.EXT_GROUP]['type'], 'select')
-        self.assertEqual(names[cc.EXT_GROUP]['proxies'], ['🛫 订阅 美国01'])
-        self.assertNotIn('🛫 订阅 美国01', names[cc.AUTO_GROUP]['proxies'])
-        self.assertNotIn('🛫 订阅 美国01', names[cc.US_GROUP]['proxies'])
+        self.assertEqual(names[cc.EXT_GROUP]['proxies'], ['US 官方优选 187ms'])
+        self.assertNotIn('US 官方优选 187ms', names[cc.AUTO_GROUP]['proxies'])
+        self.assertNotIn('US 官方优选 187ms', names[cc.US_GROUP]['proxies'])
 
     def test_front_group_has_no_subscription_choice_when_it_is_empty(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), [])
