@@ -142,7 +142,7 @@ def latest_cohort(report):
 
 def download(row):
     for key, validator, label in (
-            ('high_speed_download', high_speed.passed, '100MB双轮'),
+            ('high_speed_download', high_speed.passed, '100MB'),
             ('medium_speed_download', medium_speed.passed, '5MB'),
             ('download', lambda x: x.get('status') == 'passed', '1MB')):
         item = row.get(key) or {}
@@ -312,7 +312,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         else:
             rows += ['尚无同口径的上一轮结果，本轮作为稳定性新策略的起点。', '']
     explanation = ('P95／P99取Google／YouTube各自成功请求统计中较慢的一站，波动为较大的四分位距；失败由成功率和连续失败次数单独计入排名。成功样本较少时P99接近最大值，仅作参考；每站样本数见JSON。' if continuous else '延迟取最终五轮Google／YouTube中较慢的中位数，波动取较大的极差。')
-    rows += ['', explanation + '下行优先双100MB较低速度，上行取两轮5MB较低速度；名称延迟仍用中位数。', '']
+    rows += ['', explanation + '下行用100MB实测速度，上行取两轮5MB较低速度；名称延迟仍用中位数。', '']
     excluded = [r for r in cohort if r['id'] not in selected_ids]
     if mode != 'full':
         rows += ['## 最近一轮未入选原因', '', '| 节点 | 原因 |', '|---|---|']
@@ -370,7 +370,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '| 6 | 1MB下载 | 6秒内完整下载，所有入选节点必过 |',
              '| 补充 | FAST API／Netflix CDN | 1MB通过后获取3个不同CDN主机，依次各下载1MB（各6秒）；仅明确证书错误影响淘汰 |',
              '| 7 | 5MB下载 | 10秒内完成才进入中速组 |',
-             '| 8 | 双100MB下载 | Cloudflare和DataPacket各20秒内完成才进入高速组 |',
+             '| 8 | Cloudflare 100MB | 20秒内完成才进入高速组 |',
              '| 9 | 上行及负载 | 复用本轮3MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',
              '| 10 | 负载后SSL | 再检查四个应用域名，各两次 |',
              (f'| 并行 | 持续稳定性 | TCP与3MB上传通过即启动独立观察；{"每节点至少" + str(minimum_rounds) + "轮" if minimum_rounds else "不设固定轮数"}，{interval_text}，成功率≥90%；持续到两轮上行及负载后SSL结束，再补每节点一轮；明确证书错误淘汰 |' if continuous else '| 11 | 间隔稳定性 | 五轮，轮间至少30秒，204／Google／YouTube／ChatGPT trace／Android SSL全部通过 |'), '']

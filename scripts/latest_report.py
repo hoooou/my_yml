@@ -133,7 +133,7 @@ def stage_summary(report, website_gate=None):
             samples.append(attempts[index] if len(attempts) > index else {})
         rows.append(counts(f'high_{index + 1}', ('Cloudflare' if index == 0 else 'DataPacket') + ' 100MB',
                            samples, lambda x, url=url: high_speed.sample_passed(x, url), '1MB未通过，未进行100MB下载'))
-    add('high', '双100MB下载（高速组）', 'high_speed_download', high_speed.passed, '未完成双目标100MB检测')
+    add('high', '100MB下载（高速组）', 'high_speed_download', high_speed.passed, '未完成100MB检测')
     add('upload', '两轮上行及上传中204', 'upload', upload_speed.passed, '未进入合格候选池，未进行两轮上行检测')
     if modern:
         rows.append(counts('upload_observation', '上行观测完整性（非速度门槛）',

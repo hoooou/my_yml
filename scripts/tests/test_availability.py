@@ -97,8 +97,8 @@ class AvailabilityTests(unittest.TestCase):
                     'high_speed_download': verified_high(i+5)} for i in range(40)]
         records[39]['download']['status'] = 'failed'
         records[38]['high_speed_download']['status'] = 'failed'
-        records[37]['high_speed_download']['attempts'][1]['elapsed_ms'] = 20001
-        records[36]['high_speed_download']['attempts'][1]['received_bytes'] = 99_999_999
+        records[37]['high_speed_download']['attempts'][0]['elapsed_ms'] = 20001
+        records[36]['high_speed_download']['attempts'][0]['received_bytes'] = 99_999_999
         # Historical single-target data cannot be promoted to double-round evidence.
         records[35]['high_speed_download'] = result
         mapping = {r['id']: {'name': r['id'], 'type': 'http', 'server': '8.8.8.8', 'port': 80} for r in records}
@@ -147,7 +147,7 @@ class AvailabilityTests(unittest.TestCase):
         a.merge_shards(bundle, [part], 1)
         for key, value in [('status','skipped'), ('received_bytes',99_999_999), ('elapsed_ms',20001), ('speed_mib_s',float('inf'))]:
             invalid = copy.deepcopy(part)
-            invalid['records'][0]['high_speed_download']['attempts'][1][key] = value
+            invalid['records'][0]['high_speed_download']['attempts'][0][key] = value
             with self.assertRaises(ValueError): a.merge_shards(bundle, [invalid], 1)
         invalid = copy.deepcopy(part)
         invalid['records'][0]['high_speed_download']['attempts'].pop()
@@ -217,7 +217,7 @@ class AvailabilityTests(unittest.TestCase):
                 self.assertIsNone(result['high_speed_download_settings']['selection_limit'])
                 self.assertEqual(result['high_speed_selection_policy'],
                                  {'max_elapsed_seconds': 20, 'selection_limit': None, 'required_urls': list(a.high_speed.URLS),
-                                  'required_bytes_per_round': 100_000_000, 'required_rounds': 2,
+                                  'required_bytes_per_round': 100_000_000, 'required_rounds': 1,
                                   'speed_aggregation': 'minimum_of_completed_rounds', 'selected_count': 0})
                 self.assertEqual(result['routing_policy']['group_count'], len(config['proxy-groups']))
             finally:

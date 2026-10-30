@@ -1,4 +1,4 @@
-"""Two complete downloads from independent targets qualify the high-speed pool."""
+"""One complete 100MB download qualifies the high-speed pool."""
 import math
 
 VERSION = 2
@@ -9,7 +9,6 @@ WORKERS = 2
 MIN_MEDIUM_SPEED_MIB_S = 4.0
 URLS = (
     'https://speed.cloudflare.com/__down?bytes=100000000',
-    'http://hkg.download.datapacket.com/100mb.bin',
 )
 
 

@@ -86,7 +86,7 @@ def _landing_gates(record, mapping):
         return False
     if (record.get('quick3_download') or {}).get('status') != 'passed':
         return False
-    # 落地是整条链的出口，100MB 双目标不过就不收。
+    # 落地是整条链的出口，100MB 单目标不过就不收。
     if not high_speed.passed(record.get('high_speed_download') or {}):
         return False
     if (record.get('upload_precheck') or {}).get('status') != 'passed':

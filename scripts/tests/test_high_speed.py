@@ -55,15 +55,15 @@ class DoubleDownloadTests(unittest.TestCase):
             [(1234, 100_000_000, 20, url) for url in high_speed.URLS])
         self.assertTrue(a.high_speed_eligible(records[0]))
 
-    def test_one_failure_still_records_both_targets_and_blocks_only_high_speed(self):
+    def test_one_failure_blocks_only_high_speed(self):
         from test_availability import AvailabilityTests
-        for failed_index in (0, 1):
+        for failed_index in (0,):
             samples = verified_high()['attempts']
             samples[failed_index].update(status='failed', received_bytes=12, speed_mib_s=None)
             with patch.object(a, 'download_sample', side_effect=samples) as measure:
                 result = a.high_speed_download(1234)
-            self.assertEqual(measure.call_count, 2)
-            self.assertEqual(result['passed_count'], 1)
+            self.assertEqual(measure.call_count, 1)
+            self.assertEqual(result['passed_count'], 0)
             self.assertEqual(result['status'], 'failed')
             self.assertIsNone(result['speed_mib_s'])
             record = {'id': 'n-a', 'app_tls': verified_tls(), 'entry': {'status': 'passed'},
@@ -75,23 +75,20 @@ class DoubleDownloadTests(unittest.TestCase):
             self.assertEqual(groups['⚡ 高速下载'], ['REJECT'])
             self.assertEqual(groups['⭐ 综合优选'], [record['name']])
 
-    def test_bottleneck_speed_and_complete_evidence_required(self):
-        samples = [verified_high(20)['attempts'][0], verified_high(5)['attempts'][1]]
-        result = high_speed.summarize(samples)
+    def test_single_complete_round_required(self):
+        sample = verified_high(20)['attempts'][0]
+        result = high_speed.summarize([sample])
         self.assertTrue(high_speed.passed(result))
-        self.assertEqual(result['speed_mib_s'], 5)
-        self.assertEqual(high_speed.result_counts([{'high_speed_download': samples[0]}])['passed'], 0)
-        self.assertEqual(high_speed.result_counts([{'high_speed_download': samples[0]}])['unverified'], 1)
-        for mutation in ('missing_round', 'same_url', 'old_50mb', 'over_time', 'partial', 'fake_speed', 'fake_summary'):
+        self.assertEqual(result['speed_mib_s'], 20)
+        self.assertEqual(high_speed.result_counts([{'high_speed_download': {} }])['unverified'], 1)
+        for mutation in ('missing_round', 'over_time', 'partial', 'fake_speed', 'fake_summary'):
             bad = copy.deepcopy(result)
-            second = bad['attempts'][1]
+            attempt = bad['attempts'][0]
             if mutation == 'missing_round': bad['attempts'].pop()
-            elif mutation == 'same_url': second['url'] = high_speed.URLS[0]
-            elif mutation == 'old_50mb': second.update(requested_bytes=50_000_000, received_bytes=50_000_000)
-            elif mutation == 'over_time': second['elapsed_ms'] = 20001
-            elif mutation == 'partial': second['received_bytes'] -= 1
-            elif mutation == 'fake_speed': second['speed_mib_s'] = 500
-            else: bad['speed_mib_s'] = 20
+            elif mutation == 'over_time': attempt['elapsed_ms'] = 20001
+            elif mutation == 'partial': attempt['received_bytes'] -= 1
+            elif mutation == 'fake_speed': attempt['speed_mib_s'] = 500
+            else: bad['speed_mib_s'] = 21
             self.assertFalse(high_speed.passed(bad), mutation)
 
     def test_each_target_rejects_wrong_length_type_redirect_and_partial_response(self):

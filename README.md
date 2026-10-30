@@ -45,7 +45,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 
 排序：已有的 5MB 下载速度（没有则用 1MB）→ 国内 TCP 延迟。不按地区筛，美国节点同样可以当前置；前置少于 3 个时退回单跳，文件头会注明原因。
 
-落地侧（`后置配置.yaml`）：预检、必过站点、应用 TLS、1MB、3MB、上行预检、100MB 双目标全部通过（5MB 低于 4MiB/s 的节点不提交 100MB，直接排除），稳定性有记录时也要通过；只收 TCP 类型，hysteria2／tuic／wireguard 不收（前置转发不了 UDP），并排除 Cloudflare。名字按出口国家重新编号（`美国01|…`），链式配置的地区组按这个前缀筛。
+落地侧（`后置配置.yaml`）：预检、必过站点、应用 TLS、1MB、3MB、上行预检、100MB 单目标一轮全部通过（5MB 低于 4MiB/s 的节点不提交，直接排除），稳定性有记录时也要通过；只收 TCP 类型，hysteria2／tuic／wireguard 不收（前置转发不了 UDP），并排除 Cloudflare。名字按出口国家重新编号（`美国01|…`），链式配置的地区组按这个前缀筛。
 
 已知限制：链式必然增加延迟；前置只测自己这一段（回国、出国、TLS），不单独跑下载测速；`v2rayN.txt`不挂链。
 
@@ -54,7 +54,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 | 🚀 全局选择 | 选择分组或直接手动选择任一已发布节点（含免测节点）；默认综合优选 |
 | ⭐ 综合优选 | 入口、逐站可达、应用SSL及1MB通过，持续稳定性≥90%；综合组取本轮≥99%（不足时取最高成功率档）且结束已恢复的节点，多轮历史不稳者不进综合组 |
 | 🚄 中速下载 | 已入选合格池内完整通过5MB快测的节点，包含台湾／新加坡地区池 |
-| ⚡ 高速下载 | 综合合格池内Cloudflare和DataPacket双100MB都完整通过；取较慢一次速度排序 |
+| ⚡ 高速下载 | 综合合格池内 Cloudflare 100MB 完整通过；按该次速度排序 |
 | 🏠 非机房 IP | 综合合格池内明确hosting=false、没有已发现的出口矛盾；按独立出口IP去重 |
 | 🌏 台湾／新加坡 | trace确认TW/SG；入口、必过网站/API、SSL、1MB和稳定性仍须通过，上传速度用于分级 |
 | 🍓 小草莓（免测） | 用户指定订阅在最终生成时追加，保留原名称；独立select手动分组，不测速、不淘汰、不进入各优选组 |
@@ -65,7 +65,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 
 全局组使用select、default-selected为综合优选；其他组使用url-test，切换容差50ms。HTTPS 200（claude.ai/cdn-cgi/trace）延迟检查每300秒一次、5秒超时、期望200、关闭lazy。客户端支持时可手动固定节点，节点不可用时可能自动切换出口。[Mihomo分组字段](https://wiki.metacubex.one/config/proxy-groups/)
 
-节点名称：`美国01|120ms|85Mbps|机房|纯净度99.2%`。延迟使用实际请求中位数；带宽优先双100MB较低值，再用通过的5MB或1MB。第四段按出口 IP 的类型显示`机房`／`住宅`／`移动网络`／`未知`：`机房`是 hosting=true 的数据中心地址，`住宅`要求 hosting=false 且运营商类型为 isp，`移动网络`是 is_mobile，其余一律`未知`——**未知不等于住宅**。住宅也不保证快速或稳定。
+节点名称：`美国01|120ms|85Mbps|机房|纯净度99.2%`。延迟使用实际请求中位数；带宽优先100MB实测速度，再用通过的5MB或1MB。第四段按出口 IP 的类型显示`机房`／`住宅`／`移动网络`／`未知`：`机房`是 hosting=true 的数据中心地址，`住宅`要求 hosting=false 且运营商类型为 isp，`移动网络`是 is_mobile，其余一律`未知`——**未知不等于住宅**。住宅也不保证快速或稳定。
 
 ## 当前筛选流程
 
@@ -82,8 +82,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 | 6 | Cloudflare 1MB快测 | `https://speed.cloudflare.com/__down?bytes=1000000`，6秒内完整接收；所有入选节点必过 |
 | 补充 | FAST API／Netflix CDN | 1MB通过后通过urlCount=3取得最多三个不同CDN主机，依次各下载1MB、各限6秒。普通失败只报告；明确证书错误淘汰 |
 | 7 | Cloudflare 5MB快测 | `https://speed.cloudflare.com/__down?bytes=5000000`，10秒完整接收，每片最多4个并发；通过才进中速组，失败仍可继续100MB |
-| 8a | Cloudflare 100MB | `https://speed.cloudflare.com/__down?bytes=100000000`，20秒完整接收，带Referer: https://speed.cloudflare.com/ |
-| 8b | DataPacket 100MB | `http://hkg.download.datapacket.com/100mb.bin`，20秒完整接收；同节点两目标顺序测试，首轮失败也测第二轮，每片最多2节点同时测。两目标都过才进高速组 |
+| 8 | Cloudflare 100MB | `https://speed.cloudflare.com/__down?bytes=100000000`，20秒完整接收，带Referer: https://speed.cloudflare.com/；通过才进高速组 |
 | 9 | 最终上行及负载 | 复用3MB预检，再对Cloudflare上传5MB两轮、各10秒、间隔20秒；预检速度失败也完成两轮。速率、重复一致性及上传中204用于分级，TLS异常仍淘汰 |
 | 10 | 上传后SSL | 四个应用域名再次各两轮严格TLS检查 |
 | 并行 | 持续稳定性 | TCP通过后独立观察，3MB预检不阻挡观察；每轮结束随机等待3～10秒，不重叠、不限定20轮，每节点至少10分钟，每片最多8节点；排队可能延后实际间隔。持续到主流程结束，再补每节点一轮且满足最短观察时长 |

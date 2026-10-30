@@ -43,7 +43,7 @@ class LatestReportTests(unittest.TestCase):
             self.assertIn('本轮无合格节点，保留原订阅', text)
             self.assertIn('原订阅的 **17** 个节点', text)
             for label in ('FAST API', 'FAST CDN 1', 'FAST CDN 2', 'FAST CDN 3',
-                          'Cloudflare 100MB', 'DataPacket 100MB', '最终配置校验'):
+                          'Cloudflare 100MB', '最终配置校验'):
                 self.assertIn(label, text)
             self.assertEqual((root/'优选配置.yaml').read_text(), 'old subscription')
             self.assertEqual((root/'连通性报告.json').read_text(), old)

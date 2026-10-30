@@ -562,7 +562,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                 progress['medium_speed'] += medium_speed.passed(record['medium_speed_download'])
                 progress['high_speed'] += record['high_speed_download']['status'] == 'passed'
                 if progress['done'] % 100 == 0 or progress['done'] == len(nodes):
-                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，上行预检通过 {progress["upload_precheck"]}，网站完成 {progress["websites"]}，1MB下载通过 {progress["download"]}，5MB通过 {progress["medium_speed"]}，100MB双轮通过 {progress["high_speed"]}', flush=True)
+                    print(f'分阶段流水线 {progress["done"]}/{len(nodes)}：204通过 {progress["precheck"]}，TCP通过 {progress["tcp"]}，上行预检通过 {progress["upload_precheck"]}，网站完成 {progress["websites"]}，1MB下载通过 {progress["download"]}，5MB通过 {progress["medium_speed"]}，100MB通过 {progress["high_speed"]}', flush=True)
             return record
         with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             records = list(pool.map(measure, nodes))
