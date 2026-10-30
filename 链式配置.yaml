@@ -1,4 +1,4 @@
-# 链式配置；2026-10-30T16:20:20+08:00；规则复用优选配置，节点由 provider 提供
+# 链式配置；2026-10-30T17:07:12+08:00；规则复用优选配置，节点由 provider 提供
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -571,13 +571,15 @@ proxy-groups:
 - name: 🚀 全局选择
   type: select
   proxies:
-  - 🇺🇸 美国
+  - 🇺🇸 美国节点
+  - 🏢 美国机房
+  - 🏠 美国住宅
   - 🇯🇵 日本
   - 🇸🇬 新加坡
   - 🇪🇺 欧洲
   - 🌐 全部节点
   - DIRECT
-- name: 🇺🇸 美国
+- name: 🇺🇸 美国节点
   type: url-test
   url: http://www.gstatic.com/generate_204
   interval: 180
@@ -588,6 +590,28 @@ proxy-groups:
   use:
   - landing
   filter: ^美国
+- name: 🏢 美国机房
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+  interval: 180
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
+  lazy: false
+  use:
+  - landing
+  filter: ^美国.*[|]机房[|]
+- name: 🏠 美国住宅
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+  interval: 180
+  timeout: 5000
+  expected-status: 204
+  tolerance: 50
+  lazy: false
+  use:
+  - landing
+  filter: ^美国.*[|]住宅[|]
 - name: 🇯🇵 日本
   type: url-test
   url: http://www.gstatic.com/generate_204
