@@ -217,9 +217,9 @@ def _base(base):
     return {key: copy.deepcopy(base[key]) for key in BASE_KEYS if key in base}
 
 
-def _group(name, nodes, interval=180):
-    return {'name': name, 'type': 'url-test', 'url': CHECK_URL, 'interval': interval,
-            'timeout': 5000, 'expected-status': 204, 'tolerance': 50, 'lazy': False,
+def _group(name, nodes):
+    return {'name': name, 'type': 'url-test', 'url': CHECK_URL, 'interval': 120,
+            'timeout': 3000, 'expected-status': 204, 'tolerance': 300, 'lazy': False,
             'proxies': nodes}
 
 
@@ -303,8 +303,8 @@ def render_chain(base):
     config['proxy-groups'] = [
         {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP],
          'use': ['front']},
-        {'name': AUTO_GROUP, 'type': 'url-test', 'url': CHECK_URL, 'interval': 180,
-         'timeout': 5000, 'expected-status': 204, 'tolerance': 30, 'lazy': False,
+        {'name': AUTO_GROUP, 'type': 'url-test', 'url': CHECK_URL, 'interval': 120,
+         'timeout': 3000, 'expected-status': 204, 'tolerance': 300, 'lazy': False,
          'use': ['front']},
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [g['name'] for g in region_groups] + ['DIRECT']},
