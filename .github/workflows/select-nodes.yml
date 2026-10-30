@@ -538,6 +538,43 @@ jobs:
             cat .node-work/availability/full-test-report.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
+  pages:
+    name: 部署订阅到 GitHub Pages
+    needs: [publish, publish-retry, repair]
+    if: always() && (needs.publish.result == 'success' || needs['publish-retry'].result == 'success' || needs.repair.result == 'success')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 读取仓库
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+      - name: 组装 Pages 目录
+        run: |
+          mkdir -p _site
+          for f in 优选配置.yaml 链式配置.yaml 前置配置.yaml 后置配置.yaml v2rayN.txt 最新检测.json 连通性报告.json; do
+            if [ -f "$f" ]; then cp -f "$f" _site/; fi
+          done
+          ls -l _site
+      - name: 上传 Pages 产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: 部署到 GitHub Pages
+        id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
   repair:
     name: 补测或重建并更新原订阅
     if: github.event_name == 'workflow_dispatch' && (inputs.mode == 'repair' || inputs.mode == 'web-recheck' || inputs.mode == 'medium-recheck' || inputs.mode == 'stability-recheck' || inputs.mode == 'uplink-recheck')
