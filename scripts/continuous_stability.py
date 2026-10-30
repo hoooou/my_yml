@@ -26,13 +26,14 @@ IDLE_MIN = 3
 IDLE_MAX = 10
 PEER_POLL_SECONDS = 30
 STANDALONE_SECONDS = 600
-WORKERS = 8
-# 收尾阶段每个节点只差最后一次采样，不再需要维持常态的低并发：
-# 596 节点按 8 并发要 25 分钟以上，正好顶破收尾预算；提到 32 并发后约 6 分钟。
-TAIL_WORKERS = 32
-# 主流程完成（flag 置位）后，只允许再跑这么久给每个节点补最后一轮采样；
-# 之前没有 flag 之前不计时，靠作业超时兜底，不再设整轮预算。
-TAIL_SECONDS = 30 * 60
+# 观察与筛选同时结束：主流程一完成就不再排新采样，在跑的收尾即可。
+# 观察段独立于探测段（另一台 runner），并发从 8 提到 16：596 个节点一轮从约 20 分钟降到 10 分钟，
+# 一次全量（探测 25 分钟 + 上行 15 分钟）能凑出 4 轮左右，证据不至于只有一两轮。
+WORKERS = 16
+# 主流程一结束就停采样，每个节点的最后一次采样最多比主流程早一整轮，按这个容差判定证据有效性。
+MAX_LAG_SECONDS = 25 * 60
+# 只用于在跑的采样收尾，正常几秒内结束。
+DRAIN_SECONDS = 5 * 60
 PEER_JOB = '两轮上行及负载后SSL'
 
 
@@ -41,11 +42,10 @@ def settings(version=VERSION):
             'minimum_rounds': None, 'minimum_start_interval_seconds': None,
             'random_idle_seconds_range': [IDLE_MIN, IDLE_MAX],
             'minimum_idle_seconds_between_rounds': None, 'node_workers': WORKERS,
-            'tail_workers': TAIL_WORKERS,
             'requires_all_rounds': False, 'minimum_success_rate': .90,
             'parallel_independent_runner': True, 'scope': 'domestic_TCP_passed',
-            'observes_until': 'uplink_job_completed_and_one_sample_after_completion',
-            'maximum_tail_seconds': TAIL_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
+            'observes_until': 'uplink_job_completed',
+            'maximum_lag_seconds': MAX_LAG_SECONDS, 'percentiles': 'nearest_rank_successful_requests_per_target',
             'continuous_latency_hard_caps': False, 'explicit_certificate_error_rejects': True,
             'minimum_window_seconds': MIN_WINDOW_SECONDS, 'connection_modes': ['fresh', 'pooled_https'],
             'short_circuit_after_failure': False, 'p99_minimum_success_samples': 100}
@@ -89,7 +89,7 @@ def valid_evidence(result):
                 or (last_start is not None and ((start - last_end if result['version'] in (4, VERSION) else start - last_start) < interval - .001 or start < last_end))):
             return False
         last_start, last_end = start, end
-    return (last_start >= cutoff and (result['version'] != VERSION or
+    return (last_start >= cutoff - MAX_LAG_SECONDS and (result['version'] != VERSION or
         last_end - attempts[0]['started_offset_seconds'] >= MIN_WINDOW_SECONDS))
 
 
@@ -211,23 +211,25 @@ def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=
     running, cutoff, cutoff_at = {}, None, None
     next_control = next_peer = origin
     try:
-        # 池子按收尾并发建好，常态仍用 workers 限流，收尾（cutoff 之后）才放宽到 TAIL_WORKERS。
-        with futures.ThreadPoolExecutor(max_workers=max(workers, TAIL_WORKERS)) as pool:
+        with futures.ThreadPoolExecutor(max_workers=workers) as pool:
             while due or running:
                 now = clock()
-                limit = TAIL_WORKERS if cutoff is not None else workers
-                if cutoff_at is not None and now - cutoff_at > TAIL_SECONDS:
+                if cutoff_at is not None and now - cutoff_at > DRAIN_SECONDS:
                     raise RuntimeError('主流程完成后收尾超时，保留原订阅')
                 if now >= next_peer and cutoff is None:
                     if peer():
+                        # 与筛选同时结束：不再补采样，只等在跑的这一批收尾。
+                        # 还没采到第一次的节点仍补一次，否则它连证据都没有。
                         cutoff = clock() - origin
                         cutoff_at = clock()
+                        due[:] = [(t, i) for t, i in due if not attempts[i]]
+                        heapq.heapify(due)
                     next_peer = clock() + PEER_POLL_SECONDS
                 if now >= next_control:
                     control(len(attempts), origin)
                     checkpoint(attempts, cutoff, False)
                     next_control = clock() + 60
-                while due and due[0][0] <= clock() and len(running) < limit:
+                while due and due[0][0] <= clock() and len(running) < workers:
                     _, id = heapq.heappop(due)
                     running[pool.submit(probe, id, len(attempts[id]) + 1, origin)] = id
                 done = [job for job in running if job.done()]
@@ -235,8 +237,7 @@ def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=
                     id = running.pop(job)
                     item = job.result()
                     attempts[id].append(item)
-                    if not (cutoff is not None and item['started_offset_seconds'] >= cutoff
-                            and item['finished_offset_seconds'] - attempts[id][0]['started_offset_seconds'] >= MIN_WINDOW_SECONDS):
+                    if cutoff is None:
                         idle = random.uniform(IDLE_MIN, IDLE_MAX)
                         item['next_idle_seconds'] = idle
                         heapq.heappush(due, (origin + item['finished_offset_seconds'] + idle, id))
@@ -279,9 +280,10 @@ def observe(records, mapping, binary, root, peer=None):
         temp.write_text(json.dumps(result, ensure_ascii=False, indent=2))
         temp.replace(root / 'stability-results.json')
         rounds = [len(x) for x in attempts.values()]
-        tail = ''.join('，待收尾{}个'.format(sum(
+        tail = ''.join('，最新采样落后{}个'.format(sum(
             1 for items in attempts.values()
-            if not (items and items[-1]['started_offset_seconds'] >= cutoff))) if cutoff is not None else '')
+            if not (items and items[-1]['started_offset_seconds'] >= cutoff - MAX_LAG_SECONDS)))
+            if cutoff is not None else '')
         print(f'持续稳定性：{len(records)}节点，轮数{min(rounds, default=0)}～{max(rounds, default=0)}，主流程已完成{cutoff is not None}{tail}', flush=True)
         return result
     if not records:

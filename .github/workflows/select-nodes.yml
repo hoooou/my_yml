@@ -211,8 +211,7 @@ jobs:
   observe:
     name: 持续稳定性独立观察（分片 ${{ matrix.shard }}）
     needs: [prepare, preflight]
-    # 续跑时观察段要重跑：收尾采样是最容易出问题的一段，不能沿用上一轮的半成品。
-    if: always() && (inputs.source_run_id != '' || needs.preflight.result == 'success')
+    if: inputs.source_run_id == ''
     runs-on: ubuntu-24.04
     timeout-minutes: 210
     permissions:
@@ -249,15 +248,6 @@ jobs:
           pattern: availability-preflight-*
           merge-multiple: true
           path: .node-work/preflight
-      - name: 续跑：复用来源运行的输入与前置记录
-        if: inputs.source_run_id != ''
-        env:
-          SOURCE_RUN: ${{ inputs.source_run_id }}
-        run: |
-          mkdir -p .node-work/reuse .node-work/availability .node-work/preflight
-          gh run download "$SOURCE_RUN" -p availability-input -p 'availability-preflight-*' -D .node-work/reuse
-          cp -f .node-work/reuse/availability-input/*.json .node-work/availability/
-          cp -f .node-work/reuse/availability-preflight-*/*.json .node-work/preflight/
       - name: 定时观察至主筛选结束
         env:
           SHARD_INDEX: ${{ matrix.shard }}
@@ -359,7 +349,7 @@ jobs:
   publish:
     name: 合并校验并更新原订阅
     needs: [prepare, probe, uplink, observe]
-    if: always() && needs.uplink.result == 'success' && needs.observe.result == 'success' && (inputs.source_run_id != '' || needs.probe.result == 'success')
+    if: always() && needs.uplink.result == 'success' && (inputs.source_run_id != '' || (needs.probe.result == 'success' && needs.observe.result == 'success'))
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -409,11 +399,20 @@ jobs:
           merge-multiple: true
           path: .node-work/uplink
       - name: 读取持续观察分片
+        if: inputs.source_run_id == ''
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: availability-observation-*
           merge-multiple: true
           path: .node-work/observations
+      - name: 续跑：复用来源运行的观察结果
+        if: inputs.source_run_id != ''
+        env:
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+        run: |
+          mkdir -p .node-work/reuse .node-work/observations
+          gh run download "$SOURCE_RUN" -p 'availability-observation-*' -D .node-work/reuse
+          cp -f .node-work/reuse/availability-observation-*/*.json .node-work/observations/
       - name: 检查全量结果并生成订阅
         env:
           IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}

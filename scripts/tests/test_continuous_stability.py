@@ -78,7 +78,8 @@ class EvidenceTests(unittest.TestCase):
             elif fault == 'rushed': item['attempts'][1]['started_offset_seconds'] = 1
             elif fault == 'overlap': item['attempts'][0]['finished_offset_seconds'] = 31
             elif fault == 'no_peer': item['peer_completed_offset_seconds'] = None
-            elif fault == 'late_peer': item['peer_completed_offset_seconds'] = 571
+            elif fault == 'late_peer': item['peer_completed_offset_seconds'] = (
+                item['attempts'][-1]['started_offset_seconds'] + cs.MAX_LAG_SECONDS + 1)
             elif fault == 'nan': item['attempts'][0]['finished_offset_seconds'] = float('nan')
             elif fault == 'bad_round': item['attempts'][0]['round'] = 2
             else: item['attempts'][0]['sites'].pop('Google')
@@ -172,7 +173,8 @@ class ScheduleTests(unittest.TestCase):
         self.assertTrue(checkpoints[-1]); self.assertIn(False, checkpoints)
         for item in results.values():
             self.assertTrue(cs.passed(item)); self.assertGreater(item['round_count'], 20)
-            self.assertGreaterEqual(item['attempts'][-1]['started_offset_seconds'], item['peer_completed_offset_seconds'])
+            self.assertGreaterEqual(item['attempts'][-1]['started_offset_seconds'],
+                item['peer_completed_offset_seconds'] - cs.MAX_LAG_SECONDS)
             self.assertTrue(all(3 <= a['next_idle_seconds'] <= 10 for a in item['attempts'][:-1]))
             self.assertTrue(all(b['started_offset_seconds'] >= a['finished_offset_seconds'] + a['next_idle_seconds'] - .001
                 for a,b in zip(item['attempts'], item['attempts'][1:])))
@@ -181,7 +183,7 @@ class ScheduleTests(unittest.TestCase):
                 for a,b in zip(item['attempts'], item['attempts'][1:])))
 
     def test_fast_peer_does_not_wait_for_twenty_rounds(self):
-        # observe 只跟随主筛选，不再要求 600 秒独立窗口
+        # observe 与主筛选同时结束：主流程一完成就不再排采样，只补没采过的节点一次
         results, _, _ = self.run_schedule(peer_at=0)
         self.assertTrue(all(cs.passed(x) for x in results.values()))
         self.assertTrue(all(x['round_count'] < 20 for x in results.values()))
@@ -208,9 +210,10 @@ class ScheduleTests(unittest.TestCase):
             result = cs.schedule(['a','b','c','d'], probe, lambda: time.monotonic()-origin >= .04,
                 lambda *_: None, lambda attempts, cutoff, complete: attempts, workers=2)
         self.assertEqual(max(peaks), 2); self.assertEqual(active, set())
-        self.assertTrue(all(len(x) >= 2 for x in result.values()))
+        self.assertTrue(all(len(x) >= 1 for x in result.values()))
         for items in result.values():
-            self.assertGreaterEqual(items[1]['started_offset_seconds'], items[0]['finished_offset_seconds'])
+            for a, b in zip(items, items[1:]):
+                self.assertGreaterEqual(b['started_offset_seconds'], a['finished_offset_seconds'])
 
     def test_peer_queries_current_attempt_and_aborts_on_upstream_failure(self):
         env = {'GITHUB_REPOSITORY': 'owner/repo', 'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '2', 'GH_TOKEN': 'private'}
