@@ -9,7 +9,7 @@ OVERSEAS = {
     'Google': site('https://www.google.com/', ('google',), 'google.com', 'googleapis.com', 'googleapis.cn', 'gstatic.com', 'googleusercontent.com'),
     'YouTube': site('https://www.youtube.com/', ('youtube',), 'youtube.com', 'youtu.be', 'googlevideo.com', 'ytimg.com', 'youtube-nocookie.com'),
     'ChatGPT': site('https://chatgpt.com/', ('chatgpt', 'openai'), 'chatgpt.com', 'openai.com', 'oaistatic.com', 'oaiusercontent.com'),
-    'Claude': site('https://claude.ai/', ('claude', 'anthropic'), 'claude.ai', 'anthropic.com'),
+    'Claude': site('https://claude.ai/', ('claude', 'anthropic'), 'claude.ai', 'claude.com', 'claudeusercontent.com', 'anthropic.com'),
     'Gemini': site('https://gemini.google.com/', ('gemini',), 'gemini.google.com'),
     'GitHub': site('https://github.com/', ('github',), 'github.com', 'github.io', 'githubusercontent.com', 'githubassets.com'),
     'Wikipedia': site('https://www.wikipedia.org/', ('wikipedia',), 'wikipedia.org', 'wikimedia.org'),

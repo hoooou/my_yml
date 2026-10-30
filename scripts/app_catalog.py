@@ -52,7 +52,7 @@ PROXY_APPS = {
     # Desktop ChatGPT/Claude are deliberately not process-matched: their traffic follows
     # the domain lists, so helper processes cannot pin unrelated connections.
     'ChatGPT': app(['com.openai.chatgpt'], domains=['chatgpt.com', 'openai.com', 'oaistatic.com', 'oaiusercontent.com']),
-    'Claude': app(['com.anthropic.claude'], domains=['claude.ai', 'anthropic.com']),
+    'Claude': app(['com.anthropic.claude'], domains=['claude.ai', 'claude.com', 'claudeusercontent.com', 'anthropic.com']),
     'Gemini': app(['com.google.android.apps.bard'], domains=['gemini.google.com', 'generativelanguage.googleapis.com']),
     'Cursor': app([], ['Cursor', 'Cursor.exe', 'Cursor Helper', 'Cursor Helper (GPU)',
                       'Cursor Helper (Renderer)', 'Cursor Helper (Plugin)'], ['cursor.com', 'cursor.sh']),

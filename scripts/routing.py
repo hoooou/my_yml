@@ -63,19 +63,25 @@ def optimize_routing(config):
         if rule in ('DOMAIN-SUFFIX,cursor.sh,DIRECT', 'DOMAIN-SUFFIX,cursor.com,DIRECT'):
             continue
         custom.append(rule)
+    # lancidr 含 198.18.0.0/15——正是 fake-ip 段，放在前面会把只带 fake-ip、还没嗅探出域名的
+    # 连接判成局域网直连（Claude 这类就时通时不走代理）。局域网用显式私有网段先兜住，
+    # 整份 lancidr 挪到域名规则之后。
+    lan_rules = ['IP-CIDR,192.168.0.0/16,DIRECT,no-resolve', 'IP-CIDR,10.0.0.0/8,DIRECT,no-resolve',
+                 'IP-CIDR,172.16.0.0/12,DIRECT,no-resolve',
+                 'GEOIP,LAN,DIRECT,no-resolve',
+                 'IP-CIDR6,::1/128,DIRECT,no-resolve', 'IP-CIDR6,fc00::/7,DIRECT,no-resolve',
+                 'IP-CIDR6,fe80::/10,DIRECT,no-resolve', 'IP-CIDR6,fd00::/8,DIRECT,no-resolve',
+                 'IP-CIDR6,::/0,REJECT,no-resolve']
     rules = (rule_set('company-internal', 'DIRECT')
-             + rule_set('private', 'DIRECT') + rule_set('lancidr', 'DIRECT', True)
-             + ['GEOIP,LAN,DIRECT,no-resolve',
-                'IP-CIDR6,::1/128,DIRECT,no-resolve', 'IP-CIDR6,fc00::/7,DIRECT,no-resolve',
-                'IP-CIDR6,fe80::/10,DIRECT,no-resolve', 'IP-CIDR6,fd00::/8,DIRECT,no-resolve',
-                'IP-CIDR6,::/0,REJECT,no-resolve'] + rule_set('reject', 'REJECT')
+             + rule_set('private', 'DIRECT') + lan_rules + rule_set('reject', 'REJECT')
              + process_custom + rule_set('app-proxy', GLOBAL) + rule_set('app-direct', 'DIRECT')
              + rule_set('app-proxy-domains', GLOBAL) + rule_set('app-direct-domains', 'DIRECT')
              + rule_set('overseas-services', GLOBAL) + rule_set('domestic-services', 'DIRECT')
              + custom + rule_set('applications', 'DIRECT') + rule_set('icloud', 'DIRECT')
              + rule_set('apple', 'DIRECT') + rule_set('google', GLOBAL)
              + rule_set('proxy', GLOBAL) + rule_set('gfw', GLOBAL)
-             + rule_set('direct', 'DIRECT') + rule_set('telegramcidr', GLOBAL, True)
+             + rule_set('direct', 'DIRECT') + rule_set('lancidr', 'DIRECT', True)
+             + rule_set('telegramcidr', GLOBAL, True)
              + rule_set('cncidr', 'DIRECT') + ['GEOIP,CN,DIRECT', f'MATCH,{GLOBAL}'])
     config['rules'] = list(dict.fromkeys(rules))
     referenced = {rule.split(',')[1] for rule in rules if rule.startswith('RULE-SET,')}

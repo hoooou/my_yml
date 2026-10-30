@@ -43,6 +43,24 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(config['find-process-mode'], 'strict')
         self.assertIn('IP-CIDR6,::/0,REJECT,no-resolve', rules)
 
+    def test_claude_family_is_proxied_before_lan_and_fake_ip_rules(self):
+        # claude.com 早先只在 gfw 里、且 lancidr（含 fake-ip 段 198.18.0.0/15）排在域名规则前面，
+        # 只带 fake-ip、尚未嗅探出域名的连接会被判成局域网直连。
+        config = {'rule-providers': {'lancidr': {}, 'private': {}}}
+        r.optimize_routing(config)
+        rules, providers = config['rules'], config['rule-providers']
+        for name in ('app-proxy-domains', 'overseas-services'):
+            self.assertIn('+.claude.com', providers[name]['payload'], name)
+        self.assertIn('+.claude.ai', providers['overseas-services']['payload'])
+        self.assertLess(rules.index('RULE-SET,overseas-services,' + r.GLOBAL),
+                        rules.index('RULE-SET,lancidr,DIRECT,no-resolve'))
+        self.assertLess(rules.index('RULE-SET,app-proxy-domains,' + r.GLOBAL),
+                        rules.index('RULE-SET,lancidr,DIRECT,no-resolve'))
+        # 局域网仍按显式私有网段先直连，不依赖 lancidr
+        self.assertIn('IP-CIDR,192.168.0.0/16,DIRECT,no-resolve', rules)
+        self.assertLess(rules.index('IP-CIDR,192.168.0.0/16,DIRECT,no-resolve'),
+                        rules.index('RULE-SET,app-proxy,' + r.GLOBAL))
+
     def test_app_domain_fallback_and_dns_cover_every_catalog_entry(self):
         config = {}
         r.optimize_routing(config)
