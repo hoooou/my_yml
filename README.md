@@ -158,7 +158,7 @@ ChatGPT API：`api.openai.com/compliance/cookie_requirements`，要求预期地�
 
 `find-process-mode: strict` 按需识别：Android 用完整包名，macOS／Windows 用实际可执行名称。浏览器、Python、Node、Git 和通用 Helper 不整进程固定路由；未识别时回退域名规则。进程名称采用人工审核快照，不整体导入厂商前缀或被注释条目。
 
-住宅／纯净度优先来自 ipapi.is，密钥放在 Actions Secret `IPAPI_IS_KEY`。按独立出口去重查询，每轮预算 900 个 IP。没配密钥、密钥被拒（401／403／429）或个别 IP 查不出来时，自动改用免费的 ip-api.com 批量查询兜底：不需要密钥，一次最多 100 个 IP、15 次／分钟，返回 hosting／proxy／mobile 三个布尔值——hosting=true 判机房，mobile=true 判移动网络，三个都为 false 判住宅候选。兜底源没有滥用比例，所以这些节点显示“纯净度未知”，不补造数字。纯净度 = 100 ×（1 − company.abuser_score 的有效网段比例），不是账号安全概率；无 hosting 证据不推断住宅。
+住宅／纯净度优先来自 ipapi.is，密钥放在 Actions Secret `IPAPI_IS_KEY`。按独立出口去重查询，每轮预算 900 个 IP。没配密钥、密钥被拒（401／403／429）或个别 IP 查不出来时，自动改用免费的 ip-api.com 批量查询兜底：不需要密钥，一次最多 100 个 IP、15 次／分钟，返回 hosting／proxy／mobile 三个布尔值——hosting=true 判机房，mobile=true 判移动网络，三个都为 false 判住宅候选。兜底源没有滥用比例，所以这些节点显示“纯净度未知”，不补造数字。查到的结果按出口 IP 缓存在仓库里的 `IP归属缓存.json`，7 天内同一个 IP 不再重复查询，省下接口额度。纯净度 = 100 ×（1 − company.abuser_score 的有效网段比例），不是账号安全概率；无 hosting 证据不推断住宅。
 
 ## 来源与维护入口
 

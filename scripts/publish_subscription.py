@@ -11,12 +11,13 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+from ip_reputation import CACHE_FILE
 from latest_report import REPORT_FILES, readme_fragment, replace_fragment
 from published_report import repository_summary, FILENAME
 
 FILES = ('优选配置.yaml', '前置配置.yaml', '后置配置.yaml', '链式配置.yaml',
-         'v2rayN.txt', '连通性报告.json', *REPORT_FILES)
-OPTIONAL_FILES = ('前置配置.yaml', '后置配置.yaml', '链式配置.yaml')
+         'v2rayN.txt', '连通性报告.json', CACHE_FILE, *REPORT_FILES)
+OPTIONAL_FILES = ('前置配置.yaml', '后置配置.yaml', '链式配置.yaml', CACHE_FILE)
 REPORT_COMPACT_THRESHOLD = 25 * 1024 * 1024
 
 

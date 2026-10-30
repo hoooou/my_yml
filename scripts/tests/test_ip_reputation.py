@@ -13,7 +13,7 @@ class ReputationTests(unittest.TestCase):
             client = session.return_value.__enter__.return_value
             client.post.return_value.json.return_value = [
                 {'query': '8.8.8.8', 'status': 'success', 'hosting': False, 'proxy': False, 'mobile': False}]
-            result = p.lookup(['8.8.8.8', '8.8.8.8'], '')
+            result = p.lookup(['8.8.8.8', '8.8.8.8'], '', use_cache=False)
         self.assertEqual(len(result), 1)
         self.assertEqual(result['8.8.8.8']['provider'], 'ip-api.com')
         self.assertEqual(p.residence_label({'ip_reputation': result['8.8.8.8']}), '住宅候选')
@@ -26,7 +26,7 @@ class ReputationTests(unittest.TestCase):
             client.post.return_value.json.return_value = [
                 {'query': '8.8.8.8', 'status': 'success', 'hosting': True, 'proxy': False, 'mobile': False}]
             client.post.return_value.status_code = 403
-            result = p.lookup(['8.8.8.8'], 'secret-fixture')
+            result = p.lookup(['8.8.8.8'], 'secret-fixture', use_cache=False)
         self.assertEqual(client.post.call_count, 2)
         self.assertEqual(client.post.call_args_list[0].kwargs['json']['key'], 'secret-fixture')
         self.assertEqual(result['8.8.8.8']['provider'], 'ip-api.com')
@@ -55,7 +55,7 @@ class ReputationTests(unittest.TestCase):
             client = session.return_value.__enter__.return_value
             client.post.return_value.status_code = 429
             ips = [f'8.8.{i // 250}.{i % 250 + 1}' for i in range(101)]
-            result = p.lookup(ips + [ips[0]], 'secret-fixture')
+            result = p.lookup(ips + [ips[0]], 'secret-fixture', use_cache=False)
         # 主源 429 后不再重试；之后两批是免费备用源（101 个 IP 按 100 分两批），同样被拒，仍然未知。
         self.assertEqual(client.post.call_count, 3)
         payload = client.post.call_args_list[0].kwargs['json']
@@ -64,3 +64,38 @@ class ReputationTests(unittest.TestCase):
         self.assertEqual(len(result), 101)
         self.assertTrue(all(r['status'] == 'unknown' for r in result.values()))
         self.assertNotIn('secret-fixture', str(result))
+
+    def test_repeat_lookups_reuse_the_cache_without_requests(self):
+        import json, tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            with patch.object(p, 'ROOT', Path(folder)):
+                with patch.object(p.s, 'session') as session:
+                    client = session.return_value.__enter__.return_value
+                    client.post.return_value.json.return_value = [
+                        {'query': '8.8.8.8', 'status': 'success', 'hosting': True, 'proxy': False, 'mobile': False}]
+                    first = p.lookup(['8.8.8.8'], '')
+                    calls = client.post.call_count
+                    second = p.lookup(['8.8.8.8'], '')
+                entries = json.loads((Path(folder) / p.CACHE_FILE).read_text())['entries']
+        self.assertEqual(calls, 1)
+        self.assertEqual(client.post.call_count, calls)
+        self.assertEqual(first['8.8.8.8']['status'], 'success')
+        self.assertEqual(second['8.8.8.8']['status'], 'success')
+        self.assertEqual(p.residence_label({'ip_reputation': second['8.8.8.8']}), '机房')
+        self.assertIn('8.8.8.8', entries)
+
+    def test_stale_cache_entries_are_queried_again(self):
+        import json, tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / p.CACHE_FILE).write_text(json.dumps({'entries': {
+                '8.8.8.8': {'status': 'success', 'checked_at': '2020-01-01T00:00:00+08:00'}}}))
+            with patch.object(p, 'ROOT', root):
+                with patch.object(p.s, 'session') as session:
+                    client = session.return_value.__enter__.return_value
+                    client.post.return_value.json.return_value = [
+                        {'query': '8.8.8.8', 'status': 'success', 'hosting': False, 'proxy': True, 'mobile': False}]
+                    result = p.lookup(['8.8.8.8'], '')
+        self.assertEqual(client.post.call_count, 1)
+        self.assertIs(result['8.8.8.8']['is_proxy'], True)
+

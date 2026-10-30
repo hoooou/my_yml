@@ -1,7 +1,9 @@
 """IP intelligence with a free fallback. Never infer an individual IP risk score."""
 import ipaddress
+import json
 import math
 import re
+from pathlib import Path
 
 import requests
 import select_nodes as s
@@ -10,6 +12,10 @@ API_URL = 'https://api.ipapi.is/'
 # 免费备用源：不需要 key，一次最多 100 个 IP，15 次/分钟，只提供 hosting/proxy/mobile。
 FREE_URL = 'http://ip-api.com/batch'
 FREE_FIELDS = 'status,message,query,hosting,proxy,mobile'
+# 查过一次就存下来，7 天内同一个出口 IP 不再重复查；文件随发布一起提交。
+CACHE_FILE = 'IP归属缓存.json'
+CACHE_DAYS = 7
+ROOT = Path(__file__).resolve().parent.parent
 DAILY_LOOKUP_BUDGET = 900  # Per-run cap. Runs only look up download-passed exits (~140), so 4 runs/day stay under the free 1,000/day.
 
 
@@ -34,12 +40,53 @@ def normalize(ip, value):
     return result
 
 
-def lookup(ips, key):
+def cache_path():
+    return ROOT / CACHE_FILE
+
+
+def load_cache():
+    try:
+        data = json.loads(cache_path().read_text())
+    except (OSError, ValueError):
+        return {}
+    entries = data.get('entries') if isinstance(data, dict) else None
+    return entries if isinstance(entries, dict) else {}
+
+
+def save_cache(entries):
+    cache_path().write_text(json.dumps({'updated_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
+                                        'entries': entries}, ensure_ascii=False, indent=2, sort_keys=True) + '\n')
+
+
+def cache_fresh(entry, now):
+    try:
+        return (now - s.datetime.fromisoformat(entry['checked_at'])).days < CACHE_DAYS
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def lookup(ips, key, use_cache=True):
     addresses = sorted({ip for ip in ips if ip and ipaddress.ip_address(ip).is_global})
+    now = s.datetime.now(s.TZ)
+    cached = load_cache() if use_cache else {}
+    results = {ip: cached[ip] for ip in addresses if ip in cached and cache_fresh(cached[ip], now)}
+    pending = [ip for ip in addresses if ip not in results]
+    if pending:
+        results.update(query_primary(pending, key))
+        missing = [ip for ip in pending if results[ip].get('status') != 'success']
+        if missing:
+            results.update(free_lookup(missing))
+    if use_cache:
+        cached.update({ip: value for ip, value in results.items() if value.get('status') == 'success'})
+        save_cache({ip: value for ip, value in cached.items() if cache_fresh(value, now)})
+    return results
+
+
+def query_primary(addresses, key):
     results = {ip: {'status': 'unknown', 'provider': 'ipapi.is',
                     'reason': 'not_configured' if not key else 'lookup_unavailable'} for ip in addresses}
     if not key:
-        return free_lookup(addresses)
+        return results
     # Bulk calls count per IP. No key rotation, no anonymous fallback, no quota retries.
     selected = addresses[:DAILY_LOOKUP_BUDGET]
     with s.session() as client:
@@ -59,9 +106,6 @@ def lookup(ips, key):
             except (requests.RequestException, ValueError):
                 # Exceptions may include request details: never log them or credentials.
                 print('IP 信誉查询批次失败，未确认字段保持未知', flush=True)
-    missing = [ip for ip, value in results.items() if value.get('status') != 'success']
-    if missing:
-        results.update(free_lookup(missing))
     return results
 
 
