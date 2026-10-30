@@ -1,4 +1,4 @@
-# 链式配置；2026-10-30T18:40:16+08:00；规则复用优选配置，节点由 provider 提供
+# 链式配置；2026-10-30T18:47:29+08:00；规则复用优选配置，节点由 provider 提供
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -89,6 +89,11 @@ rules:
 - IP-CIDR6,fe80::/10,DIRECT,no-resolve
 - IP-CIDR6,fd00::/8,DIRECT,no-resolve
 - IP-CIDR6,::/0,REJECT,no-resolve
+- DOMAIN-SUFFIX,claude.ai,🚀 全局选择
+- DOMAIN-SUFFIX,claude.com,🚀 全局选择
+- DOMAIN-SUFFIX,claudeusercontent.com,🚀 全局选择
+- DOMAIN-SUFFIX,anthropic.com,🚀 全局选择
+- IP-CIDR,160.79.104.0/23,🚀 全局选择,no-resolve
 - RULE-SET,reject,REJECT
 - RULE-SET,app-proxy,🚀 全局选择
 - RULE-SET,app-direct,DIRECT

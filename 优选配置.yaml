@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-30T18:40:16+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-30T18:47:29+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -89,6 +89,11 @@ rules:
 - IP-CIDR6,fe80::/10,DIRECT,no-resolve
 - IP-CIDR6,fd00::/8,DIRECT,no-resolve
 - IP-CIDR6,::/0,REJECT,no-resolve
+- DOMAIN-SUFFIX,claude.ai,🚀 全局选择
+- DOMAIN-SUFFIX,claude.com,🚀 全局选择
+- DOMAIN-SUFFIX,claudeusercontent.com,🚀 全局选择
+- DOMAIN-SUFFIX,anthropic.com,🚀 全局选择
+- IP-CIDR,160.79.104.0/23,🚀 全局选择,no-resolve
 - RULE-SET,reject,REJECT
 - RULE-SET,app-proxy,🚀 全局选择
 - RULE-SET,app-direct,DIRECT
@@ -3120,6 +3125,13 @@ proxies:
     headers:
       Host: www.calmlunch.com
   name: 法国46|2018ms|26Mbps|机房|纯净度未知
+- cipher: aes-128-gcm
+  name: 🍓 请前往官网重新获取订阅
+  password: subscription-unavailable
+  port: 1
+  server: 127.0.0.1
+  type: ss
+  udp: true
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -3129,6 +3141,7 @@ proxy-groups:
   - ⚡ 高速下载
   - 🏠 非机房 IP
   - 🌏 台湾／新加坡
+  - 🍓 小草莓（免测）
   - DIRECT
   - 美国01|223ms|724Mbps|机房|纯净度未知
   - 美国02|251ms|1353Mbps|机房|纯净度未知
@@ -3378,6 +3391,7 @@ proxy-groups:
   - 法国44|1154ms|15Mbps|机房|纯净度未知
   - 法国45|1300ms|24Mbps|机房|纯净度未知
   - 法国46|2018ms|26Mbps|机房|纯净度未知
+  - 🍓 请前往官网重新获取订阅
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
@@ -3901,3 +3915,7 @@ proxy-groups:
   timeout: 5000
   expected-status: 200
   tolerance: 50
+- name: 🍓 小草莓（免测）
+  type: select
+  proxies:
+  - 🍓 请前往官网重新获取订阅
