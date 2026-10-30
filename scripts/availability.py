@@ -1177,7 +1177,7 @@ def render_comparison(base, records, mapping, require_stability=False, require_u
         return {'name': name, 'type': 'select' if name == '🚀 全局选择' else 'url-test', 'proxies': names or ['REJECT'],
                 'url': GROUP_TEST_URL, 'interval': 120, 'lazy': False,
                 'timeout': 3000, 'expected-status': GROUP_TEST_STATUS,
-                **({'default-selected': '⭐ 综合优选'} if name == '🚀 全局选择' else {'tolerance': 300})}
+                **({'default-selected': '⭐ 综合优选'} if name == '🚀 全局选择' else {'tolerance': 100})}
     config['proxies'] = proxies
     choices = ['⭐ 综合优选', medium_speed.GROUP, '⚡ 高速下载', '🏠 非机房 IP', REGIONAL_GROUP, 'DIRECT']
     choices.extend(node['name'] for node in proxies)
@@ -1590,7 +1590,7 @@ def main():
               'group_latency_policy': {'url': GROUP_TEST_URL, 'interval_seconds': 120,
                   'timeout_ms': 3000, 'expected_status': GROUP_TEST_STATUS, 'manual_selection': True, 'lazy': False,
                   'global_type': 'select', 'default_global_selection': '⭐ 综合优选',
-                  'other_group_type': 'url-test', 'automatic_selection': True, 'tolerance_ms': 300},
+                  'other_group_type': 'url-test', 'automatic_selection': True, 'tolerance_ms': 100},
               'website_recheck': ({'updated_at': now, 'node_count': website_rechecked_count,
                   'scope': 'available_published_quick_download_passed', 'overseas_rounds': WEBSITE_ROUNDS,
                   'workers': 8, 'jobs': 1,

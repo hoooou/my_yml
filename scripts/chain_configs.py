@@ -219,7 +219,7 @@ def _base(base):
 
 def _group(name, nodes):
     return {'name': name, 'type': 'url-test', 'url': CHECK_URL, 'interval': 120,
-            'timeout': 3000, 'expected-status': 204, 'tolerance': 300, 'lazy': False,
+            'timeout': 3000, 'expected-status': 204, 'tolerance': 100, 'lazy': False,
             'proxies': nodes}
 
 
@@ -304,7 +304,7 @@ def render_chain(base):
         {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP],
          'use': ['front']},
         {'name': AUTO_GROUP, 'type': 'url-test', 'url': CHECK_URL, 'interval': 120,
-         'timeout': 3000, 'expected-status': 204, 'tolerance': 300, 'lazy': False,
+         'timeout': 3000, 'expected-status': 204, 'tolerance': 100, 'lazy': False,
          'use': ['front']},
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [g['name'] for g in region_groups] + ['DIRECT']},
