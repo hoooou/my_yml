@@ -491,7 +491,10 @@ jobs:
           mkdir -p .node-work/shards .node-work/observations
           cp -f .node-work/downloads/availability-shard-*/*.json .node-work/shards/
           cp -f .node-work/downloads/availability-observation-*/*.json .node-work/observations/
-          gh run download "$SOURCE_RUN" -p "availability-uplink-*" -D .node-work/uplink
+          # gh run download 会把每个 artifact 放进自己的子目录，发布流程要的是同一层的 uplink-stage-*.json。
+          gh run download "$SOURCE_RUN" -p "availability-uplink-*" -D .node-work/uplink-downloads
+          mkdir -p .node-work/uplink
+          cp -f .node-work/uplink-downloads/availability-uplink-*/*.json .node-work/uplink/
           # 原报告可能不存在（发布步骤本身失败时不会有这份产物），没有就只按原始证据重建。
           gh run download "$SOURCE_RUN" -n full-test-report -D .node-work/original-report || true
       - name: 验证原始证据并生成全局手动与其余自动分组
