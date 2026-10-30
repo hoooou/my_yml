@@ -241,16 +241,10 @@ def render_front(base, fronts):
     config.setdefault('dns', {})['ipv6'] = False
     nodes, names = _front_nodes(fronts)
     config['proxies'] = nodes
-    config['proxy-providers'] = {
-        EXT_PROVIDER: {'type': 'http', 'url': EXT_SUB_URL, 'interval': 3600,
-                       'path': f'./providers/{EXT_PROVIDER}.yaml', 'proxy': 'DIRECT'},
-    }
-    front_group = _group(FRONT_TEST_GROUP, names)
-    front_group['use'] = [EXT_PROVIDER]
     config['proxy-groups'] = [
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [FRONT_TEST_GROUP, 'DIRECT']},
-        front_group,
+        _group(FRONT_TEST_GROUP, names),
     ]
     return config
 
@@ -304,9 +298,17 @@ def render_chain(base, fronts, landings):
     ]
     groups = [g for g in groups if g['proxies']]
     config['proxies'] = front_nodes + landing_nodes
+    # 自有订阅只挂在前置组上，落地节点仍然内联。
+    config['proxy-providers'] = {
+        EXT_PROVIDER: {'type': 'http', 'url': EXT_SUB_URL, 'interval': 3600,
+                       'path': f'./providers/{EXT_PROVIDER}.yaml', 'proxy': 'DIRECT'},
+    }
+    auto_group = _group(AUTO_GROUP, front_names)
+    auto_group['use'] = [EXT_PROVIDER]
     config['proxy-groups'] = [
-        {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP] + front_names},
-        _group(AUTO_GROUP, front_names),
+        {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP] + front_names,
+         'use': [EXT_PROVIDER]},
+        auto_group,
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [g['name'] for g in groups] + ['DIRECT']},
     ] + groups

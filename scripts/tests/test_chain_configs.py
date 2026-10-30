@@ -138,7 +138,9 @@ class RenderTest(unittest.TestCase):
         base = base_config()
         original = copy.deepcopy(base)
         config = cc.render_chain(base, fronts_fixture(), landings_fixture())
-        self.assertNotIn('proxy-providers', config)
+        self.assertEqual(list(config['proxy-providers']), [cc.EXT_PROVIDER])
+        self.assertEqual(config['proxy-providers'][cc.EXT_PROVIDER]['url'], cc.EXT_SUB_URL)
+        self.assertNotIn('use', {k: v for k, v in config.items() if k != 'proxy-groups'})
         self.assertEqual(len(config['proxies']), 4)  # 1 个前置 + 3 个落地
         self.assertTrue(all(node.get('dialer-proxy') in (None, cc.FRONT_GROUP)
                             for node in config['proxies']))
@@ -158,6 +160,9 @@ class RenderTest(unittest.TestCase):
                          ['美国01|100ms|50Mbps|机房|纯净度未知', '美国02|120ms|60Mbps|住宅|纯净度未知'])
         self.assertEqual(names[cc.US_HOSTING_GROUP]['proxies'], ['美国01|100ms|50Mbps|机房|纯净度未知'])
         self.assertEqual(names[cc.US_RESIDENTIAL_GROUP]['proxies'], ['美国02|120ms|60Mbps|住宅|纯净度未知'])
+        # 自有订阅只挂链式的前置组，落地仍然是内联节点。
+        self.assertEqual(names[cc.FRONT_GROUP]['use'], [cc.EXT_PROVIDER])
+        self.assertEqual(names[cc.AUTO_GROUP]['use'], [cc.EXT_PROVIDER])
         self.assertIn('德国01|200ms|20Mbps|机房|纯净度未知', names['🇪🇺 欧洲']['proxies'])
         self.assertNotIn('use', names[cc.US_GROUP])
 
@@ -177,9 +182,7 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(groups[cc.FRONT_TEST_GROUP]['type'], 'url-test')
         self.assertEqual(len(groups[cc.FRONT_TEST_GROUP]['proxies']), 2)
         self.assertIn(cc.FRONT_TEST_GROUP, groups[cc.GLOBAL_GROUP]['proxies'])
-        # 自己的订阅免测，作为 provider 直接并进前置组。
-        self.assertEqual(groups[cc.FRONT_TEST_GROUP]['use'], [cc.EXT_PROVIDER])
-        self.assertEqual(config['proxy-providers'][cc.EXT_PROVIDER]['url'], cc.EXT_SUB_URL)
+        self.assertNotIn('proxy-providers', config)
 
     def test_landing_config_groups_by_region(self):
         base = base_config()
