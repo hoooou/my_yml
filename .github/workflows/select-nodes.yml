@@ -108,9 +108,9 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 8
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -132,7 +132,7 @@ jobs:
       - name: 按阶段并行检测节点
         env:
           SHARD_INDEX: ${{ matrix.shard }}
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase preflight --shard-index "$SHARD_INDEX" --shard-count 4
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase preflight --shard-index "$SHARD_INDEX" --shard-count 8
       - name: 保存分片结果
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -160,9 +160,9 @@ jobs:
     timeout-minutes: 180
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 8
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -190,7 +190,7 @@ jobs:
       - name: 按阶段并行检测节点
         env:
           SHARD_INDEX: ${{ matrix.shard }}
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase probe --shard-index "$SHARD_INDEX" --shard-count 4
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase probe --shard-index "$SHARD_INDEX" --shard-count 8
       - name: 保存分片结果
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -211,9 +211,9 @@ jobs:
       actions: read
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 8
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -242,7 +242,7 @@ jobs:
         env:
           SHARD_INDEX: ${{ matrix.shard }}
           GH_TOKEN: ${{ github.token }}
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase observe --shard-index "$SHARD_INDEX" --shard-count 4
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase observe --shard-index "$SHARD_INDEX" --shard-count 8
       - name: 保存分片结果
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -264,13 +264,18 @@ jobs:
           if-no-files-found: warn
 
   uplink:
-    name: 两轮上行及负载后SSL
+    name: 两轮上行及负载后SSL（分片 ${{ matrix.shard }}）
     needs: [prepare, probe]
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
       contents: read
       actions: read
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - name: 读取仓库
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -298,12 +303,14 @@ jobs:
           merge-multiple: true
           path: .node-work/shards
       - name: 完成两轮上行和负载后证书检查
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase uplink-stage --shard-count 4
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase uplink-stage --shard-index "$SHARD_INDEX" --shard-count 8
       - name: 保存同轮上行结果
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: availability-uplink
-          path: .node-work/availability/uplink-stage.json
+          name: availability-uplink-${{ matrix.shard }}
+          path: .node-work/availability/uplink-stage-*.json
           include-hidden-files: true
           retention-days: 1
           if-no-files-found: error
@@ -311,7 +318,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: upload-checkpoint
+          name: upload-checkpoint-${{ matrix.shard }}
           path: .node-work/availability/upload-results.json
           include-hidden-files: true
           retention-days: 7
@@ -354,7 +361,8 @@ jobs:
       - name: 读取同轮上行结果
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: availability-uplink
+          pattern: availability-uplink-*
+          merge-multiple: true
           path: .node-work/uplink
       - name: 读取持续观察分片
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
@@ -366,7 +374,7 @@ jobs:
         env:
           IPAPI_IS_KEY: ${{ secrets.IPAPI_IS_KEY }}
           UNTESTED_SUBSCRIPTION_URL: ${{ secrets.UNTESTED_SUBSCRIPTION_URL }}
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 4
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 8
       - name: 保存本次全量检测报告
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -439,13 +447,13 @@ jobs:
             gh run download "$SOURCE_RUN" -n "availability-shard-$shard" -D .node-work/shards
             gh run download "$SOURCE_RUN" -n "availability-observation-$shard" -D .node-work/observations
           done
-          gh run download "$SOURCE_RUN" -n availability-uplink -D .node-work/uplink
+          gh run download "$SOURCE_RUN" -p "availability-uplink-*" -D .node-work/uplink
           gh run download "$SOURCE_RUN" -n full-test-report -D .node-work/original-report
       - name: 验证原始证据并生成全局手动与其余自动分组
         env:
           SOURCE_RUN: ${{ inputs.diagnostic_run_id }}
           UNTESTED_SUBSCRIPTION_URL: ${{ secrets.UNTESTED_SUBSCRIPTION_URL }}
-        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 4 --reuse-report .node-work/original-report/full-test-report.json --source-run "$SOURCE_RUN"
+        run: python scripts/availability.py --mihomo .node-work/bin/mihomo --phase publish --shard-count 8 --reuse-report .node-work/original-report/full-test-report.json --source-run "$SOURCE_RUN"
       - name: 保存本次全量检测报告
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

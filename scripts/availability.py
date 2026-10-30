@@ -225,12 +225,39 @@ def classify_all(nodes, workers=10, probe=probe_xxapi, pace=None, on_record=None
     return records, len(endpoints)
 
 
+def shard_index_of(node, count):
+    # All credentials sharing a host/port stay together: only one TCP request.
+    return int(hashlib.sha256(
+        json.dumps(endpoint_key(node), ensure_ascii=False).encode()).hexdigest(), 16) % count
+
+
 def shard_nodes(nodes, index, count):
     if count < 1 or not 0 <= index < count:
         raise ValueError('分片编号或数量无效')
-    # All credentials sharing a host/port stay together: only one TCP request.
-    return [node for node in nodes if int(hashlib.sha256(
-        json.dumps(endpoint_key(node), ensure_ascii=False).encode()).hexdigest(), 16) % count == index]
+    return [node for node in nodes if shard_index_of(node, count) == index]
+
+
+def load_uplink_stage(result_path, records):
+    """One artifact for single-shard runs, or one part per shard merged here."""
+    path = Path(result_path)
+    paths = [path] if path.exists() else sorted(path.parent.glob('uplink-stage-*.json'))
+    if not paths:
+        raise ValueError('缺少上行复测结果')
+    parts = [json.loads(p.read_text()) for p in paths]
+    if len(parts) == 1:
+        return parts[0]
+    by_id = {}
+    for part in parts:
+        by_id.update({r['id']: r for r in part.get('records') or []})
+    nodes = [n for part in parts for n in (part.get('diagnostic') or {}).get('nodes') or []]
+    first = parts[0].get('diagnostic') or {}
+    return {'bundle_id': parts[0].get('bundle_id'),
+            'records': [by_id.get(r['id'], r) for r in records],
+            'diagnostic': {'node_count': len(nodes), 'nodes': nodes,
+                           'controls_valid': all((p.get('diagnostic') or {}).get('controls_valid') is True
+                                                 for p in parts),
+                           'controls': first.get('controls') or {},
+                           'core_health': first.get('core_health') or {}}}
 
 
 DOWNLOAD_URL = 'https://speed.cloudflare.com/__down?bytes=1000000'
@@ -1377,13 +1404,20 @@ def main():
     upload_diagnostic = stability_diagnostic = None
     if args.phase == 'uplink-stage':
         candidates = eligible_for_upload(records, mapping)
+        if args.shard_count > 1:
+            candidates = [r for r in candidates
+                          if shard_index_of(mapping[r['id']], args.shard_count) == args.shard_index]
         upload_diagnostic = upload_speed.recheck(candidates, mapping, binary, root, reuse_precheck=True)
-        (root / 'uplink-stage.json').write_text(json.dumps({'bundle_id': bundle['id'],
-            'records': records, 'diagnostic': upload_diagnostic}, ensure_ascii=False))
+        touched = {r['id'] for r in candidates}
+        rows = records if args.shard_count == 1 else [r for r in records if r['id'] in touched]
+        name = 'uplink-stage.json' if args.shard_count == 1 else f'uplink-stage-{args.shard_index}.json'
+        (root / name).write_text(json.dumps({'bundle_id': bundle['id'],
+            'shard_index': args.shard_index, 'shard_count': args.shard_count,
+            'records': rows, 'diagnostic': upload_diagnostic}, ensure_ascii=False))
         return
     parallel_publish = args.phase == 'publish' and bundle.get('parallel_observation')
     if parallel_publish:
-        stage = json.loads(Path(args.uplink_result).read_text())
+        stage = load_uplink_stage(args.uplink_result, records)
         upload_diagnostic = merge_uplink(bundle, records, stage, mapping)
         observations = [json.loads(p.read_text()) for p in Path(args.observations_dir).glob('observation-*.json')]
         stability_diagnostic = continuous_stability.merge(bundle, observations, records, args.shard_count, shard_nodes)

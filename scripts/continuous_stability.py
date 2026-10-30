@@ -189,12 +189,13 @@ class PeerJob:
         jobs = response.json()['jobs']
         # An upstream failure must terminate observers even if the final job is not yet created.
         for job in jobs:
-            if (job['name'].startswith('网站、TLS与下载') or job['name'] == PEER_JOB) and job['status'] == 'completed' and job['conclusion'] != 'success':
+            if (job['name'].startswith('网站、TLS与下载') or job['name'].startswith(PEER_JOB)) \
+                    and job['status'] == 'completed' and job['conclusion'] != 'success':
                 raise RuntimeError('主筛选任务失败，停止观察并保留原订阅')
-        peer = [x for x in jobs if x['name'] == PEER_JOB]
-        if len(peer) > 1:
-            raise RuntimeError('主筛选任务标识重复')
-        return bool(peer and peer[0]['status'] == 'completed' and peer[0]['conclusion'] == 'success')
+        # 上行阶段按分片跑，同一个名字会有多份；全部完成才算主流程结束。
+        peer = [x for x in jobs if x['name'].startswith(PEER_JOB)]
+        return bool(peer) and all(
+            x['status'] == 'completed' and x['conclusion'] == 'success' for x in peer)
 
 
 def schedule(ids, probe, peer, control, checkpoint, clock=time.monotonic, sleep=time.sleep, workers=WORKERS):
