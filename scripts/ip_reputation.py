@@ -45,7 +45,7 @@ def lookup(ips, key):
             try:
                 response = client.post(API_URL, json={'ips': batch, 'key': key}, timeout=20)
                 if response.status_code in (401, 403, 429):
-                    print('IP 信誉接口鉴权或额度不可用，停止查询；未确认字段保持未知', flush=True)
+                    print(f'IP 信誉接口拒绝（HTTP {response.status_code}），停止查询；未确认字段保持未知', flush=True)
                     break
                 response.raise_for_status()
                 values = response.json()
