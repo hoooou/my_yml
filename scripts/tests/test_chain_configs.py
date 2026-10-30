@@ -140,8 +140,11 @@ class RenderTest(unittest.TestCase):
         names = {g['name']: g for g in config['proxy-groups']}
         self.assertIn(cc.FRONT_GROUP, names)
         self.assertEqual(names[cc.FRONT_GROUP]['use'], ['front'])
-        self.assertEqual(names['🇺🇸 美国']['use'], ['landing'])
-        self.assertEqual(names['🇺🇸 美国']['filter'], '^美国')
+        for group in (cc.US_GROUP, cc.US_HOSTING_GROUP, cc.US_RESIDENTIAL_GROUP):
+            self.assertEqual(names[group]['use'], ['landing'])
+        self.assertEqual(names[cc.US_GROUP]['filter'], '^美国')
+        self.assertEqual(names[cc.US_HOSTING_GROUP]['filter'], '^美国.*[|]机房[|]')
+        self.assertEqual(names[cc.US_RESIDENTIAL_GROUP]['filter'], '^美国.*[|]住宅[|]')
         self.assertIn('英国', names['🇪🇺 欧洲']['filter'])
 
     def test_front_config_single_flat_group(self):
@@ -165,14 +168,22 @@ class RenderTest(unittest.TestCase):
         base = base_config()
         landings = [
             {'name': '美国01|100ms|50Mbps|机房|纯净度99%', 'server': '1.1.1.1', 'port': 80, 'type': 'http'},
+            {'name': '美国02|120ms|60Mbps|住宅|纯净度98%', 'server': '1.1.1.2', 'port': 80, 'type': 'http'},
+            {'name': '美国03|130ms|70Mbps|未知|纯净度未知', 'server': '1.1.1.3', 'port': 80, 'type': 'http'},
             {'name': '德国01|200ms|20Mbps|机房|纯净度99%', 'server': '2.2.2.2', 'port': 80, 'type': 'http'},
         ]
         config = cc.render_landing(base, landings)
         groups = {g['name']: g for g in config['proxy-groups']}
-        self.assertIn('🇺🇸 美国', groups)
+        self.assertIn(cc.US_GROUP, groups)
         self.assertIn('🇪🇺 欧洲', groups)
-        self.assertEqual(groups['🇺🇸 美国']['proxies'],
-                         ['美国01|100ms|50Mbps|机房|纯净度99%'])
+        self.assertEqual(groups[cc.US_GROUP]['proxies'],
+                         ['美国01|100ms|50Mbps|机房|纯净度99%',
+                          '美国02|120ms|60Mbps|住宅|纯净度98%',
+                          '美国03|130ms|70Mbps|未知|纯净度未知'])
+        self.assertEqual(groups[cc.US_HOSTING_GROUP]['proxies'], ['美国01|100ms|50Mbps|机房|纯净度99%'])
+        self.assertEqual(groups[cc.US_RESIDENTIAL_GROUP]['proxies'], ['美国02|120ms|60Mbps|住宅|纯净度98%'])
+        self.assertEqual(groups[cc.GLOBAL_GROUP]['proxies'][:3],
+                         [cc.US_GROUP, cc.US_HOSTING_GROUP, cc.US_RESIDENTIAL_GROUP])
 
 
 class BuildTest(unittest.TestCase):

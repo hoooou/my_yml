@@ -28,6 +28,13 @@ FRONT_TEST_GROUP = '🛫 前置节点'
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
+# 美国拆三组：全部美国节点、其中的机房 IP、其中的住宅 IP；第四段是名字里的机房／住宅标记。
+US_GROUP = '🇺🇸 美国节点'
+US_HOSTING_GROUP = '🏢 美国机房'
+US_RESIDENTIAL_GROUP = '🏠 美国住宅'
+US_PREFIX = '美国'
+US_HOSTING_MARK = '|机房|'
+US_RESIDENTIAL_MARK = '|住宅|'
 FRONT_URL = ('https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/'
              + quote('前置配置.yaml'))
 LANDING_URL = ('https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/'
@@ -245,8 +252,11 @@ def render_landing(base, landings):
     config['proxies'] = [copy.deepcopy(node) for node in landings]
     names = [node['name'] for node in config['proxies']]
     eu = [n for n in names if str(n).startswith(EU_PREFIXES)]
+    us = [n for n in names if str(n).startswith(US_PREFIX)]
     groups = [
-        _group('🇺🇸 美国', [n for n in names if str(n).startswith('美国')]),
+        _group(US_GROUP, us),
+        _group(US_HOSTING_GROUP, [n for n in us if US_HOSTING_MARK in str(n)]),
+        _group(US_RESIDENTIAL_GROUP, [n for n in us if US_RESIDENTIAL_MARK in str(n)]),
         _group('🇯🇵 日本', [n for n in names if str(n).startswith('日本')]),
         _group('🇸🇬 新加坡', [n for n in names if str(n).startswith('新加坡')]),
         _group('🇪🇺 欧洲', eu),
@@ -273,16 +283,19 @@ def render_chain(base):
                     'override': {'dialer-proxy': FRONT_GROUP}},
     }
     region_groups = [
-        _group('🇺🇸 美国', []), _group('🇯🇵 日本', []), _group('🇸🇬 新加坡', []),
+        _group(US_GROUP, []), _group(US_HOSTING_GROUP, []), _group(US_RESIDENTIAL_GROUP, []),
+        _group('🇯🇵 日本', []), _group('🇸🇬 新加坡', []),
         _group('🇪🇺 欧洲', []), _group('🌐 全部节点', []),
     ]
-    for group in region_groups:
+    filters = ['^' + US_PREFIX,
+               '^' + US_PREFIX + '.*[|]机房[|]',
+               '^' + US_PREFIX + '.*[|]住宅[|]',
+               '^日本', '^新加坡', '^(' + '|'.join(EU_PREFIXES) + ')']
+    for group, pattern in zip(region_groups, filters + ['']):
         group.pop('proxies', None)
         group['use'] = ['landing']
-    region_groups[0]['filter'] = '^美国'
-    region_groups[1]['filter'] = '^日本'
-    region_groups[2]['filter'] = '^新加坡'
-    region_groups[3]['filter'] = '^(' + '|'.join(EU_PREFIXES) + ')'
+        if pattern:
+            group['filter'] = pattern
     config['proxy-groups'] = [
         {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP],
          'use': ['front']},
