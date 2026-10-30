@@ -222,6 +222,21 @@ def _group(name, nodes):
 _EXTERNAL_CACHE = {}
 
 
+def previous_external_fronts(path='链式配置.yaml'):
+    """上一版链式配置里的订阅节点；订阅拉取失败时用它顶上，避免整组消失。"""
+    import yaml
+    from pathlib import Path
+
+    try:
+        data = yaml.safe_load(Path(path).read_text(encoding='utf-8'))
+        group = next(g for g in data['proxy-groups'] if g['name'] == EXT_GROUP)
+        names = [name for name in group.get('proxies') or [] if name != EXT_AUTO_GROUP]
+        by_name = {node['name']: node for node in data.get('proxies') or []}
+    except Exception:
+        return []
+    return [copy.deepcopy(by_name[name]) for name in names if name in by_name]
+
+
 def external_fronts(url=EXT_SUB_URL):
     """拉取自有的 Clash 订阅，按免测前置返回；拉不到就返回空，不影响其他产物。"""
     import os
@@ -233,7 +248,7 @@ def external_fronts(url=EXT_SUB_URL):
     if url in _EXTERNAL_CACHE:
         return copy.deepcopy(_EXTERNAL_CACHE[url])
     data = None
-    for attempt in range(2):
+    for attempt in range(3):
         try:
             with session() as client:
                 # 面板按 UA 拦人：默认的 python-requests UA 直接 400，要用客户端自己的 UA。
@@ -243,11 +258,12 @@ def external_fronts(url=EXT_SUB_URL):
                 data = yaml.safe_load(response.text)
             break
         except Exception:
-            if attempt:
-                print('自有订阅拉取失败，本轮不含订阅前置', flush=True)
+            if attempt == 2:
+                print('自有订阅拉取失败，沿用上一版的订阅节点', flush=True)
     if data is None:
-        _EXTERNAL_CACHE[url] = []
-        return []
+        nodes = previous_external_fronts()
+        _EXTERNAL_CACHE[url] = nodes
+        return copy.deepcopy(nodes)
     nodes, seen, names = [], set(), set()
     for node in (data or {}).get('proxies') or []:
         if not isinstance(node, dict) or not node.get('server') or not node.get('type'):

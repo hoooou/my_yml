@@ -5,6 +5,7 @@
 
 import copy
 import unittest
+from pathlib import Path
 from unittest import mock
 
 import chain_configs as cc
@@ -172,6 +173,15 @@ class RenderTest(unittest.TestCase):
             nodes = cc.external_fronts('https://example.invalid/sub')
         self.assertEqual([n['name'] for n in nodes], ['US01'])
         self.assertEqual(client.get.call_args.kwargs['headers']['User-Agent'], 'clash-verge/v1.0')
+
+    def test_previous_chain_nodes_are_reused_when_the_subscription_fails(self):
+        import json, tempfile
+        config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / '链式配置.yaml'
+            path.write_text(json.dumps(config, ensure_ascii=False), encoding='utf-8')
+            nodes = cc.previous_external_fronts(str(path))
+        self.assertEqual([n['name'] for n in nodes], ['US 官方优选 187ms'])
 
     def test_manual_groups_come_before_automatic_ones(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
