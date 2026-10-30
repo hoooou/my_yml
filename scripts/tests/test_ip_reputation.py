@@ -8,11 +8,28 @@ import ip_reputation as p
 
 
 class ReputationTests(unittest.TestCase):
-    def test_no_key_makes_no_request_and_no_fake_score(self):
-        with patch.object(p.s, 'session', side_effect=AssertionError('no anonymous lookups')):
+    def test_no_key_falls_back_to_free_source_and_never_fakes_a_score(self):
+        with patch.object(p.s, 'session') as session:
+            client = session.return_value.__enter__.return_value
+            client.post.return_value.json.return_value = [
+                {'query': '8.8.8.8', 'status': 'success', 'hosting': False, 'proxy': False, 'mobile': False}]
             result = p.lookup(['8.8.8.8', '8.8.8.8'], '')
         self.assertEqual(len(result), 1)
+        self.assertEqual(result['8.8.8.8']['provider'], 'ip-api.com')
+        self.assertEqual(p.residence_label({'ip_reputation': result['8.8.8.8']}), '住宅候选')
         self.assertEqual(p.purity_label({'ip_reputation': result['8.8.8.8']}), '纯净未知')
+        self.assertIsNone(result['8.8.8.8']['network_purity_score'])
+
+    def test_failed_primary_lookups_are_retried_once_on_the_free_source(self):
+        with patch.object(p.s, 'session') as session:
+            client = session.return_value.__enter__.return_value
+            client.post.return_value.json.return_value = [
+                {'query': '8.8.8.8', 'status': 'success', 'hosting': True, 'proxy': False, 'mobile': False}]
+            client.post.return_value.status_code = 403
+            result = p.lookup(['8.8.8.8'], 'secret-fixture')
+        self.assertEqual(client.post.call_count, 2)
+        self.assertEqual(client.post.call_args_list[0].kwargs['json']['key'], 'secret-fixture')
+        self.assertEqual(result['8.8.8.8']['provider'], 'ip-api.com')
 
     def test_network_score_is_not_individual_abuse_and_residence_is_not_hosting_false(self):
         value = {'ip': '8.8.8.8', 'company': {'type': 'isp', 'abuser_score': '0.0183 (Elevated)'},
@@ -39,8 +56,9 @@ class ReputationTests(unittest.TestCase):
             client.post.return_value.status_code = 429
             ips = [f'8.8.{i // 250}.{i % 250 + 1}' for i in range(101)]
             result = p.lookup(ips + [ips[0]], 'secret-fixture')
-        self.assertEqual(client.post.call_count, 1)
-        payload = client.post.call_args.kwargs['json']
+        # 主源 429 后不再重试；之后两批是免费备用源（101 个 IP 按 100 分两批），同样被拒，仍然未知。
+        self.assertEqual(client.post.call_count, 3)
+        payload = client.post.call_args_list[0].kwargs['json']
         self.assertEqual(len(payload['ips']), 100)
         self.assertEqual(payload['key'], 'secret-fixture')
         self.assertEqual(len(result), 101)

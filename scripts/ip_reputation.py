@@ -1,4 +1,4 @@
-"""Optional keyed IP intelligence. Never infer an individual IP risk score."""
+"""IP intelligence with a free fallback. Never infer an individual IP risk score."""
 import ipaddress
 import math
 import re
@@ -7,6 +7,9 @@ import requests
 import select_nodes as s
 
 API_URL = 'https://api.ipapi.is/'
+# 免费备用源：不需要 key，一次最多 100 个 IP，15 次/分钟，只提供 hosting/proxy/mobile。
+FREE_URL = 'http://ip-api.com/batch'
+FREE_FIELDS = 'status,message,query,hosting,proxy,mobile'
 DAILY_LOOKUP_BUDGET = 900  # Per-run cap. Runs only look up download-passed exits (~140), so 4 runs/day stay under the free 1,000/day.
 
 
@@ -36,7 +39,7 @@ def lookup(ips, key):
     results = {ip: {'status': 'unknown', 'provider': 'ipapi.is',
                     'reason': 'not_configured' if not key else 'lookup_unavailable'} for ip in addresses}
     if not key:
-        return results
+        return free_lookup(addresses)
     # Bulk calls count per IP. No key rotation, no anonymous fallback, no quota retries.
     selected = addresses[:DAILY_LOOKUP_BUDGET]
     with s.session() as client:
@@ -56,6 +59,47 @@ def lookup(ips, key):
             except (requests.RequestException, ValueError):
                 # Exceptions may include request details: never log them or credentials.
                 print('IP 信誉查询批次失败，未确认字段保持未知', flush=True)
+    missing = [ip for ip, value in results.items() if value.get('status') != 'success']
+    if missing:
+        results.update(free_lookup(missing))
+    return results
+
+
+def normalize_free(ip, value):
+    """把 ip-api.com 的字段对齐到 ipapi.is 的形状：没有纯净度，只有机房/移动/代理判定。"""
+    if not isinstance(value, dict) or value.get('query') != ip or value.get('status') != 'success':
+        return {'status': 'unknown', 'provider': 'ip-api.com', 'reason': 'invalid_response'}
+    hosting, proxy, mobile = (value.get(key) if type(value.get(key)) is bool else None
+                              for key in ('hosting', 'proxy', 'mobile'))
+    return {'status': 'success', 'provider': 'ip-api.com', 'ip': ip,
+            'checked_at': s.datetime.now(s.TZ).isoformat(timespec='seconds'),
+            # 不是机房、不是代理、不是移动网络，按家用 ISP 处理，也就是住宅候选。
+            'company_type': 'isp' if (hosting is False and proxy is False and mobile is False) else None,
+            'asn_type': None, 'is_datacenter': hosting, 'is_mobile': mobile, 'is_proxy': proxy,
+            'is_vpn': None, 'is_tor': None, 'is_abuser': None,
+            'network_abuser_ratio': None, 'network_purity_score': None}
+
+
+def free_lookup(ips):
+    addresses = sorted({ip for ip in ips if ip and ipaddress.ip_address(ip).is_global})
+    results = {ip: {'status': 'unknown', 'provider': 'ip-api.com', 'reason': 'lookup_unavailable'}
+               for ip in addresses}
+    with s.session() as client:
+        for offset in range(0, len(addresses), 100):
+            batch = addresses[offset:offset + 100]
+            try:
+                response = client.post(FREE_URL, params={'fields': FREE_FIELDS}, json=batch, timeout=20)
+                response.raise_for_status()
+                values = response.json()
+            except (requests.RequestException, ValueError):
+                print('备用 IP 归属查询失败，未确认字段保持未知', flush=True)
+                continue
+            if not isinstance(values, list):
+                continue
+            for item in values:
+                ip = item.get('query') if isinstance(item, dict) else None
+                if ip in results:
+                    results[ip] = normalize_free(ip, item)
     return results
 
 
