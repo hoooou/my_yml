@@ -23,7 +23,7 @@ def record(index, entry='passed', precheck='passed', median=120, server_suffix=N
         'upload_precheck': {'status': 'passed'},
         'front_probe': {'cn': {'status': 'passed'}, 'intl': {'status': 'passed'},
                         'tls': {'status': 'passed'},
-                        'down10': {'status': 'passed', 'speed_mib_s': 20 + index}},
+                        'down10': {'status': 'passed'}},
         'exit': {'country_code': exit_country},
         'app_tls': {'status': 'passed'},
         'stability': {'success_rate': 0.99},
@@ -110,7 +110,7 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual(sorted(f['node']['server'] for f in fronts),
                          ['1.1.1.1', '2.2.2.2'])
 
-    def test_front_sorted_by_front_probe_speed(self):
+    def test_front_sorted_by_download_speed(self):
         records = [record(0), record(1)]
         mapping = {'n0': node(0), 'n1': node(1)}
         fronts = cc.select_fronts(records, mapping)

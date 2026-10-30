@@ -104,7 +104,7 @@ def _front_gates(record, mapping):
         return False
     if (record.get('entry') or {}).get('status') != 'passed':
         return False
-    # 前置轨道只看自己的证据：上传、独立 TLS、回国/出国、10MB。
+    # 前置轨道只看自己的证据：上传、独立 TLS、回国/出国。
     # 不依赖后置轨道的 26 站、应用 TLS、1MB 下载，也不看入口归属地。
     if (record.get('upload_precheck') or {}).get('status') != 'passed':
         return False
@@ -115,14 +115,17 @@ def _front_gates(record, mapping):
         return False
     if (probe.get('intl') or {}).get('status') != 'passed':
         return False
-    if (probe.get('down10') or {}).get('status') != 'passed':
-        return False
     return True
 
 
 def _front_speed(record):
-    speed = ((record.get('front_probe') or {}).get('down10') or {}).get('speed_mib_s')
-    return speed if isinstance(speed, (int, float)) else -1
+    """排序用已有的下载结果，前置不再单独跑测速。"""
+    for key in ('medium_speed_download', 'download'):
+        item = record.get(key) or {}
+        speed = item.get('speed_mib_s')
+        if item.get('status') == 'passed' and isinstance(speed, (int, float)):
+            return speed
+    return -1
 
 
 def select_fronts(records, mapping):
@@ -216,10 +219,9 @@ def render_front(base, fronts):
     nodes, names = [], []
     for index, item in enumerate(fronts, 1):
         entry = (item['record'].get('entry') or {}).get('latency_ms')
-        probe = item['record'].get('front_probe') or {}
-        speed = (probe.get('down10') or {}).get('speed_mib_s')
-        if not isinstance(speed, (int, float)):
-            speed = (item['record'].get('download') or {}).get('speed_mib_s')
+        speed = _front_speed(item['record'])
+        if speed < 0:
+            speed = None
         bandwidth = f"{speed * 8:.0f}Mbps" if isinstance(speed, (int, float)) else '?Mbps'
         entry_text = f"{int(entry)}ms" if isinstance(entry, (int, float)) else '?ms'
         name = f"{FRONT_PREFIX}{index:02d}|{entry_text}|{bandwidth}"

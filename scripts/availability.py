@@ -320,7 +320,6 @@ def quick_download(port):
 FRONT_CN_URL = 'http://mirrors.tuna.tsinghua.edu.cn/robots.txt'
 FRONT_INTL_URL = 'http://www.gstatic.com/generate_204'
 FRONT_TLS_URL = 'https://cp.cloudflare.com/generate_204'
-FRONT_10MB = 'https://hkg.download.datapacket.com/10mb.bin'
 
 
 def quick3_download(port):
@@ -344,14 +343,13 @@ def _front_request(port, url, timeout):
 
 
 def probe_front(port):
-    """Front-only track: CN return, international, TLS, 10MB."""
+    """Front-only track: CN return, international, TLS. No dedicated download."""
     cn = [_front_request(port, FRONT_CN_URL, (3, 6)) for _ in range(3)]
     intl = [_front_request(port, FRONT_INTL_URL, (2, 3)) for _ in range(3)]
     tls = _front_request(port, FRONT_TLS_URL, (3, 6))
     result = {'cn': summarize_rounds([{'cn': row} for row in cn], ('cn',))['cn'],
               'intl': summarize_rounds([{'intl': row} for row in intl], ('intl',))['intl'],
               'tls': tls}
-    result['down10'] = download_sample(port, 10_000_000, 10, FRONT_10MB)
     return result
 
 
@@ -521,9 +519,11 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                             record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
                     else:
                         record['download']['reason'] = '网站TLS异常或必过网页/API/trace未通过，跳过下载'
-            # 前置不查归属地：国内 TCP 通过的节点都跑一遍前置轨道，
-            # 能不能进前置交给 upload/TLS/回国/出国/10MB 这些实测门槛。
-            if not preflight_only and (record.get('entry') or {}).get('status') == 'passed':
+            # 前置不查归属地：国内 TCP + 上行预检都过的节点才跑前置轨道。
+            # 上行预检本来就是前置门槛，这样筛不会丢候选，又能把探测次数压下来。
+            if (not preflight_only
+                    and (record.get('entry') or {}).get('status') == 'passed'
+                    and (record.get('upload_precheck') or {}).get('status') == 'passed'):
                 record['front_probe'] = probe_front(port)
             with lock:
                 progress['done'] += 1
