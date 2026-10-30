@@ -539,13 +539,13 @@ proxies: []
 proxy-providers:
   front:
     type: http
-    url: https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/%E5%89%8D%E7%BD%AE%E9%85%8D%E7%BD%AE.yaml
+    url: https://fastly.jsdelivr.net/gh/hoooou/my_yml@main/%E5%89%8D%E7%BD%AE%E9%85%8D%E7%BD%AE.yaml
     interval: 3600
     path: ./providers/front.yaml
     proxy: DIRECT
   landing:
     type: http
-    url: https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/%E5%90%8E%E7%BD%AE%E9%85%8D%E7%BD%AE.yaml
+    url: https://fastly.jsdelivr.net/gh/hoooou/my_yml@main/%E5%90%8E%E7%BD%AE%E9%85%8D%E7%BD%AE.yaml
     interval: 3600
     path: ./providers/landing.yaml
     proxy: DIRECT
