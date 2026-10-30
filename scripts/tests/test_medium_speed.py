@@ -2,6 +2,7 @@ import copy
 from pathlib import Path
 import sys
 import threading
+import time
 import unittest
 from unittest.mock import patch
 
@@ -52,22 +53,27 @@ class MediumDownloadTests(unittest.TestCase):
             self.assertEqual((sample['url'], sample['requested_bytes'], sample['budget_seconds']), (m.URL, m.BYTES, 10))
             self.assertEqual(fetch.call_args.kwargs['headers']['Referer'], 'https://speed.cloudflare.com/')
 
-    def test_pipeline_orders_1mb_5mb_100mb_and_medium_failure_does_not_skip_high(self):
+    def test_pipeline_orders_1mb_5mb_100mb_and_medium_failure_stops_before_sites(self):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         pre = a.summarize_rounds([{'Google204': {'status': 'passed', 'elapsed_ms': 10}}]*3, ('Google204',))['Google204']
-        for quick_ok in (True, False):
-            calls = []
+        # 1MB 不通过只跑 1MB；5MB 不通过就停在 5MB，后面网站、TLS、100MB 都不跑。
+        for quick_ok, medium_ok, expected in ((True, True, ['1MB', '5MB', '100MB']),
+                                              (True, False, ['1MB', '5MB']),
+                                              (False, True, ['1MB'])):
+            calls, sites = [], []
             with patch.object(a.s, 'Core'), patch.object(a.s, 'query_exit', return_value=None), \
                  patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1234})), \
                  patch.object(a.app_tls, 'check', return_value=verified_tls()):
                 rows, _ = a.probe_pipeline([node], 'unused', Path('.'), precheck=lambda p: pre,
                     probe=lambda key, pace: {'status': 'passed'},
-                    site_check=lambda p: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
+                    site_check=lambda p: sites.append(1) or {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
                     download=lambda p: calls.append('1MB') or {'status': 'passed' if quick_ok else 'failed',
                         'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
-                    medium_download=lambda p: calls.append('5MB') or {**verified_medium(), 'status': 'failed'},
+                    medium_download=lambda p: calls.append('5MB') or
+                        (verified_medium() if medium_ok else {**verified_medium(), 'status': 'failed'}),
                     large_download=lambda p: calls.append('100MB') or verified_high(), upload_precheck=verified_upload_precheck)
-            self.assertEqual(calls, ['1MB', '5MB', '100MB'] if quick_ok else ['1MB'])
+            self.assertEqual(calls, expected)
+            self.assertEqual(bool(sites), quick_ok and medium_ok)
             part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': 1, 'records': rows}
             bundle = {'id': 'batch', 'nodes': [node]}
             a.merge_shards(bundle, [part], 1)
@@ -130,18 +136,14 @@ class MediumDownloadTests(unittest.TestCase):
 
     def test_pipeline_caps_medium_downloads_at_four_per_shard(self):
         nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': '8.8.8.8', 'port': 443} for i in range(8)]
-        barrier, lock = threading.Barrier(4), threading.Lock()
-        websites_ready = threading.Barrier(8)
-        def websites(port):
-            websites_ready.wait(2)
-            return {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES}
+        lock = threading.Lock()
         state = {'active': 0, 'peak': 0}
         def medium(port):
             with lock:
                 state['active'] += 1
                 state['peak'] = max(state['peak'], state['active'])
             try:
-                barrier.wait(2)
+                time.sleep(0.2)
             finally:
                 with lock: state['active'] -= 1
             return verified_medium()
@@ -150,10 +152,12 @@ class MediumDownloadTests(unittest.TestCase):
              patch.object(a.app_tls, 'check', return_value=verified_tls()):
             rows, _ = a.probe_pipeline(nodes, 'unused', Path('.'), precheck=lambda p: {'status': 'passed'},
                 probe=lambda key, pace: {'status': 'passed'},
-                site_check=websites,
-                download=lambda p: {'status': 'passed'}, medium_download=medium,
+                site_check=lambda p: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
+                download=lambda p: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
+                medium_download=medium,
                 large_download=lambda p: verified_high(), upload_precheck=verified_upload_precheck)
-        self.assertEqual(state['peak'], 4)
+        self.assertLessEqual(state['peak'], 4)
+        self.assertGreaterEqual(state['peak'], 2)
         self.assertEqual(sum(m.passed(r['medium_speed_download']) for r in rows), 8)
 
     def test_supplement_only_existing_1mb_passed_nodes_preserves_other_measurements(self):

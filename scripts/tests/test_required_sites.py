@@ -12,6 +12,7 @@ import availability as a
 from upload_fixture import verified_upload_precheck
 from medium_speed_fixture import verified_medium
 from tls_fixture import verified_tls
+from high_speed_fixture import verified_high
 from attempt_report import write_attempt
 
 
@@ -76,7 +77,7 @@ class RequiredSiteTests(unittest.TestCase):
             self.assertFalse(a.web_quality_eligible(bad), condition)
             self.assertFalse(a.regional_eligible(bad), condition)
 
-    def test_failed_claude_trace_stops_download_and_merge_rejects_bypassing_it(self):
+    def test_failed_claude_trace_stops_large_download_and_merge_rejects_bypassing_it(self):
         pages = {label: {'status': 'passed', 'elapsed_ms': 100} for label in a.POST_SITES}
         pages['ClaudeTrace'] = {'status': 'failed', 'http_status': 403, 'elapsed_ms': 100}
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
@@ -86,14 +87,15 @@ class RequiredSiteTests(unittest.TestCase):
              patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1234})):
             rows, _ = a.probe_pipeline([node], 'unused', Path('.'), precheck=lambda port: pre,
                 probe=lambda key, pace: {'status': 'passed'}, site_check=lambda port: pages,
-                download=lambda port: self.fail('blocked required page must stop downloads'),
+                download=lambda port: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
                 large_download=lambda port: self.fail('blocked required page must stop large downloads'), upload_precheck=verified_upload_precheck)
-        self.assertEqual(rows[0]['download']['status'], 'skipped')
+        self.assertEqual(rows[0]['download']['status'], 'passed')
+        self.assertEqual(rows[0]['high_speed_download']['status'], 'skipped')
         self.assertEqual(rows[0]['websites']['ClaudeTrace']['status'], 'failed')
         bundle = {'id': 'batch', 'nodes': [node]}
         part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'endpoint_count': 1, 'records': rows}
         a.merge_shards(bundle, [part], 1)
-        rows[0]['download'] = {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 1000}
+        rows[0]['high_speed_download'] = verified_high(5)
         with self.assertRaises(ValueError):
             a.merge_shards(bundle, [part], 1)
 
@@ -108,7 +110,9 @@ class RequiredSiteTests(unittest.TestCase):
             calls = []
             rows, _ = a.probe_pipeline([node], 'unused', Path('.'), precheck=lambda port: pre,
                 probe=lambda key, pace: {'status': 'passed'},
-                download=lambda port: calls.append(port) or {'status': 'failed'}, upload_precheck=verified_upload_precheck)
+                download=lambda port: calls.append(port) or {
+                    'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
+                upload_precheck=verified_upload_precheck)
         self.assertEqual(calls, [1234])
         self.assertNotIn('Claude', rows[0]['websites'])
         self.assertEqual(rows[0]['websites']['ClaudeTrace']['round_count'], 1)

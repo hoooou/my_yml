@@ -18,6 +18,8 @@ import application_quality
 import edge_candidates
 from test_stability import sample
 from tls_fixture import verified_tls
+from medium_speed_fixture import verified_medium
+from high_speed_fixture import verified_high
 from upload_fixture import verified_upload_precheck
 from test_upload_speed import sample as upload_sample
 
@@ -152,10 +154,12 @@ class PipelineTests(unittest.TestCase):
             a.merge_shards(bundle, [part], 1, preflight_only=True)
             second, count = a.probe_pipeline([node], 'unused', Path('.'), initial_records=first,
                 upload_precheck=upload, upload_controls=controls, site_check=pages,
-                download=lambda p: {'status': 'failed'}, policy_version=qp.VERSION)
+                download=lambda p: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
+                medium_download=lambda p: verified_medium(),
+                large_download=lambda p: verified_high(), policy_version=qp.VERSION)
             self.assertEqual(pages.call_count, 3); self.assertEqual(upload.call_count, 3)
             self.assertEqual(second[0]['upload_precheck']['status'], 'failed')
-            self.assertEqual(second[0]['download']['status'], 'failed')
+            self.assertEqual(second[0]['download']['status'], 'passed')
             part.update(records=second, endpoint_count=count)
             a.merge_shards(bundle, [part], 1)
 

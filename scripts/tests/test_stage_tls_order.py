@@ -12,6 +12,8 @@ import availability as a
 import quality_policy as qp
 from tls_fixture import verified_tls
 from upload_fixture import verified_upload_precheck
+from medium_speed_fixture import verified_medium
+from high_speed_fixture import verified_high
 import upload_speed as up
 import stability
 from test_upload_speed import sample as uploaded, evidence as upload_evidence
@@ -32,7 +34,9 @@ class StageOrderTests(unittest.TestCase):
                 precheck=lambda _: pre, probe=lambda *_: {'status': 'passed'},
                 upload_precheck=verified_upload_precheck, upload_controls=controls,
                 site_check=lambda _: {k: {'status': 'passed', 'elapsed_ms': 100} for k in a.DAILY_POST_SITES},
-                download=lambda _: {'status': 'failed'}, policy_version=qp.VERSION)
+                download=lambda _: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
+                medium_download=lambda _: verified_medium(),
+                large_download=lambda _: verified_high(), policy_version=qp.VERSION)
         bundle = {'id': 'batch', 'nodes': [node], 'selection_policy_version': qp.VERSION,
                   'early_upload_precheck': True}
         part = {'bundle_id': 'batch', 'index': 0, 'count': 1, 'records': records,

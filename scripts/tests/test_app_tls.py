@@ -23,7 +23,7 @@ class AppTLSGateTests(unittest.TestCase):
         medium = patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium())
         medium.start(); self.addCleanup(medium.stop)
 
-    def test_failed_app_certificate_blocks_download_at_real_pipeline_caller(self):
+    def test_failed_app_certificate_blocks_100mb_at_real_pipeline_caller(self):
         node = {'name': 'n-a', 'type': 'ss', 'server': '8.8.8.8', 'port': 443}
         failed = verified_tls()
         failed['status'] = 'failed'
@@ -32,13 +32,16 @@ class AppTLSGateTests(unittest.TestCase):
             status='failed', chain_verified=False, error_type='certificate_verification_failed')
         with patch.object(a.s, 'Core'), patch.object(a.s, 'query_exit', return_value=None), \
              patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1234})), \
-             patch.object(a.app_tls, 'check', return_value=failed):
+             patch.object(a.app_tls, 'check', return_value=failed), \
+             patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium()):
             rows, _ = a.probe_pipeline([node], 'unused', Path('.'),
                 precheck=lambda port: {'status': 'passed'}, probe=lambda key, pace: {'status': 'passed'},
                 site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},
-                download=lambda port: self.fail('certificate-invalid node reached download'), upload_precheck=verified_upload_precheck)
+                download=lambda port: {'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
+                large_download=lambda port: self.fail('certificate-invalid node reached 100MB'),
+                upload_precheck=verified_upload_precheck)
         self.assertEqual(rows[0]['app_tls']['status'], 'failed')
-        self.assertEqual(rows[0]['download']['status'], 'skipped')
+        self.assertEqual(rows[0]['high_speed_download']['status'], 'skipped')
         self.assertFalse(a.web_quality_eligible(rows[0]))
         self.assertEqual(a.render_comparison({}, rows, {'n-a': node})['proxies'], [])
 
@@ -75,7 +78,8 @@ class AppTLSGateTests(unittest.TestCase):
                                 ('Google204',))['Google204']
         with patch.object(a.s, 'Core'), patch.object(a.s, 'query_exit', return_value=None), \
              patch.object(a.s, 'make_listeners', return_value=([], {'n-a': 1234})), \
-             patch.object(a.app_tls, 'check', return_value=verified_tls()):
+             patch.object(a.app_tls, 'check', return_value=verified_tls()), \
+             patch.object(a, 'medium_speed_download', side_effect=lambda port: verified_medium()):
             rows, count = a.probe_pipeline([node], 'unused', Path('.'),
                 precheck=lambda port: pre, probe=lambda key, pace: {'status': 'passed'},
                 site_check=lambda port: {label: {'status': 'passed', 'elapsed_ms': 10} for label in a.POST_SITES},

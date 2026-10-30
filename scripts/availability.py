@@ -270,6 +270,9 @@ HIGH_DOWNLOAD_URL = high_speed.URLS[0]
 PRECHECK_URLS = {'Google204': SITES['Google204'], 'Cloudflare204': CLOUDFLARE_204_URL}
 # 预检阶段只有 204 和 TCP，单个节点 6 个轻请求；并发放到 48，两个目标在一轮内并行。
 PRECHECK_WORKERS = 48
+# 下载很便宜：1MB 和 5MB 先按 100 并发跑掉；网站和 TLS 最贵，收口到 16 并发。
+PROBE_WORKERS = 100
+SITE_STAGE_WORKERS = 16
 
 
 def combine_204(targets):
@@ -415,6 +418,8 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     medium_download = medium_download or medium_speed_download
     if preflight_only:
         workers = max(workers, PRECHECK_WORKERS)
+    elif initial_records is not None:
+        workers = max(workers, PROBE_WORKERS)
     modern = policy_version == qp.VERSION
     if modern:
         if download is quick_download:
@@ -450,6 +455,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
     listeners, ports = s.make_listeners({'id': n['name']} for n in active)
     pace, lock, tcp_jobs = Pace(interval), threading.Lock(), {}
     medium_slots = threading.BoundedSemaphore(medium_speed.WORKERS)
+    site_slots = threading.BoundedSemaphore(SITE_STAGE_WORKERS)
     large_slots = threading.BoundedSemaphore(HIGH_DOWNLOAD_WORKERS)
     bandwidth = BandwidthGate()
     abort = threading.Event()
@@ -512,66 +518,67 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                         controls['node_count'] += 1
                 if gate and (modern or upload_speed.sample_passed(
                         record['upload_precheck'], upload_speed.PRECHECK_BYTES, upload_speed.PRECHECK_BUDGET)):
-                    rounds = [site_check(port)]
-                    # Only traces get one round; overseas pages get three.
-                    for _ in range(WEBSITE_ROUNDS - 1):
-                        rounds.append(check_sites(port, {label: SITES[label] for label in OVERSEAS_SITES})
-                            if site_check_is_default else site_check(port))
-                    record['websites'] = summarize_rounds(rounds, labels=OVERSEAS_SITES)
-                    record['websites'].update(summarize_rounds(rounds[:1],
-                        labels=[label for label in DAILY_POST_SITES if label not in OVERSEAS_SITES]))
-                    if modern:
-                        for label in ('ChatGPTTrace', 'ClaudeTrace'):
-                            item = record['websites'].get(label) or {}
-                            if qp.transient((item.get('attempts') or [{}])[0]):
-                                attempts = item['attempts'] + [check_site(port, label, SITES[label])]
-                                record['websites'][label] = summarize_rounds([{label: a} for a in attempts], (label,))[label]
-                    tls_sites = website_tls_failures(record)
-                    record['website_tls'] = {'status': 'failed' if tls_sites else 'passed',
-                        'sites': tls_sites, 'reason': '网站TLS异常：' + '、'.join(tls_sites) if tls_sites else '网站测试未出现TLS异常'}
-                    record['websites_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
-                    traces = [record['websites'][label]['attempts'][0] for label in ('ChatGPTTrace', 'ClaudeTrace')
-                              if record['websites'][label]['status'] == 'passed'
-                              and record['websites'][label]['attempts'][0].get('exit_ip')]
-                    if traces:
-                        record['exit'] = {'id': record['id'], 'exit_ip': traces[0]['exit_ip'],
-                                          'country_code': traces[0]['country_code'], 'source': 'verified_trace'}
-                        record['exit_consistent'] = len({(r['exit_ip'], r['country_code']) for r in traces}) == 1
-                    else:
-                        try:
-                            record['exit'] = s.query_exit(port, {'id': record['id']})
-                        except (s.requests.RequestException, ValueError, KeyError):
-                            record['exit_reason'] = '出口 IP/地区未确认'
-                    if required_websites_passed(record) and not pre_application_tls_failure(record):
-                        record['app_tls'] = app_tls.check(port, **({'retry_transient': True} if modern else {}))
-                        if app_tls.passed(record['app_tls']):
-                            if modern:
-                                record['application_quality'] = application_quality.check(port)
+                    # 下载先行：1MB 和 5MB 都便宜，先跑掉；网站与 TLS 最贵，放到最后收口。
+                    with bandwidth.download():
+                        record['download'] = download(port)
+                    if record['download']['status'] == 'passed':
+                        if service_check is not None:
+                            record['service_checks'] = service_check(port, bandwidth)
+                        with medium_slots:
                             with bandwidth.download():
-                                record['download'] = download(port)
-                            if record['download']['status'] == 'passed':
-                                if service_check is not None:
-                                    record['service_checks'] = service_check(port, bandwidth)
-                                with medium_slots:
-                                    with bandwidth.download():
-                                        record['medium_speed_download'] = medium_download(port)
-                                record['medium_speed_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+                                record['medium_speed_download'] = medium_download(port)
+                        record['medium_speed_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+                    else:
+                        record['download']['reason'] = record['download'].get('reason') or '1MB下载未通过'
+                    if (record['download']['status'] == 'passed'
+                            and medium_speed.passed(record['medium_speed_download'])):
+                        with site_slots:
+                            rounds = [site_check(port)]
+                            # Only traces get one round; overseas pages get three.
+                            for _ in range(WEBSITE_ROUNDS - 1):
+                                rounds.append(check_sites(port, {label: SITES[label] for label in OVERSEAS_SITES})
+                                    if site_check_is_default else site_check(port))
+                            record['websites'] = summarize_rounds(rounds, labels=OVERSEAS_SITES)
+                            record['websites'].update(summarize_rounds(rounds[:1],
+                                labels=[label for label in DAILY_POST_SITES if label not in OVERSEAS_SITES]))
+                            if modern:
+                                for label in ('ChatGPTTrace', 'ClaudeTrace'):
+                                    item = record['websites'].get(label) or {}
+                                    if qp.transient((item.get('attempts') or [{}])[0]):
+                                        attempts = item['attempts'] + [check_site(port, label, SITES[label])]
+                                        record['websites'][label] = summarize_rounds([{label: a} for a in attempts], (label,))[label]
+                            tls_sites = website_tls_failures(record)
+                            record['website_tls'] = {'status': 'failed' if tls_sites else 'passed',
+                                'sites': tls_sites, 'reason': '网站TLS异常：' + '、'.join(tls_sites) if tls_sites else '网站测试未出现TLS异常'}
+                            record['websites_updated_at'] = s.datetime.now(s.TZ).isoformat(timespec='seconds')
+                            traces = [record['websites'][label]['attempts'][0] for label in ('ChatGPTTrace', 'ClaudeTrace')
+                                      if record['websites'][label]['status'] == 'passed'
+                                      and record['websites'][label]['attempts'][0].get('exit_ip')]
+                            if traces:
+                                record['exit'] = {'id': record['id'], 'exit_ip': traces[0]['exit_ip'],
+                                                  'country_code': traces[0]['country_code'], 'source': 'verified_trace'}
+                                record['exit_consistent'] = len({(r['exit_ip'], r['country_code']) for r in traces}) == 1
+                            else:
+                                try:
+                                    record['exit'] = s.query_exit(port, {'id': record['id']})
+                                except (s.requests.RequestException, ValueError, KeyError):
+                                    record['exit_reason'] = '出口 IP/地区未确认'
+                        if required_websites_passed(record) and not pre_application_tls_failure(record):
+                            record['app_tls'] = app_tls.check(port, **({'retry_transient': True} if modern else {}))
+                            if app_tls.passed(record['app_tls']):
+                                if modern:
+                                    record['application_quality'] = application_quality.check(port)
                                 medium = record.get('medium_speed_download') or {}
                                 medium_mib_s = medium.get('speed_mib_s')
-                                slow_medium = (medium.get('status') == 'passed'
-                                               and isinstance(medium_mib_s, (int, float))
+                                slow_medium = (isinstance(medium_mib_s, (int, float))
                                                and medium_mib_s < high_speed.MIN_MEDIUM_SPEED_MIB_S)
                                 if slow_medium:
                                     record['high_speed_download']['reason'] = (
-                                        f'5MB 速度低于 {high_speed.MIN_MEDIUM_SPEED_MIB_S} MiB/s，未提交两轮 100MB')
+                                        f'5MB 速度低于 {high_speed.MIN_MEDIUM_SPEED_MIB_S} MiB/s，未提交 100MB')
                                 else:
                                     with large_slots:
                                         with bandwidth.download():
                                             record['high_speed_download'] = large_download(port)
-                        else:
-                            record['download']['reason'] = 'ChatGPT应用TLS校验未全部通过，跳过下载'
-                    else:
-                        record['download']['reason'] = '网站TLS异常或必过网页/API/trace未通过，跳过下载'
             # 前置不查归属地：国内 TCP + 上行预检都过的节点才跑前置轨道。
             # 上行预检本来就是前置门槛，这样筛不会丢候选，又能把探测次数压下来。
             if (not preflight_only
@@ -680,9 +687,13 @@ def merge_shards(bundle, parts, count, preflight_only=False):
             web_gate = (pre['status'] == 'passed' if decoupled else record['entry']['status'] == 'passed')
             should_web = (not preflight_only and web_gate
                           and (modern or not uses_early or early.get('status') == 'passed'))
+            download_passed = (record.get('download') or {}).get('status') == 'passed'
+            downloads_ok = download_passed and medium_speed.passed(record.get('medium_speed_download') or {})
             if not should_web and record.get('websites'):
                 raise ValueError('上行预检或前置阶段未通过却检测了网站')
-            if should_web and (not record.get('websites') or any(
+            if record.get('websites') and not download_passed:
+                raise ValueError('1 MB未通过却检测了网站')
+            if should_web and downloads_ok and (not record.get('websites') or any(
                     record['websites'].get(site, {}).get('round_count') not in ((WEBSITE_ROUNDS,) if site in OVERSEAS_SITES else (1, 2) if modern else (1,)) or
                     len(record['websites'].get(site, {}).get('attempts', [])) != record['websites'].get(site, {}).get('round_count')
                     for site in DAILY_POST_SITES)):
@@ -710,25 +721,17 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                 evidence = record.get('website_tls') or {}
                 if evidence.get('sites') != failed_sites or evidence.get('status') != ('failed' if failed_sites else 'passed'):
                     raise ValueError('网站TLS硬筛选记录与原始请求不一致')
-            # Eligibility here is based only on evidence available before this stage.
-            # Later TLS failures still reject the node, but cannot erase a completed handshake.
-            should_tls = should_web and required_websites_passed(record) and not pre_application_tls_failure(record)
-            tls = record.get('app_tls') or {}
-            if tls.get('status') not in (('passed', 'failed') if should_tls else ('skipped',)):
-                raise ValueError('应用TLS阶段漏测或顺序异常')
-            if tls.get('status') == 'passed' and not app_tls.passed(tls):
-                raise ValueError('应用TLS证书证据不完整，拒绝发布')
-            should_download = should_tls and app_tls.passed(tls)
-            if record.get('download', {}).get('status') not in (('passed', 'failed') if should_download else ('skipped',)):
-                raise ValueError('下载阶段漏测或顺序异常')
-            if record.get('download', {}).get('status') == 'passed' and (
+            # 下载在网站之前：1MB 和 5MB 只看 gate，不再依赖网站和 TLS。
+            download = record.get('download') or {}
+            if download.get('status') not in (('passed', 'failed') if should_web else ('skipped',)):
+                raise ValueError('1MB阶段漏测或前置未通过')
+            if download.get('status') == 'passed' and (
                     (pre['status'] != 'passed' if decoupled else record['entry']['status'] != 'passed') or
-                    not required_websites_passed(record) or not app_tls.passed(tls) or
-                    record['download'].get('received_bytes') != DOWNLOAD_BYTES or
-                    not 0 < record['download'].get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
+                    download.get('received_bytes') != DOWNLOAD_BYTES or
+                    not 0 < download.get('elapsed_ms', math.inf) <= DOWNLOAD_BUDGET * 1000):
                 raise ValueError('下载结果不完整或节点未通过前置阶段')
             medium = record.get('medium_speed_download') or {}
-            should_medium = record.get('download', {}).get('status') == 'passed'
+            should_medium = download.get('status') == 'passed'
             if medium.get('status') not in (('passed', 'failed') if should_medium else ('skipped',)):
                 raise ValueError('5 MB阶段漏测或前置1 MB未通过')
             if should_medium and (medium.get('url') != medium_speed.URL
@@ -737,10 +740,23 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                 raise ValueError('5 MB检测目标或预算不匹配')
             if medium.get('status') == 'passed' and not medium_speed.passed(medium):
                 raise ValueError('5 MB结果不完整或超出预算')
+            if record.get('websites') and not medium_speed.passed(medium):
+                raise ValueError('5 MB未通过却检测了网站')
+            # 网站和 TLS 在下载之后：两个下载都过的节点才跑，TLS 失败后仍保留已完成的握手证据。
+            should_tls = (should_web and downloads_ok and required_websites_passed(record)
+                          and not pre_application_tls_failure(record))
+            tls = record.get('app_tls') or {}
+            if tls.get('status') not in (('passed', 'failed') if should_tls else ('skipped',)):
+                raise ValueError('应用TLS阶段漏测或顺序异常')
+            if tls.get('status') == 'passed' and not app_tls.passed(tls):
+                raise ValueError('应用TLS证书证据不完整，拒绝发布')
+            medium_ok = medium_speed.passed(medium)
+            slow_medium = (medium_ok and isinstance(medium.get('speed_mib_s'), (int, float))
+                           and medium['speed_mib_s'] < high_speed.MIN_MEDIUM_SPEED_MIB_S)
             high = record.get('high_speed_download') or {}
-            should_high = record.get('download', {}).get('status') == 'passed'
+            should_high = should_tls and app_tls.passed(tls) and medium_ok and not slow_medium
             if high.get('status') not in (('passed', 'failed') if should_high else ('skipped',)):
-                raise ValueError('100 MB双轮阶段漏测或前置1 MB未通过')
+                raise ValueError('100 MB阶段漏测或前置条件未满足')
             if should_high:
                 attempts = high.get('attempts') or []
                 if (high.get('version') != high_speed.VERSION or len(attempts) != len(high_speed.URLS)
@@ -748,11 +764,11 @@ def merge_shards(bundle, parts, count, preflight_only=False):
                                or item.get('url') != url or item.get('requested_bytes') != HIGH_DOWNLOAD_BYTES
                                or item.get('budget_seconds') != HIGH_DOWNLOAD_BUDGET
                                for item, url in zip(attempts, high_speed.URLS))):
-                    raise ValueError('100 MB双轮检测证据缺失或目标不匹配')
+                    raise ValueError('100 MB检测证据缺失或目标不匹配')
                 expected = high_speed.summarize(attempts)
                 if any(high.get(key) != expected[key] for key in ('status', 'round_count', 'passed_count',
                         'budget_seconds_per_round', 'speed_mib_s')):
-                    raise ValueError('100 MB双轮汇总与采样不一致')
+                    raise ValueError('100 MB汇总与采样不一致')
                 if any(item['status'] == 'passed' and not high_speed.sample_passed(item, url)
                        for item, url in zip(attempts, high_speed.URLS)):
                     raise ValueError('100 MB下载结果不完整或超出预算')

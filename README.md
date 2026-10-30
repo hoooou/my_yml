@@ -45,7 +45,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 
 排序：已有的 5MB 下载速度（没有则用 1MB）→ 国内 TCP 延迟。不按地区筛，美国节点同样可以当前置；前置少于 3 个时退回单跳，文件头会注明原因。
 
-落地侧（`后置配置.yaml`）：预检、必过站点、应用 TLS、1MB、3MB、上行预检、100MB 单目标一轮全部通过（5MB 低于 4MiB/s 的节点不提交，直接排除），稳定性有记录时也要通过；只收 TCP 类型，hysteria2／tuic／wireguard 不收（前置转发不了 UDP），并排除 Cloudflare。名字按出口国家重新编号（`美国01|…`），链式配置的地区组按这个前缀筛。
+落地侧（`后置配置.yaml`）：预检、上行预检、1MB、5MB、必过站点、应用 TLS、100MB 单目标一轮全部通过（5MB 低于 4MiB/s 的节点不提交，直接排除），稳定性有记录时也要通过；只收 TCP 类型，hysteria2／tuic／wireguard 不收（前置转发不了 UDP），并排除 Cloudflare。名字按出口国家重新编号（`美国01|…`），链式配置的地区组按这个前缀筛。
 
 已知限制：链式必然增加延迟；前置只测自己这一段（回国、出国、TLS），不单独跑下载测速；`v2rayN.txt`不挂链。
 
@@ -69,7 +69,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 
 ## 当前筛选流程
 
-四个免费标准Actions分片并行，每片最多处理16个节点；同一节点按前置条件顺序检测，不同节点处于不同阶段。网站、下载与持续稳定性使用不同运行机器，避免同一测速机器上的带宽争抢。每天重新参测，不永久拉黑某协议或某地区。
+八个免费标准Actions分片并行，探测阶段每片100并发、网站阶段收口到16；同一节点按阶段顺序检测，不同节点处于不同阶段。网站、下载与持续稳定性使用不同运行机器，避免同一测速机器上的带宽争抢。每天重新参测，不永久拉黑某协议或某地区。
 
 | 顺序 | 环节 | 当前要求及失败影响 |
 |---|---|---|
@@ -77,12 +77,12 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 | 1 | 双HTTPS 204各三轮 | Google `https://connectivitycheck.gstatic.com/generate_204`及Cloudflare `https://cp.cloudflare.com/generate_204`，交替顺序，各三次无正文204、严格TLS；两者全部通过才进入国内TCP。任一失败跳过后续入口检测；报告分别列两个目标和联合门槛，节点名称延迟仍取Google请求 |
 | 2 | 国内入口TCPing | 小小API，一入口一次，共享入口去重；四片总请求约≤5次/秒。明确连接失败淘汰，接口异常保持未验证；UDP不适用TCP，正式流程不凭云端204放行 |
 | 3 | 3MB上行预检 | `https://speed.cloudflare.com/__up?bytes=3000000`，随机合成3,000,000字节、6秒完整HTTP请求预算，严格证书校验；每片同时一个。速度不达标继续网站及观察，TLS异常仍淘汰 |
-| 4 | 海外网页／API／trace | 25个海外页面及ChatGPT API各三轮，两个trace单轮；每节点最多5个请求并发。指定必过目标见下文；任何网站／API／trace出现TLS异常（含非必过网站）均淘汰，普通连接超时按既有规则处理 |
-| 5 | 应用SSL | chatgpt.com、android.chat.openai.com、auth.openai.com、cdn.oaistatic.com各至少两次成功独立TLS；仅一次普通连接失败可补测一次。单次5秒、TLS≥1.2，信任链、域名、有效期必须正常 |
-| 6 | Cloudflare 1MB快测 | `https://speed.cloudflare.com/__down?bytes=1000000`，6秒内完整接收；所有入选节点必过 |
+| 4 | Cloudflare 1MB快测 | `https://speed.cloudflare.com/__down?bytes=1000000`，6秒内完整接收；所有入选节点必过。下载很便宜，先按每片100并发跑掉，不通过的节点不再跑网站和TLS |
 | 补充 | FAST API／Netflix CDN | 1MB通过后通过urlCount=3取得最多三个不同CDN主机，依次各下载1MB、各限6秒。普通失败只报告；明确证书错误淘汰 |
-| 7 | Cloudflare 5MB快测 | `https://speed.cloudflare.com/__down?bytes=5000000`，10秒完整接收，每片最多4个并发；通过才进中速组，失败仍可继续100MB |
-| 8 | Cloudflare 100MB | `https://speed.cloudflare.com/__down?bytes=100000000`，20秒完整接收，带Referer: https://speed.cloudflare.com/；通过才进高速组 |
+| 5 | Cloudflare 5MB快测 | `https://speed.cloudflare.com/__down?bytes=5000000`，10秒完整接收，每片最多4个并发；不通过的节点不再跑网站、TLS和100MB；通过但低于4MiB/s的不提交100MB |
+| 6 | 海外网页／API／trace | 25个海外页面及ChatGPT API各三轮，两个trace单轮；每节点最多5个请求并发，网站阶段全片收口到16并发。指定必过目标见下文；任何网站／API／trace出现TLS异常（含非必过网站）均淘汰，普通连接超时按既有规则处理 |
+| 7 | 应用SSL | chatgpt.com、android.chat.openai.com、auth.openai.com、cdn.oaistatic.com各至少两次成功独立TLS；仅一次普通连接失败可补测一次。单次5秒、TLS≥1.2，信任链、域名、有效期必须正常 |
+| 8 | Cloudflare 100MB | `https://speed.cloudflare.com/__down?bytes=100000000`，20秒完整接收，带Referer: https://speed.cloudflare.com/；5MB通过、网站和应用SSL都过的节点才跑，通过才进高速组 |
 | 9 | 最终上行及负载 | 复用3MB预检，再对Cloudflare上传5MB两轮、各10秒、间隔20秒；预检速度失败也完成两轮。速率、重复一致性及上传中204用于分级，TLS异常仍淘汰 |
 | 10 | 上传后SSL | 四个应用域名再次各两轮严格TLS检查 |
 | 并行 | 持续稳定性 | TCP通过后独立观察，3MB预检不阻挡观察；每轮结束随机等待3～10秒，不重叠、不限定20轮，每节点至少10分钟，每片最多8节点；排队可能延后实际间隔。持续到主流程结束，再补每节点一轮且满足最短观察时长 |

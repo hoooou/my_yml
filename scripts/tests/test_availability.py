@@ -110,9 +110,9 @@ class AvailabilityTests(unittest.TestCase):
     def test_large_tests_require_quick_pass_and_never_exceed_two_concurrent_downloads(self):
         nodes = [{'name': f'n-{i}', 'type': 'ss', 'server': '8.8.8.8', 'port': 443} for i in range(6)]
         lock, barrier = threading.Lock(), threading.Barrier(2)
-        websites_ready = threading.Barrier(5)
+        websites_ready = threading.Barrier(4)
         def websites(port):
-            websites_ready.wait(2)  # Finish all early uploads before blocking download fixtures.
+            websites_ready.wait(2)  # 下载先行的节点同时进入网站阶段
             return {label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES}
         active, peak, seen = 0, 0, []
         def large(port):
@@ -285,13 +285,15 @@ class AvailabilityTests(unittest.TestCase):
             tested.append(key)
             return {'status': 'passed'}
         def websites(port):
+            self.assertIn(('download', port), events, '网站检测必须在下载之后')
             website_started.set(); events.append(('websites', port))
             return {label: {'status': 'passed', 'elapsed_ms': 1} for label in a.POST_SITES}
         def download(port):
-            self.assertIn(('websites', port), events)
+            self.assertNotIn(('websites', port), events, '下载先于网站检测')
             events.append(('download', port)); return {'status': 'passed', 'speed_mib_s': 1}
         def large_download(port):
             self.assertIn(('download', port), events)
+            self.assertIn(('websites', port), events)
             events.append(('100MB', port)); return {'status': 'passed', 'speed_mib_s': 5}
         with patch.object(a.s, 'Core'), patch.object(a.s, 'make_listeners', return_value=([], {'n-0': 1, 'n-1': 2, 'n-2': 3})), \
              patch.object(a.s, 'query_exit', return_value={'exit_ip': '8.8.8.8', 'country_code': 'US'}):
@@ -396,9 +398,10 @@ class AvailabilityTests(unittest.TestCase):
             rows,_ = a.probe_pipeline([{'name':'n-a','type':'ss','server':'8.8.8.8','port':443}],
                 'unused',Path('.'),precheck=lambda port:{'status':'passed'},
                 probe=lambda key,pace:{'status':'passed'},site_check=lambda port:pages,
-                download=lambda port:self.fail('domestic-only nodes must skip downloads'),
-                large_download=lambda port:self.fail('must skip large downloads'), upload_precheck=verified_upload_precheck)
-        self.assertEqual(rows[0]['download']['status'],'skipped')
+                download=lambda port:{'status':'passed','received_bytes':a.DOWNLOAD_BYTES,'elapsed_ms':100},
+                large_download=lambda port:self.fail('domestic-only nodes must skip large downloads'), upload_precheck=verified_upload_precheck)
+        self.assertEqual(rows[0]['download']['status'],'passed')
+        self.assertEqual(rows[0]['app_tls']['status'],'skipped')
         self.assertEqual(rows[0]['high_speed_download']['status'],'skipped')
 
     def test_six_groups_have_valid_references_without_diagnostic_groups(self):

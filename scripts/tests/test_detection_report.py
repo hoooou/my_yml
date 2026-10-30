@@ -122,7 +122,9 @@ class CleanReportTests(unittest.TestCase):
         report, config = fixture(); text = render(report, config)
         self.assertIn('| 3 | 3MB上行预检 | 6秒内完整上传', text)
         self.assertIn('复用本轮3MB预检', text)
-        self.assertIn('| 6 | 1MB下载 | 6秒内完整下载', text)
+        self.assertIn('| 4 | 1MB下载 | 6秒内完整下载', text)
+        self.assertIn('| 5 | 5MB下载 | 10秒内完成', text)
+        self.assertLess(text.index('| 5 | 5MB下载'), text.index('| 6 | 海外网站及API'))
         self.assertNotIn('1MB上行预检', text)
 
     def test_stability_details_separate_repeated_failure_and_skipped_targets(self):

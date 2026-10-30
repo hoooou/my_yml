@@ -110,11 +110,11 @@ def stage_summary(report, website_gate=None):
             items.append({'status': 'passed' if accepted else 'failed',
                           'reason': '必过网页/API或trace未全部通过；各站原因见下表'})
         else:
-            items.append({'status': 'skipped', 'reason': '国内TCP未通过，未进行网站检测' if modern else '国内TCP或3MB上传未通过，未进行网站检测'})
+            items.append({'status': 'skipped', 'reason': '1MB或5MB下载未通过，未进行网站检测' if modern else '国内TCP、3MB上传或1MB下载未通过，未进行网站检测'})
     api_tested = any('ChatGPTAPI' in (r.get('websites') or {}) for r in nodes)
     rows.append(counts('websites', '12站＋ChatGPT API＋必过trace' if api_tested else '12站＋Claude trace', items, passed, '未进行网站检测'))
-    add('app_tls', '应用SSL', 'app_tls', app_tls.passed, '必过网站未通过，未进行应用SSL检查')
-    add('download', '1MB下载', 'download', passed, '网站或应用SSL未通过，未进行1MB下载')
+    add('app_tls', '应用SSL', 'app_tls', app_tls.passed, '5MB下载或必过网站未通过，未进行应用SSL检查')
+    add('download', '1MB下载', 'download', passed, '国内TCP或上行预检未通过，未进行1MB下载')
     fast = [(r.get('service_checks') or {}).get('targets', {}).get('FAST') or {} for r in nodes]
     rows.append(counts('fast_api', 'FAST API', (x.get('api') for x in fast), passed,
                        '1MB未通过，未请求FAST API'))
@@ -132,8 +132,8 @@ def stage_summary(report, website_gate=None):
             attempts = (r.get('high_speed_download') or {}).get('attempts') or []
             samples.append(attempts[index] if len(attempts) > index else {})
         rows.append(counts(f'high_{index + 1}', ('Cloudflare' if index == 0 else 'DataPacket') + ' 100MB',
-                           samples, lambda x, url=url: high_speed.sample_passed(x, url), '1MB未通过，未进行100MB下载'))
-    add('high', '100MB下载（高速组）', 'high_speed_download', high_speed.passed, '未完成100MB检测')
+                           samples, lambda x, url=url: high_speed.sample_passed(x, url), '5MB未通过或低于4MiB/s，未提交100MB'))
+    add('high', '100MB下载（高速组）', 'high_speed_download', high_speed.passed, '5MB、网站或应用SSL未通过，未提交100MB')
     add('upload', '两轮上行及上传中204', 'upload', upload_speed.passed, '未进入合格候选池，未进行两轮上行检测')
     if modern:
         rows.append(counts('upload_observation', '上行观测完整性（非速度门槛）',

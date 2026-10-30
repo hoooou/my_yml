@@ -18,6 +18,8 @@ import stability as st
 import detection_report as d
 from test_stability import sample
 from test_medium_speed import record
+from medium_speed_fixture import verified_medium
+from high_speed_fixture import verified_high
 from upload_fixture import verified_upload_precheck
 from test_upload_speed import evidence as upload_evidence
 from tls_fixture import verified_tls
@@ -299,7 +301,10 @@ class PipelineTests(unittest.TestCase):
             original = copy.deepcopy(first)
             second, count2 = a.probe_pipeline([node], 'unused', Path('.'), precheck=precheck,
                 probe=tcp, upload_precheck=early, upload_controls=controls, site_check=websites,
-                initial_records=first, download=lambda p: {'status': 'failed'})
+                initial_records=first, download=lambda p: {
+                    'status': 'passed', 'received_bytes': a.DOWNLOAD_BYTES, 'elapsed_ms': 100},
+                medium_download=lambda p: verified_medium(),
+                large_download=lambda p: verified_high())
             self.assertEqual(count, count2); self.assertEqual(websites.call_count, 3)
             self.assertEqual(early.call_count, 3); self.assertEqual(precheck.call_count, 1); self.assertEqual(tcp.call_count, 1)
             self.assertEqual(first, original)

@@ -52,6 +52,8 @@ class RedditLoginPolicyTests(unittest.TestCase):
     def test_real_pipeline_continues_tls_download_and_merge_rejects_forged_login(self):
         from upload_fixture import verified_upload_precheck
         from tls_fixture import verified_tls
+        from medium_speed_fixture import verified_medium
+        from high_speed_fixture import verified_high
         node={'name':'n-login','type':'ss','server':'8.8.8.8','port':443}
         pre=a.summarize_rounds([{'Google204':{'status':'passed','elapsed_ms':10}}]*3,('Google204',))['Google204']
         pages={label:{'status':'passed','elapsed_ms':100} for label in a.POST_SITES}
@@ -62,7 +64,9 @@ class RedditLoginPolicyTests(unittest.TestCase):
              patch.object(a.app_tls,'check',return_value=verified_tls()) as tls:
             rows,_=a.probe_pipeline([node],'unused',Path('.'),precheck=lambda port:pre,
                 probe=lambda key,pace:{'status':'passed'},site_check=lambda port:pages,
-                download=lambda port:calls.append(port) or {'status':'failed'},
+                download=lambda port:calls.append(port) or {'status':'passed','received_bytes':a.DOWNLOAD_BYTES,'elapsed_ms':100},
+                medium_download=lambda port:verified_medium(),
+                large_download=lambda port:verified_high(),
                 upload_precheck=verified_upload_precheck)
         self.assertEqual(calls,[1234]);tls.assert_called_once_with(1234)
         bundle={'id':'batch','nodes':[node]}
