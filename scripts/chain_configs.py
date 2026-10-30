@@ -230,7 +230,8 @@ def external_fronts(url=EXT_SUB_URL):
         return copy.deepcopy(_EXTERNAL_CACHE[url])
     try:
         with session() as client:
-            response = client.get(url, timeout=8)
+            # 面板按 UA 拦人：默认的 python-requests UA 直接 400，要用客户端自己的 UA。
+            response = client.get(url, timeout=8, headers={'User-Agent': 'clash-verge/v1.0'})
             response.raise_for_status()
             data = yaml.safe_load(response.text)
     except Exception:

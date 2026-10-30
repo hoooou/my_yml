@@ -163,6 +163,15 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(names[cc.US_RESIDENTIAL_GROUP]['proxies'], ['美国02|120ms|60Mbps|住宅|纯净度未知'])
         self.assertNotIn('use', names[cc.FRONT_GROUP])
 
+    def test_external_subscription_is_fetched_with_a_clash_user_agent(self):
+        payload = 'proxies:\n  - {name: US01, type: vless, server: 9.9.9.9, port: 443}\n'
+        with mock.patch('select_nodes.session') as session:
+            client = session.return_value.__enter__.return_value
+            client.get.return_value.text = payload
+            nodes = cc.external_fronts('https://example.invalid/sub')
+        self.assertEqual([n['name'] for n in nodes], ['🛫 订阅 US01'])
+        self.assertEqual(client.get.call_args.kwargs['headers']['User-Agent'], 'clash-verge/v1.0')
+
     def test_external_subscription_nodes_are_inlined_into_the_front_groups(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
         names = {g['name']: g for g in config['proxy-groups']}
