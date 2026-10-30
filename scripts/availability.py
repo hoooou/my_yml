@@ -43,9 +43,8 @@ from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, CLOUDFLARE_204_URL, PAGE_SA
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
 # xxapi 文档上限 50 QPS，按来源 IP 计。托管 runner 的出口 IP 不保证唯一，
-# 这里按单个 runner 的速率配，四片不会是每个都 50；撞到共享 IP 时靠 429 熔断兜底。
+# 按单个 runner 固定 30 QPS 配，不随分片数摊薄；撞到共享 IP 时靠 429 熔断兜底。
 XXAPI_PER_RUNNER_QPS = 30
-XXAPI_TOTAL_QPS = 120
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
           'unstable': '波动', 'verification_required': 'CF需验证', 'login_required': '登录提示通过', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
 WEBSITE_ROUNDS = 3
@@ -175,8 +174,7 @@ def service_status():
     """Inspect availability without submitting probes or solving security challenges."""
     services = {'xxapi': {'mode': 'automatic', 'url': 'https://xxapi.cn/doc/tcping',
                           'status': 'enabled', 'request_rate_per_second': XXAPI_PER_RUNNER_QPS,
-                          'documented_limit_per_second': 50,
-                          'aggregate_upper_bound': XXAPI_TOTAL_QPS},
+                          'documented_limit_per_second': 50},
                 'itdog': {'mode': 'manual_comparison', 'url': 'https://www.itdog.cn/batch_tcping/'},
                 'tcping_cn': {'mode': 'manual_comparison', 'url': 'https://www.tcping.cn/tcping'}}
     try:
@@ -1380,7 +1378,7 @@ def main():
         try:
             records, endpoint_count = probe_pipeline(subset, binary, root, quick3=quick3_download,
                 decoupled=bundle.get('entry_decoupled', False),
-                interval=max(1 / XXAPI_PER_RUNNER_QPS, args.shard_count / XXAPI_TOTAL_QPS),
+                interval=1 / XXAPI_PER_RUNNER_QPS,
                 upload_controls=controls,
                 preflight_only=args.phase == 'preflight', initial_records=seed,
                 service_check=service_probes.check_fast, policy_version=bundle.get('selection_policy_version'))
