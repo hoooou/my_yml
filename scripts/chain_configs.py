@@ -366,13 +366,14 @@ def render_chain(base, fronts, landings, ext_fronts=()):
         ext_groups = [ext_auto, {'name': EXT_GROUP, 'type': 'select',
                                  'proxies': [EXT_AUTO_GROUP] + ext_names,
                                  'default-selected': EXT_AUTO_GROUP}]
-    config['proxy-groups'] = [
-        {'name': FRONT_GROUP, 'type': 'select', 'proxies': front_choices},
-        _group(AUTO_GROUP, front_names),
-        *ext_groups,
-        {'name': GLOBAL_GROUP, 'type': 'select',
-         'proxies': [g['name'] for g in groups] + ['DIRECT']},
-    ] + groups
+    # 需要手动选的组放前面（前置、yieti、全局），自动跑的在下面。
+    manual = [{'name': FRONT_GROUP, 'type': 'select', 'proxies': front_choices}]
+    manual += [g for g in ext_groups if g['type'] == 'select']
+    manual.append({'name': GLOBAL_GROUP, 'type': 'select',
+                   'proxies': [g['name'] for g in groups] + ['DIRECT']})
+    automatic = [_group(AUTO_GROUP, front_names)]
+    automatic += [g for g in ext_groups if g['type'] != 'select']
+    config['proxy-groups'] = manual + automatic + groups
     return config
 
 

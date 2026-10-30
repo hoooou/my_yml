@@ -173,6 +173,14 @@ class RenderTest(unittest.TestCase):
         self.assertEqual([n['name'] for n in nodes], ['US01'])
         self.assertEqual(client.get.call_args.kwargs['headers']['User-Agent'], 'clash-verge/v1.0')
 
+    def test_manual_groups_come_before_automatic_ones(self):
+        config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
+        order = [g['name'] for g in config['proxy-groups']]
+        self.assertEqual(order[:3], [cc.FRONT_GROUP, cc.EXT_GROUP, cc.GLOBAL_GROUP])
+        self.assertEqual(order[3:5], [cc.AUTO_GROUP, cc.EXT_AUTO_GROUP])
+        self.assertEqual(order[5:], [cc.US_GROUP, cc.US_HOSTING_GROUP, cc.US_RESIDENTIAL_GROUP,
+                                     '🇪🇺 欧洲', '🌐 全部节点'])
+
     def test_external_subscription_nodes_get_their_own_group(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
         names = {g['name']: g for g in config['proxy-groups']}
