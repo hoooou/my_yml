@@ -12,6 +12,7 @@ import service_probes
 import stability
 import upload_speed
 import quality_policy as qp
+from mobile_pilot import OVERSEAS_SITES
 
 START = '<!-- latest-detection:start -->'
 END = '<!-- latest-detection:end -->'
@@ -112,7 +113,9 @@ def stage_summary(report, website_gate=None):
         else:
             items.append({'status': 'skipped', 'reason': '1MB或5MB下载未通过，未进行网站检测' if modern else '国内TCP、3MB上传或1MB下载未通过，未进行网站检测'})
     api_tested = any('ChatGPTAPI' in (r.get('websites') or {}) for r in nodes)
-    rows.append(counts('websites', '12站＋ChatGPT API＋必过trace' if api_tested else '12站＋Claude trace', items, passed, '未进行网站检测'))
+    site_count = len(OVERSEAS_SITES)
+    rows.append(counts('websites', f'{site_count}站（含ChatGPT API）＋必过trace' if api_tested
+                       else f'{site_count}站＋Claude trace', items, passed, '未进行网站检测'))
     add('app_tls', '应用SSL', 'app_tls', app_tls.passed, '5MB下载或必过网站未通过，未进行应用SSL检查')
     add('download', '1MB下载', 'download', passed, '国内TCP或上行预检未通过，未进行1MB下载')
     fast = [(r.get('service_checks') or {}).get('targets', {}).get('FAST') or {} for r in nodes]

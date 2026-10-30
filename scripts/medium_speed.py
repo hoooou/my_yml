@@ -13,7 +13,7 @@ def settings(total_deadline=False):
             'workers_per_shard': WORKERS, 'read_timeout_seconds': None if total_deadline else 1,
             'total_deadline': total_deadline,
             'includes_handshake': True, 'selection_limit': None,
-            'requires_1mb_pass': True, 'failure_blocks_high_speed_test': False}
+            'requires_1mb_pass': True, 'failure_blocks_high_speed_test': True}
 
 
 def passed(sample):

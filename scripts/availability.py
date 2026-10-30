@@ -476,7 +476,7 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                       'websites': None, 'exit': None, 'download': {'status': 'skipped', 'reason': '未进入下载阶段'},
                       'app_tls': {'status': 'skipped', 'reason': '必过网站未通过，未提交应用TLS检查'},
                       'medium_speed_download': {'status': 'skipped', 'reason': '1 MB快测未通过，未提交5 MB测试'},
-                      'high_speed_download': {'status': 'skipped', 'reason': '1 MB 快测未通过，未提交两轮100 MB测试'}}
+                      'high_speed_download': {'status': 'skipped', 'reason': '1 MB 或 5 MB 快测未通过，未提交 100 MB 测试'}}
             if initial_records is not None:
                 record = copy.deepcopy(seed[node['name']])
             else:

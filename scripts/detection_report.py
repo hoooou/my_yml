@@ -13,6 +13,7 @@ import upload_speed
 import service_probes
 import quality_policy as qp
 from mobile_pilot import confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
+from mobile_pilot import OVERSEAS_SITES
 
 
 def website_access_summary(nodes):
@@ -368,7 +369,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
              '| 4 | 1MB下载 | 6秒内完整下载，所有入选节点必过；不通过的节点不再跑网站和TLS |',
              '| 补充 | FAST API／Netflix CDN | 1MB通过后获取3个不同CDN主机，依次各下载1MB（各6秒）；仅明确证书错误影响淘汰 |',
              '| 5 | 5MB下载 | 10秒内完成才进入中速组；不通过的节点不再跑网站和TLS |',
-             '| 6 | 海外网站及API／trace | 指定12站及ChatGPT API各三轮；必过trace单轮；任何网站TLS异常淘汰 |',
+             f'| 6 | 海外网站及API／trace | 指定{len(OVERSEAS_SITES)}站（含ChatGPT API）各三轮；必过trace单轮；任何网站TLS异常淘汰 |',
              '| 7 | 应用SSL | 四个域名各两次，严格校验证书链、域名和有效期 |',
              '| 8 | Cloudflare 100MB | 20秒内完成才进入高速组；5MB通过且网站、应用SSL都过才跑 |',
              '| 9 | 上行及负载 | 复用本轮3MB预检，两轮5MB各10秒、间隔20秒；上传中204全部通过 |',
@@ -378,7 +379,7 @@ def write_report(report, config, path, candidate=False, website_gate=None):
         replacements = {'失败跳过网站和下载': '速度失败只记分级，不阻挡网站和观察',
             '上传中204全部通过': '上传中204记录负载表现，普通波动纳入分级',
             'TCP与3MB上传通过即启动独立观察': 'TCP通过即启动独立观察，至少10分钟',
-            '指定12站及ChatGPT API各三轮；必过trace单轮': '指定12站及ChatGPT API各三轮，允许一次恢复的普通连接失败；trace失败可复测一次',
+            f'指定{len(OVERSEAS_SITES)}站（含ChatGPT API）各三轮；必过trace单轮': f'指定{len(OVERSEAS_SITES)}站（含ChatGPT API）各三轮，允许一次恢复的普通连接失败；trace失败可复测一次',
             '各三轮全部通过': '各三轮全部通过',
             '四个域名各两次，严格校验证书链、域名和有效期': '四域名至少两次成功握手，仅一次普通超时可补测；TLS异常不放行'}
         rows = [line for line in rows]

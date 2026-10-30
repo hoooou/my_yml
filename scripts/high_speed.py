@@ -46,7 +46,8 @@ def summarize(attempts):
             'round_count': len(attempts), 'passed_count': passed_count,
             'attempts': attempts, 'budget_seconds_per_round': BUDGET,
             'speed_mib_s': min(a['speed_mib_s'] for a in attempts) if complete else None,
-            'reason': '两个100 MB文件均在各自20秒内完整下载' if complete else '两轮100 MB下载未全部通过'}
+            'reason': (f'{len(URLS)} 个 {BYTES // 1_000_000} MB 目标均在各自 {BUDGET} 秒内完整下载'
+                       if complete else f'{len(URLS)} 个 100 MB 目标未全部完整下载')}
 
 
 def passed(result):

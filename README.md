@@ -37,7 +37,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 | TLS 无异常 | 前置自己的 TLS 探测无异常 |
 | 回国 / 出国 | 国内与海外目标都能连通 |
 
-排序：已有的 5MB 下载速度（没有则用 1MB）→ 国内 TCP 延迟。前置少于 3 个时退回单跳，文件头会注明原因。
+排序：已有的 5MB 下载速度（没有则用 1MB）→ 国内 TCP 延迟。没有前置或没有落地时不生成链式配置，`chain_enabled` 记 false、上一版保持不变；原订阅不受影响。
 
 落地侧（`后置配置.yaml`）：预检、上行预检、1MB、5MB、必过站点、应用 TLS、100MB 单目标一轮全部通过（5MB 低于 4MiB/s 的节点不提交，直接排除），稳定性有记录时也要通过；只收 TCP 类型（hysteria2／tuic／wireguard 不收，前置转发不了 UDP），并排除 Cloudflare。名字按出口国家重新编号（`美国01|…`），地区组按前缀筛；美国拆成三组——`🇺🇸 美国节点` 收全部美国节点，`🏢 美国机房` 与 `🏠 美国住宅` 按名字第四段的 `机房`／`住宅` 标记细分，未知和移动网络只进美国节点组。
 
@@ -74,7 +74,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 | 4 | Cloudflare 1MB 快测 | `__down?bytes=1000000`，6 秒内完整接收，所有入选节点必过；下载很便宜，先按每片 100 并发跑掉，不过的不再跑网站和 TLS |
 | 补充 | FAST API／Netflix CDN | 1MB 通过后取最多三个不同 CDN 主机，各下载 1MB、各 6 秒；普通失败只报告，明确证书错误淘汰 |
 | 5 | Cloudflare 5MB 快测 | `__down?bytes=5000000`，10 秒内完整接收，每片最多 4 并发；不过的不再跑网站、TLS 和 100MB；通过但低于 4MiB/s 的不提交 100MB |
-| 6 | 海外网页／API／trace | 25 个海外页面与 ChatGPT API 各三轮，两个 trace 单轮；每节点最多 5 请求并发。必过目标见下文；任何网站／API／trace 出现 TLS 异常（含非必过）均淘汰 |
+| 6 | 海外网页／API／trace | 26 个海外站点（含 ChatGPT API）各三轮，两个 trace 单轮；每节点最多 5 请求并发。必过目标见下文；任何网站／API／trace 出现 TLS 异常（含非必过）均淘汰 |
 | 7 | 应用 SSL | chatgpt.com、android.chat.openai.com、auth.openai.com、cdn.oaistatic.com 各至少两次成功独立 TLS；单次 5 秒、TLS ≥1.2，信任链、域名、有效期必须正常 |
 | 8 | Cloudflare 100MB | `__down?bytes=100000000`，20 秒内完整接收，带 Referer；5MB 通过、网站和应用 SSL 都过的节点才跑，通过才进高速组 |
 | 9 | 最终上行及负载 | 复用 3MB 预检，再对 Cloudflare 上传 5MB 两轮、各 10 秒、间隔 20 秒；速度失败也完成两轮，TLS 异常仍淘汰 |
