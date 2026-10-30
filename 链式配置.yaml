@@ -1,4 +1,4 @@
-# 链式配置；2026-10-31T00:21:08+08:00；规则复用优选配置，节点已内联
+# 链式配置；2026-10-31T00:30:44+08:00；规则复用优选配置，节点已内联
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -2633,13 +2633,6 @@ proxies:
   uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
   name: 美国121|239ms|44Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-proxy-providers:
-  yieti:
-    type: http
-    url: https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash
-    interval: 3600
-    path: ./providers/yieti.yaml
-    proxy: 🔄 自动前置
 proxy-groups:
 - name: 🌉 前置
   type: select
@@ -2697,8 +2690,6 @@ proxy-groups:
   - 🛫 50|253ms|3Mbps
   - 🛫 51|97ms|2Mbps
   - 🛫 52|246ms|?Mbps
-  use:
-  - yieti
 - name: 🔄 自动前置
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -2760,8 +2751,6 @@ proxy-groups:
   - 🛫 50|253ms|3Mbps
   - 🛫 51|97ms|2Mbps
   - 🛫 52|246ms|?Mbps
-  use:
-  - yieti
 - name: 🚀 全局选择
   type: select
   proxies:
