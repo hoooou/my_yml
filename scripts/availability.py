@@ -42,9 +42,10 @@ from attempt_report import write_attempt
 from mobile_pilot import MAX_TTFB_MS, MAX_SAMPLE_MS, CLOUDFLARE_204_URL, PAGE_SAMPLE_LIMITS, REDDIT_LOGIN_SAMPLE_BYTES, confirmed_cloudflare_challenge, confirmed_reddit_login, confirmed_page_exception
 
 XXAPI = 'https://v2.xxapi.cn/api/tcping'
-# xxapi 文档上限 50 QPS；四片合计留 20% 余量，单个 runner 不超过 10 QPS。
-XXAPI_TOTAL_QPS = 40
-XXAPI_PER_RUNNER_QPS = 10
+# xxapi 文档上限 50 QPS，按来源 IP 计。托管 runner 的出口 IP 不保证唯一，
+# 这里按单个 runner 的速率配，四片不会是每个都 50；撞到共享 IP 时靠 429 熔断兜底。
+XXAPI_PER_RUNNER_QPS = 30
+XXAPI_TOTAL_QPS = 120
 LABELS = {'passed': '通', 'failed': '不通', 'unknown': '未验证',
           'unstable': '波动', 'verification_required': 'CF需验证', 'login_required': '登录提示通过', 'needs_review': '需人工复核', 'skipped': '未测', 'slow': '响应慢'}
 WEBSITE_ROUNDS = 3
@@ -173,9 +174,9 @@ def probe_xxapi(key, pace):
 def service_status():
     """Inspect availability without submitting probes or solving security challenges."""
     services = {'xxapi': {'mode': 'automatic', 'url': 'https://xxapi.cn/doc/tcping',
-                          'status': 'enabled', 'request_rate_per_second': XXAPI_TOTAL_QPS,
+                          'status': 'enabled', 'request_rate_per_second': XXAPI_PER_RUNNER_QPS,
                           'documented_limit_per_second': 50,
-                          'per_runner_per_second': XXAPI_PER_RUNNER_QPS},
+                          'aggregate_upper_bound': XXAPI_TOTAL_QPS},
                 'itdog': {'mode': 'manual_comparison', 'url': 'https://www.itdog.cn/batch_tcping/'},
                 'tcping_cn': {'mode': 'manual_comparison', 'url': 'https://www.tcping.cn/tcping'}}
     try:
