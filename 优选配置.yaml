@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-30T19:04:27+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-30T19:14:49+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -3393,9 +3393,9 @@ proxy-groups:
   - 法国46|2018ms|26Mbps|机房|纯净度未知
   - 🍓 请前往官网重新获取订阅
   url: https://claude.ai/cdn-cgi/trace
-  interval: 300
+  interval: 120
   lazy: false
-  timeout: 5000
+  timeout: 3000
   expected-status: 200
   default-selected: ⭐ 综合优选
 - name: ⭐ 综合优选
@@ -3533,11 +3533,11 @@ proxy-groups:
   - 荷兰37|897ms|21Mbps|机房|纯净度未知
   - 荷兰38|902ms|22Mbps|机房|纯净度未知
   url: https://claude.ai/cdn-cgi/trace
-  interval: 300
+  interval: 120
   lazy: false
-  timeout: 5000
+  timeout: 3000
   expected-status: 200
-  tolerance: 50
+  tolerance: 300
 - name: 🚄 中速下载
   type: url-test
   proxies:
@@ -3790,11 +3790,11 @@ proxy-groups:
   - 美国03|290ms|4Mbps|机房|纯净度未知
   - 德国04|982ms|4Mbps|机房|纯净度未知
   url: https://claude.ai/cdn-cgi/trace
-  interval: 300
+  interval: 120
   lazy: false
-  timeout: 5000
+  timeout: 3000
   expected-status: 200
-  tolerance: 50
+  tolerance: 300
 - name: ⚡ 高速下载
   type: url-test
   proxies:
@@ -3877,11 +3877,11 @@ proxy-groups:
   - 美国72|196ms|85Mbps|机房|纯净度未知
   - 美国09|488ms|67Mbps|机房|纯净度未知
   url: https://claude.ai/cdn-cgi/trace
-  interval: 300
+  interval: 120
   lazy: false
-  timeout: 5000
+  timeout: 3000
   expected-status: 200
-  tolerance: 50
+  tolerance: 300
 - name: 🏠 非机房 IP
   type: url-test
   proxies:
@@ -3900,21 +3900,21 @@ proxy-groups:
   - 荷兰65|909ms|20Mbps|未知|纯净度未知
   - 美国74|733ms|29Mbps|未知|纯净度未知
   url: https://claude.ai/cdn-cgi/trace
-  interval: 300
+  interval: 120
   lazy: false
-  timeout: 5000
+  timeout: 3000
   expected-status: 200
-  tolerance: 50
+  tolerance: 300
 - name: 🌏 台湾／新加坡
   type: url-test
   proxies:
   - 台湾01|1076ms|11Mbps|机房|纯净度未知
   url: https://claude.ai/cdn-cgi/trace
-  interval: 300
+  interval: 120
   lazy: false
-  timeout: 5000
+  timeout: 3000
   expected-status: 200
-  tolerance: 50
+  tolerance: 300
 - name: 🍓 小草莓（免测）
   type: select
   proxies:

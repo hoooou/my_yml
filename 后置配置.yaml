@@ -1,4 +1,4 @@
-# 后置配置；2026-10-30T19:04:27+08:00；154 个
+# 后置配置；2026-10-30T19:14:49+08:00；154 个
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -2136,10 +2136,10 @@ proxy-groups:
 - name: 🇺🇸 美国节点
   type: url-test
   url: http://www.gstatic.com/generate_204
-  interval: 180
-  timeout: 5000
+  interval: 120
+  timeout: 3000
   expected-status: 204
-  tolerance: 50
+  tolerance: 300
   lazy: false
   proxies:
   - 美国01|155ms|1605Mbps|机房|纯净度未知
@@ -2274,10 +2274,10 @@ proxy-groups:
 - name: 🏢 美国机房
   type: url-test
   url: http://www.gstatic.com/generate_204
-  interval: 180
-  timeout: 5000
+  interval: 120
+  timeout: 3000
   expected-status: 204
-  tolerance: 50
+  tolerance: 300
   lazy: false
   proxies:
   - 美国01|155ms|1605Mbps|机房|纯净度未知
@@ -2387,20 +2387,20 @@ proxy-groups:
 - name: 🇸🇬 新加坡
   type: url-test
   url: http://www.gstatic.com/generate_204
-  interval: 180
-  timeout: 5000
+  interval: 120
+  timeout: 3000
   expected-status: 204
-  tolerance: 50
+  tolerance: 300
   lazy: false
   proxies:
   - 新加坡01|569ms|162Mbps|机房|纯净度未知
 - name: 🇪🇺 欧洲
   type: url-test
   url: http://www.gstatic.com/generate_204
-  interval: 180
-  timeout: 5000
+  interval: 120
+  timeout: 3000
   expected-status: 204
-  tolerance: 50
+  tolerance: 300
   lazy: false
   proxies:
   - 德国01|699ms|433Mbps|未知|纯净度未知
@@ -2415,10 +2415,10 @@ proxy-groups:
 - name: 🌐 全部节点
   type: url-test
   url: http://www.gstatic.com/generate_204
-  interval: 180
-  timeout: 5000
+  interval: 120
+  timeout: 3000
   expected-status: 204
-  tolerance: 50
+  tolerance: 300
   lazy: false
   proxies:
   - 美国01|155ms|1605Mbps|机房|纯净度未知
