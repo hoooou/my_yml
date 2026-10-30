@@ -38,3 +38,5 @@ jobs:
         run: python scripts/refresh_detection_report.py
       - name: 发布报告，不改订阅节点
         run: python scripts/publish_subscription.py --report-only
+      - name: 刷新 CDN 缓存
+        run: python scripts/purge_cdn.py "${{ github.repository }}"

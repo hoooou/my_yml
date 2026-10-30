@@ -434,6 +434,9 @@ jobs:
         if: always() && (inputs.demo_nodes == '' || inputs.publish_demo == 'yes')
         id: publish_subscription
         run: python scripts/publish_subscription.py
+      - name: 刷新 CDN 缓存
+        if: always() && steps.publish_subscription.outcome == 'success'
+        run: python scripts/purge_cdn.py "${{ github.repository }}"
       - name: 发布本次摘要
         if: always()
         run: |
@@ -523,6 +526,9 @@ jobs:
         if: always()
         id: publish_subscription
         run: python scripts/publish_subscription.py
+      - name: 刷新 CDN 缓存
+        if: always() && steps.publish_subscription.outcome == 'success'
+        run: python scripts/purge_cdn.py "${{ github.repository }}"
       - name: 发布本次摘要
         if: always()
         run: |

@@ -35,8 +35,10 @@ US_RESIDENTIAL_GROUP = '🏠 美国住宅'
 US_PREFIX = '美国'
 US_HOSTING_MARK = '|机房|'
 US_RESIDENTIAL_MARK = '|住宅|'
-# 国内拉取：cdn.jsdelivr.net 在境内经常不通，provider 走 Fastly 节点（jsd.onmicrosoft.cn 已于 10-28 证书过期，不能用）。
-CDN_BASE = 'https://fastly.jsdelivr.net/gh/hoooou/my_yml@main/'
+# 国内拉取：cdn.jsdelivr.net 在境内经常不通，provider 走 jsDelivr 的 Gcore 节点。
+# Fastly 节点实测不跟随 purge 接口，发布后仍返回上一版，所以不用它；
+# jsd.onmicrosoft.cn 已于 2026-10-28 证书过期，也不能用。
+CDN_BASE = 'https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/'
 FRONT_URL = (CDN_BASE
              + quote('前置配置.yaml'))
 LANDING_URL = (CDN_BASE
