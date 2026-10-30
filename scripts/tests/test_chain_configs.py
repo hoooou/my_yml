@@ -48,6 +48,18 @@ def base_config():
     }
 
 
+
+def fronts_fixture():
+    return [{'record': record(0), 'node': node(0, server='1.1.1.1')}]
+
+
+def landings_fixture():
+    return [
+        {'name': '美国01|100ms|50Mbps|机房|纯净度未知', 'server': '2.2.2.2', 'port': 80, 'type': 'http'},
+        {'name': '美国02|120ms|60Mbps|住宅|纯净度未知', 'server': '2.2.2.3', 'port': 80, 'type': 'http'},
+        {'name': '德国01|200ms|20Mbps|机房|纯净度未知', 'server': '3.3.3.3', 'port': 80, 'type': 'http'},
+    ]
+
 class SelectionTest(unittest.TestCase):
     def setUp(self):
         patcher = mock.patch.object(cc, 'is_cloudflare', return_value=False)
@@ -122,30 +134,32 @@ class SelectionTest(unittest.TestCase):
 
 
 class RenderTest(unittest.TestCase):
-    def test_chain_uses_providers_and_copies_rules(self):
+    def test_chain_inlines_nodes_and_copies_rules(self):
         base = base_config()
         original = copy.deepcopy(base)
-        config = cc.render_chain(base)
-        self.assertEqual(config['proxies'], [])
-        self.assertEqual(set(config['proxy-providers']), {'front', 'landing'})
-        self.assertEqual(config['proxy-providers']['landing']['override']['dialer-proxy'],
-                         cc.FRONT_GROUP)
+        config = cc.render_chain(base, fronts_fixture(), landings_fixture())
+        self.assertNotIn('proxy-providers', config)
+        self.assertEqual(len(config['proxies']), 4)  # 1 个前置 + 3 个落地
+        self.assertTrue(all(node.get('dialer-proxy') in (None, cc.FRONT_GROUP)
+                            for node in config['proxies']))
+        self.assertEqual(config['proxies'][1]['dialer-proxy'], cc.FRONT_GROUP)
         self.assertEqual(config['rules'], base['rules'])
         self.assertFalse(config['ipv6'])
         self.assertFalse(config['dns']['ipv6'])
         self.assertEqual(base, original)
 
-    def test_chain_groups_filter_by_region(self):
-        config = cc.render_chain(base_config())
+    def test_chain_groups_cover_regions_without_provider_filters(self):
+        config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture())
         names = {g['name']: g for g in config['proxy-groups']}
         self.assertIn(cc.FRONT_GROUP, names)
-        self.assertEqual(names[cc.FRONT_GROUP]['use'], ['front'])
-        for group in (cc.US_GROUP, cc.US_HOSTING_GROUP, cc.US_RESIDENTIAL_GROUP):
-            self.assertEqual(names[group]['use'], ['landing'])
-        self.assertEqual(names[cc.US_GROUP]['filter'], '^美国')
-        self.assertEqual(names[cc.US_HOSTING_GROUP]['filter'], '^美国.*[|]机房[|]')
-        self.assertEqual(names[cc.US_RESIDENTIAL_GROUP]['filter'], '^美国.*[|]住宅[|]')
-        self.assertIn('英国', names['🇪🇺 欧洲']['filter'])
+        self.assertEqual(names[cc.FRONT_GROUP]['proxies'][0], cc.AUTO_GROUP)
+        self.assertEqual(len(names[cc.AUTO_GROUP]['proxies']), 1)
+        self.assertEqual(names[cc.US_GROUP]['proxies'],
+                         ['美国01|100ms|50Mbps|机房|纯净度未知', '美国02|120ms|60Mbps|住宅|纯净度未知'])
+        self.assertEqual(names[cc.US_HOSTING_GROUP]['proxies'], ['美国01|100ms|50Mbps|机房|纯净度未知'])
+        self.assertEqual(names[cc.US_RESIDENTIAL_GROUP]['proxies'], ['美国02|120ms|60Mbps|住宅|纯净度未知'])
+        self.assertIn('德国01|200ms|20Mbps|机房|纯净度未知', names['🇪🇺 欧洲']['proxies'])
+        self.assertNotIn('use', names[cc.US_GROUP])
 
     def test_front_config_single_flat_group(self):
         base = base_config()

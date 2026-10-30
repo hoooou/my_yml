@@ -1716,7 +1716,7 @@ def main():
             products = (
                 ('前置配置.yaml', front_cfg, f'# 前置配置；{now}；{chain_summary["fronts"]} 个\n'),
                 ('后置配置.yaml', landing_cfg, f'# 后置配置；{now}；{chain_summary["landings"]} 个\n'),
-                ('链式配置.yaml', chain_cfg, f'# 链式配置；{now}；规则复用优选配置，节点由 provider 提供\n'),
+                ('链式配置.yaml', chain_cfg, f'# 链式配置；{now}；规则复用优选配置，节点已内联\n'),
             )
             valid = True
             for name, value, _header in products[:2]:

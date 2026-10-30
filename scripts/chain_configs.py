@@ -3,7 +3,7 @@
 
 - 前置配置.yaml : fronts only, one flat url-test group
 - 后置配置.yaml : landings only, grouped by region, no CN-reachability gate
-- 链式配置.yaml : no nodes, two proxy-providers + groups, rules copied from 优选配置
+- 链式配置.yaml : fronts + landings inlined (no proxy-provider), groups by region, rules copied
 
 --- @ty.aicoding@1793205643486 ---
 """
@@ -12,7 +12,6 @@ import copy
 import ipaddress
 import math
 import socket
-from urllib.parse import quote
 
 # 前置不查归属地：国内 TCP 能过、再通过下面几道实测门槛就收，美国之外的都可以。
 EU_PREFIXES = ('英国', '德国', '法国', '荷兰', '意大利', '西班牙', '葡萄牙', '波兰', '瑞典',
@@ -35,14 +34,6 @@ US_RESIDENTIAL_GROUP = '🏠 美国住宅'
 US_PREFIX = '美国'
 US_HOSTING_MARK = '|机房|'
 US_RESIDENTIAL_MARK = '|住宅|'
-# 国内拉取：cdn.jsdelivr.net 在境内经常不通，provider 走 jsDelivr 的 Gcore 节点。
-# Fastly 节点实测不跟随 purge 接口，发布后仍返回上一版，所以不用它；
-# jsd.onmicrosoft.cn 已于 2026-10-28 证书过期，也不能用。
-CDN_BASE = 'https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/'
-FRONT_URL = (CDN_BASE
-             + quote('前置配置.yaml'))
-LANDING_URL = (CDN_BASE
-               + quote('后置配置.yaml'))
 CF_NETWORKS = ('172.64.0.0/13', '104.16.0.0/13', '162.158.0.0/15', '188.114.96.0/20',
                '173.245.48.0/20', '103.21.244.0/22', '131.0.72.0/22', '141.101.64.0/18',
                '108.162.192.0/18', '190.93.240.0/20', '197.234.240.0/22', '198.41.128.0/17',
@@ -223,10 +214,7 @@ def _group(name, nodes):
             'proxies': nodes}
 
 
-def render_front(base, fronts):
-    config = _base(base)
-    config['ipv6'] = False
-    config.setdefault('dns', {})['ipv6'] = False
+def _front_nodes(fronts):
     nodes, names = [], []
     for index, item in enumerate(fronts, 1):
         entry = (item['record'].get('entry') or {}).get('latency_ms')
@@ -240,6 +228,14 @@ def render_front(base, fronts):
         node['name'] = name
         nodes.append(node)
         names.append(name)
+    return nodes, names
+
+
+def render_front(base, fronts):
+    config = _base(base)
+    config['ipv6'] = False
+    config.setdefault('dns', {})['ipv6'] = False
+    nodes, names = _front_nodes(fronts)
     config['proxies'] = nodes
     config['proxy-groups'] = [
         {'name': GLOBAL_GROUP, 'type': 'select',
@@ -274,41 +270,36 @@ def render_landing(base, landings):
     return config
 
 
-def render_chain(base):
+def render_chain(base, fronts, landings):
+    """节点直接内联，不依赖 proxy-provider：客户端拉不到 provider 时链式会整组为空。"""
     config = _base(base)
     config['ipv6'] = False
     config.setdefault('dns', {})['ipv6'] = False
-    config['proxies'] = []
-    config['proxy-providers'] = {
-        'front': {'type': 'http', 'url': FRONT_URL, 'interval': 3600,
-                  'path': './providers/front.yaml', 'proxy': 'DIRECT'},
-        'landing': {'type': 'http', 'url': LANDING_URL, 'interval': 3600,
-                    'path': './providers/landing.yaml', 'proxy': 'DIRECT',
-                    'override': {'dialer-proxy': FRONT_GROUP}},
-    }
-    region_groups = [
-        _group(US_GROUP, []), _group(US_HOSTING_GROUP, []), _group(US_RESIDENTIAL_GROUP, []),
-        _group('🇯🇵 日本', []), _group('🇸🇬 新加坡', []),
-        _group('🇪🇺 欧洲', []), _group('🌐 全部节点', []),
+    front_nodes, front_names = _front_nodes(fronts)
+    landing_nodes = [copy.deepcopy(node) for node in landings]
+    for node in landing_nodes:
+        # 原来的 landing provider 用 override 挂前置，内联后逐个节点挂。
+        node['dialer-proxy'] = FRONT_GROUP
+    names = [node['name'] for node in landing_nodes]
+    eu = [n for n in names if str(n).startswith(EU_PREFIXES)]
+    us = [n for n in names if str(n).startswith(US_PREFIX)]
+    groups = [
+        _group(US_GROUP, us),
+        _group(US_HOSTING_GROUP, [n for n in us if US_HOSTING_MARK in str(n)]),
+        _group(US_RESIDENTIAL_GROUP, [n for n in us if US_RESIDENTIAL_MARK in str(n)]),
+        _group('🇯🇵 日本', [n for n in names if str(n).startswith('日本')]),
+        _group('🇸🇬 新加坡', [n for n in names if str(n).startswith('新加坡')]),
+        _group('🇪🇺 欧洲', eu),
+        _group('🌐 全部节点', names),
     ]
-    filters = ['^' + US_PREFIX,
-               '^' + US_PREFIX + '.*[|]机房[|]',
-               '^' + US_PREFIX + '.*[|]住宅[|]',
-               '^日本', '^新加坡', '^(' + '|'.join(EU_PREFIXES) + ')']
-    for group, pattern in zip(region_groups, filters + ['']):
-        group.pop('proxies', None)
-        group['use'] = ['landing']
-        if pattern:
-            group['filter'] = pattern
+    groups = [g for g in groups if g['proxies']]
+    config['proxies'] = front_nodes + landing_nodes
     config['proxy-groups'] = [
-        {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP],
-         'use': ['front']},
-        {'name': AUTO_GROUP, 'type': 'url-test', 'url': CHECK_URL, 'interval': 120,
-         'timeout': 3000, 'expected-status': 204, 'tolerance': 100, 'lazy': False,
-         'use': ['front']},
+        {'name': FRONT_GROUP, 'type': 'select', 'proxies': [AUTO_GROUP] + front_names},
+        _group(AUTO_GROUP, front_names),
         {'name': GLOBAL_GROUP, 'type': 'select',
-         'proxies': [g['name'] for g in region_groups] + ['DIRECT']},
-    ] + region_groups
+         'proxies': [g['name'] for g in groups] + ['DIRECT']},
+    ] + groups
     return config
 
 
@@ -323,5 +314,5 @@ def build(base, records, mapping):
     }
     front_config = render_front(base, fronts) if fronts else None
     landing_config = render_landing(base, landings) if landings else None
-    chain_config = render_chain(base) if (fronts and landings) else None
+    chain_config = render_chain(base, fronts, landings) if (fronts and landings) else None
     return front_config, landing_config, chain_config, summary

@@ -42,7 +42,7 @@ https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/v2rayN.txt
 https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 ```
 
-`前置配置.yaml` 和 `后置配置.yaml` 不需要手动添加：它们是 `链式配置.yaml` 内部的两个订阅源，客户端加载链式配置时会自己按下面的地址去拉，同样走 jsDelivr，国内可以直接拉到：
+`前置配置.yaml` 和 `后置配置.yaml` 是同一批前置/落地节点的单独版本，想只用前置或只用落地时可以直接加，地址如下。`链式配置.yaml` 不使用它们，节点已经内联，客户端不需要再拉第二个文件：
 
 ```text
 https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/%E5%89%8D%E7%BD%AE%E9%85%8D%E7%BD%AE.yaml
@@ -79,7 +79,7 @@ https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD
 https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
 ```
 
-与 `优选配置.yaml` 同源、独立发布，不影响原配置。区别只有一处：落地节点通过 `dialer-proxy` 挂到 `🌉 前置` 组。前置从同一轮池子里筛，不按地区：国内 TCP 能过的都进前置轨道，再由实测门槛决定去留。前置/后置两个 provider 走 `gcore.jsdelivr.net`（国内可达性比默认节点好，且跟随缓存清理）；Fastly 节点实测不跟随 purge、会返回上一版，`jsd.onmicrosoft.cn` 2026-10-28 起证书过期，都不要换回去。
+与 `优选配置.yaml` 同源、独立发布，不影响原配置。区别只有一处：落地节点通过 `dialer-proxy` 挂到 `🌉 前置` 组。前置从同一轮池子里筛，不按地区：国内 TCP 能过的都进前置轨道，再由实测门槛决定去留。前置和落地节点都直接写在配置里，不再走 proxy-provider——provider 拉不下来时链式会整组空掉，客户端也不会再额外请求第二个文件，打开即用。
 
 | 前置条件 | 说明 |
 |---|---|
