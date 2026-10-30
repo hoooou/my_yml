@@ -177,6 +177,9 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(groups[cc.FRONT_TEST_GROUP]['type'], 'url-test')
         self.assertEqual(len(groups[cc.FRONT_TEST_GROUP]['proxies']), 2)
         self.assertIn(cc.FRONT_TEST_GROUP, groups[cc.GLOBAL_GROUP]['proxies'])
+        # 自己的订阅免测，作为 provider 直接并进前置组。
+        self.assertEqual(groups[cc.FRONT_TEST_GROUP]['use'], [cc.EXT_PROVIDER])
+        self.assertEqual(config['proxy-providers'][cc.EXT_PROVIDER]['url'], cc.EXT_SUB_URL)
 
     def test_landing_config_groups_by_region(self):
         base = base_config()

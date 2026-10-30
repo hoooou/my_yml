@@ -24,6 +24,10 @@ BASE_KEYS = ('mixed-port', 'allow-lan', 'mode', 'log-level', 'external-controlle
 CHECK_URL = 'http://www.gstatic.com/generate_204'
 FRONT_PREFIX = '🛫 '
 FRONT_TEST_GROUP = '🛫 前置节点'
+# 用户自己的订阅，作为 proxy-provider 直接并进前置组：不参与检测，客户端自己拉取更新。
+# 注意：provider 地址必须写在公开配置里，token 会随产物一起公开。
+EXT_PROVIDER = 'yieti'
+EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -237,10 +241,16 @@ def render_front(base, fronts):
     config.setdefault('dns', {})['ipv6'] = False
     nodes, names = _front_nodes(fronts)
     config['proxies'] = nodes
+    config['proxy-providers'] = {
+        EXT_PROVIDER: {'type': 'http', 'url': EXT_SUB_URL, 'interval': 3600,
+                       'path': f'./providers/{EXT_PROVIDER}.yaml', 'proxy': 'DIRECT'},
+    }
+    front_group = _group(FRONT_TEST_GROUP, names)
+    front_group['use'] = [EXT_PROVIDER]
     config['proxy-groups'] = [
         {'name': GLOBAL_GROUP, 'type': 'select',
          'proxies': [FRONT_TEST_GROUP, 'DIRECT']},
-        _group(FRONT_TEST_GROUP, names),
+        front_group,
     ]
     return config
 
