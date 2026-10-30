@@ -1,4 +1,4 @@
-# 链式配置；2026-10-30T18:17:45+08:00；规则复用优选配置，节点由 provider 提供
+# 链式配置；2026-10-30T18:40:16+08:00；规则复用优选配置，节点由 provider 提供
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -80,7 +80,9 @@ dns:
 rules:
 - RULE-SET,company-internal,DIRECT
 - RULE-SET,private,DIRECT
-- RULE-SET,lancidr,DIRECT,no-resolve
+- IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+- IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+- IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
 - GEOIP,LAN,DIRECT,no-resolve
 - IP-CIDR6,::1/128,DIRECT,no-resolve
 - IP-CIDR6,fc00::/7,DIRECT,no-resolve
@@ -125,6 +127,7 @@ rules:
 - RULE-SET,proxy,🚀 全局选择
 - RULE-SET,gfw,🚀 全局选择
 - RULE-SET,direct,DIRECT
+- RULE-SET,lancidr,DIRECT,no-resolve
 - RULE-SET,telegramcidr,🚀 全局选择,no-resolve
 - RULE-SET,cncidr,DIRECT
 - GEOIP,CN,DIRECT
@@ -216,6 +219,8 @@ rule-providers:
     - +.cdninstagram.com
     - +.chatgpt.com
     - +.claude.ai
+    - +.claude.com
+    - +.claudeusercontent.com
     - +.copilot.microsoft.com
     - +.cursor.com
     - +.cursor.sh
@@ -482,6 +487,8 @@ rule-providers:
     - +.cdninstagram.com
     - +.chatgpt.com
     - +.claude.ai
+    - +.claude.com
+    - +.claudeusercontent.com
     - +.cursor.com
     - +.cursor.sh
     - +.discord.com

@@ -1,4 +1,4 @@
-# 分阶段检测；2026-10-30T18:17:45+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-10-30T18:40:16+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -80,7 +80,9 @@ dns:
 rules:
 - RULE-SET,company-internal,DIRECT
 - RULE-SET,private,DIRECT
-- RULE-SET,lancidr,DIRECT,no-resolve
+- IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+- IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+- IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
 - GEOIP,LAN,DIRECT,no-resolve
 - IP-CIDR6,::1/128,DIRECT,no-resolve
 - IP-CIDR6,fc00::/7,DIRECT,no-resolve
@@ -125,6 +127,7 @@ rules:
 - RULE-SET,proxy,🚀 全局选择
 - RULE-SET,gfw,🚀 全局选择
 - RULE-SET,direct,DIRECT
+- RULE-SET,lancidr,DIRECT,no-resolve
 - RULE-SET,telegramcidr,🚀 全局选择,no-resolve
 - RULE-SET,cncidr,DIRECT
 - GEOIP,CN,DIRECT
@@ -216,6 +219,8 @@ rule-providers:
     - +.cdninstagram.com
     - +.chatgpt.com
     - +.claude.ai
+    - +.claude.com
+    - +.claudeusercontent.com
     - +.copilot.microsoft.com
     - +.cursor.com
     - +.cursor.sh
@@ -482,6 +487,8 @@ rule-providers:
     - +.cdninstagram.com
     - +.chatgpt.com
     - +.claude.ai
+    - +.claude.com
+    - +.claudeusercontent.com
     - +.cursor.com
     - +.cursor.sh
     - +.discord.com
@@ -3113,13 +3120,6 @@ proxies:
     headers:
       Host: www.calmlunch.com
   name: 法国46|2018ms|26Mbps|机房|纯净度未知
-- cipher: aes-128-gcm
-  name: 🍓 请前往官网重新获取订阅
-  password: subscription-unavailable
-  port: 1
-  server: 127.0.0.1
-  type: ss
-  udp: true
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -3129,7 +3129,6 @@ proxy-groups:
   - ⚡ 高速下载
   - 🏠 非机房 IP
   - 🌏 台湾／新加坡
-  - 🍓 小草莓（免测）
   - DIRECT
   - 美国01|223ms|724Mbps|机房|纯净度未知
   - 美国02|251ms|1353Mbps|机房|纯净度未知
@@ -3379,7 +3378,6 @@ proxy-groups:
   - 法国44|1154ms|15Mbps|机房|纯净度未知
   - 法国45|1300ms|24Mbps|机房|纯净度未知
   - 法国46|2018ms|26Mbps|机房|纯净度未知
-  - 🍓 请前往官网重新获取订阅
   url: https://claude.ai/cdn-cgi/trace
   interval: 300
   lazy: false
@@ -3903,7 +3901,3 @@ proxy-groups:
   timeout: 5000
   expected-status: 200
   tolerance: 50
-- name: 🍓 小草莓（免测）
-  type: select
-  proxies:
-  - 🍓 请前往官网重新获取订阅
