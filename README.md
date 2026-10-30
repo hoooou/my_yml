@@ -6,7 +6,9 @@
 
 ## 使用与分组
 
-在客户端添加远程配置。三个地址内容相同，按所在网络挑一个能拉通的：
+在客户端添加远程配置。下面每个文件都给了三个地址，内容完全相同，按自己所在网络挑一个能拉通的即可。
+
+**优选配置**（日常用这个，节点全、按地区分组）：
 
 ```text
 # 国内优先：jsDelivr Gcore 节点
@@ -19,7 +21,33 @@ https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/%E4%BC%98%E9%80%89%E9%85%8D%E7%BD
 https://raw.githubusercontent.com/hoooou/my_yml/main/%E4%BC%98%E9%80%89%E9%85%8D%E7%BD%AE.yaml
 ```
 
-链式配置同理，把文件名换成 `%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml`（`链式配置.yaml`）；v2rayN 用 `v2rayN.txt`。
+**链式配置**（规则照旧，前置机再跳美国落地）：
+
+```text
+# 国内优先：jsDelivr Gcore 节点
+https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
+
+# 备用：jsDelivr 默认节点
+https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
+
+# 原始地址：GitHub raw，国内常需代理
+https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
+```
+
+**v2rayN 节点订阅**（只给 v2rayN 用，节点逐个列出、可单独测速）：
+
+```text
+https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/v2rayN.txt
+https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/v2rayN.txt
+https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
+```
+
+`前置配置.yaml` 和 `后置配置.yaml` 不需要手动添加：它们是 `链式配置.yaml` 内部的两个订阅源，客户端加载链式配置时会自己按下面的地址去拉，同样走 jsDelivr，国内可以直接拉到：
+
+```text
+https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/%E5%89%8D%E7%BD%AE%E9%85%8D%E7%BD%AE.yaml
+https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/%E5%90%8E%E7%BD%AE%E9%85%8D%E7%BD%AE.yaml
+```
 
 jsDelivr 对 `@main` 的缓存是 12 小时，所以发布后流水线会自动调 `purge.jsdelivr.net` 清一次缓存；如果刚发布、某个节点还返回旧内容，等几分钟或换另一个节点。Fastly 节点实测不跟随清缓存，已不再使用。
 
@@ -28,6 +56,8 @@ jsDelivr 对 `@main` 的缓存是 12 小时，所以发布后流水线会自动�
 ### v2rayN 原生节点订阅
 
 ```text
+https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/v2rayN.txt
+https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/v2rayN.txt
 https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 ```
 
@@ -36,6 +66,8 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 ### 链式配置（前置 → 美国落地）
 
 ```text
+https://gcore.jsdelivr.net/gh/hoooou/my_yml@main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
+https://cdn.jsdelivr.net/gh/hoooou/my_yml@main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
 https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
 ```
 
