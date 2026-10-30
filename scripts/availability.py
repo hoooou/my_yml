@@ -242,6 +242,8 @@ HIGH_DOWNLOAD_URL = high_speed.URLS[0]
 
 
 PRECHECK_URLS = {'Google204': SITES['Google204'], 'Cloudflare204': CLOUDFLARE_204_URL}
+# 预检阶段只有 204 和 TCP，单个节点 6 个轻请求；并发放到 48，两个目标在一轮内并行。
+PRECHECK_WORKERS = 48
 
 
 def combine_204(targets):
@@ -263,7 +265,21 @@ def precheck_204(port):
     rounds = []
     for index in range(3):
         order = list(PRECHECK_URLS) if index % 2 == 0 else list(reversed(PRECHECK_URLS))
-        rounds.append({label: check_site(port, label, PRECHECK_URLS[label], timeout=(2, 3)) for label in order})
+        samples, threads = {}, []
+
+        def run(label):
+            try:
+                samples[label] = check_site(port, label, PRECHECK_URLS[label], timeout=(2, 3))
+            except Exception:
+                samples[label] = {'status': 'failed', 'reason': '预检请求异常'}
+
+        for label in order:
+            thread = threading.Thread(target=run, args=(label,), daemon=True)
+            thread.start()
+            threads.append(thread)
+        for thread in threads:
+            thread.join()
+        rounds.append({label: samples[label] for label in order})
     return combine_204(summarize_rounds(rounds, tuple(PRECHECK_URLS)))
 
 
@@ -371,6 +387,8 @@ def probe_pipeline(nodes, binary, root, probe=probe_xxapi, precheck=precheck_204
                    quick3=None, decoupled=False):
     """Per-node stages are ordered, while different nodes overlap across stages."""
     medium_download = medium_download or medium_speed_download
+    if preflight_only:
+        workers = max(workers, PRECHECK_WORKERS)
     modern = policy_version == qp.VERSION
     if modern:
         if download is quick_download:
