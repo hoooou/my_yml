@@ -34,7 +34,7 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/v2rayN.txt
 https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D%E7%BD%AE.yaml
 ```
 
-与`优选配置.yaml`同源、独立发布，**不影响原配置**。区别只有一处：所有落地节点通过`dialer-proxy`挂到`🌉 前置`组，前置从同一轮免费池中筛出，不按地区筛：国内 TCP 能过的节点都进前置轨道，再由实测门槛决定去留。
+与`优选配置.yaml`同源、独立发布，**不影响原配置**。区别只有一处：所有落地节点通过`dialer-proxy`挂到`🌉 前置`组，前置从同一轮免费池中筛出，不按地区筛：国内 TCP 能过的节点都进前置轨道，再由实测门槛决定去留。前置/后置两个 provider 走`fastly.jsdelivr.net`节点而不是默认的`cdn.jsdelivr.net`，国内更容易拉到；`jsd.onmicrosoft.cn`这类镜像 2026-10-28 起证书过期，不要再换回去。
 
 | 前置条件 | 说明 |
 |---|---|
