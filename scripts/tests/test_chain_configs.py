@@ -209,6 +209,18 @@ class RenderTest(unittest.TestCase):
         self.assertNotIn('US 官方优选 187ms', names[cc.AUTO_GROUP]['proxies'])
         self.assertNotIn('US 官方优选 187ms', names[cc.US_GROUP]['proxies'])
 
+    def test_domain_fronted_nodes_are_preferred_over_bare_ips(self):
+        nodes = [{'name': 'US ip 100ms', 'server': '1.2.3.4', 'port': 443},
+                 {'name': 'US 域名 300ms', 'server': 'cf.example.com', 'port': 443},
+                 {'name': 'HK 域名 400ms', 'server': 'youxuan.cf.090227.xyz', 'port': 443},
+                 {'name': 'HK ip 200ms', 'server': '5.6.7.8', 'port': 443}]
+        latencies = {node['name']: float(node['name'].split()[-1].rstrip('ms')) for node in nodes}
+        picked = [node['name'] for node in cc.pick_ext_auto(nodes, latencies, limit=3)]
+        self.assertEqual(picked[:2], ['US 域名 300ms', 'HK 域名 400ms'])
+        self.assertEqual(picked[2], 'US ip 100ms')
+        self.assertTrue(cc.is_domain_server({'server': 'a.example.com'}))
+        self.assertFalse(cc.is_domain_server({'server': '1.2.3.4'}))
+
     def test_auto_picks_by_measured_latency_and_spreads_across_regions(self):
         nodes = ([{'name': f'HK 官方优选 {index}'} for index in range(5)]
                  + [{'name': f'US 官方优选 {index}'} for index in range(5)]

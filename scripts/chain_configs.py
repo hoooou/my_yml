@@ -302,12 +302,27 @@ def ext_region(name):
     return 'CF' if 'CF' in text else '其他'
 
 
+def is_domain_server(node):
+    """server 写的是域名（优选域名）而不是 IP，这类节点在国内通常更容易通。"""
+    host = str(node.get('server') or '').strip()
+    if not host:
+        return False
+    try:
+        ipaddress.ip_address(host)
+    except ValueError:
+        return True
+    return False
+
+
 def pick_ext_auto(nodes, latencies, per_region=EXT_AUTO_PER_REGION, limit=EXT_AUTO_SIZE):
-    """按地区轮着挑：先每个地区拿最快的，再拿第二快的，直到凑满 limit。"""
+    """优先挑优选域名型节点，再按地区轮着挑：先每个地区拿最快的，再拿第二快的。"""
+    preferred = [node for node in nodes if is_domain_server(node)]
+    pool = preferred if len(preferred) >= limit else list(nodes)
     buckets = {}
-    for index, node in enumerate(nodes):
+    for index, node in enumerate(pool):
+        penalty = 0.0 if is_domain_server(node) else 100000.0
         buckets.setdefault(ext_region(node.get('name')), []).append(
-            (latencies.get(node['name'], float('inf')), index, node))
+            (penalty + latencies.get(node['name'], float('inf')), index, node))
     for items in buckets.values():
         items.sort(key=lambda item: (item[0], item[1]))
     picked, round_index = [], 0
