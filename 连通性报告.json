@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-31T08:51:45+08:00",
+  "updated_at": "2026-10-31T15:43:58+08:00",
   "scope": "all_subscriptions",
   "schema_version": 22,
   "selection_policy": {
@@ -449124,10 +449124,10 @@
   "quality_change": {
     "available": true,
     "differences": {
-      "observed_nodes": 133,
-      "passed_observations": 228,
-      "unrecovered_nodes": -56,
-      "multi_period_nodes": 15
+      "observed_nodes": 0,
+      "passed_observations": 0,
+      "unrecovered_nodes": 0,
+      "multi_period_nodes": 0
     }
   },
   "untested_subscription": {
@@ -454287,7 +454287,11 @@
   },
   "measurements_updated_at": "2026-10-31T08:50:53+08:00",
   "publication_mode": "full",
-  "measurement_recovery": null,
+  "measurement_recovery": {
+    "source_run": "41149496903",
+    "measurements_updated_at": "2026-10-31T08:50:53+08:00",
+    "new_probes": false
+  },
   "group_latency_policy": {
     "url": "https://claude.ai/cdn-cgi/trace",
     "interval_seconds": 120,
@@ -455027,7 +455031,7 @@
   "ip_reputation_policy": {
     "provider": "ipapi.is",
     "scope": "quick_download_passed_unique_exits",
-    "configured": true,
+    "configured": false,
     "lookup_budget_per_run": 900,
     "purity_formula": "100 * (1 - company.abuser_score_numeric_ratio)",
     "score_scope": "company_network_not_individual_ip",
@@ -455722,7 +455726,7 @@
     "landings": 179,
     "chain_enabled": true
   },
-  "source_run": "41149496903",
+  "source_run": "41181639269",
   "nodes": [
     {
       "id": "n-f058035472be",
@@ -462508,10 +462512,10 @@
   "report_kind": "published_summary",
   "raw_record_count": 10619,
   "raw_evidence": {
-    "run_id": "41149496903",
+    "run_id": "41181639269",
     "artifact": "full-test-report",
     "filename": "full-test-report.published.json",
-    "sha256": "9691d1c13ef51ec0bfad39f4ab4301666d08d0e1d6adb7d5058e80068a9b4a71",
+    "sha256": "444c9e59f10d9d4360275eb778f0f034ccfce9a5d34068d23f3defab809f7d78",
     "retention_days": 7
   }
 }
