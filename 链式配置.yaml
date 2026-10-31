@@ -1,4 +1,4 @@
-# 链式配置；2026-10-31T17:42:45+08:00；规则复用优选配置，节点已内联
+# 链式配置；2026-11-01T03:29:15+08:00；规则复用优选配置，节点已内联
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -548,20 +548,94 @@ sniffer:
   - Mijia Cloud
   - +.push.apple.com
 proxies:
-- port: 443
-  server: 172.64.69.89
+- server: az-1.linkaa.xyz
+  port: 53110
+  type: vmess
+  uuid: 6e571484-4166-4699-8f58-b34a1823691f
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: false
+  servername: az-1.linkaa.xyz
+  network: ws
+  ws-opts:
+    path: /game/resources
+    headers:
+      Host: az-1.linkaa.xyz
+  name: 🛫 01|49ms|16Mbps
+- server: az-1.linkaa.xyz
+  port: 53617
+  type: vmess
+  uuid: 6e571484-4166-4699-8f58-b34a1823691f
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: false
+  servername: az-1.linkaa.xyz
+  network: ws
+  ws-opts:
+    path: /game/resources
+    headers:
+      Host: az-1.linkaa.xyz
+  name: 🛫 02|53ms|17Mbps
+- password: 0324fbc29561
+  port: 443
+  server: 56481.df6h451rh.xin
+  skip-cert-verify: true
+  sni: images.ctfassets.net
+  type: anytls
+  udp: true
+  name: 🛫 03|106ms|6Mbps
+- server: ph001.zestapp778.com
+  port: 46298
+  type: trojan
+  password: 5t6i121em5lkmsmk
+  udp: true
+  sni: ph001.zestapp778.com
+  network: tcp
+  name: 🛫 04|139ms|12Mbps
+- server: v2jp.k1.ssnss.live
+  port: 44184
+  type: trojan
+  password: d050aca3-9df2-4461-90ec-92373c1d7636
+  udp: true
+  network: tcp
+  name: 🛫 05|142ms|30Mbps
+- type: http
+  server: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
+  port: 443
+  password: 1b609740-eec2-11ef-8543-f23c93136cb3
+  sni: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
+  tls: true
+  username: 1b609740-eec2-11ef-8543-f23c93136cb3
+  name: 🛫 06|158ms|38Mbps
+- type: http
+  server: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
+  port: 5443
+  password: 1b609740-eec2-11ef-8543-f23c93136cb3
+  sni: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
+  tls: true
+  username: 1b609740-eec2-11ef-8543-f23c93136cb3
+  name: 🛫 07|174ms|25Mbps
+- password: 'null'
+  port: 443
+  server: voteshirleysew.club
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
+  username: 'null'
   udp: true
-  name: 🛫 01|208ms|191Mbps
-- type: http
-  server: webdrone.club
-  port: 443
+  sni: voteshirleysew.club
+  name: 🛫 08|184ms|78Mbps
+- port: 443
+  server: kimberlymilano.icu
+  sni: kimberlymilano.icu
+  sub_tag: R002-260618
   tls: true
-  sni: webdrone.club
-  name: 🛫 02|2203ms|135Mbps
+  type: http
+  udp: true
+  name: 🛫 09|194ms|41Mbps
 - port: 443
   server: tzoa.fun
   sni: tzoa.fun
@@ -569,303 +643,115 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 03|211ms|121Mbps
-- port: 8443
-  server: 18.206.28.143
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 04|243ms|82Mbps
-- port: 443
-  server: 23.133.176.14
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 05|238ms|81Mbps
-- port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 06|196ms|72Mbps
-- type: http
-  server: 44.229.69.166
-  port: 8443
-  tls: true
-  skip-cert-verify: true
-  name: 🛫 07|199ms|68Mbps
-- port: 8443
-  server: 44.217.145.28
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 08|243ms|63Mbps
-- port: 443
-  server: 162.217.114.50
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 09|251ms|54Mbps
-- type: http
-  server: jgwynphotoarts.pro
-  port: 443
-  username: 'null'
-  password: None
-  tls: true
-  name: 🛫 10|215ms|50Mbps
-- server: 150.251.143.86
-  port: 8443
-  type: vless
-  uuid: c29fa587-b10d-445d-b7e3-eaa6d1bd1330
-  udp: true
-  tls: true
-  servername: est1.srv.luckdns.fun
-  reality-opts:
-    public-key: ASRlLIMLrchtPN9Jc8hC3HPjcDU_xzZlnQj2rcdUJ1k
-    short-id: c5787235
-  client-fingerprint: chrome
-  network: grpc
-  grpc-opts:
-    grpc-service-name: Windows.Update
-  name: 🛫 11|340ms|48Mbps
-- port: 443
-  server: 172.64.68.89
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 12|203ms|45Mbps
-- port: 443
-  server: zebpay.site
-  sni: zebpay.site
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 13|2249ms|39Mbps
+  name: 🛫 10|196ms|42Mbps
 - type: http
   server: efr-marktplatz.club
   port: 443
   username: 'null'
   password: None
   tls: true
-  name: 🛫 14|2205ms|39Mbps
+  name: 🛫 11|199ms|50Mbps
+- password: None
+  port: 443
+  server: berniesbodybla.fun
+  skip-cert-verify: false
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: berniesbodybla.fun
+  name: 🛫 12|203ms|94Mbps
+- password: None
+  port: 443
+  server: purposebydesig.club
+  skip-cert-verify: false
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: purposebydesig.club
+  name: 🛫 13|204ms|80Mbps
 - type: http
-  server: goedkoopgeluid.icu
+  server: crosscards.site
   port: 443
   username: 'null'
   password: None
   tls: true
-  skip-cert-verify: true
-  name: 🛫 15|196ms|38Mbps
+  name: 🛫 14|210ms|253Mbps
+- server: se-2.pythonsetupbib.online
+  port: 61374
+  type: vless
+  uuid: f8d52ece-fad4-478d-875d-df6eed3befa7
+  tls: true
+  reality-opts:
+    public-key: QrNs0ew7snHqLfpVXS9RAhlRzgAzzGZK9fXmDcx9xHI
+  servername: se-2.pythonsetupbib.online
+  client-fingerprint: chrome
+  network: xhttp
+  xhttp-opts:
+    path: /
+    host: se-2.pythonsetupbib.online
+    mode: packet-up
+    x-padding-bytes: 100-500
+  udp: true
+  name: 🛫 15|383ms|20Mbps
+- server: p11real2.greewebservices.ir
+  port: 1040
+  type: vless
+  uuid: f234330e-f9df-46e3-8f60-b2af5173c147
+  udp: true
+  tls: true
+  servername: play.googleapis.com
+  reality-opts:
+    public-key: xQnXh5EfPDhcEBB7rRiLca33GYrMEeUa35domLL_yA8
+    short-id: e3085d4fc679ba12
+  client-fingerprint: ios
+  network: tcp
+  name: 🛫 16|458ms|14Mbps
 - type: http
-  server: carolinafreigh.fun
+  server: jgwynphotoarts.pro
   port: 443
-  tls: true
-  name: 🛫 16|180ms|38Mbps
-- alterId: '0'
-  cipher: auto
-  network: ws
-  port: 443
-  server: www.windowsmsidownloads.com
-  skip-cert-verify: false
-  sub_tag: B007-260618
-  tls: true
-  type: vmess
-  udp: true
-  uuid: 80be2deb-3b27-4775-9bd1-7f2a2b9c261b
-  ws-opts:
-    headers:
-      Host: www.windowsmsidownloads.com
-    path: /truth
-  xudp: true
-  packet-encoding: xudp
-  servername: www.windowsmsidownloads.com
-  name: 🛫 17|216ms|34Mbps
-- port: 443
-  server: 18.200.158.139
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 18|174ms|34Mbps
-- server: www.ubuntuupdates.com
-  port: 443
-  type: vmess
-  uuid: 83b09a64-1eaf-4c4d-89ed-866d4b6b8115
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: www.ubuntuupdates.com
-  network: ws
-  ws-opts:
-    path: /truth
-    headers:
-      Host: www.ubuntuupdates.com
-  name: 🛫 19|216ms|34Mbps
-- type: ss
-  server: 202.50.253.81
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 🛫 20|247ms|31Mbps
-- port: 9002
-  server: 158.173.154.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 21|168ms|30Mbps
-- port: 8443
-  server: 35.84.133.236
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 22|192ms|30Mbps
-- type: http
-  server: 54.190.176.228
-  port: 8443
   username: 'null'
-  password: 'null'
+  password: None
   tls: true
-  skip-cert-verify: true
-  name: 🛫 23|196ms|30Mbps
-- server: 172.67.156.121
+  name: 🛫 17|2196ms|52Mbps
+- password: None
   port: 443
-  type: vmess
-  uuid: e70a5b70-f63c-4450-af8b-94990cdf80c0
-  alterId: 0
-  cipher: auto
-  udp: true
+  server: mmgr.club
+  skip-cert-verify: true
+  sub_tag: P002-260618
   tls: true
-  servername: www.gptcloudai.com
-  network: ws
-  ws-opts:
-    path: /truth
-    headers:
-      Host: www.gptcloudai.com
-  name: 🛫 24|207ms|29Mbps
+  type: http
+  udp: true
+  sni: mmgr.club
+  name: 🛫 18|2201ms|40Mbps
+- password: '1234'
+  port: 2080
+  server: 47.129.174.248
+  skip-cert-verify: true
+  type: http
+  username: '1234'
+  name: 🛫 19|84ms|14Mbps
 - port: 443
-  server: 51.210.167.149
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 25|172ms|29Mbps
-- alterId: '0'
-  cipher: auto
-  network: ws
-  port: 443
-  server: cf.877771.xyz
-  skip-cert-verify: false
-  sub_tag: S004-260618
-  tls: true
-  type: vmess
-  udp: true
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  ws-opts:
-    early-data-header-name: Sec-WebSocket-Protocol
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    max-early-data: 2048
-    path: /ws
-  xudp: true
-  packet-encoding: xudp
-  servername: vmess.lbw666.dpdns.org
-  name: 🛫 26|60ms|28Mbps
-- password: None
-  port: 9002
-  server: 158.173.154.3
+  server: 213.109.163.119
   skip-cert-verify: true
   tls: true
   type: http
-  name: 🛫 27|160ms|27Mbps
-- alterId: '0'
-  cipher: auto
-  network: ws
-  port: 443
-  server: cf.0sm.com
-  skip-cert-verify: false
-  sub_tag: M003-260806
-  tls: true
-  type: vmess
   udp: true
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  ws-opts:
-    early-data-header-name: Sec-WebSocket-Protocol
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    max-early-data: 2048
-    path: /ws
-  xudp: true
-  packet-encoding: xudp
-  servername: vmess.lbw666.dpdns.org
-  name: 🛫 28|54ms|25Mbps
-- password: None
+  name: 🛫 20|144ms|24Mbps
+- type: http
+  server: 185.238.170.10
   port: 443
-  server: 34.249.214.108
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 21|164ms|15Mbps
+- port: 9002
+  server: 158.173.154.5
   skip-cert-verify: true
   tls: true
   type: http
-  name: 🛫 29|224ms|23Mbps
-- server: www.visa.com.hk
-  port: 443
-  type: vless
-  uuid: 4f735420-0179-45d7-ba4e-ed66d1bf3a89
   udp: true
-  tls: true
-  servername: it-mil.862400.xyz
-  client-fingerprint: random
-  network: ws
-  ws-opts:
-    path: /announcement?ed=2048
-    headers:
-      Host: it-mil.862400.xyz
-  name: 🛫 30|211ms|23Mbps
-- password: None
-  port: 9002
-  server: 158.173.154.2
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 31|183ms|23Mbps
-- server: 155.212.240.10
-  port: 443
-  type: vless
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  udp: true
-  tls: true
-  servername: n.bitpulse.me
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
-    headers:
-      Host: n.bitpulse.me
-  name: 🛫 32|170ms|22Mbps
-- password: None
-  port: 443
-  server: 82.66.235.221
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 🛫 33|204ms|21Mbps
+  name: 🛫 22|166ms|22Mbps
 - client-fingerprint: safari
   flow: xtls-rprx-vision
   network: tcp
@@ -879,126 +765,84 @@ proxies:
   type: vless
   udp: true
   uuid: f5e70ce3-cfb4-4df1-b25c-d19bfae627c0
-  name: 🛫 34|222ms|21Mbps
-- password: None
-  port: 9002
-  server: 158.173.154.4
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 35|164ms|21Mbps
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 82.196.9.7
-  sni: 52c40907.acsnet.co
-  tls: true
-  type: http
-  username: testuser1
-  name: 🛫 36|235ms|21Mbps
-- password: None
-  port: 443
-  server: 84.235.228.156
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 37|198ms|21Mbps
+  name: 🛫 23|167ms|20Mbps
 - port: 443
-  server: 116.202.172.99
+  server: 141.94.16.4
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 38|147ms|21Mbps
-- server: 144.31.140.125
-  port: 8443
-  type: vless
-  uuid: f5e70ce3-cfb4-4df1-b25c-d19bfae627c0
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: twitch.tv
-  reality-opts:
-    public-key: wgyw3OxZw4HEzedNdY_eHdcVkrtT7GEeZSHfzcZ8iDo
-    short-id: 168c15efac9df5fd
-  client-fingerprint: firefox
-  network: tcp
-  name: 🛫 39|253ms|20Mbps
+  name: 🛫 24|170ms|8Mbps
 - port: 443
-  server: 213.109.163.119
+  server: 18.200.158.139
   skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 40|156ms|20Mbps
-- port: 9002
-  server: 158.173.154.5
+  name: 🛫 25|171ms|24Mbps
+- type: http
+  server: 185.238.168.20
+  port: 443
+  tls: true
   skip-cert-verify: true
+  name: 🛫 26|178ms|17Mbps
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 162.243.146.243
+  sni: a2f392f3.acsnet.co
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 🛫 27|179ms|4Mbps
+- port: 443
+  server: 96.5.129.85
+  skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 41|222ms|20Mbps
+  name: 🛫 28|184ms|?Mbps
 - port: 443
   server: 82.65.162.76
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 🛫 42|214ms|20Mbps
-- port: 443
-  server: 91.92.250.33
+  name: 🛫 29|188ms|22Mbps
+- port: 8443
+  server: 44.248.167.117
   skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 43|207ms|19Mbps
-- port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  sub_tag: R002-260618
+  name: 🛫 30|194ms|31Mbps
+- type: http
+  server: 44.229.69.166
+  port: 8443
   tls: true
-  type: http
-  udp: true
-  name: 🛫 44|155ms|19Mbps
+  skip-cert-verify: true
+  name: 🛫 31|196ms|31Mbps
 - password: None
   port: 443
-  server: 79.76.126.155
+  server: 23.133.176.14
   skip-cert-verify: true
-  sub_tag: K001-260618
+  sub_tag: P002-260618
   tls: true
   type: http
-  username: ''
   udp: true
-  name: 🛫 45|192ms|19Mbps
-- port: 8443
-  server: 45.150.164.18
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 46|181ms|19Mbps
-- type: http
-  server: 89.150.35.94
+  name: 🛫 32|198ms|74Mbps
+- password: None
   port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
+  server: 185.219.159.16
   skip-cert-verify: true
-  name: 🛫 47|247ms|18Mbps
-- port: 443
-  server: 134.65.17.77
-  skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 48|373ms|18Mbps
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.18
-  type: ss
-  name: 🛫 49|249ms|18Mbps
+  name: 🛫 33|198ms|15Mbps
 - server: 138.16.140.168
   port: 443
   type: vless
@@ -1012,7 +856,95 @@ proxies:
     short-id: 5c56a4cfea5866c0
   client-fingerprint: edge
   network: tcp
-  name: 🛫 50|176ms|18Mbps
+  name: 🛫 34|203ms|4Mbps
+- port: 443
+  server: 172.64.69.89
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 35|204ms|106Mbps
+- password: None
+  port: 443
+  server: 82.66.235.221
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 🛫 36|204ms|18Mbps
+- port: 443
+  server: 116.202.172.99
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 37|204ms|9Mbps
+- type: vless
+  server: 155.212.240.10
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  udp: true
+  tls: true
+  servername: n.bitpulse.me
+  sni: n.bitpulse.me
+  skip-cert-verify: true
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+    headers:
+      Host: n.bitpulse.me
+  name: 🛫 38|204ms|2Mbps
+- port: 443
+  server: 172.64.68.89
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 39|206ms|106Mbps
+- port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 40|206ms|18Mbps
+- type: vless
+  network: ws
+  server: 104.18.39.123
+  port: 443
+  uuid: 0ad8f7d9-85a2-45f3-9948-27903a20ec29
+  servername: us7.mcdonaldshamburgergoodgoodgood.xyz
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: chrome
+  ws-opts:
+    headers:
+      Host: us7.mcdonaldshamburgergoodgoodgood.xyz
+    path: /
+  name: 🛫 41|207ms|63Mbps
+- port: 443
+  server: 91.92.250.33
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 42|209ms|17Mbps
+- type: http
+  server: 54.190.176.228
+  port: 8443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 43|213ms|36Mbps
 - port: 443
   server: 87.106.223.158
   skip-cert-verify: true
@@ -1020,77 +952,30 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 51|178ms|18Mbps
-- password: None
-  port: 443
-  server: 185.219.159.16
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 52|220ms|17Mbps
-- server: 195.141.65.98
-  port: 443
-  type: vless
-  uuid: 53f03acd-fec1-6685-fc8f-03baf9550cb8
-  udp: true
-  tls: true
-  servername: 148-253-210-191.sslip.io
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /test-ws
-    headers:
-      Host: 148-253-210-191.sslip.io
-  name: 🛫 53|221ms|16Mbps
-- port: 443
-  server: 62.90.77.30
+  name: 🛫 44|218ms|20Mbps
+- port: 8443
+  server: 35.84.133.236
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 54|246ms|16Mbps
-- type: vless
-  server: 172.64.91.69
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  udp: true
-  tls: true
-  servername: n.bitpulse.me
-  sni: n.bitpulse.me
-  skip-cert-verify: true
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
-    headers:
-      Host: n.bitpulse.me
-  name: 🛫 55|201ms|15Mbps
+  name: 🛫 45|224ms|40Mbps
 - port: 443
-  server: 217.210.129.243
+  server: 34.249.214.108
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 46|224ms|22Mbps
+- port: 8443
+  server: 44.217.145.28
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 56|315ms|15Mbps
-- port: 443
-  server: 103.86.116.118
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 57|220ms|15Mbps
-- port: 443
-  server: 176.94.74.21
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 58|242ms|15Mbps
+  name: 🛫 47|231ms|17Mbps
 - port: 443
   server: 103.86.117.202
   skip-cert-verify: true
@@ -1098,125 +983,100 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 59|243ms|14Mbps
-- server: 104.21.29.192
-  port: 443
-  type: vless
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  udp: true
-  tls: true
-  servername: n.bitpulse.me
-  network: ws
-  ws-opts:
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed
-    headers:
-      Host: n.bitpulse.me
-  name: 🛫 60|211ms|13Mbps
-- server: vpn.cintaku.qzz.io
-  port: 443
-  type: vless
-  uuid: fc7d2cfe-f5ef-40c8-a848-a0bdc11f6349
-  udp: true
-  tls: true
-  servername: vpn.cintaku.qzz.io
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /vlessws
-    headers:
-      Host: vpn.cintaku.qzz.io
-  name: 🛫 61|212ms|11Mbps
-- type: anytls
-  server: 56481.df6h451rh.xin
-  port: 443
-  password: 0324fbc29561
-  udp: true
-  sni: images.ctfassets.net
-  alpn:
-  - http/1.1
-  skip-cert-verify: true
-  client-fingerprint: chrome
-  name: 🛫 62|132ms|9Mbps
-- port: 8443
-  server: 77.221.136.60
+  name: 🛫 48|232ms|14Mbps
+- port: 443
+  server: 162.217.114.50
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 63|281ms|4Mbps
-- password: test123
-  port: 1080
-  server: 104.168.249.36
-  type: socks5
-  username: test123
-  name: 🛫 64|248ms|4Mbps
+  name: 🛫 49|235ms|69Mbps
+- port: 443
+  server: 103.86.116.118
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 50|241ms|15Mbps
+- port: 443
+  server: 38.247.141.135
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 51|242ms|112Mbps
+- port: 8443
+  server: 18.206.28.143
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 52|243ms|83Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.27
+  type: ss
+  name: 🛫 53|249ms|6Mbps
 - password: e4b72b531a2d10900519
   port: 443
-  server: 162.243.146.243
-  sni: a2f392f3.acsnet.co
-  sub_tag: R002-260618
+  server: 82.196.9.7
+  sni: 52c40907.acsnet.co
   tls: true
   type: http
   username: testuser1
-  udp: true
-  name: 🛫 65|154ms|4Mbps
-- type: vless
-  server: saas.sin.fan
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  udp: true
-  tls: true
-  servername: n.bitpulse.me
-  sni: n.bitpulse.me
+  name: 🛫 54|250ms|24Mbps
+- port: 443
+  server: 176.94.74.21
   skip-cert-verify: true
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
-    headers:
-      Host: n.bitpulse.me
-  name: 🛫 66|216ms|4Mbps
-- server: 5.181.158.192
-  port: 8469
-  type: vless
-  uuid: 1c8f7130-8c1a-4949-831d-1d45b39c795b
-  udp: true
+  sub_tag: R002-260618
   tls: true
-  flow: xtls-rprx-vision
-  servername: svoboda12.bystriynet.online
-  reality-opts:
-    public-key: jXnHLdfNcX2fwTFY-d2boAYcfC9EnnhqYS0hfR6WwFo
-    short-id: 55d42bdd79605658
-  client-fingerprint: firefox
-  network: tcp
-  name: 🛫 67|225ms|3Mbps
-- server: 8.35.211.242
+  type: http
+  udp: true
+  name: 🛫 55|251ms|9Mbps
+- type: http
+  server: 107.151.238.27
   port: 443
-  type: vless
-  uuid: fc7d2cfe-f5ef-40c8-a848-a0bdc11f6349
-  udp: true
+  username: testuser1
+  password: e4b72b531a2d10900519
   tls: true
-  servername: vpn.cintaku.qzz.io
-  network: ws
-  ws-opts:
-    path: /vlessws
-    headers:
-      Host: vpn.cintaku.qzz.io
-  name: 🛫 68|193ms|3Mbps
-- server: 188.114.98.0
-  port: 443
-  type: vless
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  sni: 6b97ee1b.acsnet.co
+  skip-cert-verify: true
+  name: 🛫 56|255ms|?Mbps
+- server: 202.50.253.36
+  port: 19999
+  type: ss
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   udp: true
+  name: 🛫 57|264ms|17Mbps
+- port: 443
+  server: 62.90.77.30
+  skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
-  servername: n.bitpulse.me
-  network: ws
-  ws-opts:
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
-    headers:
-      Host: n.bitpulse.me
-  name: 🛫 69|206ms|?Mbps
+  type: http
+  udp: true
+  name: 🛫 58|268ms|15Mbps
+- port: 443
+  server: 217.210.129.243
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 59|303ms|14Mbps
+- port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 60|370ms|19Mbps
 - name: US 官方优选 187ms
   server: 172.67.72.145
   port: 443
@@ -7562,708 +7422,19 @@ proxies:
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
-  server: 95.215.201.18
-  type: ss
-  udp: true
-  name: 美国01|137ms|1572Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 167.88.61.193
-  skip-cert-verify: false
-  sni: browseseniorrolesandenhanceyourcareertoday.com
-  type: trojan
-  udp: true
-  name: 美国02|222ms|1222Mbps|机房|纯净度92.7%
-  dialer-proxy: 🌉 前置
-- port: 443
-  server: tzoa.fun
-  sni: tzoa.fun
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国03|400ms|1102Mbps|住宅|纯净度99.5%
-  dialer-proxy: 🌉 前置
-- type: http
-  server: crosscards.site
-  port: 443
-  username: 'null'
-  password: None
-  tls: true
-  name: 美国04|506ms|1098Mbps|住宅|纯净度99.6%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 167.88.61.175
-  skip-cert-verify: false
-  sni: blog.browseseniorrolesandenhanceyourcareertoday.com
-  type: trojan
-  udp: true
-  name: 美国05|286ms|1096Mbps|机房|纯净度92.7%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.76
-  skip-cert-verify: true
-  sni: api.unlockyourfuturefindyourperfectcareer.com
-  type: trojan
-  udp: true
-  name: 美国06|238ms|1053Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  network: tcp
-  port: 18580
-  server: us007.zestapp778.com
-  servername: us007.zestapp778.com
-  tls: true
-  type: vless
-  uuid: e9a8144e-5237-488a-afb1-9ca3d8d54c80
-  name: 美国07|139ms|1019Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.104
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国08|254ms|995Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 193.151.160.18
-  type: ss
-  udp: true
-  name: 美国09|128ms|890Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-128-gcm
-  password: shadowsocks
-  port: 443
-  server: 173.244.56.6
-  type: ss
-  udp: true
-  name: 美国10|204ms|874Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.31
-  skip-cert-verify: false
-  sni: unlockyourfuturefindyourperfectcareer.com
-  type: trojan
-  udp: true
-  name: 美国11|208ms|867Mbps|机房|纯净度94.7%
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.35
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国12|278ms|862Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 185.215.132.9
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  udp: true
-  name: 美国13|153ms|857Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 167.88.61.20
-  skip-cert-verify: false
-  sni: api.browseseniorrolesandenhanceyourcareertoday.com
-  type: trojan
-  udp: true
-  name: 美国14|230ms|828Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: random
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.74
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国15|309ms|815Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.114.106
-  skip-cert-verify: false
-  sni: www.findconnectwithemployersandbuildprofessionalnetwork.com
-  type: trojan
-  udp: true
-  name: 美国16|121ms|813Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.155.59
-  skip-cert-verify: false
-  sni: api.nextjobopportunityandclaimyouridealrole.com
-  type: trojan
-  udp: true
-  name: 美国17|156ms|802Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.114.126
-  skip-cert-verify: false
-  sni: resources.findconnectwithemployersandbuildprofessionalnetwork.com
-  type: trojan
-  udp: true
-  name: 美国18|217ms|793Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.155.176
-  skip-cert-verify: true
-  sni: blog.nextjobopportunityandclaimyouridealrole.com
-  type: trojan
-  udp: true
-  name: 美国19|145ms|789Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- cipher: aes-128-gcm
-  password: shadowsocks
-  port: 443
-  server: 156.146.38.169
-  type: ss
-  udp: true
-  name: 美国20|125ms|765Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: f0eb8c92ce8946aaba856569cff1a16b
-  port: 443
-  server: 216.106.186.33
-  skip-cert-verify: false
-  sni: resources.findlocaljobnetworkandbuildcommunityconnections.com
-  type: trojan
-  udp: true
-  name: 美国21|298ms|744Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.171
-  skip-cert-verify: false
-  sni: learn.unlockyourfuturefindyourperfectcareer.com
-  type: trojan
-  udp: true
-  name: 美国22|213ms|740Mbps|机房|纯净度94.7%
-  dialer-proxy: 🌉 前置
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
   server: 185.230.230.18
   type: ss
   udp: true
-  name: 美国23|209ms|738Mbps|机房|纯净度未知
+  name: 美国01|161ms|1121Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
   port: 443
-  server: 216.152.155.23
+  server: 167.88.61.85
   skip-cert-verify: false
-  sni: courses.nextjobopportunityandclaimyouridealrole.com
+  sni: resources.browseseniorrolesandenhanceyourcareertoday.com
   type: trojan
   udp: true
-  name: 美国24|207ms|727Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.121
-  sni: www.unlockyourfuturefindyourperfectcareer.com
-  type: trojan
-  name: 美国25|207ms|725Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 169.197.140.214
-  skip-cert-verify: true
-  sni: courses.discoverfreshgraduatejobsstartyourprofessionaljourney.com
-  type: trojan
-  udp: true
-  name: 美国26|416ms|725Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 170.101.101.67
-  skip-cert-verify: false
-  sni: courses.explorecreativejobsandenhanceyourcareerportfolio.com
-  type: trojan
-  udp: true
-  name: 美国27|174ms|723Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.142
-  skip-cert-verify: true
-  sni: cdn.unlockyourfuturefindyourperfectcareer.com
-  type: trojan
-  udp: true
-  name: 美国28|206ms|714Mbps|机房|纯净度94.7%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 169.197.140.169
-  skip-cert-verify: false
-  sni: api.discoverfreshgraduatejobsstartyourprofessionaljourney.com
-  type: trojan
-  udp: true
-  name: 美国29|343ms|704Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: firefox
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.168
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国30|258ms|703Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: rc4-md5
-  password: 14fFPrbezE3HDZzsMOr6
-  port: 8080
-  server: 107.151.182.197
-  sub_tag: A004-260618
-  type: ss
-  udp: true
-  name: 美国31|200ms|702Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 167.88.61.198
-  skip-cert-verify: false
-  sni: cdn.browseseniorrolesandenhanceyourcareertoday.com
-  type: trojan
-  udp: true
-  name: 美国32|214ms|687Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- network: tcp
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.155.158
-  skip-cert-verify: true
-  sni: resources.nextjobopportunityandclaimyouridealrole.com
-  type: trojan
-  name: 美国33|226ms|681Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.147.152
-  skip-cert-verify: false
-  sni: learn.connectingpeoplewithgreatjobs.com
-  type: trojan
-  udp: true
-  name: 加拿大01|163ms|673Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- type: http
-  server: webdrone.club
-  port: 443
-  tls: true
-  sni: webdrone.club
-  name: 美国34|353ms|672Mbps|住宅|纯净度99.5%
-  dialer-proxy: 🌉 前置
-- password: dba20dcb635e430fa4d3bfc303a149d2
-  port: 443
-  server: 216.106.186.32
-  skip-cert-verify: true
-  sni: blog.findlocaljobnetworkandbuildcommunityconnections.com
-  type: trojan
-  udp: true
-  name: 美国35|213ms|666Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 170.101.101.53
-  skip-cert-verify: false
-  sni: www.explorecreativejobsandenhanceyourcareerportfolio.com
-  type: trojan
-  udp: true
-  name: 美国36|432ms|654Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 169.197.140.224
-  skip-cert-verify: false
-  sni: resources.discoverfreshgraduatejobsstartyourprofessionaljourney.com
-  type: trojan
-  udp: true
-  name: 美国37|287ms|654Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: rc4-md5
-  password: 14fFPrbezE3HDZzsMOr6
-  port: 8080
-  server: 107.155.57.11
-  sub_tag: A004-260618
-  type: ss
-  udp: true
-  name: 美国38|229ms|653Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: nwilryafgkyvuxauc8pz
-  port: 50875
-  server: 69.164.240.85
-  skip-cert-verify: true
-  sni: 69.164.240.85
-  type: trojan
-  udp: true
-  name: 美国39|325ms|650Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.156.49
-  skip-cert-verify: true
-  sni: cdn.healthcarejobshubenhancemedicalprofessionalskillstoday.com
-  type: trojan
-  udp: true
-  name: 美国40|178ms|644Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.114.45
-  skip-cert-verify: false
-  sni: cdn.findconnectwithemployersandbuildprofessionalnetwork.com
-  type: trojan
-  udp: true
-  name: 美国41|148ms|642Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 169.197.140.245
-  skip-cert-verify: false
-  sni: www.discoverfreshgraduatejobsstartyourprofessionaljourney.com
-  type: trojan
-  udp: true
-  name: 美国42|300ms|638Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.156.65
-  skip-cert-verify: true
-  sni: ''
-  type: trojan
-  udp: true
-  name: 美国43|264ms|629Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 169.197.140.171
-  skip-cert-verify: false
-  sni: cdn.discoverfreshgraduatejobsstartyourprofessionaljourney.com
-  type: trojan
-  udp: true
-  name: 美国44|165ms|629Mbps|机房|纯净度88.2%
-  dialer-proxy: 🌉 前置
-- port: 443
-  server: 23.133.176.14
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国45|120ms|623Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-128-gcm
-  password: shadowsocks
-  port: 443
-  server: 156.146.38.170
-  type: ss
-  udp: true
-  name: 美国46|133ms|619Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 193.151.163.18
-  type: ss
-  udp: true
-  name: 美国47|148ms|615Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  flow: xtls-rprx-vision
-  network: raw
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.231
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国48|268ms|607Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- alterId: '0'
-  cipher: auto
-  network: tcp
-  port: 18000
-  server: 84.17.41.2
-  skip-cert-verify: false
-  sub_tag: B007-260618
-  tls: false
-  type: vmess
-  udp: true
-  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
-  xudp: true
-  packet-encoding: xudp
-  name: 美国49|183ms|604Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 216.152.147.89
-  port: 443
-  type: trojan
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  udp: true
-  sni: www.connectingpeoplewithgreatjobs.com
-  network: tcp
-  name: 加拿大02|221ms|601Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- server: 3h-unitedstates1.09vpn.com
-  port: 80
-  type: vless
-  uuid: 18cf8db1-9f86-43f7-baa0-382efb7f2dfa
-  udp: true
-  tls: false
-  servername: 3h-unitedstates1.09vpn.com
-  network: ws
-  ws-opts:
-    path: /vless/
-    headers:
-      Host: 3h-unitedstates1.09vpn.com
-  name: 美国50|136ms|599Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: f0eb8c92ce8946aaba856569cff1a16b
-  port: 443
-  server: resources.findlocaljobnetworkandbuildcommunityconnections.com
-  skip-cert-verify: false
-  sni: ''
-  type: trojan
-  udp: true
-  name: 美国51|225ms|599Mbps|住宅|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.156.81
-  skip-cert-verify: true
-  sni: ''
-  type: trojan
-  udp: true
-  name: 美国52|306ms|591Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 170.101.101.131
-  skip-cert-verify: false
-  sni: blog.explorecreativejobsandenhanceyourcareerportfolio.com
-  type: trojan
-  udp: true
-  name: 美国53|176ms|585Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-128-gcm
-  password: shadowsocks
-  port: 443
-  server: 156.146.38.168
-  type: ss
-  udp: true
-  name: 美国54|261ms|585Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 38.107.232.36
-  port: 80
-  type: vless
-  uuid: 18cf8db1-9f86-43f7-baa0-382efb7f2dfa
-  udp: true
-  tls: false
-  network: ws
-  ws-opts:
-    path: /vless/
-  name: 美国55|133ms|572Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- encryption: none
-  network: ws
-  port: 30016
-  server: 69.48.201.136
-  sub_tag: S004-260618
-  type: vless
-  udp: true
-  uuid: 03dc60cb-a8d4-4226-93fe-0e6cbf77fe5a
-  ws-opts:
-    headers:
-      Host: uspanel.unixzone.us
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/69.0.3497.100 Safari/537.36
-    path: /usserver
-  xudp: true
-  packet-encoding: xudp
-  name: 美国56|147ms|570Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.114.245
-  skip-cert-verify: true
-  sni: findconnectwithemployersandbuildprofessionalnetwork.com
-  type: trojan
-  udp: true
-  name: 美国57|134ms|569Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-128-gcm
-  password: shadowsocks
-  port: 443
-  server: 156.146.38.167
-  type: ss
-  udp: true
-  name: 美国58|117ms|567Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.147.85
-  skip-cert-verify: false
-  sni: cdn.connectingpeoplewithgreatjobs.com
-  type: trojan
-  udp: true
-  name: 加拿大03|399ms|565Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 170.101.101.112
-  skip-cert-verify: false
-  sni: resources.explorecreativejobsandenhanceyourcareerportfolio.com
-  type: trojan
-  udp: true
-  name: 美国59|174ms|561Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.114.132
-  skip-cert-verify: true
-  sni: 66.163.114.132
-  type: trojan
-  udp: true
-  name: 美国60|115ms|559Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.147.93
-  skip-cert-verify: false
-  sni: connectingpeoplewithgreatjobs.com
-  type: trojan
-  udp: true
-  name: 加拿大04|127ms|556Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.147
-  skip-cert-verify: true
-  sni: courses.unlockyourfuturefindyourperfectcareer.com
-  type: trojan
-  udp: true
-  name: 美国61|221ms|556Mbps|机房|纯净度94.7%
-  dialer-proxy: 🌉 前置
-- server: 216.152.155.131
-  port: 443
-  type: trojan
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  udp: true
-  sni: www.nextjobopportunityandclaimyouridealrole.com
-  network: tcp
-  name: 美国62|210ms|552Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.242
-  skip-cert-verify: true
-  sni: api.nextjobopportunityandclaimyouridealrole.com
-  type: trojan
-  udp: true
-  name: 美国63|220ms|544Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 216.152.155.54
-  port: 443
-  type: trojan
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  sni: learn.nextjobopportunityandclaimyouridealrole.com
-  skip-cert-verify: false
-  name: 美国64|138ms|536Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 193.151.160.9
-  sub_tag: A004-260618
-  type: ss
-  udp: true
-  name: 美国65|167ms|536Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 208.84.100.209
-  port: 8080
-  type: vless
-  uuid: 36c3dcc2-17b6-4478-b8a7-3978e6d5afe9
-  udp: true
-  tls: false
-  network: ws
-  ws-opts:
-    path: /
-  name: 美国66|274ms|535Mbps|机房|纯净度100.0%
-  dialer-proxy: 🌉 前置
-- password: ae7eb4dwyaz25pxwgq59
-  port: 59689
-  server: 66.23.203.21
-  skip-cert-verify: true
-  sni: 66.23.203.21
-  type: trojan
-  udp: true
-  name: 美国67|174ms|529Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 170.101.101.211
-  skip-cert-verify: true
-  sni: api.explorecreativejobsandenhanceyourcareerportfolio.com
-  type: trojan
-  udp: true
-  name: 美国68|603ms|528Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  network: tcp
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.156.42
-  skip-cert-verify: true
-  sni: blog.healthcarejobshubenhancemedicalprofessionalskillstoday.com
-  sub_tag: A004-260618
-  type: trojan
-  udp: true
-  name: 美国69|254ms|527Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 242a3d8eee5e4ed1a6bfa4141d549a25
-  port: 443
-  server: www.findlocaljobnetworkandbuildcommunityconnections.com
-  skip-cert-verify: true
-  sni: ''
-  type: trojan
-  udp: true
-  name: 美国70|210ms|521Mbps|机房|纯净度93.7%
+  name: 美国02|362ms|1017Mbps|机房|纯净度92.7%
   dialer-proxy: 🌉 前置
 - client-fingerprint: chrome
   flow: xtls-rprx-vision
@@ -8278,25 +7449,7 @@ proxies:
   type: vless
   udp: true
   uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国71|233ms|513Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.147.201
-  skip-cert-verify: false
-  sni: resources.connectingpeoplewithgreatjobs.com
-  type: trojan
-  udp: true
-  name: 加拿大05|590ms|512Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.147.48
-  skip-cert-verify: false
-  sni: courses.connectingpeoplewithgreatjobs.com
-  type: trojan
-  udp: true
-  name: 加拿大06|189ms|506Mbps|住宅|纯净度未知
+  name: 美国03|349ms|937Mbps|未知|纯净度未知
   dialer-proxy: 🌉 前置
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
@@ -8304,9 +7457,388 @@ proxies:
   server: 45.86.51.18
   type: ss
   udp: true
-  name: 美国72|161ms|496Mbps|机房|纯净度未知
+  name: 美国04|244ms|869Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- server: uspanel.unixzone.us
+  port: 30016
+  type: vless
+  uuid: 03dc60cb-a8d4-4226-93fe-0e6cbf77fe5a
+  udp: true
+  tls: false
+  servername: uspanel.unixzone.us
+  network: ws
+  ws-opts:
+    path: /usserver
+    headers:
+      Host: uspanel.unixzone.us
+  name: 美国05|336ms|864Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- alterId: '0'
+  cipher: auto
+  network: tcp
+  port: 18000
+  server: 84.17.41.2
+  skip-cert-verify: false
+  sub_tag: B007-260618
+  tls: false
+  type: vmess
+  udp: true
+  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
+  xudp: true
+  packet-encoding: xudp
+  name: 美国06|211ms|837Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 95.215.201.18
+  type: ss
+  udp: true
+  name: 美国07|139ms|818Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.13
+  skip-cert-verify: false
+  sni: blog.unlockyourfuturefindyourperfectcareer.com
+  type: trojan
+  name: 美国08|345ms|804Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 193.151.160.9
+  sub_tag: A004-260618
+  type: ss
+  udp: true
+  name: 美国09|158ms|784Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- server: blog.findlocaljobnetworkandbuildcommunityconnections.com
+  port: 443
+  type: trojan
+  password: dba20dcb635e430fa4d3bfc303a149d2
+  udp: true
+  network: tcp
+  name: 美国10|304ms|771Mbps|机房|纯净度93.7%
+  dialer-proxy: 🌉 前置
+- cipher: aes-128-gcm
+  password: shadowsocks
+  port: 443
+  server: 173.244.56.9
+  type: ss
+  udp: true
+  name: 美国11|285ms|764Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: rc4-md5
+  password: 14fFPrbezE3HDZzsMOr6
+  port: 8080
+  server: 107.151.182.253
+  type: ss
+  udp: true
+  name: 美国12|503ms|745Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 193.151.163.18
+  type: ss
+  udp: true
+  name: 美国13|202ms|732Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.121
+  skip-cert-verify: true
+  sni: 66.163.112.121
+  type: trojan
+  udp: true
+  name: 美国14|265ms|728Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- server: 38.107.232.36
+  port: 80
+  type: vless
+  uuid: 18cf8db1-9f86-43f7-baa0-382efb7f2dfa
+  udp: true
+  tls: false
+  network: ws
+  ws-opts:
+    path: /vless/
+  name: 美国15|116ms|697Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.31
+  skip-cert-verify: false
+  sni: unlockyourfuturefindyourperfectcareer.com
+  type: trojan
+  udp: true
+  name: 美国16|122ms|687Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 193.151.160.18
+  type: ss
+  udp: true
+  name: 美国17|244ms|683Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.171
+  skip-cert-verify: false
+  sni: learn.unlockyourfuturefindyourperfectcareer.com
+  type: trojan
+  udp: true
+  name: 美国18|287ms|677Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.142
+  skip-cert-verify: true
+  sni: cdn.unlockyourfuturefindyourperfectcareer.com
+  type: trojan
+  udp: true
+  name: 美国19|127ms|670Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 167.88.61.198
+  skip-cert-verify: false
+  sni: cdn.browseseniorrolesandenhanceyourcareertoday.com
+  type: trojan
+  udp: true
+  name: 美国20|228ms|654Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.114.245
+  skip-cert-verify: true
+  sni: findconnectwithemployersandbuildprofessionalnetwork.com
+  type: trojan
+  udp: true
+  name: 美国21|232ms|653Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- server: 3h-unitedstates1.09vpn.com
+  port: 80
+  type: vless
+  uuid: 18cf8db1-9f86-43f7-baa0-382efb7f2dfa
+  udp: true
+  tls: false
+  servername: 3h-unitedstates1.09vpn.com
+  network: ws
+  ws-opts:
+    path: /vless/
+    headers:
+      Host: 3h-unitedstates1.09vpn.com
+  name: 美国22|183ms|643Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 169.197.140.171
+  skip-cert-verify: false
+  sni: cdn.discoverfreshgraduatejobsstartyourprofessionaljourney.com
+  type: trojan
+  udp: true
+  name: 美国23|329ms|634Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 167.88.61.20
+  skip-cert-verify: false
+  sni: api.browseseniorrolesandenhanceyourcareertoday.com
+  type: trojan
+  udp: true
+  name: 美国24|106ms|628Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: None
+  port: 443
+  server: purposebydesig.club
+  skip-cert-verify: false
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: purposebydesig.club
+  name: 美国25|442ms|627Mbps|住宅|纯净度99.5%
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 169.197.140.214
+  skip-cert-verify: true
+  sni: courses.discoverfreshgraduatejobsstartyourprofessionaljourney.com
+  type: trojan
+  udp: true
+  name: 美国26|260ms|619Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- type: http
+  server: webdrone.club
+  port: 443
+  tls: true
+  sni: webdrone.club
+  name: 美国27|186ms|616Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.242
+  skip-cert-verify: true
+  sni: api.nextjobopportunityandclaimyouridealrole.com
+  type: trojan
+  udp: true
+  name: 美国28|262ms|615Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: None
+  port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国29|101ms|602Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.76
+  sni: api.unlockyourfuturefindyourperfectcareer.com
+  type: trojan
+  name: 美国30|217ms|598Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: ae7eb4dwyaz25pxwgq59
+  port: 59689
+  server: 66.23.203.21
+  skip-cert-verify: true
+  sni: ''
+  type: trojan
+  udp: true
+  name: 美国31|163ms|581Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.114.166
+  skip-cert-verify: true
+  sni: blog.findconnectwithemployersandbuildprofessionalnetwork.com
+  type: trojan
+  udp: true
+  name: 美国32|211ms|568Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 169.197.140.169
+  skip-cert-verify: false
+  sni: api.discoverfreshgraduatejobsstartyourprofessionaljourney.com
+  type: trojan
+  udp: true
+  name: 美国33|153ms|567Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 185.176.206.9
+  type: ss
+  name: 英国01|447ms|546Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.114.126
+  skip-cert-verify: true
+  sni: resources.findconnectwithemployersandbuildprofessionalnetwork.com
+  type: trojan
+  udp: true
+  name: 美国34|161ms|543Mbps|机房|纯净度94.7%
+  dialer-proxy: 🌉 前置
+- client-fingerprint: chrome
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: nqwCf6oW49tEtmQ0EzxigZ0uu1pg0E30CS54G40Iti0
+    short-id: 4477382ff6d3d41c
+  server: 51.81.203.63
+  servername: www.icloud.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: cb2dbb6a-a1ea-4023-9ace-6466cee57241
+  name: 美国35|211ms|543Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: nwilryafgkyvuxauc8pz
+  port: 50875
+  server: 69.164.240.85
+  skip-cert-verify: true
+  sni: 69.164.240.85
+  type: trojan
+  udp: true
+  name: 美国36|265ms|542Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- server: 185.215.132.9
+  port: 19999
+  type: ss
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  udp: true
+  name: 美国37|146ms|536Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.114.114
+  skip-cert-verify: true
+  sni: ''
+  type: trojan
+  udp: true
+  name: 美国38|152ms|533Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.114.106
+  skip-cert-verify: false
+  sni: www.findconnectwithemployersandbuildprofessionalnetwork.com
+  type: trojan
+  udp: true
+  name: 美国39|205ms|532Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 216.238.80.100
+  skip-cert-verify: true
+  sni: connectwithtopemployersandfindidealjobs.com
+  type: trojan
+  udp: true
+  name: MX01|159ms|526Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.114.45
+  skip-cert-verify: false
+  sni: cdn.findconnectwithemployersandbuildprofessionalnetwork.com
+  type: trojan
+  udp: true
+  name: 美国40|219ms|525Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.112.147
+  skip-cert-verify: true
+  sni: courses.unlockyourfuturefindyourperfectcareer.com
+  type: trojan
+  udp: true
+  name: 美国41|131ms|505Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - client-fingerprint: firefox
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 47443
+  reality-opts:
+    public-key: hz7rzdHvTAVwfy48pa6313yBF-sV7V0svvPVnl95bgY
+    short-id: ae97246a8f799854
+  server: 185.168.208.190
+  servername: us-1.waspguard.ru
+  tls: true
+  type: vless
+  udp: true
+  uuid: 1fe01c8a-ab37-4e95-bbfc-95d4a608931e
+  name: 美国42|232ms|505Mbps|住宅|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: chrome
   flow: xtls-rprx-vision
   network: tcp
   port: 443
@@ -8319,61 +7851,7 @@ proxies:
   type: vless
   udp: true
   uuid: 9063f9fb-e88a-4ee0-b4a4-a92ca7316a9f
-  name: 美国73|195ms|495Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 170.101.101.19
-  skip-cert-verify: false
-  sni: learn.explorecreativejobsandenhanceyourcareerportfolio.com
-  type: trojan
-  udp: true
-  name: 美国74|190ms|490Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.147.79
-  skip-cert-verify: true
-  sni: blog.connectingpeoplewithgreatjobs.com
-  type: trojan
-  udp: true
-  name: 加拿大07|191ms|488Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.147.74
-  skip-cert-verify: false
-  sni: api.connectingpeoplewithgreatjobs.com
-  type: trojan
-  udp: true
-  name: 加拿大08|518ms|488Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.114.114
-  skip-cert-verify: true
-  sni: 66.163.114.114
-  type: trojan
-  udp: true
-  name: 美国75|138ms|488Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 169.197.140.218
-  skip-cert-verify: false
-  sni: learn.discoverfreshgraduatejobsstartyourprofessionaljourney.com
-  type: trojan
-  udp: true
-  name: 美国76|306ms|486Mbps|机房|纯净度88.2%
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.238.80.100
-  skip-cert-verify: false
-  sni: connectwithtopemployersandfindidealjobs.com
-  type: trojan
-  udp: true
-  name: MX01|249ms|482Mbps|机房|纯净度未知
+  name: 美国43|319ms|495Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - server: 185.215.132.18
   port: 19999
@@ -8381,219 +7859,48 @@ proxies:
   cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   udp: true
-  name: 美国77|143ms|481Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 216.106.186.66
-  port: 443
-  type: trojan
-  password: 242a3d8eee5e4ed1a6bfa4141d549a25
-  udp: true
-  sni: www.findlocaljobnetworkandbuildcommunityconnections.com
-  network: tcp
-  name: 美国78|124ms|470Mbps|机房|纯净度93.7%
+  name: 美国44|144ms|473Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
   port: 443
-  server: 66.163.114.166
-  skip-cert-verify: true
-  sni: blog.findconnectwithemployersandbuildprofessionalnetwork.com
-  type: trojan
-  udp: true
-  name: 美国79|165ms|469Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 185.176.206.9
-  type: ss
-  name: 英国01|373ms|467Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 216.152.156.212
-  sni: courses.healthcarejobshubenhancemedicalprofessionalskillstoday.com
-  type: trojan
-  name: 美国80|175ms|458Mbps|机房|纯净度98.2%
-  dialer-proxy: 🌉 前置
-- network: tcp
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 66.163.112.13
+  server: 167.88.61.193
   skip-cert-verify: false
-  sni: blog.unlockyourfuturefindyourperfectcareer.com
+  sni: browseseniorrolesandenhanceyourcareertoday.com
   type: trojan
-  name: 美国81|209ms|451Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: ios
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.235
-  servername: yahoo.com
-  tls: true
-  type: vless
   udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国82|322ms|450Mbps|机房|纯净度未知
+  name: 美国45|108ms|472Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - client-fingerprint: chrome
   flow: xtls-rprx-vision
-  network: tcp
-  port: 47443
-  reality-opts:
-    public-key: g5am2VhZkx_xH2TSKfUU8OYLxAzFrmcszNQg8AbOenE
-    short-id: ae97223a8f799872
-  server: 187.52.44.20
-  servername: nl4.waspnest.space
-  tls: true
-  type: vless
-  udp: true
-  uuid: 1fe01c8a-ab37-4e95-bbfc-95d4a608931e
-  name: 荷兰01|515ms|450Mbps|机房|纯净度100.0%
-  dialer-proxy: 🌉 前置
-- password: None
-  port: 443
-  server: purposebydesig.club
-  skip-cert-verify: false
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: purposebydesig.club
-  name: 美国83|202ms|427Mbps|住宅|纯净度99.7%
-  dialer-proxy: 🌉 前置
-- password: None
-  port: 443
-  server: berniesbodybla.fun
-  skip-cert-verify: false
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: berniesbodybla.fun
-  name: 美国84|192ms|427Mbps|住宅|纯净度99.7%
-  dialer-proxy: 🌉 前置
-- server: 193.108.119.78
-  port: 443
-  type: trojan
-  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  udp: true
-  sni: www.iloverussia2026.com
-  network: tcp
-  name: 德国01|521ms|424Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
-  port: 443
-  server: 167.88.61.85
-  skip-cert-verify: false
-  sni: resources.browseseniorrolesandenhanceyourcareertoday.com
-  type: trojan
-  udp: true
-  name: 美国85|271ms|414Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 'null'
-  port: 443
-  server: voteshirleysew.club
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  sni: voteshirleysew.club
-  name: 美国86|116ms|413Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- alterId: 0
-  cipher: auto
   network: raw
-  port: 18000
-  server: 134.195.196.211
-  type: vmess
-  udp: true
-  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
-  name: 加拿大09|182ms|412Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- type: http
-  server: jgwynphotoarts.pro
-  port: 443
-  username: 'null'
-  password: None
-  tls: true
-  name: 美国87|361ms|406Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: blog.findlocaljobnetworkandbuildcommunityconnections.com
-  port: 443
-  type: trojan
-  password: dba20dcb635e430fa4d3bfc303a149d2
-  sni: blog.findlocaljobnetworkandbuildcommunityconnections.com
-  skip-cert-verify: false
-  name: 美国88|209ms|406Mbps|机房|纯净度93.7%
-  dialer-proxy: 🌉 前置
-- client-fingerprint: random
-  flow: xtls-rprx-vision
-  network: tcp
   port: 443
   reality-opts:
     public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
     short-id: c39cc7310a
-  server: 169.40.42.225
+  server: 169.40.42.89
   servername: yahoo.com
   tls: true
   type: vless
   udp: true
   uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国89|325ms|401Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: aes-128-gcm
-  password: shadowsocks
-  port: 443
-  server: 173.244.56.9
-  type: ss
-  udp: true
-  name: 美国90|166ms|384Mbps|机房|纯净度未知
+  name: 美国46|138ms|463Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - cipher: rc4-md5
   password: 14fFPrbezE3HDZzsMOr6
   port: 8080
-  server: 98.98.79.198
+  server: 107.151.182.197
   sub_tag: A004-260618
   type: ss
   udp: true
-  name: 美国91|268ms|383Mbps|机房|纯净度未知
+  name: 美国47|128ms|460Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- type: vless
-  server: 169.40.42.229
+- cipher: aes-128-gcm
+  password: shadowsocks
   port: 443
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  flow: xtls-rprx-vision
+  server: 173.244.56.6
+  type: ss
   udp: true
-  tls: true
-  servername: yahoo.com
-  sni: yahoo.com
-  skip-cert-verify: false
-  client-fingerprint: ios
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  name: 美国92|363ms|379Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: random
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.224
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国93|296ms|373Mbps|未知|纯净度未知
+  name: 美国48|149ms|453Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - cipher: rc4-md5
   password: 14fFPrbezE3HDZzsMOr6
@@ -8602,15 +7909,178 @@ proxies:
   sub_tag: A004-260618
   type: ss
   udp: true
-  name: 美国94|211ms|365Mbps|机房|纯净度未知
+  name: 美国49|281ms|447Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- server: 146.70.46.214
-  port: 8080
-  type: ss
-  cipher: rc4-md5
-  password: 14fFPrbezE3HDZzsMOr6
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 66.163.114.132
+  skip-cert-verify: true
+  sni: 66.163.114.132
+  type: trojan
   udp: true
-  name: 英国02|576ms|364Mbps|机房|纯净度未知
+  name: 美国50|229ms|440Mbps|机房|纯净度94.7%
+  dialer-proxy: 🌉 前置
+- port: 443
+  server: tzoa.fun
+  sni: tzoa.fun
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国51|355ms|434Mbps|住宅|纯净度99.6%
+  dialer-proxy: 🌉 前置
+- client-fingerprint: ios
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.90
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国52|317ms|432Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- type: http
+  server: efr-marktplatz.club
+  port: 443
+  username: 'null'
+  password: None
+  tls: true
+  name: 美国53|476ms|430Mbps|住宅|纯净度99.7%
+  dialer-proxy: 🌉 前置
+- type: http
+  server: jgwynphotoarts.pro
+  port: 443
+  username: 'null'
+  password: None
+  tls: true
+  name: 美国54|520ms|427Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: rc4-md5
+  password: 14fFPrbezE3HDZzsMOr6
+  port: 8080
+  server: 79.110.53.169
+  type: ss
+  udp: true
+  name: 美国55|162ms|419Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- server: 142.171.48.179
+  port: 28167
+  type: vmess
+  uuid: 2abe0fba-ecd7-483a-83a2-33600b6a4df7
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: false
+  servername: gw.alicdn.com
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: gw.alicdn.com
+  name: 美国56|286ms|415Mbps|机房|纯净度99.5%
+  dialer-proxy: 🌉 前置
+- port: 443
+  server: zebpay.site
+  sni: zebpay.site
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国57|489ms|409Mbps|住宅|纯净度99.7%
+  dialer-proxy: 🌉 前置
+- client-fingerprint: chrome
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: xPnpkXu5qfwIArlHKvJsqKJnGdGbJK1tT2GzWMyLohA
+    short-id: 9c56fddf237e8eaf
+  server: 195.211.98.43
+  servername: www.cloudflare.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: 1b4b11d5-4c2d-4533-9a55-636757cdee94
+  name: 美国58|554ms|406Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: rc4-md5
+  password: 14fFPrbezE3HDZzsMOr6
+  port: 8080
+  server: 23.251.121.242
+  type: ss
+  udp: true
+  name: 美国59|136ms|405Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 167.88.61.175
+  skip-cert-verify: false
+  sni: blog.browseseniorrolesandenhanceyourcareertoday.com
+  type: trojan
+  udp: true
+  name: 美国60|113ms|399Mbps|机房|纯净度92.7%
+  dialer-proxy: 🌉 前置
+- client-fingerprint: chrome
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.35
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国61|178ms|383Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- port: 8443
+  server: 35.84.133.236
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国62|427ms|379Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: rc4-md5
+  password: 14fFPrbezE3HDZzsMOr6
+  port: 8080
+  server: 107.155.57.11
+  sub_tag: A004-260618
+  type: ss
+  udp: true
+  name: 美国63|136ms|372Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 169.197.140.218
+  skip-cert-verify: false
+  sni: learn.discoverfreshgraduatejobsstartyourprofessionaljourney.com
+  type: trojan
+  udp: true
+  name: 美国64|252ms|371Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: firefox
+  flow: xtls-rprx-vision
+  network: raw
+  port: 28190
+  reality-opts:
+    public-key: ZJRnFU-1s1JOnO8E9uZ7b00l1fPEh63fGRbdBANFRno
+    short-id: ''
+  server: 159.89.87.21
+  servername: aws.amazon.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: 14c80e0e-f7ce-4991-94fc-99a1db4a9b1e
+  name: 美国65|255ms|344Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - type: vless
   network: ws
@@ -8626,83 +8096,195 @@ proxies:
     headers:
       Host: 3h-unitedstates3.09vpn.com
     path: /vless/
-  name: 美国95|579ms|363Mbps|机房|纯净度未知
+  name: 美国66|605ms|337Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- client-fingerprint: ios
-  flow: xtls-rprx-vision
-  network: tcp
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
   port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.89
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国96|279ms|359Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 137.184.174.93
-  port: 8080
-  type: ss
-  cipher: rc4-md5
-  password: 14fFPrbezE3HDZzsMOr6
-  name: 加拿大10|456ms|350Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: ios
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.90
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国97|273ms|345Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- cipher: rc4-md5
-  password: 14fFPrbezE3HDZzsMOr6
-  port: 8080
-  server: 107.155.57.51
-  type: ss
-  udp: true
-  name: 美国98|223ms|337Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- type: vless
-  server: 51.158.206.26
-  port: 23576
-  client-fingerprint: chrome
-  encryption: none
-  flow: xtls-rprx-vision
-  network: tcp
-  reality-opts:
-    public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: '01'
-  servername: fuck.rkn
+  server: 169.197.140.224
   skip-cert-verify: false
+  sni: resources.discoverfreshgraduatejobsstartyourprofessionaljourney.com
+  type: trojan
+  udp: true
+  name: 美国67|197ms|322Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- port: 443
+  server: 162.217.114.50
+  skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 荷兰02|496ms|332Mbps|机房|纯净度未知
+  type: http
+  udp: true
+  name: 美国68|258ms|321Mbps|住宅|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: random
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.224
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国69|126ms|311Mbps|未知|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: chrome
+  flow: xtls-rprx-vision
+  network: raw
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.74
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国70|222ms|311Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- type: http
+  server: 44.248.167.117
+  port: 8443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 美国71|216ms|292Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 'null'
+  port: 443
+  server: carolinafreigh.fun
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  sni: carolinafreigh.fun
+  name: 美国72|477ms|287Mbps|住宅|纯净度99.5%
   dialer-proxy: 🌉 前置
 - client-fingerprint: firefox
   flow: xtls-rprx-vision
   network: tcp
   port: 443
   reality-opts:
-    public-key: xPnpkXu5qfwIArlHKvJsqKJnGdGbJK1tT2GzWMyLohA
-    short-id: 9c56fddf237e8eaf
-  server: 195.211.98.43
-  servername: www.cloudflare.com
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.168
+  servername: yahoo.com
   tls: true
   type: vless
   udp: true
-  uuid: 1b4b11d5-4c2d-4533-9a55-636757cdee94
-  name: 美国99|254ms|331Mbps|机房|纯净度未知
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国73|215ms|283Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- port: 443
+  server: goedkoopgeluid.icu
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: goedkoopgeluid.icu
+  name: 美国74|151ms|277Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- port: 443
+  server: kimberlymilano.icu
+  sni: kimberlymilano.icu
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国75|122ms|274Mbps|住宅|纯净度99.6%
+  dialer-proxy: 🌉 前置
+- server: 152.228.162.19
+  port: 80
+  type: vless
+  uuid: 25f86cb1-2140-4085-abcb-c3a0ea7a4be0
+  udp: true
+  tls: false
+  network: ws
+  ws-opts:
+    path: /vless/
+  name: 法国01|1238ms|272Mbps|机房|纯净度98.0%
+  dialer-proxy: 🌉 前置
+- password: None
+  port: 443
+  server: mmgr.club
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  sni: mmgr.club
+  name: 美国76|410ms|271Mbps|住宅|纯净度99.5%
+  dialer-proxy: 🌉 前置
+- type: vless
+  server: 169.40.42.229
+  port: 443
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  flow: xtls-rprx-vision
+  udp: true
+  tls: true
+  servername: yahoo.com
+  sni: yahoo.com
+  skip-cert-verify: false
+  client-fingerprint: ios
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  name: 美国77|354ms|270Mbps|未知|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: ios
+  flow: xtls-rprx-vision
+  network: raw
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.202
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国78|408ms|260Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- alterId: '0'
+  cipher: auto
+  network: tcp
+  port: 18000
+  server: 169.197.142.22
+  skip-cert-verify: false
+  sub_tag: C002-260622
+  tls: false
+  type: vmess
+  udp: true
+  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
+  xudp: true
+  packet-encoding: xudp
+  name: 美国79|301ms|255Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- cipher: rc4-md5
+  password: 14fFPrbezE3HDZzsMOr6
+  port: 8080
+  server: 137.184.174.93
+  type: ss
+  udp: true
+  name: 加拿大01|404ms|248Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: None
+  port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰01|864ms|243Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - type: vless
   server: 51.158.206.20
@@ -8718,102 +8300,22 @@ proxies:
   skip-cert-verify: false
   tls: true
   uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 荷兰03|473ms|323Mbps|机房|纯净度未知
+  name: 荷兰02|611ms|240Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- server: 51.158.206.96
-  port: 23576
-  type: vless
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: fuck.rkn
-  reality-opts:
-    public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: '01'
-  client-fingerprint: chrome
-  network: tcp
-  name: 荷兰04|462ms|316Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
+- client-fingerprint: random
   flow: xtls-rprx-vision
   network: tcp
-  port: 23576
+  port: 443
   reality-opts:
-    public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: '01'
-  server: 51.158.206.8
-  servername: fuck.rkn
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.231
+  servername: yahoo.com
   tls: true
   type: vless
   udp: true
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 荷兰05|489ms|312Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- type: vmess
-  network: tcp
-  server: 67.220.85.46
-  port: 18000
-  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
-  udp: true
-  alterId: 0
-  cipher: aes-128-gcm
-  name: 美国100|189ms|309Mbps|机房|纯净度94.9%
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 23576
-  reality-opts:
-    public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: '01'
-  server: 15.204.97.219
-  servername: fuck.rkn
-  tls: true
-  type: vless
-  udp: true
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 美国101|237ms|305Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- type: vless
-  server: 51.158.206.29
-  port: 23576
-  client-fingerprint: chrome
-  encryption: none
-  flow: xtls-rprx-vision
-  network: tcp
-  reality-opts:
-    public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: '01'
-  servername: fuck.rkn
-  skip-cert-verify: false
-  tls: true
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 荷兰06|506ms|294Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- port: 443
-  server: 162.217.114.50
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国102|305ms|294Mbps|住宅|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: firefox
-  flow: xtls-rprx-vision
-  network: raw
-  port: 47443
-  reality-opts:
-    public-key: hz7rzdHvTAVwfy48pa6313yBF-sV7V0svvPVnl95bgY
-    short-id: ae97246a8f799854
-  server: 185.168.208.190
-  servername: us-1.waspguard.ru
-  tls: true
-  type: vless
-  udp: true
-  uuid: 1fe01c8a-ab37-4e95-bbfc-95d4a608931e
-  name: 美国103|468ms|292Mbps|住宅|纯净度未知
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国80|127ms|234Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - type: vless
   server: 15.204.97.197
@@ -8829,82 +8331,10 @@ proxies:
   skip-cert-verify: false
   tls: true
   uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 美国104|231ms|290Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: ios
-  flow: xtls-rprx-vision
-  network: raw
-  port: 443
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  server: 169.40.42.202
-  servername: yahoo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  name: 美国105|127ms|286Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 443
-  reality-opts:
-    public-key: nqwCf6oW49tEtmQ0EzxigZ0uu1pg0E30CS54G40Iti0
-    short-id: 4477382ff6d3d41c
-  server: 51.81.203.63
-  servername: www.icloud.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: cb2dbb6a-a1ea-4023-9ace-6466cee57241
-  name: 美国106|336ms|283Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- type: http
-  server: efr-marktplatz.club
-  port: 443
-  username: 'null'
-  password: None
-  tls: true
-  name: 美国107|398ms|277Mbps|住宅|纯净度99.6%
-  dialer-proxy: 🌉 前置
-- port: 443
-  server: goedkoopgeluid.icu
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: goedkoopgeluid.icu
-  name: 美国108|388ms|276Mbps|住宅|纯净度99.7%
-  dialer-proxy: 🌉 前置
-- password: None
-  port: 443
-  server: mmgr.club
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: mmgr.club
-  name: 美国109|408ms|275Mbps|住宅|纯净度99.7%
-  dialer-proxy: 🌉 前置
-- type: http
-  server: kimberlymilano.icu
-  port: 443
-  username: Ok5vbmU=
-  tls: true
-  name: 美国110|374ms|272Mbps|住宅|纯净度99.7%
-  dialer-proxy: 🌉 前置
-- type: http
-  server: carolinafreigh.fun
-  port: 443
-  tls: true
-  name: 美国111|345ms|270Mbps|住宅|纯净度99.6%
+  name: 美国81|149ms|218Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - type: vless
-  server: 51.158.206.34
+  server: 15.204.97.206
   port: 23576
   client-fingerprint: chrome
   encryption: none
@@ -8917,68 +8347,65 @@ proxies:
   skip-cert-verify: false
   tls: true
   uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 荷兰07|511ms|264Mbps|机房|纯净度未知
+  name: 美国82|147ms|216Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- server: 66.163.113.238
-  port: 443
-  type: vless
-  uuid: 13bf9403-22d1-4221-939b-f6606c423139
-  udp: true
+- type: http
+  server: 54.190.176.228
+  port: 8443
+  username: 'null'
+  password: 'null'
   tls: true
-  flow: xtls-rprx-vision
-  servername: steamcommunity.com
-  reality-opts:
-    public-key: DNCphTaL7BtXj1HybzMFir0ki_IiM62kr6ddIZYxagw
-    short-id: 5c56a4cfea5866c0
-  client-fingerprint: chrome
-  network: tcp
-  name: 加拿大11|197ms|260Mbps|机房|纯净度未知
+  skip-cert-verify: true
+  name: 美国83|138ms|200Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- client-fingerprint: firefox
-  flow: xtls-rprx-vision
-  network: raw
-  port: 28190
-  reality-opts:
-    public-key: ZJRnFU-1s1JOnO8E9uZ7b00l1fPEh63fGRbdBANFRno
-    short-id: ''
-  server: 159.89.87.21
-  servername: aws.amazon.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: 14c80e0e-f7ce-4991-94fc-99a1db4a9b1e
-  name: 美国112|177ms|257Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: random
-  flow: xtls-rprx-vision
-  network: tcp
+- server: 15.204.97.209
   port: 23576
+  type: vless
+  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: fuck.rkn
   reality-opts:
     public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: ''
-  server: ww13.levikogjgfdd.ir
-  servername: fuck.rkn
-  tls: true
-  type: vless
-  udp: true
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 美国113|264ms|256Mbps|机房|纯净度未知
+    short-id: '01'
+  client-fingerprint: chrome
+  network: tcp
+  name: 美国84|151ms|198Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- server: de.poncheki.xyz
-  port: 2083
-  type: vless
-  uuid: d4001352-dc64-48b8-b786-5860b284ad3d
+- server: 38.91.107.49
+  port: 18000
+  type: vmess
+  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
+  alterId: 0
+  cipher: auto
   udp: true
+  tls: false
+  network: tcp
+  name: 美国85|146ms|169Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- port: 8443
+  server: 18.206.28.143
+  skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
-  servername: vk.com
+  type: http
+  udp: true
+  name: 美国86|114ms|161Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: firefox
+  network: raw
+  port: 2053
   reality-opts:
-    public-key: NWNI1krUm5rhcIRnP3KVvatf9hNKu_H-93bPUdw4cxw
-    short-id: 0ad9fd399087e404
-  client-fingerprint: firefox
-  network: grpc
-  grpc-opts:
-    grpc-service-name: tjwvrf1q9d0n
-  name: 德国02|456ms|227Mbps|住宅|纯净度未知
+    public-key: k4l6TxwkBbx9DhZAFpByq5rfCWFSgyOex3f_eFe9CWU
+    short-id: 83f8317a948bb769
+  server: 66.70.179.198
+  servername: www.cloudflare.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: dc620cd6-a9d8-4a0f-8f18-006b895db77e
+  name: 加拿大02|369ms|157Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - client-fingerprint: chrome
   flow: xtls-rprx-vision
@@ -8993,7 +8420,22 @@ proxies:
   type: vless
   udp: true
   uuid: 00144519-7e0d-476b-8d28-435576af9262
-  name: 美国114|256ms|225Mbps|未知|纯净度未知
+  name: 美国87|158ms|151Mbps|未知|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: firefox
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.225
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国88|341ms|141Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 - client-fingerprint: chrome
   flow: xtls-rprx-vision
@@ -9002,183 +8444,56 @@ proxies:
   reality-opts:
     public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
     short-id: '01'
-  server: 15.204.97.206
-  servername: fuck.rkn
-  tls: true
-  type: vless
-  udp: true
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 美国115|309ms|222Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- alterId: 0
-  cipher: auto
-  network: raw
-  port: 18000
-  server: 38.91.107.49
-  type: vmess
-  udp: true
-  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
-  name: 美国116|158ms|217Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: random
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 23576
-  reality-opts:
-    public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: ''
   server: 15.204.97.214
   servername: fuck.rkn
   tls: true
   type: vless
   udp: true
   uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 美国117|231ms|206Mbps|机房|纯净度未知
+  name: 美国89|150ms|132Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- client-fingerprint: firefox
-  network: tcp
-  port: 2053
-  reality-opts:
-    public-key: g63cT3uI0Y5iUtj3m__RYz7nmR1eIK4AYikdnZCl63w
-    short-id: bfe58beb41f1d09f
-  server: 51.77.217.70
-  servername: www.apple.com
-  tls: true
+- network: ws
+  port: 14430
+  server: 45.138.100.248
+  sub_tag: A004-260618
   type: vless
   udp: true
-  uuid: bf16ee0c-8b3c-41e4-ab3a-8b48033c404e
-  name: 法国01|491ms|203Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: firefox
-  flow: xtls-rprx-vision
-  network: raw
-  port: 443
-  reality-opts:
-    public-key: uTmb-ytXsx8p0fkBz7A76SHpWk7_oVutIA4LGTE8BQk
-    short-id: f98843107912e782
-  server: 209.200.246.148
-  servername: www.cloudflare.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: ca52e2b6-fb9f-4dac-b6dc-49da9923f251
-  name: 加拿大12|162ms|201Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 5.149.249.94
-  port: 443
-  type: vless
-  uuid: ed77c1dc-3df2-412b-b855-49286f979c21
-  udp: true
-  tls: true
-  servername: nlb.kosmosapp.net
-  reality-opts:
-    public-key: pR39Vv5qhk8r6akOicoy6mMs4-ppSWUez8MyAXG7wwQ
-    short-id: 27350908de933e09
-  client-fingerprint: firefox
-  network: grpc
-  grpc-opts:
-    grpc-service-name: neurex
-  name: 荷兰08|296ms|199Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: firefox
-  network: raw
-  port: 2053
-  reality-opts:
-    public-key: k4l6TxwkBbx9DhZAFpByq5rfCWFSgyOex3f_eFe9CWU
-    short-id: 83f8317a948bb769
-  server: 66.70.179.198
-  servername: www.cloudflare.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: dc620cd6-a9d8-4a0f-8f18-006b895db77e
-  name: 加拿大13|252ms|198Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- port: 443
-  server: 18.200.158.139
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 爱尔兰01|555ms|185Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 5.149.248.151
-  port: 443
-  type: vless
-  uuid: 7aad73a9-a0ff-4fad-9142-4f5c7c6bb2c1
-  udp: true
-  tls: true
-  servername: nla.kosmosapp.net
-  reality-opts:
-    public-key: pR39Vv5qhk8r6akOicoy6mMs4-ppSWUez8MyAXG7wwQ
-    short-id: 27350908de933e09
-  client-fingerprint: firefox
-  network: grpc
-  grpc-opts:
-    grpc-service-name: neurex
-  name: 荷兰09|451ms|172Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- alterId: 0
-  cipher: auto
-  network: tcp
-  port: 1234
-  server: 141.95.65.9
-  servername: supervpn.super.com
-  skip-cert-verify: true
-  tls: true
-  type: vmess
-  udp: true
-  uuid: 5c040f1d-45db-43bd-8d46-e4950e433735
-  name: 德国03|576ms|171Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- port: 8443
-  server: 18.206.28.143
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国118|214ms|161Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: support.zoom.us
-  port: 8080
-  type: vless
-  uuid: 990bf436-f1b9-4e7f-857d-14378acc4ae5
-  udp: true
-  tls: false
-  servername: free.nadun.store
-  client-fingerprint: chrome
-  network: ws
+  uuid: ae908ff5-f749-402c-af25-e6e9aef4d6bb
   ws-opts:
-    path: /
     headers:
-      Host: free.nadun.store
-  name: 新加坡01|756ms|160Mbps|机房|纯净度未知
+      Host: 45.138.100.248
+      User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/67.0.3396.99 Safari/537.36
+    path: /vless
+  xudp: true
+  packet-encoding: xudp
+  name: 美国90|254ms|87Mbps|未知|纯净度未知
   dialer-proxy: 🌉 前置
-- server: 150.251.143.86
-  port: 8443
+- network: tcp
+  port: 10443
+  server: 45.138.100.248
   type: vless
-  uuid: c29fa587-b10d-445d-b7e3-eaa6d1bd1330
   udp: true
-  tls: true
-  servername: est1.srv.luckdns.fun
-  reality-opts:
-    public-key: ASRlLIMLrchtPN9Jc8hC3HPjcDU_xzZlnQj2rcdUJ1k
-    short-id: c5787235
-  client-fingerprint: chrome
-  network: grpc
-  grpc-opts:
-    grpc-service-name: Windows.Update
-  name: 荷兰10|314ms|152Mbps|机房|纯净度99.6%
+  uuid: ae908ff5-f749-402c-af25-e6e9aef4d6bb
+  name: 美国91|135ms|84Mbps|未知|纯净度未知
   dialer-proxy: 🌉 前置
-- port: 8443
-  server: 44.248.167.117
+- password: 5t6i121em5lkmsmk
+  port: 15083
+  server: mx001.zestapp778.com
   skip-cert-verify: true
-  tls: true
-  type: http
+  sni: mx001.zestapp778.com
+  type: trojan
   udp: true
-  name: 美国119|303ms|149Mbps|机房|纯净度未知
+  name: MX02|382ms|79Mbps|住宅|纯净度未知
+  dialer-proxy: 🌉 前置
+- password: 5t6i121em5lkmsmk
+  port: 57277
+  server: us001.zestapp778.com
+  skip-cert-verify: true
+  sni: us001.zestapp778.com
+  type: trojan
+  udp: true
+  name: 美国92|291ms|77Mbps|住宅|纯净度未知
   dialer-proxy: 🌉 前置
 - server: 15.204.97.198
   port: 23576
@@ -9190,129 +8505,50 @@ proxies:
   servername: fuck.rkn
   reality-opts:
     public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
-    short-id: ''
-  client-fingerprint: chrome
-  network: tcp
-  name: 美国120|224ms|146Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- alterId: 0
-  cipher: auto
-  network: tcp
-  port: 18000
-  server: 169.197.142.22
-  type: vmess
-  udp: true
-  uuid: f8c8dc3d-0d37-46b0-8b34-a7232882fcfe
-  name: 美国121|266ms|127Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- port: 8443
-  server: 44.217.145.28
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国122|327ms|118Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- type: http
-  server: 44.229.69.166
-  port: 8443
-  tls: true
-  skip-cert-verify: true
-  name: 美国123|308ms|106Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- client-fingerprint: edge
-  flow: xtls-rprx-vision
-  network: tcp
-  port: 8443
-  reality-opts:
-    public-key: JNp0hUDwHZQw9kbwd-D1WfIOdqCtdJeBv1WTNp37V0M
-    short-id: 7e7434c068cbef5a
-  server: 153.75.86.200
-  servername: www.apple.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: 95fe46c3-6cfb-5116-beb7-459d4c7db0ad
-  name: 荷兰11|851ms|100Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 45.138.100.248
-  port: 10443
-  type: vless
-  uuid: ae908ff5-f749-402c-af25-e6e9aef4d6bb
-  udp: true
-  tls: false
-  network: tcp
-  name: 美国124|135ms|89Mbps|未知|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 15.204.233.41
-  port: 8882
-  type: ss
-  cipher: aes-256-gcm
-  password: kDWvXYZoTBcGkC4
-  udp: true
-  name: 美国125|278ms|87Mbps|机房|纯净度未知
-  dialer-proxy: 🌉 前置
-- password: 5t6i121em5lkmsmk
-  port: 15083
-  server: mx001.zestapp778.com
-  skip-cert-verify: false
-  sni: mx001.zestapp778.com
-  type: trojan
-  udp: true
-  name: MX02|336ms|81Mbps|住宅|纯净度未知
-  dialer-proxy: 🌉 前置
-- server: 51.38.71.51
-  port: 2083
-  type: ss
-  cipher: 2022-blake3-aes-256-gcm
-  password: cOiC+3JhAXMwdGV5exnrMSorJU0Rl5qlLCbCAuDlWY4=:2tFqykGqZ101XW11f6iRiERnPycFAjjYq0y2zUYhKho=
-  udp: true
-  name: 英国03|405ms|74Mbps|机房|纯净度94.5%
-  dialer-proxy: 🌉 前置
-- client-fingerprint: chrome
-  network: grpc
-  port: 8444
-  reality-opts:
-    public-key: FWitre1jinQR7qz5HQ0q2Q4Gg9xA9B0SyizCziN7Ch0
-    short-id: 457fab2ac885dbe0
-  server: 62.133.63.45
-  servername: github.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: a346c521-7a7f-452b-9356-a4893feb5982
-  name: TR01|411ms|69Mbps|住宅|纯净度未知
-  dialer-proxy: 🌉 前置
-- type: vless
-  server: 15.204.97.195
-  port: 23576
-  client-fingerprint: chrome
-  encryption: none
-  flow: xtls-rprx-vision
-  network: tcp
-  reality-opts:
-    public-key: 1y5h2FGWKXTJ9xLPCqPo6Mw7RxoZzh6fGkEQKNxpZ3s
     short-id: '01'
-  servername: fuck.rkn
-  skip-cert-verify: false
-  tls: true
-  uuid: 48ff2b70-e180-582f-8866-d9a2edeed5f5
-  name: 美国126|150ms|67Mbps|机房|纯净度未知
+  client-fingerprint: chrome
+  network: tcp
+  name: 美国93|152ms|71Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
-- network: ws
-  password: humanity
-  port: 443
-  server: 185.18.250.252
-  skip-cert-verify: true
-  sni: www.calmlunch.com
+- server: 149.104.87.33
+  port: 15083
   type: trojan
+  password: 5t6i121em5lkmsmk
   udp: true
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 法国02|526ms|50Mbps|机房|纯净度未知
+  sni: mx001.zestapp778.com
+  client-fingerprint: chrome
+  network: tcp
+  name: MX03|253ms|64Mbps|住宅|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: ios
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.104
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国94|258ms|46Mbps|机房|纯净度未知
+  dialer-proxy: 🌉 前置
+- client-fingerprint: firefox
+  flow: xtls-rprx-vision
+  network: tcp
+  port: 443
+  reality-opts:
+    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
+    short-id: c39cc7310a
+  server: 169.40.42.235
+  servername: yahoo.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
+  name: 美国95|162ms|40Mbps|机房|纯净度未知
   dialer-proxy: 🌉 前置
 proxy-groups:
 - name: 🌉 前置
@@ -9784,7 +9020,6 @@ proxy-groups:
   - 🇺🇸 美国节点
   - 🏢 美国机房
   - 🏠 美国住宅
-  - 🇸🇬 新加坡
   - 🇪🇺 欧洲
   - 🌐 全部节点
   - DIRECT
@@ -9797,75 +9032,66 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 🛫 01|208ms|191Mbps
-  - 🛫 02|2203ms|135Mbps
-  - 🛫 03|211ms|121Mbps
-  - 🛫 04|243ms|82Mbps
-  - 🛫 05|238ms|81Mbps
-  - 🛫 06|196ms|72Mbps
-  - 🛫 07|199ms|68Mbps
-  - 🛫 08|243ms|63Mbps
-  - 🛫 09|251ms|54Mbps
-  - 🛫 10|215ms|50Mbps
-  - 🛫 11|340ms|48Mbps
-  - 🛫 12|203ms|45Mbps
-  - 🛫 13|2249ms|39Mbps
-  - 🛫 14|2205ms|39Mbps
-  - 🛫 15|196ms|38Mbps
-  - 🛫 16|180ms|38Mbps
-  - 🛫 17|216ms|34Mbps
-  - 🛫 18|174ms|34Mbps
-  - 🛫 19|216ms|34Mbps
-  - 🛫 20|247ms|31Mbps
-  - 🛫 21|168ms|30Mbps
-  - 🛫 22|192ms|30Mbps
-  - 🛫 23|196ms|30Mbps
-  - 🛫 24|207ms|29Mbps
-  - 🛫 25|172ms|29Mbps
-  - 🛫 26|60ms|28Mbps
-  - 🛫 27|160ms|27Mbps
-  - 🛫 28|54ms|25Mbps
-  - 🛫 29|224ms|23Mbps
-  - 🛫 30|211ms|23Mbps
-  - 🛫 31|183ms|23Mbps
-  - 🛫 32|170ms|22Mbps
-  - 🛫 33|204ms|21Mbps
-  - 🛫 34|222ms|21Mbps
-  - 🛫 35|164ms|21Mbps
-  - 🛫 36|235ms|21Mbps
-  - 🛫 37|198ms|21Mbps
-  - 🛫 38|147ms|21Mbps
-  - 🛫 39|253ms|20Mbps
-  - 🛫 40|156ms|20Mbps
-  - 🛫 41|222ms|20Mbps
-  - 🛫 42|214ms|20Mbps
-  - 🛫 43|207ms|19Mbps
-  - 🛫 44|155ms|19Mbps
-  - 🛫 45|192ms|19Mbps
-  - 🛫 46|181ms|19Mbps
-  - 🛫 47|247ms|18Mbps
-  - 🛫 48|373ms|18Mbps
-  - 🛫 49|249ms|18Mbps
-  - 🛫 50|176ms|18Mbps
-  - 🛫 51|178ms|18Mbps
-  - 🛫 52|220ms|17Mbps
-  - 🛫 53|221ms|16Mbps
-  - 🛫 54|246ms|16Mbps
-  - 🛫 55|201ms|15Mbps
-  - 🛫 56|315ms|15Mbps
-  - 🛫 57|220ms|15Mbps
-  - 🛫 58|242ms|15Mbps
-  - 🛫 59|243ms|14Mbps
-  - 🛫 60|211ms|13Mbps
-  - 🛫 61|212ms|11Mbps
-  - 🛫 62|132ms|9Mbps
-  - 🛫 63|281ms|4Mbps
-  - 🛫 64|248ms|4Mbps
-  - 🛫 65|154ms|4Mbps
-  - 🛫 66|216ms|4Mbps
-  - 🛫 67|225ms|3Mbps
-  - 🛫 68|193ms|3Mbps
-  - 🛫 69|206ms|?Mbps
+  - 🛫 01|49ms|16Mbps
+  - 🛫 02|53ms|17Mbps
+  - 🛫 03|106ms|6Mbps
+  - 🛫 04|139ms|12Mbps
+  - 🛫 05|142ms|30Mbps
+  - 🛫 06|158ms|38Mbps
+  - 🛫 07|174ms|25Mbps
+  - 🛫 08|184ms|78Mbps
+  - 🛫 09|194ms|41Mbps
+  - 🛫 10|196ms|42Mbps
+  - 🛫 11|199ms|50Mbps
+  - 🛫 12|203ms|94Mbps
+  - 🛫 13|204ms|80Mbps
+  - 🛫 14|210ms|253Mbps
+  - 🛫 15|383ms|20Mbps
+  - 🛫 16|458ms|14Mbps
+  - 🛫 17|2196ms|52Mbps
+  - 🛫 18|2201ms|40Mbps
+  - 🛫 19|84ms|14Mbps
+  - 🛫 20|144ms|24Mbps
+  - 🛫 21|164ms|15Mbps
+  - 🛫 22|166ms|22Mbps
+  - 🛫 23|167ms|20Mbps
+  - 🛫 24|170ms|8Mbps
+  - 🛫 25|171ms|24Mbps
+  - 🛫 26|178ms|17Mbps
+  - 🛫 27|179ms|4Mbps
+  - 🛫 28|184ms|?Mbps
+  - 🛫 29|188ms|22Mbps
+  - 🛫 30|194ms|31Mbps
+  - 🛫 31|196ms|31Mbps
+  - 🛫 32|198ms|74Mbps
+  - 🛫 33|198ms|15Mbps
+  - 🛫 34|203ms|4Mbps
+  - 🛫 35|204ms|106Mbps
+  - 🛫 36|204ms|18Mbps
+  - 🛫 37|204ms|9Mbps
+  - 🛫 38|204ms|2Mbps
+  - 🛫 39|206ms|106Mbps
+  - 🛫 40|206ms|18Mbps
+  - 🛫 41|207ms|63Mbps
+  - 🛫 42|209ms|17Mbps
+  - 🛫 43|213ms|36Mbps
+  - 🛫 44|218ms|20Mbps
+  - 🛫 45|224ms|40Mbps
+  - 🛫 46|224ms|22Mbps
+  - 🛫 47|231ms|17Mbps
+  - 🛫 48|232ms|14Mbps
+  - 🛫 49|235ms|69Mbps
+  - 🛫 50|241ms|15Mbps
+  - 🛫 51|242ms|112Mbps
+  - 🛫 52|243ms|83Mbps
+  - 🛫 53|249ms|6Mbps
+  - 🛫 54|250ms|24Mbps
+  - 🛫 55|251ms|9Mbps
+  - 🛫 56|255ms|?Mbps
+  - 🛫 57|264ms|17Mbps
+  - 🛫 58|268ms|15Mbps
+  - 🛫 59|303ms|14Mbps
+  - 🛫 60|370ms|19Mbps
 - name: 🛫 yieti 自动
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -9876,20 +9102,20 @@ proxy-groups:
   lazy: true
   proxies:
   - visa中国优选
-  - US|官方优选|191ms
-  - CF 联通优选 4
-  - GB 移动优选174ms 36.58Mbps
-  - 官方优选icook.tw
-  - US 移动优选aandd.co.jp 239ms
-  - HK 官方优选 138ms 2
-  - SG|官方优选|100ms 2
+  - US 移动优选dx.doi.org 201ms
   - DE 移动优选cfip.1323123.xyz 225ms
-  - US|官方优选|191ms 2
-  - CF优选 171.65ms 20.97MB/s
-  - GB 移动优选email.lg.com 179ms
+  - GB 移动优选networksolutions.com 169ms
+  - cfip.1323123.xyz
+  - GB 移动优选investor.apple.com 191ms
+  - US 移动优选aandd.co.jp 239ms
+  - US 移动优选vegasgeek.com 212ms
+  - 官方优选icook.hk
+  - US 移动优选support.communilink.net 229ms
   - 官方优选time.is
-  - JP 官方优选103ms 148.63Mbps
-  - HK 官方优选 59ms 2
+  - youxuan.cf.090227.xyz
+  - US 移动优选www.moc.gov.tw 243ms
+  - GB 移动优选cdn.nodeimage.com 236ms
+  - US 移动优选www.transgenderdor.org 309ms
 - name: 🇺🇸 美国节点
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -9899,132 +9125,101 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 美国01|137ms|1572Mbps|机房|纯净度未知
-  - 美国02|222ms|1222Mbps|机房|纯净度92.7%
-  - 美国03|400ms|1102Mbps|住宅|纯净度99.5%
-  - 美国04|506ms|1098Mbps|住宅|纯净度99.6%
-  - 美国05|286ms|1096Mbps|机房|纯净度92.7%
-  - 美国06|238ms|1053Mbps|机房|纯净度未知
-  - 美国07|139ms|1019Mbps|机房|纯净度未知
-  - 美国08|254ms|995Mbps|机房|纯净度未知
-  - 美国09|128ms|890Mbps|机房|纯净度未知
-  - 美国10|204ms|874Mbps|机房|纯净度未知
-  - 美国11|208ms|867Mbps|机房|纯净度94.7%
-  - 美国12|278ms|862Mbps|机房|纯净度未知
-  - 美国13|153ms|857Mbps|机房|纯净度未知
-  - 美国14|230ms|828Mbps|机房|纯净度未知
-  - 美国15|309ms|815Mbps|机房|纯净度未知
-  - 美国16|121ms|813Mbps|机房|纯净度未知
-  - 美国17|156ms|802Mbps|机房|纯净度98.2%
-  - 美国18|217ms|793Mbps|机房|纯净度未知
-  - 美国19|145ms|789Mbps|机房|纯净度98.2%
-  - 美国20|125ms|765Mbps|机房|纯净度未知
-  - 美国21|298ms|744Mbps|未知|纯净度未知
-  - 美国22|213ms|740Mbps|机房|纯净度94.7%
-  - 美国23|209ms|738Mbps|机房|纯净度未知
-  - 美国24|207ms|727Mbps|机房|纯净度98.2%
-  - 美国25|207ms|725Mbps|机房|纯净度未知
-  - 美国26|416ms|725Mbps|机房|纯净度未知
-  - 美国27|174ms|723Mbps|机房|纯净度未知
-  - 美国28|206ms|714Mbps|机房|纯净度94.7%
-  - 美国29|343ms|704Mbps|机房|纯净度未知
-  - 美国30|258ms|703Mbps|机房|纯净度未知
-  - 美国31|200ms|702Mbps|机房|纯净度未知
-  - 美国32|214ms|687Mbps|机房|纯净度未知
-  - 美国33|226ms|681Mbps|未知|纯净度未知
-  - 美国34|353ms|672Mbps|住宅|纯净度99.5%
-  - 美国35|213ms|666Mbps|未知|纯净度未知
-  - 美国36|432ms|654Mbps|机房|纯净度未知
-  - 美国37|287ms|654Mbps|机房|纯净度未知
-  - 美国38|229ms|653Mbps|机房|纯净度未知
-  - 美国39|325ms|650Mbps|机房|纯净度未知
-  - 美国40|178ms|644Mbps|机房|纯净度98.2%
-  - 美国41|148ms|642Mbps|机房|纯净度未知
-  - 美国42|300ms|638Mbps|机房|纯净度未知
-  - 美国43|264ms|629Mbps|机房|纯净度98.2%
-  - 美国44|165ms|629Mbps|机房|纯净度88.2%
-  - 美国45|120ms|623Mbps|机房|纯净度未知
-  - 美国46|133ms|619Mbps|机房|纯净度未知
-  - 美国47|148ms|615Mbps|机房|纯净度未知
-  - 美国48|268ms|607Mbps|机房|纯净度未知
-  - 美国49|183ms|604Mbps|机房|纯净度未知
-  - 美国50|136ms|599Mbps|机房|纯净度未知
-  - 美国51|225ms|599Mbps|住宅|纯净度未知
-  - 美国52|306ms|591Mbps|未知|纯净度未知
-  - 美国53|176ms|585Mbps|机房|纯净度未知
-  - 美国54|261ms|585Mbps|机房|纯净度未知
-  - 美国55|133ms|572Mbps|机房|纯净度未知
-  - 美国56|147ms|570Mbps|机房|纯净度未知
-  - 美国57|134ms|569Mbps|机房|纯净度未知
-  - 美国58|117ms|567Mbps|机房|纯净度未知
-  - 美国59|174ms|561Mbps|机房|纯净度未知
-  - 美国60|115ms|559Mbps|机房|纯净度未知
-  - 美国61|221ms|556Mbps|机房|纯净度94.7%
-  - 美国62|210ms|552Mbps|机房|纯净度98.2%
-  - 美国63|220ms|544Mbps|机房|纯净度未知
-  - 美国64|138ms|536Mbps|未知|纯净度未知
-  - 美国65|167ms|536Mbps|机房|纯净度未知
-  - 美国66|274ms|535Mbps|机房|纯净度100.0%
-  - 美国67|174ms|529Mbps|机房|纯净度未知
-  - 美国68|603ms|528Mbps|机房|纯净度未知
-  - 美国69|254ms|527Mbps|未知|纯净度未知
-  - 美国70|210ms|521Mbps|机房|纯净度93.7%
-  - 美国71|233ms|513Mbps|未知|纯净度未知
-  - 美国72|161ms|496Mbps|机房|纯净度未知
-  - 美国73|195ms|495Mbps|机房|纯净度未知
-  - 美国74|190ms|490Mbps|机房|纯净度未知
-  - 美国75|138ms|488Mbps|机房|纯净度未知
-  - 美国76|306ms|486Mbps|机房|纯净度88.2%
-  - 美国77|143ms|481Mbps|机房|纯净度未知
-  - 美国78|124ms|470Mbps|机房|纯净度93.7%
-  - 美国79|165ms|469Mbps|机房|纯净度未知
-  - 美国80|175ms|458Mbps|机房|纯净度98.2%
-  - 美国81|209ms|451Mbps|机房|纯净度未知
-  - 美国82|322ms|450Mbps|机房|纯净度未知
-  - 美国83|202ms|427Mbps|住宅|纯净度99.7%
-  - 美国84|192ms|427Mbps|住宅|纯净度99.7%
-  - 美国85|271ms|414Mbps|机房|纯净度未知
-  - 美国86|116ms|413Mbps|机房|纯净度未知
-  - 美国87|361ms|406Mbps|机房|纯净度未知
-  - 美国88|209ms|406Mbps|机房|纯净度93.7%
-  - 美国89|325ms|401Mbps|机房|纯净度未知
-  - 美国90|166ms|384Mbps|机房|纯净度未知
-  - 美国91|268ms|383Mbps|机房|纯净度未知
-  - 美国92|363ms|379Mbps|未知|纯净度未知
-  - 美国93|296ms|373Mbps|未知|纯净度未知
-  - 美国94|211ms|365Mbps|机房|纯净度未知
-  - 美国95|579ms|363Mbps|机房|纯净度未知
-  - 美国96|279ms|359Mbps|机房|纯净度未知
-  - 美国97|273ms|345Mbps|机房|纯净度未知
-  - 美国98|223ms|337Mbps|机房|纯净度未知
-  - 美国99|254ms|331Mbps|机房|纯净度未知
-  - 美国100|189ms|309Mbps|机房|纯净度94.9%
-  - 美国101|237ms|305Mbps|机房|纯净度未知
-  - 美国102|305ms|294Mbps|住宅|纯净度未知
-  - 美国103|468ms|292Mbps|住宅|纯净度未知
-  - 美国104|231ms|290Mbps|机房|纯净度未知
-  - 美国105|127ms|286Mbps|机房|纯净度未知
-  - 美国106|336ms|283Mbps|机房|纯净度未知
-  - 美国107|398ms|277Mbps|住宅|纯净度99.6%
-  - 美国108|388ms|276Mbps|住宅|纯净度99.7%
-  - 美国109|408ms|275Mbps|住宅|纯净度99.7%
-  - 美国110|374ms|272Mbps|住宅|纯净度99.7%
-  - 美国111|345ms|270Mbps|住宅|纯净度99.6%
-  - 美国112|177ms|257Mbps|机房|纯净度未知
-  - 美国113|264ms|256Mbps|机房|纯净度未知
-  - 美国114|256ms|225Mbps|未知|纯净度未知
-  - 美国115|309ms|222Mbps|机房|纯净度未知
-  - 美国116|158ms|217Mbps|机房|纯净度未知
-  - 美国117|231ms|206Mbps|机房|纯净度未知
-  - 美国118|214ms|161Mbps|机房|纯净度未知
-  - 美国119|303ms|149Mbps|机房|纯净度未知
-  - 美国120|224ms|146Mbps|机房|纯净度未知
-  - 美国121|266ms|127Mbps|机房|纯净度未知
-  - 美国122|327ms|118Mbps|机房|纯净度未知
-  - 美国123|308ms|106Mbps|机房|纯净度未知
-  - 美国124|135ms|89Mbps|未知|纯净度未知
-  - 美国125|278ms|87Mbps|机房|纯净度未知
-  - 美国126|150ms|67Mbps|机房|纯净度未知
+  - 美国01|161ms|1121Mbps|机房|纯净度未知
+  - 美国02|362ms|1017Mbps|机房|纯净度92.7%
+  - 美国03|349ms|937Mbps|未知|纯净度未知
+  - 美国04|244ms|869Mbps|机房|纯净度未知
+  - 美国05|336ms|864Mbps|机房|纯净度未知
+  - 美国06|211ms|837Mbps|机房|纯净度未知
+  - 美国07|139ms|818Mbps|机房|纯净度未知
+  - 美国08|345ms|804Mbps|机房|纯净度未知
+  - 美国09|158ms|784Mbps|机房|纯净度未知
+  - 美国10|304ms|771Mbps|机房|纯净度93.7%
+  - 美国11|285ms|764Mbps|机房|纯净度未知
+  - 美国12|503ms|745Mbps|机房|纯净度未知
+  - 美国13|202ms|732Mbps|机房|纯净度未知
+  - 美国14|265ms|728Mbps|机房|纯净度未知
+  - 美国15|116ms|697Mbps|机房|纯净度未知
+  - 美国16|122ms|687Mbps|机房|纯净度未知
+  - 美国17|244ms|683Mbps|机房|纯净度未知
+  - 美国18|287ms|677Mbps|机房|纯净度未知
+  - 美国19|127ms|670Mbps|机房|纯净度未知
+  - 美国20|228ms|654Mbps|机房|纯净度未知
+  - 美国21|232ms|653Mbps|机房|纯净度未知
+  - 美国22|183ms|643Mbps|机房|纯净度未知
+  - 美国23|329ms|634Mbps|机房|纯净度未知
+  - 美国24|106ms|628Mbps|机房|纯净度未知
+  - 美国25|442ms|627Mbps|住宅|纯净度99.5%
+  - 美国26|260ms|619Mbps|机房|纯净度未知
+  - 美国27|186ms|616Mbps|机房|纯净度未知
+  - 美国28|262ms|615Mbps|机房|纯净度未知
+  - 美国29|101ms|602Mbps|机房|纯净度未知
+  - 美国30|217ms|598Mbps|机房|纯净度未知
+  - 美国31|163ms|581Mbps|机房|纯净度未知
+  - 美国32|211ms|568Mbps|机房|纯净度未知
+  - 美国33|153ms|567Mbps|机房|纯净度未知
+  - 美国34|161ms|543Mbps|机房|纯净度94.7%
+  - 美国35|211ms|543Mbps|机房|纯净度未知
+  - 美国36|265ms|542Mbps|机房|纯净度未知
+  - 美国37|146ms|536Mbps|机房|纯净度未知
+  - 美国38|152ms|533Mbps|机房|纯净度未知
+  - 美国39|205ms|532Mbps|机房|纯净度未知
+  - 美国40|219ms|525Mbps|机房|纯净度未知
+  - 美国41|131ms|505Mbps|机房|纯净度未知
+  - 美国42|232ms|505Mbps|住宅|纯净度未知
+  - 美国43|319ms|495Mbps|机房|纯净度未知
+  - 美国44|144ms|473Mbps|机房|纯净度未知
+  - 美国45|108ms|472Mbps|机房|纯净度未知
+  - 美国46|138ms|463Mbps|机房|纯净度未知
+  - 美国47|128ms|460Mbps|机房|纯净度未知
+  - 美国48|149ms|453Mbps|机房|纯净度未知
+  - 美国49|281ms|447Mbps|机房|纯净度未知
+  - 美国50|229ms|440Mbps|机房|纯净度94.7%
+  - 美国51|355ms|434Mbps|住宅|纯净度99.6%
+  - 美国52|317ms|432Mbps|机房|纯净度未知
+  - 美国53|476ms|430Mbps|住宅|纯净度99.7%
+  - 美国54|520ms|427Mbps|机房|纯净度未知
+  - 美国55|162ms|419Mbps|机房|纯净度未知
+  - 美国56|286ms|415Mbps|机房|纯净度99.5%
+  - 美国57|489ms|409Mbps|住宅|纯净度99.7%
+  - 美国58|554ms|406Mbps|机房|纯净度未知
+  - 美国59|136ms|405Mbps|机房|纯净度未知
+  - 美国60|113ms|399Mbps|机房|纯净度92.7%
+  - 美国61|178ms|383Mbps|机房|纯净度未知
+  - 美国62|427ms|379Mbps|机房|纯净度未知
+  - 美国63|136ms|372Mbps|机房|纯净度未知
+  - 美国64|252ms|371Mbps|机房|纯净度未知
+  - 美国65|255ms|344Mbps|机房|纯净度未知
+  - 美国66|605ms|337Mbps|机房|纯净度未知
+  - 美国67|197ms|322Mbps|机房|纯净度未知
+  - 美国68|258ms|321Mbps|住宅|纯净度未知
+  - 美国69|126ms|311Mbps|未知|纯净度未知
+  - 美国70|222ms|311Mbps|机房|纯净度未知
+  - 美国71|216ms|292Mbps|机房|纯净度未知
+  - 美国72|477ms|287Mbps|住宅|纯净度99.5%
+  - 美国73|215ms|283Mbps|机房|纯净度未知
+  - 美国74|151ms|277Mbps|机房|纯净度未知
+  - 美国75|122ms|274Mbps|住宅|纯净度99.6%
+  - 美国76|410ms|271Mbps|住宅|纯净度99.5%
+  - 美国77|354ms|270Mbps|未知|纯净度未知
+  - 美国78|408ms|260Mbps|机房|纯净度未知
+  - 美国79|301ms|255Mbps|机房|纯净度未知
+  - 美国80|127ms|234Mbps|机房|纯净度未知
+  - 美国81|149ms|218Mbps|机房|纯净度未知
+  - 美国82|147ms|216Mbps|机房|纯净度未知
+  - 美国83|138ms|200Mbps|机房|纯净度未知
+  - 美国84|151ms|198Mbps|机房|纯净度未知
+  - 美国85|146ms|169Mbps|机房|纯净度未知
+  - 美国86|114ms|161Mbps|机房|纯净度未知
+  - 美国87|158ms|151Mbps|未知|纯净度未知
+  - 美国88|341ms|141Mbps|机房|纯净度未知
+  - 美国89|150ms|132Mbps|机房|纯净度未知
+  - 美国90|254ms|87Mbps|未知|纯净度未知
+  - 美国91|135ms|84Mbps|未知|纯净度未知
+  - 美国92|291ms|77Mbps|住宅|纯净度未知
+  - 美国93|152ms|71Mbps|机房|纯净度未知
+  - 美国94|258ms|46Mbps|机房|纯净度未知
+  - 美国95|162ms|40Mbps|机房|纯净度未知
 - name: 🏢 美国机房
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -10034,108 +9229,85 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 美国01|137ms|1572Mbps|机房|纯净度未知
-  - 美国02|222ms|1222Mbps|机房|纯净度92.7%
-  - 美国05|286ms|1096Mbps|机房|纯净度92.7%
-  - 美国06|238ms|1053Mbps|机房|纯净度未知
-  - 美国07|139ms|1019Mbps|机房|纯净度未知
-  - 美国08|254ms|995Mbps|机房|纯净度未知
-  - 美国09|128ms|890Mbps|机房|纯净度未知
-  - 美国10|204ms|874Mbps|机房|纯净度未知
-  - 美国11|208ms|867Mbps|机房|纯净度94.7%
-  - 美国12|278ms|862Mbps|机房|纯净度未知
-  - 美国13|153ms|857Mbps|机房|纯净度未知
-  - 美国14|230ms|828Mbps|机房|纯净度未知
-  - 美国15|309ms|815Mbps|机房|纯净度未知
-  - 美国16|121ms|813Mbps|机房|纯净度未知
-  - 美国17|156ms|802Mbps|机房|纯净度98.2%
-  - 美国18|217ms|793Mbps|机房|纯净度未知
-  - 美国19|145ms|789Mbps|机房|纯净度98.2%
-  - 美国20|125ms|765Mbps|机房|纯净度未知
-  - 美国22|213ms|740Mbps|机房|纯净度94.7%
-  - 美国23|209ms|738Mbps|机房|纯净度未知
-  - 美国24|207ms|727Mbps|机房|纯净度98.2%
-  - 美国25|207ms|725Mbps|机房|纯净度未知
-  - 美国26|416ms|725Mbps|机房|纯净度未知
-  - 美国27|174ms|723Mbps|机房|纯净度未知
-  - 美国28|206ms|714Mbps|机房|纯净度94.7%
-  - 美国29|343ms|704Mbps|机房|纯净度未知
-  - 美国30|258ms|703Mbps|机房|纯净度未知
-  - 美国31|200ms|702Mbps|机房|纯净度未知
-  - 美国32|214ms|687Mbps|机房|纯净度未知
-  - 美国36|432ms|654Mbps|机房|纯净度未知
-  - 美国37|287ms|654Mbps|机房|纯净度未知
-  - 美国38|229ms|653Mbps|机房|纯净度未知
-  - 美国39|325ms|650Mbps|机房|纯净度未知
-  - 美国40|178ms|644Mbps|机房|纯净度98.2%
-  - 美国41|148ms|642Mbps|机房|纯净度未知
-  - 美国42|300ms|638Mbps|机房|纯净度未知
-  - 美国43|264ms|629Mbps|机房|纯净度98.2%
-  - 美国44|165ms|629Mbps|机房|纯净度88.2%
-  - 美国45|120ms|623Mbps|机房|纯净度未知
-  - 美国46|133ms|619Mbps|机房|纯净度未知
-  - 美国47|148ms|615Mbps|机房|纯净度未知
-  - 美国48|268ms|607Mbps|机房|纯净度未知
-  - 美国49|183ms|604Mbps|机房|纯净度未知
-  - 美国50|136ms|599Mbps|机房|纯净度未知
-  - 美国53|176ms|585Mbps|机房|纯净度未知
-  - 美国54|261ms|585Mbps|机房|纯净度未知
-  - 美国55|133ms|572Mbps|机房|纯净度未知
-  - 美国56|147ms|570Mbps|机房|纯净度未知
-  - 美国57|134ms|569Mbps|机房|纯净度未知
-  - 美国58|117ms|567Mbps|机房|纯净度未知
-  - 美国59|174ms|561Mbps|机房|纯净度未知
-  - 美国60|115ms|559Mbps|机房|纯净度未知
-  - 美国61|221ms|556Mbps|机房|纯净度94.7%
-  - 美国62|210ms|552Mbps|机房|纯净度98.2%
-  - 美国63|220ms|544Mbps|机房|纯净度未知
-  - 美国65|167ms|536Mbps|机房|纯净度未知
-  - 美国66|274ms|535Mbps|机房|纯净度100.0%
-  - 美国67|174ms|529Mbps|机房|纯净度未知
-  - 美国68|603ms|528Mbps|机房|纯净度未知
-  - 美国70|210ms|521Mbps|机房|纯净度93.7%
-  - 美国72|161ms|496Mbps|机房|纯净度未知
-  - 美国73|195ms|495Mbps|机房|纯净度未知
-  - 美国74|190ms|490Mbps|机房|纯净度未知
-  - 美国75|138ms|488Mbps|机房|纯净度未知
-  - 美国76|306ms|486Mbps|机房|纯净度88.2%
-  - 美国77|143ms|481Mbps|机房|纯净度未知
-  - 美国78|124ms|470Mbps|机房|纯净度93.7%
-  - 美国79|165ms|469Mbps|机房|纯净度未知
-  - 美国80|175ms|458Mbps|机房|纯净度98.2%
-  - 美国81|209ms|451Mbps|机房|纯净度未知
-  - 美国82|322ms|450Mbps|机房|纯净度未知
-  - 美国85|271ms|414Mbps|机房|纯净度未知
-  - 美国86|116ms|413Mbps|机房|纯净度未知
-  - 美国87|361ms|406Mbps|机房|纯净度未知
-  - 美国88|209ms|406Mbps|机房|纯净度93.7%
-  - 美国89|325ms|401Mbps|机房|纯净度未知
-  - 美国90|166ms|384Mbps|机房|纯净度未知
-  - 美国91|268ms|383Mbps|机房|纯净度未知
-  - 美国94|211ms|365Mbps|机房|纯净度未知
-  - 美国95|579ms|363Mbps|机房|纯净度未知
-  - 美国96|279ms|359Mbps|机房|纯净度未知
-  - 美国97|273ms|345Mbps|机房|纯净度未知
-  - 美国98|223ms|337Mbps|机房|纯净度未知
-  - 美国99|254ms|331Mbps|机房|纯净度未知
-  - 美国100|189ms|309Mbps|机房|纯净度94.9%
-  - 美国101|237ms|305Mbps|机房|纯净度未知
-  - 美国104|231ms|290Mbps|机房|纯净度未知
-  - 美国105|127ms|286Mbps|机房|纯净度未知
-  - 美国106|336ms|283Mbps|机房|纯净度未知
-  - 美国112|177ms|257Mbps|机房|纯净度未知
-  - 美国113|264ms|256Mbps|机房|纯净度未知
-  - 美国115|309ms|222Mbps|机房|纯净度未知
-  - 美国116|158ms|217Mbps|机房|纯净度未知
-  - 美国117|231ms|206Mbps|机房|纯净度未知
-  - 美国118|214ms|161Mbps|机房|纯净度未知
-  - 美国119|303ms|149Mbps|机房|纯净度未知
-  - 美国120|224ms|146Mbps|机房|纯净度未知
-  - 美国121|266ms|127Mbps|机房|纯净度未知
-  - 美国122|327ms|118Mbps|机房|纯净度未知
-  - 美国123|308ms|106Mbps|机房|纯净度未知
-  - 美国125|278ms|87Mbps|机房|纯净度未知
-  - 美国126|150ms|67Mbps|机房|纯净度未知
+  - 美国01|161ms|1121Mbps|机房|纯净度未知
+  - 美国02|362ms|1017Mbps|机房|纯净度92.7%
+  - 美国04|244ms|869Mbps|机房|纯净度未知
+  - 美国05|336ms|864Mbps|机房|纯净度未知
+  - 美国06|211ms|837Mbps|机房|纯净度未知
+  - 美国07|139ms|818Mbps|机房|纯净度未知
+  - 美国08|345ms|804Mbps|机房|纯净度未知
+  - 美国09|158ms|784Mbps|机房|纯净度未知
+  - 美国10|304ms|771Mbps|机房|纯净度93.7%
+  - 美国11|285ms|764Mbps|机房|纯净度未知
+  - 美国12|503ms|745Mbps|机房|纯净度未知
+  - 美国13|202ms|732Mbps|机房|纯净度未知
+  - 美国14|265ms|728Mbps|机房|纯净度未知
+  - 美国15|116ms|697Mbps|机房|纯净度未知
+  - 美国16|122ms|687Mbps|机房|纯净度未知
+  - 美国17|244ms|683Mbps|机房|纯净度未知
+  - 美国18|287ms|677Mbps|机房|纯净度未知
+  - 美国19|127ms|670Mbps|机房|纯净度未知
+  - 美国20|228ms|654Mbps|机房|纯净度未知
+  - 美国21|232ms|653Mbps|机房|纯净度未知
+  - 美国22|183ms|643Mbps|机房|纯净度未知
+  - 美国23|329ms|634Mbps|机房|纯净度未知
+  - 美国24|106ms|628Mbps|机房|纯净度未知
+  - 美国26|260ms|619Mbps|机房|纯净度未知
+  - 美国27|186ms|616Mbps|机房|纯净度未知
+  - 美国28|262ms|615Mbps|机房|纯净度未知
+  - 美国29|101ms|602Mbps|机房|纯净度未知
+  - 美国30|217ms|598Mbps|机房|纯净度未知
+  - 美国31|163ms|581Mbps|机房|纯净度未知
+  - 美国32|211ms|568Mbps|机房|纯净度未知
+  - 美国33|153ms|567Mbps|机房|纯净度未知
+  - 美国34|161ms|543Mbps|机房|纯净度94.7%
+  - 美国35|211ms|543Mbps|机房|纯净度未知
+  - 美国36|265ms|542Mbps|机房|纯净度未知
+  - 美国37|146ms|536Mbps|机房|纯净度未知
+  - 美国38|152ms|533Mbps|机房|纯净度未知
+  - 美国39|205ms|532Mbps|机房|纯净度未知
+  - 美国40|219ms|525Mbps|机房|纯净度未知
+  - 美国41|131ms|505Mbps|机房|纯净度未知
+  - 美国43|319ms|495Mbps|机房|纯净度未知
+  - 美国44|144ms|473Mbps|机房|纯净度未知
+  - 美国45|108ms|472Mbps|机房|纯净度未知
+  - 美国46|138ms|463Mbps|机房|纯净度未知
+  - 美国47|128ms|460Mbps|机房|纯净度未知
+  - 美国48|149ms|453Mbps|机房|纯净度未知
+  - 美国49|281ms|447Mbps|机房|纯净度未知
+  - 美国50|229ms|440Mbps|机房|纯净度94.7%
+  - 美国52|317ms|432Mbps|机房|纯净度未知
+  - 美国54|520ms|427Mbps|机房|纯净度未知
+  - 美国55|162ms|419Mbps|机房|纯净度未知
+  - 美国56|286ms|415Mbps|机房|纯净度99.5%
+  - 美国58|554ms|406Mbps|机房|纯净度未知
+  - 美国59|136ms|405Mbps|机房|纯净度未知
+  - 美国60|113ms|399Mbps|机房|纯净度92.7%
+  - 美国61|178ms|383Mbps|机房|纯净度未知
+  - 美国62|427ms|379Mbps|机房|纯净度未知
+  - 美国63|136ms|372Mbps|机房|纯净度未知
+  - 美国64|252ms|371Mbps|机房|纯净度未知
+  - 美国65|255ms|344Mbps|机房|纯净度未知
+  - 美国66|605ms|337Mbps|机房|纯净度未知
+  - 美国67|197ms|322Mbps|机房|纯净度未知
+  - 美国70|222ms|311Mbps|机房|纯净度未知
+  - 美国71|216ms|292Mbps|机房|纯净度未知
+  - 美国73|215ms|283Mbps|机房|纯净度未知
+  - 美国74|151ms|277Mbps|机房|纯净度未知
+  - 美国78|408ms|260Mbps|机房|纯净度未知
+  - 美国79|301ms|255Mbps|机房|纯净度未知
+  - 美国80|127ms|234Mbps|机房|纯净度未知
+  - 美国81|149ms|218Mbps|机房|纯净度未知
+  - 美国82|147ms|216Mbps|机房|纯净度未知
+  - 美国83|138ms|200Mbps|机房|纯净度未知
+  - 美国84|151ms|198Mbps|机房|纯净度未知
+  - 美国85|146ms|169Mbps|机房|纯净度未知
+  - 美国86|114ms|161Mbps|机房|纯净度未知
+  - 美国88|341ms|141Mbps|机房|纯净度未知
+  - 美国89|150ms|132Mbps|机房|纯净度未知
+  - 美国93|152ms|71Mbps|机房|纯净度未知
+  - 美国94|258ms|46Mbps|机房|纯净度未知
+  - 美国95|162ms|40Mbps|机房|纯净度未知
 - name: 🏠 美国住宅
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -10145,29 +9317,16 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 美国03|400ms|1102Mbps|住宅|纯净度99.5%
-  - 美国04|506ms|1098Mbps|住宅|纯净度99.6%
-  - 美国34|353ms|672Mbps|住宅|纯净度99.5%
-  - 美国51|225ms|599Mbps|住宅|纯净度未知
-  - 美国83|202ms|427Mbps|住宅|纯净度99.7%
-  - 美国84|192ms|427Mbps|住宅|纯净度99.7%
-  - 美国102|305ms|294Mbps|住宅|纯净度未知
-  - 美国103|468ms|292Mbps|住宅|纯净度未知
-  - 美国107|398ms|277Mbps|住宅|纯净度99.6%
-  - 美国108|388ms|276Mbps|住宅|纯净度99.7%
-  - 美国109|408ms|275Mbps|住宅|纯净度99.7%
-  - 美国110|374ms|272Mbps|住宅|纯净度99.7%
-  - 美国111|345ms|270Mbps|住宅|纯净度99.6%
-- name: 🇸🇬 新加坡
-  type: url-test
-  url: http://www.gstatic.com/generate_204
-  interval: 120
-  timeout: 3000
-  expected-status: 204
-  tolerance: 100
-  lazy: false
-  proxies:
-  - 新加坡01|756ms|160Mbps|机房|纯净度未知
+  - 美国25|442ms|627Mbps|住宅|纯净度99.5%
+  - 美国42|232ms|505Mbps|住宅|纯净度未知
+  - 美国51|355ms|434Mbps|住宅|纯净度99.6%
+  - 美国53|476ms|430Mbps|住宅|纯净度99.7%
+  - 美国57|489ms|409Mbps|住宅|纯净度99.7%
+  - 美国68|258ms|321Mbps|住宅|纯净度未知
+  - 美国72|477ms|287Mbps|住宅|纯净度99.5%
+  - 美国75|122ms|274Mbps|住宅|纯净度99.6%
+  - 美国76|410ms|271Mbps|住宅|纯净度99.5%
+  - 美国92|291ms|77Mbps|住宅|纯净度未知
 - name: 🇪🇺 欧洲
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -10177,26 +9336,10 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 英国01|373ms|467Mbps|机房|纯净度未知
-  - 荷兰01|515ms|450Mbps|机房|纯净度100.0%
-  - 德国01|521ms|424Mbps|未知|纯净度未知
-  - 英国02|576ms|364Mbps|机房|纯净度未知
-  - 荷兰02|496ms|332Mbps|机房|纯净度未知
-  - 荷兰03|473ms|323Mbps|机房|纯净度未知
-  - 荷兰04|462ms|316Mbps|机房|纯净度未知
-  - 荷兰05|489ms|312Mbps|机房|纯净度未知
-  - 荷兰06|506ms|294Mbps|机房|纯净度未知
-  - 荷兰07|511ms|264Mbps|机房|纯净度未知
-  - 德国02|456ms|227Mbps|住宅|纯净度未知
-  - 法国01|491ms|203Mbps|机房|纯净度未知
-  - 荷兰08|296ms|199Mbps|机房|纯净度未知
-  - 爱尔兰01|555ms|185Mbps|机房|纯净度未知
-  - 荷兰09|451ms|172Mbps|机房|纯净度未知
-  - 德国03|576ms|171Mbps|机房|纯净度未知
-  - 荷兰10|314ms|152Mbps|机房|纯净度99.6%
-  - 荷兰11|851ms|100Mbps|机房|纯净度未知
-  - 英国03|405ms|74Mbps|机房|纯净度94.5%
-  - 法国02|526ms|50Mbps|机房|纯净度未知
+  - 英国01|447ms|546Mbps|机房|纯净度未知
+  - 法国01|1238ms|272Mbps|机房|纯净度98.0%
+  - 荷兰01|864ms|243Mbps|机房|纯净度未知
+  - 荷兰02|611ms|240Mbps|机房|纯净度未知
 - name: 🌐 全部节点
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -10206,166 +9349,107 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 美国01|137ms|1572Mbps|机房|纯净度未知
-  - 美国02|222ms|1222Mbps|机房|纯净度92.7%
-  - 美国03|400ms|1102Mbps|住宅|纯净度99.5%
-  - 美国04|506ms|1098Mbps|住宅|纯净度99.6%
-  - 美国05|286ms|1096Mbps|机房|纯净度92.7%
-  - 美国06|238ms|1053Mbps|机房|纯净度未知
-  - 美国07|139ms|1019Mbps|机房|纯净度未知
-  - 美国08|254ms|995Mbps|机房|纯净度未知
-  - 美国09|128ms|890Mbps|机房|纯净度未知
-  - 美国10|204ms|874Mbps|机房|纯净度未知
-  - 美国11|208ms|867Mbps|机房|纯净度94.7%
-  - 美国12|278ms|862Mbps|机房|纯净度未知
-  - 美国13|153ms|857Mbps|机房|纯净度未知
-  - 美国14|230ms|828Mbps|机房|纯净度未知
-  - 美国15|309ms|815Mbps|机房|纯净度未知
-  - 美国16|121ms|813Mbps|机房|纯净度未知
-  - 美国17|156ms|802Mbps|机房|纯净度98.2%
-  - 美国18|217ms|793Mbps|机房|纯净度未知
-  - 美国19|145ms|789Mbps|机房|纯净度98.2%
-  - 美国20|125ms|765Mbps|机房|纯净度未知
-  - 美国21|298ms|744Mbps|未知|纯净度未知
-  - 美国22|213ms|740Mbps|机房|纯净度94.7%
-  - 美国23|209ms|738Mbps|机房|纯净度未知
-  - 美国24|207ms|727Mbps|机房|纯净度98.2%
-  - 美国25|207ms|725Mbps|机房|纯净度未知
-  - 美国26|416ms|725Mbps|机房|纯净度未知
-  - 美国27|174ms|723Mbps|机房|纯净度未知
-  - 美国28|206ms|714Mbps|机房|纯净度94.7%
-  - 美国29|343ms|704Mbps|机房|纯净度未知
-  - 美国30|258ms|703Mbps|机房|纯净度未知
-  - 美国31|200ms|702Mbps|机房|纯净度未知
-  - 美国32|214ms|687Mbps|机房|纯净度未知
-  - 美国33|226ms|681Mbps|未知|纯净度未知
-  - 加拿大01|163ms|673Mbps|机房|纯净度98.2%
-  - 美国34|353ms|672Mbps|住宅|纯净度99.5%
-  - 美国35|213ms|666Mbps|未知|纯净度未知
-  - 美国36|432ms|654Mbps|机房|纯净度未知
-  - 美国37|287ms|654Mbps|机房|纯净度未知
-  - 美国38|229ms|653Mbps|机房|纯净度未知
-  - 美国39|325ms|650Mbps|机房|纯净度未知
-  - 美国40|178ms|644Mbps|机房|纯净度98.2%
-  - 美国41|148ms|642Mbps|机房|纯净度未知
-  - 美国42|300ms|638Mbps|机房|纯净度未知
-  - 美国43|264ms|629Mbps|机房|纯净度98.2%
-  - 美国44|165ms|629Mbps|机房|纯净度88.2%
-  - 美国45|120ms|623Mbps|机房|纯净度未知
-  - 美国46|133ms|619Mbps|机房|纯净度未知
-  - 美国47|148ms|615Mbps|机房|纯净度未知
-  - 美国48|268ms|607Mbps|机房|纯净度未知
-  - 美国49|183ms|604Mbps|机房|纯净度未知
-  - 加拿大02|221ms|601Mbps|机房|纯净度98.2%
-  - 美国50|136ms|599Mbps|机房|纯净度未知
-  - 美国51|225ms|599Mbps|住宅|纯净度未知
-  - 美国52|306ms|591Mbps|未知|纯净度未知
-  - 美国53|176ms|585Mbps|机房|纯净度未知
-  - 美国54|261ms|585Mbps|机房|纯净度未知
-  - 美国55|133ms|572Mbps|机房|纯净度未知
-  - 美国56|147ms|570Mbps|机房|纯净度未知
-  - 美国57|134ms|569Mbps|机房|纯净度未知
-  - 美国58|117ms|567Mbps|机房|纯净度未知
-  - 加拿大03|399ms|565Mbps|机房|纯净度98.2%
-  - 美国59|174ms|561Mbps|机房|纯净度未知
-  - 美国60|115ms|559Mbps|机房|纯净度未知
-  - 加拿大04|127ms|556Mbps|机房|纯净度98.2%
-  - 美国61|221ms|556Mbps|机房|纯净度94.7%
-  - 美国62|210ms|552Mbps|机房|纯净度98.2%
-  - 美国63|220ms|544Mbps|机房|纯净度未知
-  - 美国64|138ms|536Mbps|未知|纯净度未知
-  - 美国65|167ms|536Mbps|机房|纯净度未知
-  - 美国66|274ms|535Mbps|机房|纯净度100.0%
-  - 美国67|174ms|529Mbps|机房|纯净度未知
-  - 美国68|603ms|528Mbps|机房|纯净度未知
-  - 美国69|254ms|527Mbps|未知|纯净度未知
-  - 美国70|210ms|521Mbps|机房|纯净度93.7%
-  - 美国71|233ms|513Mbps|未知|纯净度未知
-  - 加拿大05|590ms|512Mbps|机房|纯净度98.2%
-  - 加拿大06|189ms|506Mbps|住宅|纯净度未知
-  - 美国72|161ms|496Mbps|机房|纯净度未知
-  - 美国73|195ms|495Mbps|机房|纯净度未知
-  - 美国74|190ms|490Mbps|机房|纯净度未知
-  - 加拿大07|191ms|488Mbps|未知|纯净度未知
-  - 加拿大08|518ms|488Mbps|未知|纯净度未知
-  - 美国75|138ms|488Mbps|机房|纯净度未知
-  - 美国76|306ms|486Mbps|机房|纯净度88.2%
-  - MX01|249ms|482Mbps|机房|纯净度未知
-  - 美国77|143ms|481Mbps|机房|纯净度未知
-  - 美国78|124ms|470Mbps|机房|纯净度93.7%
-  - 美国79|165ms|469Mbps|机房|纯净度未知
-  - 英国01|373ms|467Mbps|机房|纯净度未知
-  - 美国80|175ms|458Mbps|机房|纯净度98.2%
-  - 美国81|209ms|451Mbps|机房|纯净度未知
-  - 美国82|322ms|450Mbps|机房|纯净度未知
-  - 荷兰01|515ms|450Mbps|机房|纯净度100.0%
-  - 美国83|202ms|427Mbps|住宅|纯净度99.7%
-  - 美国84|192ms|427Mbps|住宅|纯净度99.7%
-  - 德国01|521ms|424Mbps|未知|纯净度未知
-  - 美国85|271ms|414Mbps|机房|纯净度未知
-  - 美国86|116ms|413Mbps|机房|纯净度未知
-  - 加拿大09|182ms|412Mbps|机房|纯净度未知
-  - 美国87|361ms|406Mbps|机房|纯净度未知
-  - 美国88|209ms|406Mbps|机房|纯净度93.7%
-  - 美国89|325ms|401Mbps|机房|纯净度未知
-  - 美国90|166ms|384Mbps|机房|纯净度未知
-  - 美国91|268ms|383Mbps|机房|纯净度未知
-  - 美国92|363ms|379Mbps|未知|纯净度未知
-  - 美国93|296ms|373Mbps|未知|纯净度未知
-  - 美国94|211ms|365Mbps|机房|纯净度未知
-  - 英国02|576ms|364Mbps|机房|纯净度未知
-  - 美国95|579ms|363Mbps|机房|纯净度未知
-  - 美国96|279ms|359Mbps|机房|纯净度未知
-  - 加拿大10|456ms|350Mbps|机房|纯净度未知
-  - 美国97|273ms|345Mbps|机房|纯净度未知
-  - 美国98|223ms|337Mbps|机房|纯净度未知
-  - 荷兰02|496ms|332Mbps|机房|纯净度未知
-  - 美国99|254ms|331Mbps|机房|纯净度未知
-  - 荷兰03|473ms|323Mbps|机房|纯净度未知
-  - 荷兰04|462ms|316Mbps|机房|纯净度未知
-  - 荷兰05|489ms|312Mbps|机房|纯净度未知
-  - 美国100|189ms|309Mbps|机房|纯净度94.9%
-  - 美国101|237ms|305Mbps|机房|纯净度未知
-  - 荷兰06|506ms|294Mbps|机房|纯净度未知
-  - 美国102|305ms|294Mbps|住宅|纯净度未知
-  - 美国103|468ms|292Mbps|住宅|纯净度未知
-  - 美国104|231ms|290Mbps|机房|纯净度未知
-  - 美国105|127ms|286Mbps|机房|纯净度未知
-  - 美国106|336ms|283Mbps|机房|纯净度未知
-  - 美国107|398ms|277Mbps|住宅|纯净度99.6%
-  - 美国108|388ms|276Mbps|住宅|纯净度99.7%
-  - 美国109|408ms|275Mbps|住宅|纯净度99.7%
-  - 美国110|374ms|272Mbps|住宅|纯净度99.7%
-  - 美国111|345ms|270Mbps|住宅|纯净度99.6%
-  - 荷兰07|511ms|264Mbps|机房|纯净度未知
-  - 加拿大11|197ms|260Mbps|机房|纯净度未知
-  - 美国112|177ms|257Mbps|机房|纯净度未知
-  - 美国113|264ms|256Mbps|机房|纯净度未知
-  - 德国02|456ms|227Mbps|住宅|纯净度未知
-  - 美国114|256ms|225Mbps|未知|纯净度未知
-  - 美国115|309ms|222Mbps|机房|纯净度未知
-  - 美国116|158ms|217Mbps|机房|纯净度未知
-  - 美国117|231ms|206Mbps|机房|纯净度未知
-  - 法国01|491ms|203Mbps|机房|纯净度未知
-  - 加拿大12|162ms|201Mbps|机房|纯净度未知
-  - 荷兰08|296ms|199Mbps|机房|纯净度未知
-  - 加拿大13|252ms|198Mbps|机房|纯净度未知
-  - 爱尔兰01|555ms|185Mbps|机房|纯净度未知
-  - 荷兰09|451ms|172Mbps|机房|纯净度未知
-  - 德国03|576ms|171Mbps|机房|纯净度未知
-  - 美国118|214ms|161Mbps|机房|纯净度未知
-  - 新加坡01|756ms|160Mbps|机房|纯净度未知
-  - 荷兰10|314ms|152Mbps|机房|纯净度99.6%
-  - 美国119|303ms|149Mbps|机房|纯净度未知
-  - 美国120|224ms|146Mbps|机房|纯净度未知
-  - 美国121|266ms|127Mbps|机房|纯净度未知
-  - 美国122|327ms|118Mbps|机房|纯净度未知
-  - 美国123|308ms|106Mbps|机房|纯净度未知
-  - 荷兰11|851ms|100Mbps|机房|纯净度未知
-  - 美国124|135ms|89Mbps|未知|纯净度未知
-  - 美国125|278ms|87Mbps|机房|纯净度未知
-  - MX02|336ms|81Mbps|住宅|纯净度未知
-  - 英国03|405ms|74Mbps|机房|纯净度94.5%
-  - TR01|411ms|69Mbps|住宅|纯净度未知
-  - 美国126|150ms|67Mbps|机房|纯净度未知
-  - 法国02|526ms|50Mbps|机房|纯净度未知
+  - 美国01|161ms|1121Mbps|机房|纯净度未知
+  - 美国02|362ms|1017Mbps|机房|纯净度92.7%
+  - 美国03|349ms|937Mbps|未知|纯净度未知
+  - 美国04|244ms|869Mbps|机房|纯净度未知
+  - 美国05|336ms|864Mbps|机房|纯净度未知
+  - 美国06|211ms|837Mbps|机房|纯净度未知
+  - 美国07|139ms|818Mbps|机房|纯净度未知
+  - 美国08|345ms|804Mbps|机房|纯净度未知
+  - 美国09|158ms|784Mbps|机房|纯净度未知
+  - 美国10|304ms|771Mbps|机房|纯净度93.7%
+  - 美国11|285ms|764Mbps|机房|纯净度未知
+  - 美国12|503ms|745Mbps|机房|纯净度未知
+  - 美国13|202ms|732Mbps|机房|纯净度未知
+  - 美国14|265ms|728Mbps|机房|纯净度未知
+  - 美国15|116ms|697Mbps|机房|纯净度未知
+  - 美国16|122ms|687Mbps|机房|纯净度未知
+  - 美国17|244ms|683Mbps|机房|纯净度未知
+  - 美国18|287ms|677Mbps|机房|纯净度未知
+  - 美国19|127ms|670Mbps|机房|纯净度未知
+  - 美国20|228ms|654Mbps|机房|纯净度未知
+  - 美国21|232ms|653Mbps|机房|纯净度未知
+  - 美国22|183ms|643Mbps|机房|纯净度未知
+  - 美国23|329ms|634Mbps|机房|纯净度未知
+  - 美国24|106ms|628Mbps|机房|纯净度未知
+  - 美国25|442ms|627Mbps|住宅|纯净度99.5%
+  - 美国26|260ms|619Mbps|机房|纯净度未知
+  - 美国27|186ms|616Mbps|机房|纯净度未知
+  - 美国28|262ms|615Mbps|机房|纯净度未知
+  - 美国29|101ms|602Mbps|机房|纯净度未知
+  - 美国30|217ms|598Mbps|机房|纯净度未知
+  - 美国31|163ms|581Mbps|机房|纯净度未知
+  - 美国32|211ms|568Mbps|机房|纯净度未知
+  - 美国33|153ms|567Mbps|机房|纯净度未知
+  - 英国01|447ms|546Mbps|机房|纯净度未知
+  - 美国34|161ms|543Mbps|机房|纯净度94.7%
+  - 美国35|211ms|543Mbps|机房|纯净度未知
+  - 美国36|265ms|542Mbps|机房|纯净度未知
+  - 美国37|146ms|536Mbps|机房|纯净度未知
+  - 美国38|152ms|533Mbps|机房|纯净度未知
+  - 美国39|205ms|532Mbps|机房|纯净度未知
+  - MX01|159ms|526Mbps|机房|纯净度未知
+  - 美国40|219ms|525Mbps|机房|纯净度未知
+  - 美国41|131ms|505Mbps|机房|纯净度未知
+  - 美国42|232ms|505Mbps|住宅|纯净度未知
+  - 美国43|319ms|495Mbps|机房|纯净度未知
+  - 美国44|144ms|473Mbps|机房|纯净度未知
+  - 美国45|108ms|472Mbps|机房|纯净度未知
+  - 美国46|138ms|463Mbps|机房|纯净度未知
+  - 美国47|128ms|460Mbps|机房|纯净度未知
+  - 美国48|149ms|453Mbps|机房|纯净度未知
+  - 美国49|281ms|447Mbps|机房|纯净度未知
+  - 美国50|229ms|440Mbps|机房|纯净度94.7%
+  - 美国51|355ms|434Mbps|住宅|纯净度99.6%
+  - 美国52|317ms|432Mbps|机房|纯净度未知
+  - 美国53|476ms|430Mbps|住宅|纯净度99.7%
+  - 美国54|520ms|427Mbps|机房|纯净度未知
+  - 美国55|162ms|419Mbps|机房|纯净度未知
+  - 美国56|286ms|415Mbps|机房|纯净度99.5%
+  - 美国57|489ms|409Mbps|住宅|纯净度99.7%
+  - 美国58|554ms|406Mbps|机房|纯净度未知
+  - 美国59|136ms|405Mbps|机房|纯净度未知
+  - 美国60|113ms|399Mbps|机房|纯净度92.7%
+  - 美国61|178ms|383Mbps|机房|纯净度未知
+  - 美国62|427ms|379Mbps|机房|纯净度未知
+  - 美国63|136ms|372Mbps|机房|纯净度未知
+  - 美国64|252ms|371Mbps|机房|纯净度未知
+  - 美国65|255ms|344Mbps|机房|纯净度未知
+  - 美国66|605ms|337Mbps|机房|纯净度未知
+  - 美国67|197ms|322Mbps|机房|纯净度未知
+  - 美国68|258ms|321Mbps|住宅|纯净度未知
+  - 美国69|126ms|311Mbps|未知|纯净度未知
+  - 美国70|222ms|311Mbps|机房|纯净度未知
+  - 美国71|216ms|292Mbps|机房|纯净度未知
+  - 美国72|477ms|287Mbps|住宅|纯净度99.5%
+  - 美国73|215ms|283Mbps|机房|纯净度未知
+  - 美国74|151ms|277Mbps|机房|纯净度未知
+  - 美国75|122ms|274Mbps|住宅|纯净度99.6%
+  - 法国01|1238ms|272Mbps|机房|纯净度98.0%
+  - 美国76|410ms|271Mbps|住宅|纯净度99.5%
+  - 美国77|354ms|270Mbps|未知|纯净度未知
+  - 美国78|408ms|260Mbps|机房|纯净度未知
+  - 美国79|301ms|255Mbps|机房|纯净度未知
+  - 加拿大01|404ms|248Mbps|机房|纯净度未知
+  - 荷兰01|864ms|243Mbps|机房|纯净度未知
+  - 荷兰02|611ms|240Mbps|机房|纯净度未知
+  - 美国80|127ms|234Mbps|机房|纯净度未知
+  - 美国81|149ms|218Mbps|机房|纯净度未知
+  - 美国82|147ms|216Mbps|机房|纯净度未知
+  - 美国83|138ms|200Mbps|机房|纯净度未知
+  - 美国84|151ms|198Mbps|机房|纯净度未知
+  - 美国85|146ms|169Mbps|机房|纯净度未知
+  - 美国86|114ms|161Mbps|机房|纯净度未知
+  - 加拿大02|369ms|157Mbps|机房|纯净度未知
+  - 美国87|158ms|151Mbps|未知|纯净度未知
+  - 美国88|341ms|141Mbps|机房|纯净度未知
+  - 美国89|150ms|132Mbps|机房|纯净度未知
+  - 美国90|254ms|87Mbps|未知|纯净度未知
+  - 美国91|135ms|84Mbps|未知|纯净度未知
+  - MX02|382ms|79Mbps|住宅|纯净度未知
+  - 美国92|291ms|77Mbps|住宅|纯净度未知
+  - 美国93|152ms|71Mbps|机房|纯净度未知
+  - MX03|253ms|64Mbps|住宅|纯净度未知
+  - 美国94|258ms|46Mbps|机房|纯净度未知
+  - 美国95|162ms|40Mbps|机房|纯净度未知
