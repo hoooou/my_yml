@@ -150,8 +150,11 @@ def select_fronts(records, mapping):
             continue
         seen.add(key)
         picked.append({'record': record, 'node': node})
-    picked.sort(key=lambda item: (-_front_speed(item['record']),
-                                  (item['record'].get('entry') or {}).get('latency_ms') or 1e9))
+    # 前置的排序：优选域名型的（server 是域名）优先，其次看国内 TCP 延迟，最后才看下载速度。
+    # 前置只是跳板，国内 RTT 比节点自身的下载速度更影响体感。
+    picked.sort(key=lambda item: (0 if is_domain_server(item['node']) else 1,
+                                  (item['record'].get('entry') or {}).get('latency_ms') or 1e9,
+                                  -_front_speed(item['record'])))
     return picked
 
 

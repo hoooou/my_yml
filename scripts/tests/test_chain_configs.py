@@ -126,11 +126,26 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual(sorted(f['node']['server'] for f in fronts),
                          ['1.1.1.1', '2.2.2.2'])
 
-    def test_front_sorted_by_download_speed(self):
+    def test_front_sorted_by_domestic_latency_then_download_speed(self):
+        # 前置是跳板，先看国内 TCP 延迟（record(0) 是 40ms，record(1) 是 41ms）。
         records = [record(0), record(1)]
         mapping = {'n0': node(0), 'n1': node(1)}
         fronts = cc.select_fronts(records, mapping)
+        self.assertEqual([f['node']['name'] for f in fronts], ['n0', 'n1'])
+        # 延迟相同时才比下载速度（record(1) 的下载更快）。
+        same = [record(0), record(1)]
+        for item in same:
+            item['entry']['latency_ms'] = 50
+        fronts = cc.select_fronts(same, mapping)
         self.assertEqual([f['node']['name'] for f in fronts], ['n1', 'n0'])
+
+    def test_fronts_rank_domain_nodes_and_domestic_latency_first(self):
+        records = [record(0), record(1), record(2)]
+        mapping = {'n0': node(0, server='1.2.3.4'), 'n1': node(1, server='cf.example.com'),
+                   'n2': node(2, server='5.6.7.8')}
+        mapping['n1']['name'] = 'n1'
+        fronts = cc.select_fronts(records, mapping)
+        self.assertEqual([item['node']['server'] for item in fronts][0], 'cf.example.com')
 
     def test_front_rejects_failed_entry(self):
         records = [record(0, entry='failed')]
