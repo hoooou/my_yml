@@ -260,9 +260,10 @@ def external_fronts(url=EXT_SUB_URL):
                 response.raise_for_status()
                 data = yaml.safe_load(response.text)
             break
-        except Exception:
+        except Exception as error:
             if attempt == 2:
-                print('自有订阅拉取失败，沿用上一版的订阅节点', flush=True)
+                reason = '订阅返回 404，通常是当日额度用尽' if '404' in str(error) else '订阅拉取失败'
+                print(f'{reason}，沿用上一版的订阅节点', flush=True)
     if data is None:
         nodes = previous_external_fronts()
         _EXTERNAL_CACHE[url] = nodes
