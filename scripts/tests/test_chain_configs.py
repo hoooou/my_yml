@@ -215,6 +215,9 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(cc.ext_auto_names(nodes), [f'US {110 + index * 10}ms' for index in range(15)])
         nodes[0]['name'] = '没有延迟的名字'
         self.assertNotIn('没有延迟的名字', cc.ext_auto_names(nodes))
+        # 小数延迟要按数值比，不能只取点号后面的两位。
+        decimal = [{'name': 'HK 55ms'}, {'name': 'CF 168.02ms'}, {'name': 'CF 35.28ms'}]
+        self.assertEqual(cc.ext_auto_names(decimal), ['CF 35.28ms', 'HK 55ms', 'CF 168.02ms'])
 
     def test_front_group_has_no_subscription_choice_when_it_is_empty(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), [])

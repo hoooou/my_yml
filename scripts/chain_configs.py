@@ -288,8 +288,8 @@ def external_fronts(url=EXT_SUB_URL):
 def ext_auto_names(nodes, limit=EXT_AUTO_SIZE):
     """按订阅名字里的延迟挑前 N 个；名字里没延迟的排在后面，保持订阅顺序。"""
     def latency(item):
-        match = re.search(r'(\d+)\s*ms', str(item[1].get('name')))
-        return int(match.group(1)) if match else 10 ** 6
+        match = re.search(r'(\d+(?:\.\d+)?)\s*ms', str(item[1].get('name')))
+        return float(match.group(1)) if match else float('inf')
     ranked = sorted(enumerate(nodes), key=lambda item: (latency(item), item[0]))
     return [item[1]['name'] for item in ranked[:limit]]
 
