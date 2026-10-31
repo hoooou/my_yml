@@ -30,7 +30,8 @@ FRONT_TEST_GROUP = '🛫 前置节点'
 EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
 EXT_GROUP = '🛫 yieti'
 EXT_AUTO_GROUP = '🛫 yieti 自动'
-EXT_AUTO_SIZE = 15  # 自动组只放订阅里延迟最低的这一批，健康检查才不会把额度吃光
+EXT_AUTO_SIZE = 15  # 自动组最多放这么多个
+EXT_AUTO_PER_REGION = 3  # 每个地区最多挑这么多个
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -285,13 +286,92 @@ def external_fronts(url=EXT_SUB_URL):
     return copy.deepcopy(nodes)
 
 
-def ext_auto_names(nodes, limit=EXT_AUTO_SIZE):
-    """按订阅名字里的延迟挑前 N 个；名字里没延迟的排在后面，保持订阅顺序。"""
-    def latency(item):
-        match = re.search(r'(\d+(?:\.\d+)?)\s*ms', str(item[1].get('name')))
-        return float(match.group(1)) if match else float('inf')
-    ranked = sorted(enumerate(nodes), key=lambda item: (latency(item), item[0]))
-    return [item[1]['name'] for item in ranked[:limit]]
+EXT_REGION_TOKENS = (
+    ('HK', ('HK', '香港')), ('TW', ('TW', '台湾', '臺灣')), ('JP', ('JP', '日本')),
+    ('SG', ('SG', '新加坡', '狮城')), ('KR', ('KR', '韩国')), ('US', ('US', '美国')),
+    ('UK', ('UK', 'GB', '英国')), ('DE', ('DE', '德国')),
+)
+
+
+def ext_region(name):
+    """地区只看名字里的标记；名字里没有地区标记的归到 CF/其他。"""
+    text = str(name).upper()
+    for region, tokens in EXT_REGION_TOKENS:
+        if any(token in text for token in tokens):
+            return region
+    return 'CF' if 'CF' in text else '其他'
+
+
+def pick_ext_auto(nodes, latencies, per_region=EXT_AUTO_PER_REGION, limit=EXT_AUTO_SIZE):
+    """按地区轮着挑：先每个地区拿最快的，再拿第二快的，直到凑满 limit。"""
+    buckets = {}
+    for index, node in enumerate(nodes):
+        buckets.setdefault(ext_region(node.get('name')), []).append(
+            (latencies.get(node['name'], float('inf')), index, node))
+    for items in buckets.values():
+        items.sort(key=lambda item: (item[0], item[1]))
+    picked, round_index = [], 0
+    while len(picked) < limit:
+        candidates = [key for key, items in buckets.items() if len(items) > round_index]
+        if not candidates:
+            break
+        candidates.sort(key=lambda key: (buckets[key][round_index][0], key))
+        for key in candidates:
+            if len(picked) >= limit:
+                break
+            if len(picked) and sum(1 for node in picked if ext_region(node.get('name')) == key) >= per_region:
+                continue
+            picked.append(buckets[key][round_index][2])
+        round_index += 1
+    return picked
+
+
+_LATENCY_CACHE = {}
+
+
+def ext_latencies(nodes, per_second=25):
+    """用 xxapi 的 TCP 探测拿真实延迟（名字里的数字不可信）；限流就停。"""
+    import os
+    import time
+    from availability import XXAPI, Pace, parse_xxapi
+    from select_nodes import session
+
+    if os.environ.get('CHAIN_EXTERNAL_SUB') == 'off':
+        return {}
+    key = tuple((node.get('name'), node.get('server'), node.get('port')) for node in nodes)
+    if key in _LATENCY_CACHE:
+        return dict(_LATENCY_CACHE[key])
+    pace = Pace(1 / per_second)
+    values, client = {}, None
+    try:
+        client = session().__enter__()
+        for node in nodes:
+            host, port = str(node.get('server', '')), int(node.get('port') or 0)
+            if not host or not port or not pace.wait():
+                continue
+            try:
+                response = client.get(XXAPI, params={'address': host, 'port': port}, timeout=(5, 10))
+                if response.status_code == 429:
+                    print('xxapi 限流，后面的订阅节点不再测速', flush=True)
+                    break
+                response.raise_for_status()
+                parsed = parse_xxapi(response.json(), host, port)
+            except Exception:
+                continue
+            if parsed.get('status') == 'passed':
+                values[node.get('name')] = parsed['latency_ms']
+            time.sleep(0)
+    finally:
+        if client is not None:
+            client.close()
+    _LATENCY_CACHE[key] = dict(values)
+    return values
+
+
+def ext_auto_names(nodes):
+    if not nodes:
+        return []
+    return [node['name'] for node in pick_ext_auto(nodes, ext_latencies(nodes))]
 
 
 def _front_nodes(fronts):

@@ -209,15 +209,28 @@ class RenderTest(unittest.TestCase):
         self.assertNotIn('US 官方优选 187ms', names[cc.AUTO_GROUP]['proxies'])
         self.assertNotIn('US 官方优选 187ms', names[cc.US_GROUP]['proxies'])
 
-    def test_auto_group_keeps_only_the_fastest_fifteen(self):
-        nodes = [{'name': f'US {300 - index * 10}ms', 'server': f'9.9.9.{index}', 'port': 443, 'type': 'vless'}
-                 for index in range(20)]
-        self.assertEqual(cc.ext_auto_names(nodes), [f'US {110 + index * 10}ms' for index in range(15)])
-        nodes[0]['name'] = '没有延迟的名字'
-        self.assertNotIn('没有延迟的名字', cc.ext_auto_names(nodes))
-        # 小数延迟要按数值比，不能只取点号后面的两位。
-        decimal = [{'name': 'HK 55ms'}, {'name': 'CF 168.02ms'}, {'name': 'CF 35.28ms'}]
-        self.assertEqual(cc.ext_auto_names(decimal), ['CF 35.28ms', 'HK 55ms', 'CF 168.02ms'])
+    def test_auto_picks_by_measured_latency_and_spreads_across_regions(self):
+        nodes = ([{'name': f'HK 官方优选 {index}'} for index in range(5)]
+                 + [{'name': f'US 官方优选 {index}'} for index in range(5)]
+                 + [{'name': f'CF优选 {index}'} for index in range(5)])
+        latencies = {node['name']: float(index) for index, node in enumerate(nodes)}
+        picked = [node['name'] for node in cc.pick_ext_auto(nodes, latencies)]
+        # 每个地区最多 3 个，轮着补齐。
+        self.assertEqual(len(picked), 9)
+        self.assertEqual(sum('HK' in name for name in picked), 3)
+        self.assertEqual(sum('US' in name for name in picked), 3)
+        self.assertEqual(sum('CF' in name for name in picked), 3)
+
+    def test_auto_skips_nodes_that_failed_the_probe(self):
+        nodes = [{'name': 'HK 1'}, {'name': 'HK 2'}, {'name': 'US 1'}]
+        picked = [node['name'] for node in cc.pick_ext_auto(nodes, {'US 1': 80.0})]
+        self.assertEqual(picked[0], 'US 1')
+
+    def test_region_comes_from_the_name(self):
+        self.assertEqual(cc.ext_region('HK|官方优选|55ms'), 'HK')
+        self.assertEqual(cc.ext_region('US 官方优选 187ms'), 'US')
+        self.assertEqual(cc.ext_region('CF优选 35.28ms'), 'CF')
+        self.assertEqual(cc.ext_region('节点 01'), '其他')
 
     def test_front_group_has_no_subscription_choice_when_it_is_empty(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), [])
