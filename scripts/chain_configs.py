@@ -10,6 +10,7 @@
 
 import copy
 import ipaddress
+import re
 import math
 import socket
 
@@ -29,6 +30,7 @@ FRONT_TEST_GROUP = '🛫 前置节点'
 EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
 EXT_GROUP = '🛫 yieti'
 EXT_AUTO_GROUP = '🛫 yieti 自动'
+EXT_AUTO_SIZE = 15  # 自动组只放订阅里延迟最低的这一批，健康检查才不会把额度吃光
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -283,6 +285,15 @@ def external_fronts(url=EXT_SUB_URL):
     return copy.deepcopy(nodes)
 
 
+def ext_auto_names(nodes, limit=EXT_AUTO_SIZE):
+    """按订阅名字里的延迟挑前 N 个；名字里没延迟的排在后面，保持订阅顺序。"""
+    def latency(item):
+        match = re.search(r'(\d+)\s*ms', str(item[1].get('name')))
+        return int(match.group(1)) if match else 10 ** 6
+    ranked = sorted(enumerate(nodes), key=lambda item: (latency(item), item[0]))
+    return [item[1]['name'] for item in ranked[:limit]]
+
+
 def _front_nodes(fronts):
     nodes, names = [], []
     for index, item in enumerate(fronts, 1):
@@ -377,8 +388,9 @@ def render_chain(base, fronts, landings, ext_fronts=()):
     # 订阅节点：自动那一项按顺序兜底（fallback，只看通不通），其余节点仍可手动强制。
     ext_groups = []
     if ext_names:
-        ext_auto = _group(EXT_AUTO_GROUP, ext_names)
-        ext_auto.update(type='fallback', interval=300)  # 453 个节点，5 分钟一轮够了
+        # 自动组只放挑出来的十几个，url-test 自动选最快的；lazy 让没用它的时候不探测。
+        ext_auto = _group(EXT_AUTO_GROUP, ext_auto_names(ext_nodes))
+        ext_auto.update(interval=300, lazy=True)
         ext_groups = [ext_auto, {'name': EXT_GROUP, 'type': 'select',
                                  'proxies': [EXT_AUTO_GROUP] + ext_names,
                                  'default-selected': EXT_AUTO_GROUP}]

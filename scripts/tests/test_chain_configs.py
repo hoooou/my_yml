@@ -199,14 +199,22 @@ class RenderTest(unittest.TestCase):
         self.assertEqual([p['name'] for p in config['proxies']][1], 'US 官方优选 187ms')
         # 前置组只有两个选项：自动前置、yieti 分组。
         self.assertEqual(names[cc.FRONT_GROUP]['proxies'], [cc.AUTO_GROUP, cc.EXT_GROUP])
-        # yieti：手动组里第一项是按顺序兜底的 fallback，其余节点仍可强制选中。
+        # yieti：手动组里第一项是自动测速组，其余节点仍可强制选中。
         self.assertEqual(names[cc.EXT_GROUP]['type'], 'select')
         self.assertEqual(names[cc.EXT_GROUP]['proxies'], [cc.EXT_AUTO_GROUP, 'US 官方优选 187ms'])
-        self.assertEqual(names[cc.EXT_AUTO_GROUP]['type'], 'fallback')
+        self.assertEqual(names[cc.EXT_AUTO_GROUP]['type'], 'url-test')
         self.assertEqual(names[cc.EXT_GROUP]['default-selected'], cc.EXT_AUTO_GROUP)
         self.assertEqual(names[cc.EXT_AUTO_GROUP]['proxies'], ['US 官方优选 187ms'])
+        self.assertTrue(names[cc.EXT_AUTO_GROUP]['lazy'])
         self.assertNotIn('US 官方优选 187ms', names[cc.AUTO_GROUP]['proxies'])
         self.assertNotIn('US 官方优选 187ms', names[cc.US_GROUP]['proxies'])
+
+    def test_auto_group_keeps_only_the_fastest_fifteen(self):
+        nodes = [{'name': f'US {300 - index * 10}ms', 'server': f'9.9.9.{index}', 'port': 443, 'type': 'vless'}
+                 for index in range(20)]
+        self.assertEqual(cc.ext_auto_names(nodes), [f'US {110 + index * 10}ms' for index in range(15)])
+        nodes[0]['name'] = '没有延迟的名字'
+        self.assertNotIn('没有延迟的名字', cc.ext_auto_names(nodes))
 
     def test_front_group_has_no_subscription_choice_when_it_is_empty(self):
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), [])
