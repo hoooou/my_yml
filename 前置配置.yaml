@@ -1,4 +1,4 @@
-# 前置配置；2026-11-01T08:29:19+08:00；110 个
+# 前置配置；2026-11-01T18:33:41+08:00；124 个
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -548,157 +548,158 @@ sniffer:
   - Mijia Cloud
   - +.push.apple.com
 proxies:
-- server: cf.0sm.com
-  port: 80
+- server: japan.com
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 01|54ms|4Mbps
+- server: icook.tw
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 02|57ms|9Mbps
+- server: cf.877771.xyz
+  port: 443
   type: vmess
   uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
   alterId: 0
   cipher: auto
   udp: true
-  tls: false
-  servername: vmess.lbw666.dpdns.org
-  network: ws
-  ws-opts:
-    path: /ws
-    headers:
-      Host: vmess.lbw666.dpdns.org
-  name: 🛫 01|50ms|55Mbps
-- alterId: '0'
-  cipher: auto
-  network: ws
-  port: 443
-  server: cf.877771.xyz
-  skip-cert-verify: false
-  sub_tag: S004-260618
   tls: true
-  type: vmess
-  udp: true
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
+  servername: vmess.lbw666.dpdns.org
+  network: ws
   ws-opts:
-    early-data-header-name: Sec-WebSocket-Protocol
+    path: /ws?ed=2048
     headers:
       Host: vmess.lbw666.dpdns.org
-    max-early-data: 2048
-    path: /ws
-  xudp: true
-  packet-encoding: xudp
-  servername: vmess.lbw666.dpdns.org
-  name: 🛫 02|50ms|30Mbps
-- alterId: '0'
-  cipher: auto
-  network: ws
+  name: 🛫 03|58ms|12Mbps
+- server: time.is
   port: 443
-  server: cf.0sm.com
-  skip-cert-verify: false
-  sub_tag: M003-260806
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
   tls: true
-  type: vmess
-  udp: true
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  ws-opts:
-    early-data-header-name: Sec-WebSocket-Protocol
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    max-early-data: 2048
-    path: /ws
-  xudp: true
-  packet-encoding: xudp
-  servername: vmess.lbw666.dpdns.org
-  name: 🛫 03|54ms|36Mbps
-- password: 0324fbc29561
-  port: 443
-  server: 56481.df6h451rh.xin
-  skip-cert-verify: true
-  sni: images.ctfassets.net
-  type: anytls
-  udp: true
-  name: 🛫 04|88ms|12Mbps
-- alterId: 0
-  cipher: auto
+  servername: v6.bangfw.dpdns.org
   network: ws
-  port: 55386
-  server: az-1.linkaa.xyz
-  servername: az-1.linkaa.xyz
-  skip-cert-verify: false
-  tls: false
-  type: vmess
-  udp: true
-  uuid: 6e571484-4166-4699-8f58-b34a1823691f
   ws-opts:
+    path: /
     headers:
-      Host: az-1.linkaa.xyz
-    path: /game/resources
-  xudp: true
-  name: 🛫 05|123ms|17Mbps
-- server: ph001.zestapp778.com
-  port: 46298
-  type: trojan
-  password: 5t6i121em5lkmsmk
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 04|62ms|12Mbps
+- server: ou44bxs-g04.jp06-jz-vm0.entry.fr0528.art
+  port: 28786
+  type: vmess
+  uuid: d687b024-a5cf-3433-8d06-1c99e2e28821
+  alterId: 1
+  cipher: auto
   udp: true
-  sni: ph001.zestapp778.com
+  tls: true
+  servername: ou44bxs-g04.jp06-jz-vm0.entry.fr0528.art
   network: tcp
-  name: 🛫 06|137ms|12Mbps
-- type: http
-  server: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
-  port: 443
-  password: 1b609740-eec2-11ef-8543-f23c93136cb3
-  sni: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
+  name: 🛫 05|117ms|21Mbps
+- server: hw14.roghanmo.com
+  port: 465
+  type: vless
+  uuid: 98aa35fc-7d2f-4744-a91b-7e33b4fdd9c8
   tls: true
-  username: 1b609740-eec2-11ef-8543-f23c93136cb3
-  name: 🛫 07|153ms|167Mbps
-- type: http
-  server: zebpay.site
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 🛫 08|165ms|57Mbps
-- server: dbcaes0wkjroahsq.v.3dns.vip
-  port: 443
-  type: vmess
-  uuid: 234a80412b4d44a3a8d8523cbfd58dc4
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: dBcaeS0WKJRoAhsQ.v.3dns.vip
+  alpn:
+  - http/1.1
+  servername: hw14.roghanmo.com.
+  client-fingerprint: chrome
   network: ws
   ws-opts:
-    path: /ws-vmess
+    path: /
     headers:
-      Host: dBcaeS0WKJRoAhsQ.v.3dns.vip
-  name: 🛫 09|167ms|18Mbps
-- server: o3zbhk3htyknltss.v.3dns.vip
+      Host: hw14.roghanmo.com
+  udp: true
+  name: 🛫 06|157ms|3Mbps
+- type: http
+  server: chalo-ru.nexorcdn.com
+  port: 27402
+  username: ef37886e2aacd6fa622e3de3810299c2
+  password: 9jkvAVV-9ufV6IGd
+  tls: true
+  sni: chalo-ru.nexorcdn.com
+  name: 🛫 07|178ms|15Mbps
+- type: vless
+  server: c20s5.portablesubmarines.com
   port: 443
-  type: vmess
-  uuid: 234a80412b4d44a3a8d8523cbfd58dc4
-  alterId: 0
-  cipher: auto
+  uuid: 85fe968d-fbb5-40dc-8422-30635eccb149
+  flow: xtls-rprx-vision
   udp: true
   tls: true
-  servername: O3ZBhK3HTyKNltsS.v.3dns.vip
-  network: ws
-  ws-opts:
-    path: /ws-vmess
-    headers:
-      Host: O3ZBhK3HTyKNltsS.v.3dns.vip
-  name: 🛫 10|178ms|23Mbps
-- password: None
-  port: 443
-  server: purposebydesig.club
+  servername: portal.citygrainla.com
+  sni: portal.citygrainla.com
   skip-cert-verify: false
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  sni: purposebydesig.club
-  name: 🛫 11|204ms|119Mbps
-- type: http
-  server: efr-marktplatz.club
+  client-fingerprint: qq
+  reality-opts:
+    public-key: BlSccfT5tvDIOS7v9VaPd0ulUNhUdvlMjGiNzDNDUHE
+    short-id: 051f20c2344a2dfd
+  name: 🛫 08|193ms|19Mbps
+- alpn:
+  - http/1.1
+  client-fingerprint: chrome
+  network: ws
   port: 443
-  username: 'null'
-  password: None
+  server: bounded-crammed.video-streams.org
+  servername: bounded-crammed.video-streams.org
   tls: true
-  name: 🛫 12|204ms|61Mbps
+  type: vless
+  udp: true
+  uuid: 7797f4a9-cf0b-4e07-a496-235897575512
+  ws-opts:
+    headers:
+      Host: bounded-crammed.video-streams.org
+    path: /ws
+  name: 🛫 09|201ms|47Mbps
+- alpn:
+  - http/1.1
+  client-fingerprint: chrome
+  network: ws
+  port: 443
+  server: ghosts-spasm.quick-cdn.net
+  servername: ghosts-spasm.quick-cdn.net
+  tls: true
+  type: vless
+  udp: true
+  uuid: e43b6051-ee86-43c0-a073-3601f8d3e248
+  ws-opts:
+    headers:
+      Host: ghosts-spasm.quick-cdn.net
+    path: /ws
+  name: 🛫 10|202ms|30Mbps
+- alpn:
+  - http/1.1
+  client-fingerprint: chrome
+  network: ws
+  port: 443
+  server: grimness-backlogs.cdn-content.com
+  servername: grimness-backlogs.cdn-content.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: 2957d7ed-4697-4dda-8939-0caf7a0e93af
+  ws-opts:
+    headers:
+      Host: grimness-backlogs.cdn-content.com
+    path: /ws
+  name: 🛫 11|203ms|25Mbps
 - server: saas.sin.fan
   port: 443
   type: vless
@@ -712,7 +713,113 @@ proxies:
     path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
     headers:
       Host: n.bitpulse.me
-  name: 🛫 13|205ms|29Mbps
+  name: 🛫 12|204ms|27Mbps
+- server: gur.gov.ua
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 13|204ms|15Mbps
+- server: www.baipiao.eu.org
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 14|207ms|22Mbps
+- server: www.visakorea.com
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 15|209ms|6Mbps
+- server: www.visa.com
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 16|211ms|4Mbps
+- server: www.gptcloudai.com
+  port: 443
+  type: vmess
+  uuid: e70a5b70-f63c-4450-af8b-94990cdf80c0
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  servername: www.gptcloudai.com
+  network: ws
+  ws-opts:
+    path: /truth
+    headers:
+      Host: www.gptcloudai.com
+  name: 🛫 17|214ms|?Mbps
+- server: www.gov.ua
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 18|215ms|19Mbps
+- server: icook.hk
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 19|215ms|5Mbps
+- server: www.wto.org
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 20|217ms|6Mbps
 - alterId: '0'
   cipher: auto
   network: ws
@@ -731,92 +838,96 @@ proxies:
   xudp: true
   packet-encoding: xudp
   servername: www.windowsmsidownloads.com
-  name: 🛫 14|206ms|93Mbps
+  name: 🛫 21|221ms|79Mbps
+- password: 9jkvAVV-9ufV6IGd
+  port: 41560
+  server: chalo-ru.nexorcdn.com
+  skip-cert-verify: true
+  sni: chalo-ru.nexorcdn.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: ef37886e2aacd6fa622e3de3810299c2
+  udp: true
+  name: 🛫 22|233ms|10Mbps
+- password: 6b7c1278-ff9d-11ee-84ca-f23c913c8d2b
+  port: 443
+  server: 5b33bfe4-tdups0-tf8z9r-1pr35.uk.oshuawei.com
+  tls: true
+  type: http
+  username: 6b7c1278-ff9d-11ee-84ca-f23c913c8d2b
+  name: 🛫 23|237ms|21Mbps
+- type: http
+  server: efr-marktplatz.club
+  port: 443
+  username: 'null'
+  password: None
+  tls: true
+  name: 🛫 24|242ms|76Mbps
+- type: http
+  server: zebpay.site
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 25|244ms|122Mbps
 - password: None
   port: 443
-  server: mmgr.club
-  skip-cert-verify: true
-  sub_tag: P002-260618
+  server: purposebydesig.club
+  skip-cert-verify: false
+  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  sni: mmgr.club
-  name: 🛫 15|217ms|51Mbps
-- server: www.ubuntuupdates.com
-  port: 443
-  type: vmess
-  uuid: 83b09a64-1eaf-4c4d-89ed-866d4b6b8115
-  alterId: 0
-  cipher: auto
-  udp: true
+  sni: purposebydesig.club
+  name: 🛫 26|244ms|100Mbps
+- port: 443
+  server: goedkoopgeluid.icu
+  skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
-  servername: www.ubuntuupdates.com
-  network: ws
-  ws-opts:
-    path: /truth
-    headers:
-      Host: www.ubuntuupdates.com
-  name: 🛫 16|221ms|29Mbps
-- type: http
-  server: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
-  port: 5443
-  password: 1b609740-eec2-11ef-8543-f23c93136cb3
-  sni: 9420e530-te8ao0-tfnl0i-au6.fmtdc1.sghuawei.com
-  tls: true
-  username: 1b609740-eec2-11ef-8543-f23c93136cb3
-  name: 🛫 17|368ms|26Mbps
-- server: se-2.pythonsetupbib.online
-  port: 61374
-  type: vless
-  uuid: f8d52ece-fad4-478d-875d-df6eed3befa7
-  tls: true
-  reality-opts:
-    public-key: QrNs0ew7snHqLfpVXS9RAhlRzgAzzGZK9fXmDcx9xHI
-  servername: se-2.pythonsetupbib.online
-  client-fingerprint: chrome
-  network: xhttp
-  xhttp-opts:
-    path: /
-    host: se-2.pythonsetupbib.online
-    mode: packet-up
-    x-padding-bytes: 100-500
+  type: http
   udp: true
-  name: 🛫 18|525ms|19Mbps
-- server: cf.090227.xyz
-  port: 443
-  type: vmess
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: vmess.lbw666.dpdns.org
-  network: ws
-  ws-opts:
-    path: /ws
-    headers:
-      Host: vmess.lbw666.dpdns.org
-  name: 🛫 19|1075ms|55Mbps
-- server: az-1.linkaa.xyz
-  port: 53617
-  type: vmess
-  uuid: 6e571484-4166-4699-8f58-b34a1823691f
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: false
-  servername: az-1.linkaa.xyz
-  network: ws
-  ws-opts:
-    path: /game/resources
-    headers:
-      Host: az-1.linkaa.xyz
-  name: 🛫 20|2125ms|4Mbps
+  sni: goedkoopgeluid.icu
+  name: 🛫 27|249ms|79Mbps
 - type: http
   server: carolinafreigh.fun
   port: 443
   tls: true
-  name: 🛫 21|2171ms|50Mbps
+  name: 🛫 28|256ms|88Mbps
+- server: www.zsu.gov.ua
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 29|473ms|25Mbps
+- server: russia.com
+  port: 443
+  type: vless
+  uuid: 599798e2-5eed-40f3-a5cf-cbda9a4baad1
+  udp: true
+  tls: true
+  servername: v6.bangfw.dpdns.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: v6.bangfw.dpdns.org
+  name: 🛫 30|1060ms|2Mbps
+- password: 0324fbc29561
+  port: 443
+  server: 56481.df6h451rh.xin
+  skip-cert-verify: true
+  sni: images.ctfassets.net
+  type: anytls
+  udp: true
+  name: 🛫 31|1188ms|3Mbps
 - password: None
   port: 443
   server: berniesbodybla.fun
@@ -826,72 +937,119 @@ proxies:
   type: http
   udp: true
   sni: berniesbodybla.fun
-  name: 🛫 22|2198ms|131Mbps
+  name: 🛫 32|2247ms|125Mbps
+- port: 1080
+  server: 34.150.120.78
+  type: socks5
+  name: 🛫 33|40ms|14Mbps
 - password: '1234'
   port: 2080
   server: 47.129.174.248
   skip-cert-verify: true
   type: http
   username: '1234'
-  name: 🛫 23|89ms|15Mbps
-- type: http
-  server: 116.202.172.99
+  name: 🛫 34|81ms|17Mbps
+- server: 45.38.190.101
   port: 443
+  type: vless
+  uuid: 55ad002b-6cdf-4d76-81bb-91f3f605afc5
+  udp: true
   tls: true
-  skip-cert-verify: true
-  name: 🛫 24|143ms|26Mbps
+  servername: google.com
+  reality-opts:
+    public-key: BwvlA1kuzTnXLIVO4AbvYMgbLG87MWPcwoodcZc_8S0
+    short-id: 6e8a5b8428df2c7b
+  client-fingerprint: chrome
+  network: xhttp
+  xhttp-opts:
+    path: /
+    host: google.com
+    mode: auto
+  name: 🛫 35|142ms|18Mbps
 - port: 443
   server: 213.109.163.119
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 🛫 25|147ms|17Mbps
+  name: 🛫 36|143ms|18Mbps
+- server: 179.43.170.84
+  port: 443
+  type: vless
+  uuid: 8007dda2-aed2-4514-8299-6e3edbdb015b
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: si2.greenzone12.com
+  reality-opts:
+    public-key: hyOYRfDSIYyqALQt3N2H0RjK8gbV1JvPTkNACC4PJF8
+    short-id: 8718c58d3d51db59
+  client-fingerprint: chrome
+  network: tcp
+  name: 🛫 37|144ms|27Mbps
+- type: http
+  server: 116.202.172.99
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 38|150ms|30Mbps
+- port: 443
+  server: 141.94.16.4
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 39|153ms|9Mbps
+- server: 66.163.127.155
+  port: 443
+  type: trojan
+  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  udp: true
+  sni: indyourperfectremotetechjobfromthecomfortofhome.com
+  network: tcp
+  name: 🛫 40|158ms|23Mbps
+- server: 66.163.127.215
+  port: 443
+  type: trojan
+  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  udp: true
+  sni: courses.indyourperfectremotetechjobfromthecomfortofhome.com
+  network: tcp
+  name: 🛫 41|159ms|17Mbps
+- type: http
+  server: 185.93.106.214
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 42|160ms|23Mbps
+- server: 66.163.127.154
+  port: 443
+  type: trojan
+  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  udp: true
+  sni: www.indyourperfectremotetechjobfromthecomfortofhome.com
+  network: tcp
+  name: 🛫 43|160ms|21Mbps
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 162.243.146.243
+  sni: a2f392f3.acsnet.co
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 🛫 44|160ms|4Mbps
 - port: 9002
   server: 158.173.154.5
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 🛫 26|156ms|30Mbps
-- port: 443
-  server: 103.97.88.154
-  skip-cert-verify: true
-  sni: 4a8c2906c96058315dffbc2b0e7ff19b-98005bea43f9ac33.apache-iv.com
-  tls: true
-  type: http
-  name: 🛫 27|156ms|21Mbps
-- port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 28|159ms|27Mbps
-- password: None
-  port: 9002
-  server: 158.173.154.3
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 29|159ms|26Mbps
-- server: 179.253.179.109
-  port: 50083
-  type: vless
-  uuid: 268fac1e-bb07-4d6c-8942-92fef4d7ede1
-  udp: true
-  tls: true
-  servername: 177.3.219.252
-  network: tcp
-  name: 🛫 30|159ms|5Mbps
-- port: 9002
-  server: 158.173.154.1
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 31|162ms|22Mbps
+  name: 🛫 45|161ms|29Mbps
 - client-fingerprint: safari
   flow: xtls-rprx-vision
   network: tcp
@@ -905,58 +1063,14 @@ proxies:
   type: vless
   udp: true
   uuid: f5e70ce3-cfb4-4df1-b25c-d19bfae627c0
-  name: 🛫 32|162ms|22Mbps
-- type: vless
-  network: ws
-  server: 155.212.240.10
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  servername: n.bitpulse.me
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: chrome
-  ws-opts:
-    headers:
-      Host: n.bitpulse.me
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed
-  name: 🛫 33|162ms|17Mbps
-- port: 443
-  server: 18.200.158.139
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 34|164ms|28Mbps
+  name: 🛫 46|163ms|21Mbps
 - port: 9002
-  server: 158.173.154.2
+  server: 158.173.154.1
   skip-cert-verify: true
   tls: true
   type: http
-  name: 🛫 35|164ms|21Mbps
-- alterId: '0'
-  cipher: auto
-  network: ws
-  port: 443
-  server: 104.17.136.198
-  skip-cert-verify: false
-  sub_tag: M003-260806
-  tls: true
-  type: vmess
   udp: true
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  ws-opts:
-    early-data-header-name: Sec-WebSocket-Protocol
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    max-early-data: 2048
-    path: /ws
-  xudp: true
-  packet-encoding: xudp
-  servername: vmess.lbw666.dpdns.org
-  name: 🛫 36|165ms|45Mbps
+  name: 🛫 47|165ms|18Mbps
 - port: 9090
   server: 185.53.129.141
   skip-cert-verify: true
@@ -964,43 +1078,548 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 37|166ms|4Mbps
-- server: 5.129.249.65
+  name: 🛫 48|165ms|14Mbps
+- server: 94.183.206.48
+  port: 7443
+  type: vless
+  uuid: 12776e55-6230-48b9-b069-1bb8a04b4237
+  udp: true
+  tls: true
+  servername: optim.tildacdn.pub
+  reality-opts:
+    public-key: unNROkbh95ZZNHzG2RIkgrFftOLldNH0ccmtW63CziE
+    short-id: ''
+  client-fingerprint: firefox
+  network: grpc
+  grpc-opts:
+    grpc-service-name: ebl
+  name: 🛫 49|166ms|43Mbps
+- server: 66.163.127.107
+  port: 443
+  type: trojan
+  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  udp: true
+  sni: blog.indyourperfectremotetechjobfromthecomfortofhome.com
+  network: tcp
+  name: 🛫 50|166ms|22Mbps
+- port: 9002
+  server: 158.173.154.2
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 51|167ms|19Mbps
+- password: None
+  port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 52|171ms|22Mbps
+- server: 155.212.240.10
   port: 443
   type: vless
-  uuid: a5212bcb-ab85-459a-bec6-9f259eeeebfa
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  udp: true
   tls: true
-  reality-opts:
-    public-key: iT-HgkPRUHl7Tm-LUWAGD-zoNoZSkVc-M9sscIIomHY
-    short-id: a62228a1c8b3378f
-  servername: rue.tems.bet
+  servername: n.bitpulse.me
   client-fingerprint: firefox
-  network: tcp
-  udp: true
-  name: 🛫 38|167ms|18Mbps
-- server: 179.253.179.109
-  port: 63053
-  type: vless
-  uuid: e3aa3d22-a95e-407b-aacc-d855b90a5d70
-  udp: true
-  tls: true
-  servername: de2.derevohom.xyz
-  client-fingerprint: chrome
-  network: tcp
-  name: 🛫 39|168ms|9Mbps
+  network: ws
+  ws-opts:
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+    headers:
+      Host: n.bitpulse.me
+  name: 🛫 53|171ms|12Mbps
 - port: 443
   server: 193.233.75.115
   skip-cert-verify: true
   tls: true
   type: http
-  name: 🛫 40|170ms|4Mbps
+  name: 🛫 54|174ms|13Mbps
 - port: 443
-  server: 34.249.214.108
+  server: 18.200.158.139
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 55|176ms|21Mbps
+- password: None
+  port: 443
+  server: 87.106.223.158
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 56|186ms|21Mbps
+- server: 151.101.41.242
+  port: 443
+  type: vless
+  uuid: 11e6c528-434f-4b15-83b3-40a46237ea13
+  udp: true
+  tls: true
+  servername: ghosts-spasm.quick-cdn.net
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /ws
+    headers:
+      Host: ghosts-spasm.quick-cdn.net
+  name: 🛫 57|187ms|11Mbps
+- server: 151.101.21.242
+  port: 443
+  type: vless
+  uuid: f80cfcb4-9bd1-4a0d-a50b-28e3eea107d8
+  udp: true
+  tls: true
+  servername: bounded-crammed.video-streams.org
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /ws
+    headers:
+      Host: bounded-crammed.video-streams.org
+  name: 🛫 58|189ms|10Mbps
+- type: vless
+  network: ws
+  server: 104.19.235.15
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  servername: n.bitpulse.me
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: unsafe
+  ws-opts:
+    headers:
+      Host: n.bitpulse.me
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128
+  name: 🛫 59|192ms|16Mbps
+- server: 151.101.201.242
+  port: 443
+  type: vless
+  uuid: 11e6c528-434f-4b15-83b3-40a46237ea13
+  udp: true
+  tls: true
+  servername: bounded-crammed.video-streams.org
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /ws
+    headers:
+      Host: bounded-crammed.video-streams.org
+  name: 🛫 60|193ms|12Mbps
+- server: 104.25.239.113
+  port: 2053
+  type: trojan
+  password: gHQP0D7D15
+  udp: true
+  sni: marvdasht.phonecomparisonblog.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: marvdasht.phonecomparisonblog.org
+  name: 🛫 61|194ms|19Mbps
+- server: 188.114.96.1
+  port: 443
+  type: vmess
+  uuid: 80be2deb-3b27-4775-9bd1-7f2a2b9c261b
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  servername: www.windowsmsidownloads.com
+  network: ws
+  ws-opts:
+    path: /truth
+    headers:
+      Host: www.windowsmsidownloads.com
+  name: 🛫 62|195ms|55Mbps
+- type: vless
+  network: ws
+  server: 172.66.128.146
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  servername: n.bitpulse.me
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: unsafe
+  ws-opts:
+    headers:
+      Host: n.bitpulse.me
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed
+  name: 🛫 63|195ms|14Mbps
+- port: 443
+  server: 82.65.162.76
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 🛫 41|174ms|24Mbps
+  name: 🛫 64|196ms|24Mbps
+- port: 443
+  server: 172.64.68.89
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 65|197ms|173Mbps
+- server: 172.64.91.69
+  port: 443
+  type: vless
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  udp: true
+  tls: true
+  servername: n.bitpulse.me
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+    headers:
+      Host: n.bitpulse.me
+  name: 🛫 66|197ms|28Mbps
+- password: None
+  port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 67|198ms|72Mbps
+- password: None
+  port: 443
+  server: 129.153.93.183
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 68|198ms|50Mbps
+- server: 172.67.118.45
+  port: 2053
+  type: trojan
+  password: gHQP0D7D15
+  udp: true
+  sni: marvdasht.phonecomparisonblog.org
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: marvdasht.phonecomparisonblog.org
+  name: 🛫 69|198ms|19Mbps
+- type: vless
+  network: ws
+  server: 104.17.108.213
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  servername: n.bitpulse.me
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: unsafe
+  ws-opts:
+    headers:
+      Host: n.bitpulse.me
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+  name: 🛫 70|200ms|17Mbps
+- server: 31.77.143.70
+  port: 443
+  type: vless
+  uuid: 24b5a8bc-3648-42e1-b02d-227ceeead1c9
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: ru3.ghostyconnect.org
+  reality-opts:
+    public-key: gyxmHhZGVwv__xhL9xgbC5IViZ4SOqp3Naosi-CPqQs
+    short-id: ''
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 71|201ms|16Mbps
+- type: vless
+  network: ws
+  server: 104.21.29.192
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  servername: n.bitpulse.me
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: unsafe
+  ws-opts:
+    headers:
+      Host: n.bitpulse.me
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed
+  name: 🛫 72|204ms|17Mbps
+- server: 46.8.125.64
+  port: 443
+  type: vless
+  uuid: dc413f44-7dce-4cc4-b2c7-878ef70ce464
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: dubai-cdn-keno.keno.su
+  reality-opts:
+    public-key: 9MgNwdrftjPf18DG8qYo6iHJw7IG7uSnULScDQ0WDy4
+    short-id: 0123456789abcdef
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 73|205ms|15Mbps
+- type: vless
+  network: ws
+  server: 104.18.51.110
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  servername: n.bitpulse.me
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: unsafe
+  ws-opts:
+    headers:
+      Host: n.bitpulse.me
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128
+  name: 🛫 74|207ms|16Mbps
+- port: 443
+  server: 172.64.69.89
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 75|208ms|98Mbps
+- server: 151.101.65.242
+  port: 443
+  type: vless
+  uuid: b7eb28c2-9bd0-4c53-859c-dc0646288b8c
+  udp: true
+  tls: true
+  servername: ghosts-spasm.quick-cdn.net
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /ws
+    headers:
+      Host: ghosts-spasm.quick-cdn.net
+  name: 🛫 76|208ms|48Mbps
+- type: vless
+  network: ws
+  server: 104.16.188.34
+  port: 443
+  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
+  servername: n.bitpulse.me
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: unsafe
+  ws-opts:
+    headers:
+      Host: n.bitpulse.me
+    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
+  name: 🛫 77|209ms|17Mbps
+- server: 151.101.161.242
+  port: 443
+  type: vless
+  uuid: f80cfcb4-9bd1-4a0d-a50b-28e3eea107d8
+  udp: true
+  tls: true
+  servername: bounded-crammed.video-streams.org
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /ws
+    headers:
+      Host: bounded-crammed.video-streams.org
+  name: 🛫 78|211ms|21Mbps
+- type: http
+  server: 54.190.176.228
+  port: 8443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 79|212ms|57Mbps
+- server: 66.163.127.225
+  port: 443
+  type: trojan
+  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  udp: true
+  sni: cdn.indyourperfectremotetechjobfromthecomfortofhome.com
+  network: tcp
+  name: 🛫 80|212ms|21Mbps
+- type: http
+  server: 158.173.154.4
+  port: 9002
+  tls: true
+  sni: 158.173.154.4
+  skip-cert-verify: true
+  name: 🛫 81|212ms|19Mbps
+- password: None
+  port: 9090
+  server: 104.248.151.93
+  skip-cert-verify: true
+  type: http
+  name: 🛫 82|212ms|17Mbps
+- server: 66.163.127.9
+  port: 443
+  type: trojan
+  password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  udp: true
+  sni: resources.indyourperfectremotetechjobfromthecomfortofhome.com
+  network: tcp
+  name: 🛫 83|216ms|25Mbps
+- port: 8443
+  server: 35.84.133.236
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 84|217ms|68Mbps
+- server: 81.22.132.136
+  port: 443
+  type: trojan
+  password: humanity
+  udp: true
+  sni: www.calmlunch.com
+  network: ws
+  ws-opts:
+    path: /assignment
+    headers:
+      Host: www.calmlunch.com
+  name: 🛫 85|217ms|22Mbps
+- port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 86|221ms|18Mbps
+- port: 443
+  server: 38.247.141.135
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 87|225ms|71Mbps
+- type: http
+  server: 44.229.69.166
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 88|225ms|33Mbps
+- type: http
+  server: 185.238.170.10
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 89|227ms|16Mbps
+- port: 443
+  server: 91.92.250.33
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 90|228ms|17Mbps
+- port: 8443
+  server: 44.248.167.117
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 91|229ms|38Mbps
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 82.196.9.7
+  sni: 52c40907.acsnet.co
+  tls: true
+  type: http
+  username: testuser1
+  name: 🛫 92|230ms|17Mbps
+- server: 151.123.187.198
+  port: 443
+  type: vless
+  uuid: b24ad12f-f6ce-4f0b-a264-d58a76104026
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: al2.magazinnarubeva.ru
+  reality-opts:
+    public-key: trN5x0amt2YuVzF2vZnK294YBAuh_zl5QkZjPyWz-TI
+    short-id: 8718c58d3d51db59
+  client-fingerprint: safari
+  network: tcp
+  name: 🛫 93|232ms|19Mbps
+- port: 443
+  server: 103.86.117.202
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 94|234ms|11Mbps
+- password: None
+  port: 9002
+  server: 158.173.154.3
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 95|236ms|19Mbps
+- server: 146.75.37.242
+  port: 443
+  type: vless
+  uuid: 11e6c528-434f-4b15-83b3-40a46237ea13
+  udp: true
+  tls: true
+  servername: bounded-crammed.video-streams.org
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /ws
+    headers:
+      Host: bounded-crammed.video-streams.org
+  name: 🛫 96|237ms|17Mbps
+- password: None
+  port: 443
+  server: 82.66.235.221
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 97|240ms|17Mbps
+- password: None
+  port: 8443
+  server: 44.217.145.28
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 🛫 98|245ms|37Mbps
+- server: 95.81.102.121
+  port: 443
+  type: vless
+  uuid: 48eb49ce-38b5-4ed1-b6ab-8eaf37cde710
+  udp: true
+  tls: true
+  servername: nodeam.easyvpn.dev
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /easyvpn-ws
+    headers:
+      Host: nodeam.easyvpn.dev
+  name: 🛫 99|247ms|21Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.81
+  type: ss
+  name: 🛫 100|248ms|?Mbps
 - client-fingerprint: chrome
   encryption: none
   fingerprint: CD6E838B9BFE31CAB8B3D5C858B0D6223FE84ECE236C1FDB281BE93C302E1E6E
@@ -1019,571 +1638,7 @@ proxies:
         like Gecko) Chrome/64.0.3282.186 Safari/537.36
     path: /
   xudp: true
-  name: 🛫 42|182ms|57Mbps
-- server: 172.67.118.45
-  port: 2053
-  type: trojan
-  password: gHQP0D7D15
-  udp: true
-  sni: marvdasht.phonecomparisonblog.org
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: marvdasht.phonecomparisonblog.org
-  name: 🛫 43|193ms|19Mbps
-- type: vless
-  network: ws
-  server: 172.66.128.146
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  servername: n.bitpulse.me
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: unsafe
-  ws-opts:
-    headers:
-      Host: n.bitpulse.me
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed
-  name: 🛫 44|195ms|22Mbps
-- server: 162.159.36.20
-  port: 443
-  type: trojan
-  password: humanity
-  udp: true
-  sni: www.calmlunch.com
-  network: ws
-  ws-opts:
-    path: /assignment
-    headers:
-      Host: www.calmlunch.com
-  name: 🛫 45|195ms|20Mbps
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 162.243.146.243
-  sni: a2f392f3.acsnet.co
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: testuser1
-  udp: true
-  name: 🛫 46|195ms|4Mbps
-- port: 443
-  server: 172.64.69.89
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 47|197ms|99Mbps
-- port: 443
-  server: 172.64.68.89
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 48|198ms|287Mbps
-- port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 49|198ms|74Mbps
-- type: vmess
-  network: ws
-  server: 104.27.0.1
-  port: 443
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  skip-cert-verify: true
-  tls: true
-  alterId: 0
-  cipher: auto
-  ws-opts:
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    path: /ws
-  name: 🛫 50|199ms|84Mbps
-- server: 104.25.239.113
-  port: 2053
-  type: trojan
-  password: gHQP0D7D15
-  udp: true
-  sni: marvdasht.phonecomparisonblog.org
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: marvdasht.phonecomparisonblog.org
-  name: 🛫 51|199ms|14Mbps
-- alpn:
-  - h3
-  client-fingerprint: edge
-  network: xhttp
-  port: 443
-  server: 151.101.131.6
-  servername: apps.apple.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: bdf38176-48e9-40f1-9d1c-d501c333b464
-  xhttp-opts:
-    host: kkbr.tm
-    mode: auto
-    path: /crownnet
-  name: 🛫 52|199ms|?Mbps
-- type: http
-  server: 54.190.176.228
-  port: 8443
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 🛫 53|200ms|35Mbps
-- type: trojan
-  server: 104.25.109.237
-  port: 443
-  alpn:
-  - h2
-  - http/1.1
-  client-fingerprint: chrome
-  network: ws
-  password: humanity
-  sni: www.calmlunch.com
-  ws-opts:
-    headers:
-      Host: www.calmlunch.com
-    path: /assignment
-  name: 🛫 54|200ms|18Mbps
-- port: 8443
-  server: 35.84.133.236
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 55|201ms|48Mbps
-- server: 172.64.229.21
-  port: 443
-  type: vmess
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: vmess.lbw666.dpdns.org
-  network: ws
-  ws-opts:
-    path: /ws?ed=2048
-    headers:
-      Host: vmess.lbw666.dpdns.org
-  name: 🛫 56|202ms|58Mbps
-- server: 141.193.213.172
-  port: 443
-  type: trojan
-  password: humanity
-  udp: true
-  sni: www.calmlunch.com
-  client-fingerprint: android
-  network: ws
-  ws-opts:
-    path: /assignment
-    headers:
-      Host: www.calmlunch.com
-  name: 🛫 57|202ms|21Mbps
-- type: vless
-  network: ws
-  server: 104.17.108.213
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  servername: n.bitpulse.me
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: unsafe
-  ws-opts:
-    headers:
-      Host: n.bitpulse.me
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
-  name: 🛫 58|202ms|18Mbps
-- server: 172.67.221.77
-  port: 443
-  type: vmess
-  uuid: 83b09a64-1eaf-4c4d-89ed-866d4b6b8115
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: www.ubuntuupdates.com
-  network: ws
-  ws-opts:
-    path: /truth
-    headers:
-      Host: www.ubuntuupdates.com
-  name: 🛫 59|204ms|35Mbps
-- type: vless
-  network: ws
-  server: 104.21.29.192
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  servername: n.bitpulse.me
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: unsafe
-  ws-opts:
-    headers:
-      Host: n.bitpulse.me
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed
-  name: 🛫 60|204ms|24Mbps
-- client-fingerprint: chrome
-  network: ws
-  port: 443
-  server: 172.67.166.188
-  servername: vpn.cintaku.qzz.io
-  tls: true
-  type: vless
-  uuid: fc7d2cfe-f5ef-40c8-a848-a0bdc11f6349
-  ws-opts:
-    headers:
-      Host: vpn.cintaku.qzz.io
-    path: /vlessws
-  name: 🛫 61|204ms|4Mbps
-- alterId: 0
-  cipher: auto
-  network: ws
-  port: 80
-  server: 104.17.147.222
-  skip-cert-verify: false
-  sub_tag: A004-260618
-  tls: false
-  type: vmess
-  udp: true
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  ws-opts:
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    path: /ws
-  xudp: true
-  packet-encoding: xudp
-  servername: vmess.lbw666.dpdns.org
-  name: 🛫 62|205ms|98Mbps
-- type: vless
-  network: ws
-  server: 104.16.188.34
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  servername: n.bitpulse.me
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: unsafe
-  ws-opts:
-    headers:
-      Host: n.bitpulse.me
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
-  name: 🛫 63|205ms|28Mbps
-- type: vless
-  network: ws
-  server: 104.19.235.15
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  servername: n.bitpulse.me
-  skip-cert-verify: false
-  tls: true
-  udp: true
-  tfo: false
-  client-fingerprint: unsafe
-  ws-opts:
-    headers:
-      Host: n.bitpulse.me
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128
-  name: 🛫 64|205ms|16Mbps
-- server: 104.21.15.251
-  port: 443
-  type: vmess
-  uuid: ba1116e2-8c2f-4e3d-8e50-c954360cf970
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: www.windowssearchtools.com
-  network: ws
-  ws-opts:
-    path: /truth
-    headers:
-      Host: www.windowssearchtools.com
-  name: 🛫 65|205ms|15Mbps
-- server: 104.21.7.133
-  port: 443
-  type: vmess
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: vmess.lbw666.dpdns.org
-  network: ws
-  ws-opts:
-    path: /ws?ed=2048
-    headers:
-      Host: vmess.lbw666.dpdns.org
-  name: 🛫 66|205ms|12Mbps
-- server: 172.66.0.1
-  port: 443
-  type: vmess
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: vmess.lbw666.dpdns.org
-  network: ws
-  ws-opts:
-    path: /ws
-    headers:
-      Host: vmess.lbw666.dpdns.org
-  name: 🛫 67|206ms|29Mbps
-- type: vmess
-  network: ws
-  server: 172.67.187.145
-  port: 80
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  skip-cert-verify: true
-  alterId: 0
-  cipher: auto
-  ws-opts:
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    path: /ws
-  name: 🛫 68|206ms|25Mbps
-- type: vless
-  server: 172.64.91.69
-  port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  udp: true
-  tls: true
-  servername: n.bitpulse.me
-  sni: n.bitpulse.me
-  skip-cert-verify: true
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128?ed=2560
-    headers:
-      Host: n.bitpulse.me
-  name: 🛫 69|207ms|27Mbps
-- server: 188.114.96.1
-  port: 443
-  type: vmess
-  uuid: 80be2deb-3b27-4775-9bd1-7f2a2b9c261b
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: www.windowsmsidownloads.com
-  network: ws
-  ws-opts:
-    path: /truth
-    headers:
-      Host: www.windowsmsidownloads.com
-  name: 🛫 70|208ms|56Mbps
-- server: 104.18.32.47
-  port: 443
-  type: trojan
-  password: humanity
-  udp: true
-  sni: www.calmlunch.com
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /assignment
-    headers:
-      Host: www.calmlunch.com
-  name: 🛫 71|208ms|20Mbps
-- port: 443
-  server: 31.186.220.204
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 72|208ms|17Mbps
-- server: 104.16.122.175
-  port: 443
-  type: trojan
-  password: humanity
-  udp: true
-  sni: www.calmlunch.com
-  network: ws
-  ws-opts:
-    path: /assignment
-    headers:
-      Host: www.calmlunch.com
-  name: 🛫 73|209ms|20Mbps
-- type: http
-  server: 44.229.69.166
-  port: 8443
-  tls: true
-  skip-cert-verify: true
-  name: 🛫 74|212ms|109Mbps
-- port: 443
-  server: 87.106.223.158
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 75|212ms|17Mbps
-- password: None
-  port: 443
-  server: 82.66.235.221
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 76|213ms|21Mbps
-- port: 443
-  server: 82.65.162.76
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 77|215ms|18Mbps
-- server: 77.216.2.178
-  port: 30
-  type: ss
-  cipher: chacha20-ietf-poly1305
-  password: BHxDn8Z67zuaoQsjHqSAMQQs8Dz1CGqJ
-  udp: true
-  name: 🛫 78|216ms|19Mbps
-- server: 81.22.132.136
-  port: 443
-  type: trojan
-  password: humanity
-  udp: true
-  sni: www.calmlunch.com
-  network: ws
-  ws-opts:
-    path: /assignment
-    headers:
-      Host: www.calmlunch.com
-  name: 🛫 79|218ms|16Mbps
-- type: vmess
-  network: ws
-  server: 104.21.7.133
-  port: 80
-  uuid: 0cf6d970-3f1d-4aae-a989-92a8f76ae3db
-  skip-cert-verify: true
-  alterId: 0
-  cipher: auto
-  ws-opts:
-    headers:
-      Host: vmess.lbw666.dpdns.org
-    path: /ws
-  name: 🛫 80|221ms|95Mbps
-- port: 443
-  server: 38.247.141.135
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 81|221ms|45Mbps
-- server: 206.1.97.108
-  port: 25021
-  type: vless
-  uuid: 2446e2e2-1ce3-4502-9050-1dd32bacc68c
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: www.samsung.com
-  reality-opts:
-    public-key: od79bUkYtqQtsGrrTdhmkDflx5c9al4vqxwWApvc-Dg
-    short-id: 17fa3af0924c88b3
-  client-fingerprint: firefox
-  network: tcp
-  name: 🛫 82|221ms|4Mbps
-- port: 443
-  server: 103.86.116.118
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 83|226ms|11Mbps
-- server: 138.16.140.168
-  port: 443
-  type: vless
-  uuid: 13bf9403-22d1-4221-939b-f6606c423139
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: steamcommunity.com
-  reality-opts:
-    public-key: HyVJj9KuPfDV5lOLEkMeVmYFZoFMQid6eiLC_6Yf1mQ
-    short-id: 5c56a4cfea5866c0
-  client-fingerprint: edge
-  network: tcp
-  name: 🛫 84|228ms|26Mbps
-- port: 443
-  server: 103.86.117.202
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 85|235ms|14Mbps
-- password: None
-  port: 443
-  server: 23.133.176.14
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 86|236ms|42Mbps
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 82.196.9.7
-  sni: 52c40907.acsnet.co
-  tls: true
-  type: http
-  username: testuser1
-  name: 🛫 87|237ms|16Mbps
-- port: 443
-  server: 176.94.74.21
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 88|239ms|13Mbps
-- port: 8443
-  server: 18.206.28.143
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 89|243ms|62Mbps
-- type: ss
-  server: 202.50.253.45
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 🛫 90|244ms|21Mbps
-- type: ss
-  server: 202.50.253.99
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 🛫 91|246ms|32Mbps
+  name: 🛫 101|249ms|42Mbps
 - type: ss
   server: 202.50.253.72
   port: 19999
@@ -1591,30 +1646,20 @@ proxies:
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   skip-cert-verify: true
   udp: true
-  name: 🛫 92|247ms|21Mbps
-- type: ss
-  server: 202.50.253.90
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
+  name: 🛫 102|251ms|5Mbps
+- server: 64.188.83.148
+  port: 2083
+  type: vless
+  uuid: 75b517db-1f97-4bda-a479-863d988c31a0
   udp: true
-  name: 🛫 93|248ms|20Mbps
-- port: 443
-  server: 62.90.77.30
-  skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
-  type: http
-  udp: true
-  name: 🛫 94|248ms|17Mbps
-- password: None
-  port: 8443
-  server: 44.217.145.28
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 95|249ms|36Mbps
+  servername: speedtestmark.com
+  network: ws
+  ws-opts:
+    path: /vless-ws
+    headers:
+      Host: speedtestmark.com
+  name: 🛫 103|252ms|29Mbps
 - server: 144.31.140.125
   port: 8443
   type: vless
@@ -1628,62 +1673,37 @@ proxies:
     short-id: 168c15efac9df5fd
   client-fingerprint: chrome
   network: tcp
-  name: 🛫 96|249ms|21Mbps
-- server: 202.50.253.36
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  udp: true
-  name: 🛫 97|251ms|21Mbps
-- type: ss
-  server: 202.50.253.81
-  port: 19999
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  skip-cert-verify: true
-  udp: true
-  name: 🛫 98|253ms|28Mbps
-- port: 443
-  server: 4.172.245.121
+  name: 🛫 104|252ms|27Mbps
+- port: 8443
+  server: 18.206.28.143
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 99|256ms|37Mbps
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.18
-  sub_tag: B007-260618
-  type: ss
-  udp: true
-  name: 🛫 100|259ms|27Mbps
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.54
-  type: ss
-  name: 🛫 101|259ms|23Mbps
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.63
-  type: ss
-  name: 🛫 102|261ms|22Mbps
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.27
-  type: ss
-  name: 🛫 103|262ms|21Mbps
-- type: http
-  server: 89.150.35.94
-  port: 443
-  tls: true
+  name: 🛫 105|254ms|35Mbps
+- port: 443
+  server: 176.94.74.21
   skip-cert-verify: true
-  name: 🛫 104|266ms|29Mbps
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 106|254ms|13Mbps
+- server: 104.165.205.63
+  port: 2083
+  type: vless
+  uuid: 9ec97e03-5e0b-4feb-b6f2-1c377977e471
+  udp: true
+  tls: true
+  servername: speedtestmark.com
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /vless-ws
+    headers:
+      Host: speedtestmark.com
+  name: 🛫 107|257ms|16Mbps
 - port: 443
   server: 162.217.114.50
   skip-cert-verify: true
@@ -1691,15 +1711,89 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 105|267ms|21Mbps
-- port: 443
-  server: 141.94.16.4
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
+  name: 🛫 108|260ms|21Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.54
+  type: ss
   udp: true
-  name: 🛫 106|272ms|11Mbps
+  name: 🛫 109|264ms|20Mbps
+- type: http
+  server: 62.90.77.30
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 110|264ms|16Mbps
+- type: ss
+  server: 202.50.253.45
+  port: 19999
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  skip-cert-verify: true
+  udp: true
+  name: 🛫 111|267ms|17Mbps
+- server: 157.22.240.20
+  port: 443
+  type: vless
+  uuid: f28ce4eb-62cd-45f5-b3b3-be1c1a95e335
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: yandex.ru
+  reality-opts:
+    public-key: T1BWBw3lq9G1LiQ7eQSPfdNQic7bUMEbdFNJBewAwB8
+    short-id: 6ad3c0f1e9b2478a
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 112|269ms|5Mbps
+- server: 177.202.96.14
+  port: 1443
+  type: vless
+  uuid: b24ad12f-f6ce-4f0b-a264-d58a76104026
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: pl2.greenzone12.com
+  reality-opts:
+    public-key: jIq_COD-tIXTvgDn-TslFGtB_a8HVgUOOIlUByv8fkg
+    short-id: 8718c58d3d51db59
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 113|271ms|17Mbps
+- server: 193.239.160.134
+  port: 443
+  type: trojan
+  password: humanity
+  udp: true
+  sni: www.calmlunch.com
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /assignment
+    headers:
+      Host: www.calmlunch.com
+  name: 🛫 114|275ms|16Mbps
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.18
+  type: ss
+  name: 🛫 115|276ms|21Mbps
+- server: 87.121.47.4
+  port: 2083
+  type: vless
+  uuid: 75b517db-1f97-4bda-a479-863d988c31a0
+  udp: true
+  tls: true
+  servername: speedtestmark.com
+  client-fingerprint: random
+  network: ws
+  ws-opts:
+    path: /vless-ws
+    headers:
+      Host: speedtestmark.com
+  name: 🛫 116|277ms|19Mbps
 - password: None
   port: 443
   server: 185.219.159.16
@@ -1707,13 +1801,69 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 107|278ms|22Mbps
+  name: 🛫 117|288ms|17Mbps
 - port: 443
   server: 217.210.129.243
   skip-cert-verify: true
   tls: true
   type: http
-  name: 🛫 108|302ms|16Mbps
+  name: 🛫 118|305ms|11Mbps
+- server: 91.132.48.199
+  port: 443
+  type: vless
+  uuid: 0d607d84-0ae0-4b9c-a4f3-1766ab456e02
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: bunny.net
+  reality-opts:
+    public-key: _0hmzeEAGEx6boacV3d-FrFGaFBYfdvJno39FxveJwM
+    short-id: e7c5f2a9
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 119|307ms|10Mbps
+- server: 104.165.205.54
+  port: 2083
+  type: vless
+  uuid: a0bce4ce-514e-4837-8753-0c458484b538
+  udp: true
+  tls: true
+  servername: speedtestmark.com
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /vless-ws
+    headers:
+      Host: speedtestmark.com
+  name: 🛫 120|327ms|18Mbps
+- server: 50.7.43.117
+  port: 443
+  type: vless
+  uuid: b24ad12f-f6ce-4f0b-a264-d58a76104026
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: pt3.magazinnarubeva.ru
+  reality-opts:
+    public-key: trN5x0amt2YuVzF2vZnK294YBAuh_zl5QkZjPyWz-TI
+    short-id: 8718c58d3d51db59
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 121|344ms|19Mbps
+- server: 177.202.70.13
+  port: 443
+  type: vless
+  uuid: 1d1eda2e-0bd7-4478-877b-1c5425c6c4dd
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: tradingview.com
+  reality-opts:
+    public-key: yr_opKG6DGTppNDXkk-DhGSYJZXbb9o-caexk2FZO38
+    short-id: 8f3c6e2a1b5d4f09
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 122|365ms|18Mbps
 - port: 443
   server: 134.65.17.77
   skip-cert-verify: true
@@ -1721,23 +1871,21 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 109|368ms|22Mbps
-- type: vless
-  network: ws
-  server: 104.18.51.110
+  name: 🛫 123|377ms|24Mbps
+- server: 201.58.150.14
   port: 443
-  uuid: f27b6f65-6e59-4f89-b929-afa397ca587f
-  servername: n.bitpulse.me
-  skip-cert-verify: false
-  tls: true
+  type: vless
+  uuid: 8007dda2-aed2-4514-8299-6e3edbdb015b
   udp: true
-  tfo: false
-  client-fingerprint: unsafe
-  ws-opts:
-    headers:
-      Host: n.bitpulse.me
-    path: /019bcbad-3813-7cce-8786-3ac0e418f128
-  name: 🛫 110|1215ms|27Mbps
+  tls: true
+  flow: xtls-rprx-vision
+  servername: jp1.wolffast.net
+  reality-opts:
+    public-key: trN5x0amt2YuVzF2vZnK294YBAuh_zl5QkZjPyWz-TI
+    short-id: 8718c58d3d51db59
+  client-fingerprint: chrome
+  network: tcp
+  name: 🛫 124|412ms|19Mbps
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -1753,113 +1901,127 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 🛫 01|50ms|55Mbps
-  - 🛫 02|50ms|30Mbps
-  - 🛫 03|54ms|36Mbps
-  - 🛫 04|88ms|12Mbps
-  - 🛫 05|123ms|17Mbps
-  - 🛫 06|137ms|12Mbps
-  - 🛫 07|153ms|167Mbps
-  - 🛫 08|165ms|57Mbps
-  - 🛫 09|167ms|18Mbps
-  - 🛫 10|178ms|23Mbps
-  - 🛫 11|204ms|119Mbps
-  - 🛫 12|204ms|61Mbps
-  - 🛫 13|205ms|29Mbps
-  - 🛫 14|206ms|93Mbps
-  - 🛫 15|217ms|51Mbps
-  - 🛫 16|221ms|29Mbps
-  - 🛫 17|368ms|26Mbps
-  - 🛫 18|525ms|19Mbps
-  - 🛫 19|1075ms|55Mbps
-  - 🛫 20|2125ms|4Mbps
-  - 🛫 21|2171ms|50Mbps
-  - 🛫 22|2198ms|131Mbps
-  - 🛫 23|89ms|15Mbps
-  - 🛫 24|143ms|26Mbps
-  - 🛫 25|147ms|17Mbps
-  - 🛫 26|156ms|30Mbps
-  - 🛫 27|156ms|21Mbps
-  - 🛫 28|159ms|27Mbps
-  - 🛫 29|159ms|26Mbps
-  - 🛫 30|159ms|5Mbps
-  - 🛫 31|162ms|22Mbps
-  - 🛫 32|162ms|22Mbps
-  - 🛫 33|162ms|17Mbps
-  - 🛫 34|164ms|28Mbps
-  - 🛫 35|164ms|21Mbps
-  - 🛫 36|165ms|45Mbps
-  - 🛫 37|166ms|4Mbps
-  - 🛫 38|167ms|18Mbps
-  - 🛫 39|168ms|9Mbps
-  - 🛫 40|170ms|4Mbps
-  - 🛫 41|174ms|24Mbps
-  - 🛫 42|182ms|57Mbps
-  - 🛫 43|193ms|19Mbps
-  - 🛫 44|195ms|22Mbps
-  - 🛫 45|195ms|20Mbps
-  - 🛫 46|195ms|4Mbps
-  - 🛫 47|197ms|99Mbps
-  - 🛫 48|198ms|287Mbps
-  - 🛫 49|198ms|74Mbps
-  - 🛫 50|199ms|84Mbps
-  - 🛫 51|199ms|14Mbps
-  - 🛫 52|199ms|?Mbps
-  - 🛫 53|200ms|35Mbps
-  - 🛫 54|200ms|18Mbps
-  - 🛫 55|201ms|48Mbps
-  - 🛫 56|202ms|58Mbps
-  - 🛫 57|202ms|21Mbps
-  - 🛫 58|202ms|18Mbps
-  - 🛫 59|204ms|35Mbps
-  - 🛫 60|204ms|24Mbps
-  - 🛫 61|204ms|4Mbps
-  - 🛫 62|205ms|98Mbps
-  - 🛫 63|205ms|28Mbps
-  - 🛫 64|205ms|16Mbps
-  - 🛫 65|205ms|15Mbps
-  - 🛫 66|205ms|12Mbps
-  - 🛫 67|206ms|29Mbps
-  - 🛫 68|206ms|25Mbps
-  - 🛫 69|207ms|27Mbps
-  - 🛫 70|208ms|56Mbps
-  - 🛫 71|208ms|20Mbps
-  - 🛫 72|208ms|17Mbps
-  - 🛫 73|209ms|20Mbps
-  - 🛫 74|212ms|109Mbps
-  - 🛫 75|212ms|17Mbps
-  - 🛫 76|213ms|21Mbps
-  - 🛫 77|215ms|18Mbps
-  - 🛫 78|216ms|19Mbps
-  - 🛫 79|218ms|16Mbps
-  - 🛫 80|221ms|95Mbps
-  - 🛫 81|221ms|45Mbps
-  - 🛫 82|221ms|4Mbps
-  - 🛫 83|226ms|11Mbps
-  - 🛫 84|228ms|26Mbps
-  - 🛫 85|235ms|14Mbps
-  - 🛫 86|236ms|42Mbps
-  - 🛫 87|237ms|16Mbps
-  - 🛫 88|239ms|13Mbps
-  - 🛫 89|243ms|62Mbps
-  - 🛫 90|244ms|21Mbps
-  - 🛫 91|246ms|32Mbps
-  - 🛫 92|247ms|21Mbps
-  - 🛫 93|248ms|20Mbps
-  - 🛫 94|248ms|17Mbps
-  - 🛫 95|249ms|36Mbps
-  - 🛫 96|249ms|21Mbps
-  - 🛫 97|251ms|21Mbps
-  - 🛫 98|253ms|28Mbps
-  - 🛫 99|256ms|37Mbps
-  - 🛫 100|259ms|27Mbps
-  - 🛫 101|259ms|23Mbps
-  - 🛫 102|261ms|22Mbps
-  - 🛫 103|262ms|21Mbps
-  - 🛫 104|266ms|29Mbps
-  - 🛫 105|267ms|21Mbps
-  - 🛫 106|272ms|11Mbps
-  - 🛫 107|278ms|22Mbps
-  - 🛫 108|302ms|16Mbps
-  - 🛫 109|368ms|22Mbps
-  - 🛫 110|1215ms|27Mbps
+  - 🛫 01|54ms|4Mbps
+  - 🛫 02|57ms|9Mbps
+  - 🛫 03|58ms|12Mbps
+  - 🛫 04|62ms|12Mbps
+  - 🛫 05|117ms|21Mbps
+  - 🛫 06|157ms|3Mbps
+  - 🛫 07|178ms|15Mbps
+  - 🛫 08|193ms|19Mbps
+  - 🛫 09|201ms|47Mbps
+  - 🛫 10|202ms|30Mbps
+  - 🛫 11|203ms|25Mbps
+  - 🛫 12|204ms|27Mbps
+  - 🛫 13|204ms|15Mbps
+  - 🛫 14|207ms|22Mbps
+  - 🛫 15|209ms|6Mbps
+  - 🛫 16|211ms|4Mbps
+  - 🛫 17|214ms|?Mbps
+  - 🛫 18|215ms|19Mbps
+  - 🛫 19|215ms|5Mbps
+  - 🛫 20|217ms|6Mbps
+  - 🛫 21|221ms|79Mbps
+  - 🛫 22|233ms|10Mbps
+  - 🛫 23|237ms|21Mbps
+  - 🛫 24|242ms|76Mbps
+  - 🛫 25|244ms|122Mbps
+  - 🛫 26|244ms|100Mbps
+  - 🛫 27|249ms|79Mbps
+  - 🛫 28|256ms|88Mbps
+  - 🛫 29|473ms|25Mbps
+  - 🛫 30|1060ms|2Mbps
+  - 🛫 31|1188ms|3Mbps
+  - 🛫 32|2247ms|125Mbps
+  - 🛫 33|40ms|14Mbps
+  - 🛫 34|81ms|17Mbps
+  - 🛫 35|142ms|18Mbps
+  - 🛫 36|143ms|18Mbps
+  - 🛫 37|144ms|27Mbps
+  - 🛫 38|150ms|30Mbps
+  - 🛫 39|153ms|9Mbps
+  - 🛫 40|158ms|23Mbps
+  - 🛫 41|159ms|17Mbps
+  - 🛫 42|160ms|23Mbps
+  - 🛫 43|160ms|21Mbps
+  - 🛫 44|160ms|4Mbps
+  - 🛫 45|161ms|29Mbps
+  - 🛫 46|163ms|21Mbps
+  - 🛫 47|165ms|18Mbps
+  - 🛫 48|165ms|14Mbps
+  - 🛫 49|166ms|43Mbps
+  - 🛫 50|166ms|22Mbps
+  - 🛫 51|167ms|19Mbps
+  - 🛫 52|171ms|22Mbps
+  - 🛫 53|171ms|12Mbps
+  - 🛫 54|174ms|13Mbps
+  - 🛫 55|176ms|21Mbps
+  - 🛫 56|186ms|21Mbps
+  - 🛫 57|187ms|11Mbps
+  - 🛫 58|189ms|10Mbps
+  - 🛫 59|192ms|16Mbps
+  - 🛫 60|193ms|12Mbps
+  - 🛫 61|194ms|19Mbps
+  - 🛫 62|195ms|55Mbps
+  - 🛫 63|195ms|14Mbps
+  - 🛫 64|196ms|24Mbps
+  - 🛫 65|197ms|173Mbps
+  - 🛫 66|197ms|28Mbps
+  - 🛫 67|198ms|72Mbps
+  - 🛫 68|198ms|50Mbps
+  - 🛫 69|198ms|19Mbps
+  - 🛫 70|200ms|17Mbps
+  - 🛫 71|201ms|16Mbps
+  - 🛫 72|204ms|17Mbps
+  - 🛫 73|205ms|15Mbps
+  - 🛫 74|207ms|16Mbps
+  - 🛫 75|208ms|98Mbps
+  - 🛫 76|208ms|48Mbps
+  - 🛫 77|209ms|17Mbps
+  - 🛫 78|211ms|21Mbps
+  - 🛫 79|212ms|57Mbps
+  - 🛫 80|212ms|21Mbps
+  - 🛫 81|212ms|19Mbps
+  - 🛫 82|212ms|17Mbps
+  - 🛫 83|216ms|25Mbps
+  - 🛫 84|217ms|68Mbps
+  - 🛫 85|217ms|22Mbps
+  - 🛫 86|221ms|18Mbps
+  - 🛫 87|225ms|71Mbps
+  - 🛫 88|225ms|33Mbps
+  - 🛫 89|227ms|16Mbps
+  - 🛫 90|228ms|17Mbps
+  - 🛫 91|229ms|38Mbps
+  - 🛫 92|230ms|17Mbps
+  - 🛫 93|232ms|19Mbps
+  - 🛫 94|234ms|11Mbps
+  - 🛫 95|236ms|19Mbps
+  - 🛫 96|237ms|17Mbps
+  - 🛫 97|240ms|17Mbps
+  - 🛫 98|245ms|37Mbps
+  - 🛫 99|247ms|21Mbps
+  - 🛫 100|248ms|?Mbps
+  - 🛫 101|249ms|42Mbps
+  - 🛫 102|251ms|5Mbps
+  - 🛫 103|252ms|29Mbps
+  - 🛫 104|252ms|27Mbps
+  - 🛫 105|254ms|35Mbps
+  - 🛫 106|254ms|13Mbps
+  - 🛫 107|257ms|16Mbps
+  - 🛫 108|260ms|21Mbps
+  - 🛫 109|264ms|20Mbps
+  - 🛫 110|264ms|16Mbps
+  - 🛫 111|267ms|17Mbps
+  - 🛫 112|269ms|5Mbps
+  - 🛫 113|271ms|17Mbps
+  - 🛫 114|275ms|16Mbps
+  - 🛫 115|276ms|21Mbps
+  - 🛫 116|277ms|19Mbps
+  - 🛫 117|288ms|17Mbps
+  - 🛫 118|305ms|11Mbps
+  - 🛫 119|307ms|10Mbps
+  - 🛫 120|327ms|18Mbps
+  - 🛫 121|344ms|19Mbps
+  - 🛫 122|365ms|18Mbps
+  - 🛫 123|377ms|24Mbps
+  - 🛫 124|412ms|19Mbps
