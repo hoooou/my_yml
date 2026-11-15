@@ -1,4 +1,4 @@
-# 分阶段检测；2026-11-15T18:54:26+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-11-16T04:41:57+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -548,6 +548,44 @@ sniffer:
   - Mijia Cloud
   - +.push.apple.com
 proxies:
+- port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国01|202ms|583Mbps|机房|纯净度100.0%
+- port: 443
+  server: 172.64.68.89
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国02|209ms|1476Mbps|机房|纯净度未知
+- port: 443
+  server: 172.64.68.89
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国03|212ms|964Mbps|机房|纯净度未知
+- password: None
+  port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国04|211ms|495Mbps|机房|纯净度100.0%
+- password: None
+  port: 443
+  server: 23.133.176.14
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国05|212ms|598Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 443
   server: 172.64.69.89
@@ -556,50 +594,16 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 美国01|169ms|826Mbps|机房|纯净度未知
+  name: 美国06|228ms|640Mbps|机房|纯净度未知
 - password: None
   port: 443
   server: 172.64.68.89
   skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国02|196ms|691Mbps|机房|纯净度未知
-- type: http
-  server: 129.153.93.183
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 美国03|214ms|204Mbps|机房|纯净度99.9%
-- password: 'null'
-  port: 443
-  server: 172.64.68.89
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 美国04|199ms|711Mbps|机房|纯净度未知
-- port: 443
-  server: 172.64.68.89
-  skip-cert-verify: true
-  sub_tag: R002-260618
+  sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 美国05|206ms|938Mbps|机房|纯净度未知
-- type: http
-  server: 129.153.93.183
-  port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 美国06|218ms|251Mbps|机房|纯净度99.9%
-- port: 443
-  server: 172.64.68.89
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国07|218ms|1188Mbps|机房|纯净度未知
+  name: 美国07|220ms|1320Mbps|机房|纯净度未知
 - port: 443
   server: 172.64.68.89
   skip-cert-verify: true
@@ -608,33 +612,28 @@ proxies:
   type: http
   udp: true
   x-toolall-mihomo: true
-  name: 美国08|214ms|771Mbps|机房|纯净度未知
-- port: 443
-  server: 129.153.93.183
-  skip-cert-verify: true
-  sub_tag: R002-260618
+  name: 美国08|216ms|1538Mbps|机房|纯净度未知
+- type: http
+  server: 23.133.176.14
+  port: 443
   tls: true
-  type: http
-  udp: true
-  name: 美国09|220ms|264Mbps|机房|纯净度99.9%
+  skip-cert-verify: true
+  name: 美国09|216ms|556Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 443
-  server: 129.153.93.183
+  server: 172.64.68.89
   skip-cert-verify: true
   tls: true
   type: http
   username: 'null'
-  udp: true
-  name: 美国10|202ms|188Mbps|机房|纯净度99.9%
+  name: 美国10|218ms|1058Mbps|机房|纯净度未知
 - password: None
   port: 443
   server: 172.64.68.89
   skip-cert-verify: true
-  sub_tag: P002-260618
   tls: true
   type: http
-  udp: true
-  name: 美国11|206ms|1450Mbps|机房|纯净度未知
+  name: 美国11|239ms|1044Mbps|机房|纯净度未知
 - password: None
   port: 443
   server: 129.153.93.183
@@ -643,87 +642,58 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国12|236ms|235Mbps|机房|纯净度99.9%
-- type: http
-  server: 23.133.176.14
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 美国13|282ms|502Mbps|机房|纯净度100.0%
-- type: http
-  server: 162.243.146.243
-  port: 443
-  username: testuser1
-  password: e4b72b531a2d10900519
-  tls: true
-  sni: a2f392f3.acsnet.co
-  skip-cert-verify: true
-  name: 美国14|298ms|4Mbps|机房|纯净度99.7%
-- password: None
-  port: 443
-  server: 23.133.176.14
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 美国15|289ms|364Mbps|机房|纯净度100.0%
-- password: None
-  port: 443
-  server: 23.133.176.14
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 美国16|301ms|500Mbps|机房|纯净度100.0%
+  name: 美国12|360ms|181Mbps|机房|纯净度99.9%
 - port: 443
-  server: 23.133.176.14
+  server: 129.153.93.183
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 美国17|298ms|518Mbps|机房|纯净度100.0%
-- port: 9480
-  server: 104.129.203.85
+  name: 美国13|391ms|177Mbps|机房|纯净度99.9%
+- type: http
+  server: 129.153.93.183
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
   skip-cert-verify: true
-  type: http
-  name: 美国18|488ms|473Mbps|机房|纯净度99.6%
-- server: 213.182.201.138
-  port: 3090
-  type: vless
-  uuid: 303e1419-66cb-4fcf-bde2-88b26c0e9f67
+  name: 美国14|394ms|304Mbps|机房|纯净度99.9%
+- type: http
+  server: 129.153.93.183
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 美国15|411ms|268Mbps|机房|纯净度99.9%
+- type: socks5
+  server: 23.230.200.176
+  port: 62000
+  username: u1f0cijj
+  password: ppyefe3k
+  name: 美国16|428ms|21Mbps|机房|纯净度100.0%
+- type: vless
+  server: 79.182.39.131
+  port: 443
+  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
   udp: true
-  tls: false
+  tls: true
+  servername: 717252g.nl8.h1clayd.click
+  sni: 717252g.nl8.h1clayd.click
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: PD8Jdlg3xB9QY--jwQjp8PFPzCS8-Oryw6-HWBcHMFU
+    short-id: d3bd772514c87d28
   network: grpc
   grpc-opts:
-    grpc-service-name: vless
-  name: 德国01|489ms|311Mbps|未知|纯净度100.0%
-- password: 'null'
-  port: 443
-  server: 18.200.158.139
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 爱尔兰01|538ms|280Mbps|机房|纯净度100.0%
-- port: 443
-  server: 18.200.158.139
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 爱尔兰02|533ms|253Mbps|机房|纯净度100.0%
-- password: None
-  port: 443
-  server: 18.200.158.139
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 爱尔兰03|541ms|248Mbps|机房|纯净度100.0%
+    grpc-service-name: 204adda7e3da
+  name: 荷兰01|417ms|26Mbps|机房|纯净度100.0%
+- type: socks5
+  server: 144.225.47.158
+  port: 42000
+  username: DJy1T0dt
+  password: sZnD8GTz
+  name: MX01|446ms|17Mbps|机房|纯净度100.0%
 - port: 8443
   server: 54.190.176.228
   skip-cert-verify: true
@@ -731,81 +701,47 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国19|528ms|390Mbps|机房|纯净度100.0%
-- type: http
-  server: 54.190.176.228
-  port: 8443
-  username: 'null'
-  password: 'null'
-  tls: true
+  name: 美国17|530ms|32Mbps|机房|纯净度100.0%
+- port: 9480
+  server: 104.129.203.85
   skip-cert-verify: true
-  name: 美国20|525ms|552Mbps|机房|纯净度100.0%
-- type: http
-  server: 54.190.176.228
-  port: 8443
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 54.190.176.228
-  skip-cert-verify: true
-  name: 美国21|510ms|374Mbps|机房|纯净度100.0%
-- type: http
-  server: 18.200.158.139
+  type: http
+  name: 美国18|503ms|165Mbps|机房|纯净度99.6%
+- password: 'null'
   port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 18.200.158.139
+  server: 129.153.93.183
   skip-cert-verify: true
-  name: 爱尔兰04|542ms|277Mbps|机房|纯净度100.0%
-- password: None
-  port: 8443
-  server: 18.206.28.143
-  skip-cert-verify: true
-  sub_tag: P002-260618
   tls: true
   type: http
+  username: 'null'
   udp: true
-  name: 美国22|558ms|160Mbps|机房|纯净度100.0%
+  name: 美国19|384ms|275Mbps|机房|纯净度99.9%
 - type: http
-  server: 18.200.158.139
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 爱尔兰05|552ms|260Mbps|机房|纯净度100.0%
-- password: None
+  server: 54.190.176.228
   port: 8443
-  server: 18.206.28.143
-  skip-cert-verify: true
+  username: 'null'
+  password: 'null'
   tls: true
-  type: http
-  name: 美国23|565ms|118Mbps|机房|纯净度100.0%
+  skip-cert-verify: true
+  name: 美国20|516ms|28Mbps|机房|纯净度100.0%
 - port: 443
   server: 45.134.9.41
   skip-cert-verify: true
   sni: 991cc80f13caf81d3426ddebb2da7f49-240d6105b6ef86f0.apache-iv.com
   tls: true
   type: http
-  name: MX01|564ms|19Mbps|机房|纯净度97.3%
-- password: DJy1T0dt
-  port: 42000
-  server: 144.225.47.161
-  skip-cert-verify: true
-  type: socks5
-  username: Tek2x6av
-  name: MX02|569ms|14Mbps|机房|纯净度100.0%
-- port: 8443
-  server: 44.217.145.28
-  skip-cert-verify: true
-  sub_tag: R002-260618
+  name: MX02|556ms|21Mbps|机房|纯净度97.3%
+- type: http
+  server: 51.158.243.91
+  port: 443
   tls: true
-  type: http
-  udp: true
-  name: 美国24|545ms|122Mbps|机房|纯净度100.0%
+  sni: 51.158.243.91
+  skip-cert-verify: true
+  name: 荷兰02|625ms|17Mbps|机房|纯净度99.7%
 - server: ws137.mydosss.ccwu.cc
   port: 443
   type: vless
-  uuid: 7e0e7ca3-7aab-420e-9b40-c15a228ef33a
+  uuid: 48eb716d-6121-43c1-9dd2-9a2a25bf3178
   udp: true
   tls: true
   servername: ws137.mydosss.ccwu.cc
@@ -815,40 +751,30 @@ proxies:
     path: /3b575ddc8596
     headers:
       Host: ws137.mydosss.ccwu.cc
-  name: 美国25|599ms|288Mbps|机房|纯净度98.7%
+  name: 美国21|593ms|178Mbps|机房|纯净度98.7%
 - port: 443
-  server: 103.82.101.43
+  server: 51.158.243.91
   skip-cert-verify: true
-  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
-  sub_tag: R002-260618
   tls: true
   type: http
-  udp: true
-  x-toolall-mihomo: true
-  name: 法国01|627ms|20Mbps|机房|纯净度99.2%
-- port: 443
-  server: 103.82.101.43
-  skip-cert-verify: true
-  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 法国02|620ms|21Mbps|机房|纯净度99.2%
-- port: 443
-  server: 185.246.153.28
-  skip-cert-verify: true
-  sni: 4a8c2906c96058315dffbc2b0e7ff19b-0c66a58858a795df.apache-iv.com
-  tls: true
-  type: http
-  name: 荷兰01|652ms|25Mbps|机房|纯净度99.6%
+  name: 荷兰03|622ms|16Mbps|机房|纯净度99.7%
 - type: http
-  server: 84.17.47.150
-  port: 9002
+  server: 51.158.243.91
+  port: 443
+  username: 'null'
+  password: None
   tls: true
-  sni: 84.17.47.150
+  sni: 51.158.243.91
   skip-cert-verify: true
-  name: 荷兰02|659ms|28Mbps|机房|纯净度96.4%
+  name: 荷兰04|625ms|16Mbps|机房|纯净度99.7%
+- port: 443
+  server: 51.158.243.91
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰05|627ms|19Mbps|机房|纯净度99.7%
 - server: ws137.mydosss.ccwu.cc
   port: 443
   type: vless
@@ -862,128 +788,694 @@ proxies:
     path: /3b575ddc8596
     headers:
       Host: ws137.mydosss.ccwu.cc
-  name: 美国26|660ms|274Mbps|机房|纯净度98.7%
-- port: 443
-  server: 116.202.172.99
+  name: 美国22|606ms|106Mbps|机房|纯净度98.7%
+- port: 8443
+  server: 18.206.28.143
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 德国02|711ms|30Mbps|机房|纯净度100.0%
-- port: 443
-  server: 116.202.172.99
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 德国03|718ms|30Mbps|机房|纯净度100.0%
-- type: socks5
-  server: 144.225.47.158
-  port: 42000
-  username: DJy1T0dt
-  password: sZnD8GTz
-  name: MX03|707ms|21Mbps|机房|纯净度100.0%
+  name: 美国23|596ms|159Mbps|机房|纯净度100.0%
 - password: 'null'
-  port: 9002
-  server: 84.17.47.150
+  port: 443
+  server: 51.158.243.91
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   username: 'null'
   udp: true
-  name: 荷兰03|710ms|32Mbps|机房|纯净度96.4%
-- server: velvet-ridge.justext.space
-  port: 2096
-  type: vless
-  uuid: 399049fd-9cd6-4425-8114-6ea2f5040fe4
-  udp: true
-  tls: true
-  servername: velvet-ridge.justext.space
-  client-fingerprint: firefox
-  network: tcp
-  name: 奥地利01|694ms|13Mbps|机房|纯净度100.0%
-- server: 104.194.144.40
+  name: 荷兰06|655ms|18Mbps|机房|纯净度99.7%
+- type: ss
+  server: 202.50.253.90
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  tls: false
+  skip-cert-verify: false
+  name: 意大利01|615ms|18Mbps|机房|纯净度95.3%
+- password: None
   port: 443
-  type: vless
-  uuid: cf56362c-c1d4-420d-9bac-06fc7c0f467a
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: inpost.co.uk
-  reality-opts:
-    public-key: MFEIB2WW-LFHZhI_2lxznilxfnc8n2B7Dkn2hpAcSHY
-    short-id: dcfed5639f3b1830
-  client-fingerprint: edge
-  network: tcp
-  name: 英国01|737ms|28Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 443
-  server: 116.202.172.99
+  server: 51.158.243.91
   skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
   type: http
   username: 'null'
+  name: 荷兰07|628ms|13Mbps|机房|纯净度99.7%
+- type: ss
+  server: 202.50.253.72
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
   udp: true
-  name: 德国04|698ms|29Mbps|机房|纯净度100.0%
-- type: http
-  server: 84.17.47.150
-  port: 9002
-  tls: true
+  tls: false
+  skip-cert-verify: false
+  name: 意大利02|632ms|17Mbps|机房|纯净度95.3%
+- password: None
+  port: 443
+  server: 213.109.163.119
   skip-cert-verify: true
-  name: 荷兰04|678ms|29Mbps|机房|纯净度96.4%
-- type: socks5
-  server: 23.230.200.176
-  port: 62000
-  username: u1f0cijj
-  password: ppyefe3k
-  name: 美国27|592ms|15Mbps|机房|纯净度100.0%
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国01|687ms|9Mbps|机房|纯净度99.8%
 - type: http
-  server: 134.65.17.77
+  server: 213.109.163.119
   port: 443
   username: 'null'
   password: 'null'
   tls: true
-  sni: 134.65.17.77
+  sni: 213.109.163.119
   skip-cert-verify: true
-  name: BR01|876ms|25Mbps|机房|纯净度100.0%
-- password: None
+  name: 德国02|692ms|16Mbps|机房|纯净度99.8%
+- port: 443
+  server: 213.109.163.119
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 德国03|699ms|15Mbps|机房|纯净度99.8%
+- password: 'null'
   port: 443
-  server: 134.65.17.77
+  server: 213.109.163.119
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 德国04|699ms|14Mbps|机房|纯净度99.8%
+- type: http
+  server: 54.190.176.228
+  port: 8443
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 54.190.176.228
+  skip-cert-verify: true
+  name: 美国24|507ms|28Mbps|机房|纯净度100.0%
+- server: ws137.mydosss.ccwu.cc
+  port: 443
+  type: vless
+  uuid: 7e0e7ca3-7aab-420e-9b40-c15a228ef33a
+  udp: true
+  tls: true
+  servername: ws137.mydosss.ccwu.cc
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /3b575ddc8596
+    headers:
+      Host: ws137.mydosss.ccwu.cc
+  name: 美国25|609ms|255Mbps|机房|纯净度98.7%
+- port: 443
+  server: 213.109.163.119
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: BR02|870ms|25Mbps|机房|纯净度100.0%
-- port: 19362
-  server: 51.159.225.197
+  name: 德国05|707ms|14Mbps|机房|纯净度99.8%
+- type: http
+  server: 213.109.163.119
+  port: 443
+  tls: true
+  sni: 213.109.163.119
+  skip-cert-verify: true
+  name: 德国06|707ms|16Mbps|机房|纯净度99.8%
+- server: 162.35.101.177
+  port: 443
+  type: vless
+  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
+  tls: true
+  reality-opts:
+    public-key: cO3wYHISTeorXcM8ffaDCDdqZ-olBQL-GyZqb-W7rTk
+    short-id: bd8f712209a9c283
+  servername: 0592efg.us8.h1clayd.click
+  client-fingerprint: edge
+  network: grpc
+  grpc-opts:
+    grpc-mode: gun
+    grpc-service-name: 99f2107b03f8
+  udp: true
+  name: 美国26|630ms|11Mbps|机房|纯净度99.9%
+- type: ss
+  server: 202.50.253.36
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: false
+  name: 意大利03|746ms|19Mbps|机房|纯净度95.3%
+- port: 443
+  server: 103.82.101.43
+  skip-cert-verify: true
+  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 法国01|790ms|25Mbps|机房|纯净度99.2%
+- port: 443
+  server: 103.82.101.43
+  skip-cert-verify: true
+  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  x-toolall-mihomo: true
+  name: 法国02|799ms|26Mbps|机房|纯净度99.2%
+- password: 'null'
+  port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 爱尔兰01|820ms|20Mbps|机房|纯净度100.0%
+- port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 爱尔兰02|825ms|6Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 443
+  server: 18.200.158.139
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 爱尔兰03|825ms|264Mbps|机房|纯净度100.0%
+- type: http
+  server: 18.200.158.139
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 爱尔兰04|827ms|231Mbps|机房|纯净度100.0%
+- password: None
+  port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 爱尔兰05|812ms|23Mbps|机房|纯净度100.0%
+- type: http
+  server: 18.200.158.139
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 18.200.158.139
+  skip-cert-verify: true
+  name: 爱尔兰06|822ms|277Mbps|机房|纯净度100.0%
+- type: http
+  server: 34.249.214.108
+  port: 443
+  tls: true
+  sni: 34.249.214.108
+  skip-cert-verify: true
+  name: 爱尔兰07|834ms|21Mbps|机房|纯净度100.0%
+- port: 443
+  server: 18.200.158.139
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 爱尔兰08|842ms|286Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰08|839ms|29Mbps|机房|纯净度96.4%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰09|853ms|32Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  x-toolall-mihomo: true
+  name: 荷兰10|856ms|31Mbps|机房|纯净度96.4%
+- password: 'null'
+  port: 443
+  server: 18.200.158.139
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 爱尔兰09|833ms|33Mbps|机房|纯净度100.0%
+- password: None
+  port: 443
+  server: 18.200.158.139
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 爱尔兰10|839ms|155Mbps|机房|纯净度100.0%
+- server: ws137.mydosss.ccwu.cc
+  port: 443
+  type: vless
+  uuid: 56066a03-d283-48cf-8120-eb8d810025cb
+  udp: true
+  tls: true
+  servername: ws137.mydosss.ccwu.cc
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /3b575ddc8596
+    headers:
+      Host: ws137.mydosss.ccwu.cc
+  name: 美国27|617ms|236Mbps|机房|纯净度98.7%
+- password: None
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰11|846ms|33Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.147
+  port: 9002
+  username: 'null'
+  password: None
+  tls: true
+  sni: 84.17.47.147
+  skip-cert-verify: true
+  name: 荷兰12|855ms|29Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 荷兰13|862ms|29Mbps|机房|纯净度96.4%
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.27
+  sub_tag: B007-260618
+  type: ss
+  udp: true
+  name: 意大利04|589ms|15Mbps|机房|纯净度95.3%
+- password: ''
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 荷兰14|860ms|29Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.147
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰15|835ms|27Mbps|机房|纯净度96.4%
+- type: http
+  server: 51.159.225.196
+  port: 23856
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰16|881ms|18Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.147
+  skip-cert-verify: true
+  sni: 84.17.47.147
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰17|876ms|31Mbps|机房|纯净度96.4%
+- password: 'null'
+  port: 23856
+  server: 51.159.225.196
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 荷兰05|888ms|25Mbps|机房|纯净度100.0%
+  username: 'null'
+  name: 荷兰18|884ms|19Mbps|机房|纯净度100.0%
+- port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰19|885ms|16Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰20|883ms|20Mbps|机房|纯净度100.0%
+- port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰21|879ms|18Mbps|机房|纯净度100.0%
+- port: 443
+  server: 116.202.172.99
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 德国07|863ms|21Mbps|机房|纯净度100.0%
+- type: http
+  server: 51.159.225.196
+  port: 23856
+  username: 'null'
+  password: None
+  tls: true
+  sni: 51.159.225.196
+  skip-cert-verify: true
+  name: 荷兰22|884ms|17Mbps|机房|纯净度100.0%
+- password: None
+  port: 8443
+  server: 18.206.28.143
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国28|613ms|161Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 443
+  server: 116.202.172.99
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 德国08|904ms|23Mbps|机房|纯净度100.0%
+- port: 443
+  server: 116.202.172.99
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国09|896ms|27Mbps|机房|纯净度100.0%
+- type: http
+  server: 51.159.225.196
+  port: 23856
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 51.159.225.196
+  skip-cert-verify: true
+  name: 荷兰23|879ms|14Mbps|机房|纯净度100.0%
+- type: http
+  server: 159.69.94.125
+  port: 443
+  tls: true
+  sni: 159.69.94.125
+  skip-cert-verify: true
+  name: 德国10|926ms|14Mbps|机房|纯净度100.0%
+- password: None
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰24|876ms|18Mbps|机房|纯净度100.0%
+- port: 443
+  server: 159.69.94.125
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国11|929ms|16Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 443
+  server: 159.69.94.125
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 德国12|942ms|15Mbps|机房|纯净度100.0%
+- type: socks5
+  server: 103.248.150.50
+  port: 42000
+  username: paZFN3JA
+  password: EGJDy5Kg
+  name: 日本01|892ms|20Mbps|未知|纯净度100.0%
+- password: None
+  port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 法国03|963ms|18Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 23856
+  server: 51.159.225.196
+  skip-cert-verify: true
+  sni: 51.159.225.196
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰25|886ms|18Mbps|机房|纯净度100.0%
+- port: 19362
+  server: 51.159.225.197
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰26|967ms|17Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 法国04|967ms|17Mbps|机房|纯净度100.0%
+- type: http
+  server: 84.17.47.148
+  port: 9002
+  username: 'null'
+  password: None
+  tls: true
+  sni: 84.17.47.148
+  skip-cert-verify: true
+  name: 荷兰27|976ms|25Mbps|机房|纯净度96.4%
 - type: http
   server: 51.159.225.197
   port: 19362
   tls: true
   skip-cert-verify: true
-  name: 荷兰06|891ms|24Mbps|机房|纯净度100.0%
-- port: 19362
-  server: 51.159.225.197
+  name: 荷兰28|954ms|17Mbps|机房|纯净度100.0%
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.36
+  type: ss
+  name: 意大利05|771ms|19Mbps|机房|纯净度95.3%
+- password: None
+  port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰29|979ms|25Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.150
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰30|977ms|25Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.148
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 荷兰07|891ms|25Mbps|机房|纯净度100.0%
+  name: 荷兰31|990ms|25Mbps|机房|纯净度96.4%
 - type: http
-  server: 34.249.214.108
-  port: 443
+  server: 84.17.47.148
+  port: 9002
+  username: 'null'
+  password: 'null'
   tls: true
   skip-cert-verify: true
-  name: 爱尔兰06|903ms|26Mbps|机房|纯净度100.0%
+  name: 荷兰32|999ms|23Mbps|机房|纯净度96.4%
+- type: http
+  server: 51.159.225.196
+  port: 23856
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰33|883ms|18Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰34|996ms|25Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.150
+  port: 9002
+  tls: true
+  sni: 84.17.47.150
+  skip-cert-verify: true
+  name: 荷兰35|982ms|25Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.148
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 84.17.47.148
+  skip-cert-verify: true
+  name: 荷兰36|991ms|23Mbps|机房|纯净度96.4%
+- type: http
+  server: 87.98.174.157
+  port: 6103
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 87.98.174.157
+  skip-cert-verify: true
+  name: 法国05|980ms|17Mbps|机房|纯净度100.0%
+- port: 19362
+  server: 51.159.225.197
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰37|962ms|18Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.150
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰38|1004ms|30Mbps|机房|纯净度96.4%
+- password: 'null'
+  port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 法国06|1009ms|17Mbps|机房|纯净度100.0%
+- client-fingerprint: firefox
+  network: xhttp
+  port: 443
+  server: 193.160.208.240
+  servername: 193.160.208.240
+  tls: true
+  type: vless
+  udp: true
+  uuid: 4777d90d-265b-4927-a0d1-63f36ed1421c
+  xhttp-opts:
+    mode: auto
+    path: /assets/twru01/
+  name: 德国13|999ms|17Mbps|机房|纯净度100.0%
+- server: ws137.mydosss.ccwu.cc
+  port: 443
+  type: vless
+  uuid: 44be961e-c60d-463c-86d6-50ce6d8866c5
+  udp: true
+  tls: true
+  servername: ws137.mydosss.ccwu.cc
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /3b575ddc8596
+    headers:
+      Host: ws137.mydosss.ccwu.cc
+  name: 美国29|680ms|96Mbps|机房|纯净度98.7%
+- port: 9002
+  server: 84.17.47.150
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰39|974ms|22Mbps|机房|纯净度96.4%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.148
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰40|978ms|25Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  x-toolall-mihomo: true
+  name: 荷兰41|863ms|28Mbps|机房|纯净度96.4%
 - password: 'null'
   port: 443
   server: 134.65.17.77
@@ -993,7 +1485,62 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: BR03|903ms|26Mbps|机房|纯净度100.0%
+  name: BR01|1065ms|22Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: BR02|1060ms|16Mbps|机房|纯净度100.0%
+- server: 202.50.253.72
+  port: 19999
+  type: ss
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  name: 意大利06|845ms|9Mbps|机房|纯净度95.3%
+- password: None
+  port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: BR03|1067ms|20Mbps|机房|纯净度100.0%
+- port: 443
+  server: 103.82.101.44
+  skip-cert-verify: true
+  sni: f3a61d8406d537345747f99f8a281007-3f754ed5da1bba09.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 法国07|1052ms|23Mbps|机房|纯净度99.2%
+- port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: BR04|1045ms|15Mbps|机房|纯净度100.0%
+- type: http
+  server: 134.65.17.77
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 134.65.17.77
+  skip-cert-verify: true
+  name: BR05|1078ms|17Mbps|机房|纯净度100.0%
+- port: 443
+  server: 134.65.17.77
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: BR06|1089ms|18Mbps|机房|纯净度100.0%
 - client-fingerprint: chrome
   network: xhttp
   port: 443
@@ -1007,79 +1554,273 @@ proxies:
     host: d1ivx1xk58pr8u.cloudfront.net
     path: /cf
   xudp: true
-  name: 芬兰01|869ms|18Mbps|机房|纯净度99.9%
-- type: ss
-  server: 202.50.253.90
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利01|905ms|21Mbps|机房|纯净度95.3%
+  name: 芬兰01|971ms|16Mbps|机房|纯净度99.9%
+- password: DJy1T0dt
+  port: 42000
+  server: 144.225.47.161
+  skip-cert-verify: true
+  type: socks5
+  username: Tek2x6av
+  name: MX03|677ms|24Mbps|机房|纯净度100.0%
 - port: 443
-  server: 134.65.17.77
+  server: 185.246.153.42
+  skip-cert-verify: true
+  sni: 482c8436a1f7c908b48a1757abb5dd79-3791fb4df2db250b.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰42|1117ms|18Mbps|机房|纯净度99.6%
+- server: 193.160.208.240
+  port: 443
+  type: vless
+  uuid: 4777d90d-265b-4927-a0d1-63f36ed1421c
+  udp: true
+  tls: true
+  network: xhttp
+  xhttp-opts:
+    path: /assets/twru01/
+    mode: auto
+  name: 德国14|1041ms|8Mbps|机房|纯净度100.0%
+- port: 443
+  server: 185.246.153.28
+  skip-cert-verify: true
+  sni: 4a8c2906c96058315dffbc2b0e7ff19b-0c66a58858a795df.apache-iv.com
+  tls: true
+  type: http
+  name: 荷兰43|1125ms|26Mbps|机房|纯净度99.6%
+- type: http
+  server: 107.91.88.70
+  port: 8443
+  tls: true
+  sni: 107.91.88.70
+  skip-cert-verify: true
+  name: 美国30|1021ms|10Mbps|移动网络|纯净度100.0%
+- port: 443
+  server: 176.94.74.21
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: BR04|886ms|25Mbps|机房|纯净度100.0%
-- type: ss
-  server: 202.50.253.90
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: false
-  name: 意大利02|886ms|21Mbps|机房|纯净度95.3%
+  name: 德国15|964ms|7Mbps|住宅|纯净度100.0%
 - port: 9002
-  server: 84.17.47.148
+  server: 193.176.84.21
+  skip-cert-verify: true
+  sub_tag: Z001-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚01|1123ms|13Mbps|机房|纯净度100.0%
+- type: http
+  server: 84.17.47.147
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 84.17.47.147
+  skip-cert-verify: true
+  name: 荷兰44|841ms|28Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 193.176.84.25
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 荷兰08|910ms|32Mbps|机房|纯净度96.4%
+  name: 罗马尼亚02|1147ms|5Mbps|机房|纯净度100.0%
+- port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 法国08|977ms|17Mbps|机房|纯净度100.0%
+- server: 104.171.133.213
+  port: 443
+  type: vless
+  uuid: 7ad63b26-bf70-4872-8fab-ebaf73a1e19d
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: mirror-75.topp-con.xyz
+  client-fingerprint: firefox
+  network: tcp
+  name: 芬兰02|1208ms|17Mbps|机房|纯净度99.9%
+- type: http
+  server: 62.90.77.30
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 以色列01|1231ms|13Mbps|未知|纯净度100.0%
+- port: 443
+  server: 62.90.77.30
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 以色列02|1242ms|12Mbps|未知|纯净度100.0%
+- password: None
+  port: 443
+  server: 87.106.223.158
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 德国16|1251ms|26Mbps|机房|纯净度99.6%
 - password: 'null'
   port: 443
-  server: 134.65.17.77
+  server: 87.106.223.158
   skip-cert-verify: true
   tls: true
   type: http
   username: 'null'
-  name: BR05|924ms|24Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 84.17.47.148
-  skip-cert-verify: true
-  tls: true
-  type: http
   udp: true
-  name: 荷兰09|914ms|33Mbps|机房|纯净度96.4%
-- port: 443
-  server: 134.65.17.77
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: BR06|911ms|24Mbps|机房|纯净度100.0%
-- type: ss
-  server: 202.50.253.36
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: false
-  name: 意大利03|885ms|24Mbps|机房|纯净度95.3%
+  name: 德国17|1001ms|26Mbps|机房|纯净度99.6%
 - type: http
-  server: 51.159.225.196
-  port: 23856
+  server: 77.221.136.60
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 德国18|1222ms|6Mbps|机房|纯净度100.0%
+- password: None
+  port: 443
+  server: 62.90.77.30
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 以色列03|1240ms|12Mbps|未知|纯净度100.0%
+- port: 9002
+  server: 193.176.84.21
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚03|1249ms|6Mbps|机房|纯净度100.0%
+- port: 8443
+  server: 77.221.136.60
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国19|1258ms|6Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.39
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  name: 罗马尼亚04|1212ms|17Mbps|机房|纯净度100.0%
+- port: 443
+  server: 185.219.159.15
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 拉脱维亚01|1155ms|17Mbps|机房|纯净度99.0%
+- type: http
+  server: 87.106.223.158
+  port: 443
   username: 'null'
   password: 'null'
   tls: true
   skip-cert-verify: true
-  name: 荷兰10|929ms|27Mbps|机房|纯净度100.0%
+  name: 德国20|1140ms|28Mbps|机房|纯净度99.6%
+- type: http
+  server: 185.219.159.15
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 拉脱维亚02|1284ms|14Mbps|机房|纯净度99.0%
+- type: http
+  server: 34.249.214.108
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 爱尔兰11|817ms|23Mbps|机房|纯净度100.0%
+- password: None
+  port: 443
+  server: 87.106.223.158
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 德国21|1296ms|28Mbps|机房|纯净度99.6%
+- password: None
+  port: 443
+  server: 185.219.159.16
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 拉脱维亚03|1226ms|18Mbps|机房|纯净度99.0%
+- server: 129.101.100.219
+  port: 443
+  type: vless
+  uuid: 7ad63b26-bf70-4872-8fab-ebaf73a1e19d
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: db-28.topp-con.xyz
+  client-fingerprint: firefox
+  network: tcp
+  name: 芬兰03|1210ms|18Mbps|机房|纯净度99.9%
+- password: None
+  port: 9002
+  server: 193.176.84.39
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚05|1266ms|12Mbps|机房|纯净度100.0%
+- type: http
+  server: 62.90.77.30
+  port: 443
+  tls: true
+  sni: 62.90.77.30
+  skip-cert-verify: true
+  name: 以色列04|1249ms|11Mbps|未知|纯净度100.0%
+- type: http
+  server: 185.219.159.16
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 拉脱维亚04|1205ms|15Mbps|机房|纯净度99.0%
+- server: 108.156.65.62
+  port: 443
+  type: vless
+  uuid: 2e69b088-6ef3-417f-8247-125cf257fafd
+  udp: true
+  tls: true
+  servername: d1ivx1xk58pr8u.cloudfront.net
+  client-fingerprint: chrome
+  network: xhttp
+  xhttp-opts:
+    path: /cf
+    host: d1ivx1xk58pr8u.cloudfront.net
+  name: 芬兰04|1024ms|15Mbps|机房|纯净度99.9%
+- password: None
+  port: 9002
+  server: 193.176.84.18
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 罗马尼亚06|1191ms|17Mbps|机房|纯净度100.0%
 - client-fingerprint: chrome
   network: xhttp
   port: 4443
@@ -1093,872 +1834,31 @@ proxies:
     host: bl1.nexfile.net
     mode: auto
     path: /api/v1/sync/
-  name: 波兰01|918ms|31Mbps|机房|纯净度100.0%
+  name: 波兰01|1182ms|25Mbps|机房|纯净度100.0%
 - password: None
   port: 9002
-  server: 84.17.47.148
+  server: 193.176.84.21
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 荷兰11|910ms|32Mbps|机房|纯净度96.4%
-- password: 'null'
-  port: 9002
-  server: 84.17.47.148
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰12|923ms|32Mbps|机房|纯净度96.4%
-- password: None
-  port: 443
-  server: 34.249.214.108
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 爱尔兰07|913ms|31Mbps|机房|纯净度100.0%
-- type: http
-  server: 84.17.47.148
-  port: 9002
-  username: 'null'
-  password: None
-  tls: true
-  sni: 84.17.47.148
-  skip-cert-verify: true
-  name: 荷兰13|909ms|30Mbps|机房|纯净度96.4%
-- server: 108.156.65.62
-  port: 443
-  type: vless
-  uuid: 2e69b088-6ef3-417f-8247-125cf257fafd
-  udp: true
-  tls: true
-  servername: d1ivx1xk58pr8u.cloudfront.net
-  client-fingerprint: chrome
-  network: xhttp
-  xhttp-opts:
-    path: /cf
-    host: d1ivx1xk58pr8u.cloudfront.net
-  name: 芬兰02|840ms|16Mbps|机房|纯净度99.9%
-- server: 104.171.133.213
-  port: 443
-  type: vless
-  uuid: 7ad63b26-bf70-4872-8fab-ebaf73a1e19d
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: mirror-75.topp-con.xyz
-  client-fingerprint: firefox
-  network: tcp
-  name: 芬兰03|869ms|22Mbps|机房|纯净度99.9%
-- server: 129.101.100.219
-  port: 443
-  type: vless
-  uuid: 7ad63b26-bf70-4872-8fab-ebaf73a1e19d
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: db-28.topp-con.xyz
-  client-fingerprint: firefox
-  network: tcp
-  name: 芬兰04|894ms|21Mbps|机房|纯净度99.9%
-- password: 'null'
-  port: 443
-  server: 34.249.214.108
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 爱尔兰08|913ms|29Mbps|机房|纯净度100.0%
-- port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰14|933ms|22Mbps|机房|纯净度100.0%
-- type: http
-  server: 84.17.47.148
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 84.17.47.148
-  skip-cert-verify: true
-  name: 荷兰15|906ms|31Mbps|机房|纯净度96.4%
-- type: http
-  server: 84.17.47.148
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰16|938ms|30Mbps|机房|纯净度96.4%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.90
-  type: ss
-  name: 意大利04|884ms|21Mbps|机房|纯净度95.3%
-- password: None
-  port: 9002
-  server: 193.176.84.18
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 罗马尼亚01|948ms|14Mbps|机房|纯净度100.0%
-- type: socks5
-  server: 103.248.150.50
-  port: 42000
-  username: paZFN3JA
-  password: EGJDy5Kg
-  name: 日本01|957ms|20Mbps|未知|纯净度100.0%
-- type: ss
-  server: 202.50.253.72
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: false
-  name: 意大利05|864ms|22Mbps|机房|纯净度95.3%
-- password: 'null'
-  port: 9002
-  server: 84.17.47.147
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰17|962ms|14Mbps|机房|纯净度96.4%
-- password: 'null'
-  port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 法国03|959ms|11Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 法国04|975ms|7Mbps|机房|纯净度100.0%
-- port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 法国05|969ms|24Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  sni: 51.159.225.196
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰18|938ms|26Mbps|机房|纯净度100.0%
+  name: 罗马尼亚07|1130ms|6Mbps|机房|纯净度100.0%
 - port: 9002
-  server: 193.176.84.19
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚02|954ms|12Mbps|机房|纯净度100.0%
-- server: jp032009.ssgreen.org
-  port: 443
-  type: vmess
-  uuid: 3734800b-3191-470b-ac36-86b18e3a826e
-  alterId: 0
-  cipher: auto
-  udp: true
-  tls: true
-  servername: JP032009.ssgreen.org
-  network: ws
-  ws-opts:
-    path: /wes
-    headers:
-      Host: JP032009.ssgreen.org
-  name: 日本02|919ms|18Mbps|机房|纯净度100.0%
-- type: http
-  server: 51.159.225.196
-  port: 23856
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰19|961ms|27Mbps|机房|纯净度100.0%
-- type: http
-  server: 51.158.243.91
-  port: 443
-  tls: true
-  sni: 51.158.243.91
-  skip-cert-verify: true
-  name: 荷兰20|991ms|22Mbps|机房|纯净度99.7%
-- port: 9002
-  server: 193.176.84.18
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚03|951ms|14Mbps|机房|纯净度100.0%
-- port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰21|966ms|25Mbps|机房|纯净度100.0%
-- password: None
-  port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 法国06|991ms|23Mbps|机房|纯净度100.0%
-- type: http
-  server: 51.159.225.196
-  port: 23856
-  username: 'null'
-  password: None
-  tls: true
-  sni: 51.159.225.196
-  skip-cert-verify: true
-  name: 荷兰22|926ms|28Mbps|机房|纯净度100.0%
-- type: http
-  server: 51.159.225.196
-  port: 23856
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 51.159.225.196
-  skip-cert-verify: true
-  name: 荷兰23|972ms|29Mbps|机房|纯净度100.0%
-- port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国07|980ms|11Mbps|机房|纯净度100.0%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.90
-  sub_tag: C001-260618
-  type: ss
-  udp: true
-  name: 意大利06|878ms|21Mbps|机房|纯净度95.3%
-- password: 'null'
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰24|961ms|27Mbps|机房|纯净度100.0%
-- server: 162.35.38.156
-  port: 443
-  type: vless
-  uuid: a88d4614-2134-404c-9479-6aba1ca9cdfd
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: 2499dbt.us12.h1clayd.click
-  reality-opts:
-    public-key: UkUbCx7k5ykWTJTr1jqCOxns6TwvTAbfR0JvJzuALjM
-    short-id: a62b22480f962a1d
-  client-fingerprint: chrome
-  network: tcp
-  name: 美国28|741ms|6Mbps|机房|纯净度99.8%
-- password: 'null'
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  username: 'null'
-  name: 荷兰25|968ms|27Mbps|机房|纯净度100.0%
-- server: 202.50.253.99
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  name: 意大利07|840ms|24Mbps|机房|纯净度95.3%
-- type: http
-  server: 51.158.243.91
-  port: 443
-  username: 'null'
-  password: None
-  tls: true
-  sni: 51.158.243.91
-  skip-cert-verify: true
-  name: 荷兰26|991ms|20Mbps|机房|纯净度99.7%
-- password: 'null'
-  port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰27|1000ms|20Mbps|机房|纯净度99.7%
-- port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰28|992ms|19Mbps|机房|纯净度99.7%
-- server: 147.45.153.29
-  port: 443
-  type: vless
-  uuid: 7ad63b26-bf70-4872-8fab-ebaf73a1e19d
-  udp: true
-  tls: true
-  flow: xtls-rprx-vision
-  servername: patch-46.topp-con.xyz
-  reality-opts:
-    public-key: LEziyH-E4k9hehGRJkVi1FadVObB_NZJy8U7oUCVWXU
-    short-id: b9120cd53ffd7bba
-  client-fingerprint: chrome
-  network: tcp
-  name: 德国05|969ms|17Mbps|机房|纯净度99.8%
-- password: None
-  port: 9002
-  server: 193.176.84.19
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚04|980ms|24Mbps|机房|纯净度100.0%
-- server: 195.133.88.165
-  port: 2096
-  type: vless
-  uuid: 399049fd-9cd6-4425-8114-6ea2f5040fe4
-  udp: true
-  tls: true
-  servername: velvet-ridge.justext.space
-  client-fingerprint: firefox
-  network: tcp
-  name: 奥地利02|1026ms|22Mbps|机房|纯净度100.0%
-- port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰29|990ms|21Mbps|机房|纯净度99.7%
-- password: None
-  port: 443
-  server: 51.158.243.91
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 荷兰30|1009ms|21Mbps|机房|纯净度99.7%
-- type: http
-  server: 159.69.94.125
-  port: 443
-  tls: true
-  sni: 159.69.94.125
-  skip-cert-verify: true
-  name: 德国06|1040ms|22Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.19
-  port: 9002
+  server: 193.176.84.25
   skip-cert-verify: true
   sni: www.bing.com
   tls: true
-  name: 罗马尼亚05|939ms|23Mbps|机房|纯净度100.0%
-- server: 202.50.253.36
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  name: 意大利08|919ms|13Mbps|机房|纯净度95.3%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.19
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 罗马尼亚06|964ms|9Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.19
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚07|1019ms|22Mbps|机房|纯净度100.0%
-- port: 443
-  server: 159.69.94.125
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
   type: http
   udp: true
-  name: 德国07|1041ms|24Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 443
-  server: 159.69.94.125
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 德国08|1057ms|23Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 84.17.47.150
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰31|669ms|32Mbps|机房|纯净度96.4%
-- type: http
-  server: 84.17.47.147
-  port: 9002
-  username: 'null'
-  password: None
-  tls: true
-  sni: 84.17.47.147
-  skip-cert-verify: true
-  name: 荷兰32|1042ms|19Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.126
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  x-toolall-mihomo: true
-  name: 荷兰33|1039ms|6Mbps|机房|纯净度96.4%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.45
-  sub_tag: A004-260618
-  type: ss
-  udp: true
-  name: 意大利09|823ms|20Mbps|机房|纯净度95.3%
-- password: None
-  port: 9002
-  server: 84.17.47.147
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 荷兰34|1079ms|17Mbps|机房|纯净度96.4%
-- type: http
-  server: 84.17.47.147
-  port: 9002
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰35|1095ms|17Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 84.17.47.147
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰36|1117ms|17Mbps|机房|纯净度96.4%
-- type: http
-  server: 84.17.47.147
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 84.17.47.147
-  skip-cert-verify: true
-  name: 荷兰37|967ms|19Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 84.17.47.126
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  x-toolall-mihomo: true
-  name: 荷兰38|1100ms|21Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 84.17.47.147
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰39|1098ms|19Mbps|机房|纯净度96.4%
-- port: 443
-  server: 213.109.163.119
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国09|1114ms|22Mbps|机房|纯净度99.8%
-- type: http
-  server: 213.109.163.119
-  port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 213.109.163.119
-  skip-cert-verify: true
-  name: 德国10|1124ms|17Mbps|机房|纯净度99.8%
-- password: ''
-  port: 9002
-  server: 84.17.47.147
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 荷兰40|1046ms|19Mbps|机房|纯净度96.4%
-- port: 443
-  server: 213.109.163.119
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 德国11|1107ms|21Mbps|机房|纯净度99.8%
-- password: 'null'
-  port: 443
-  server: 213.109.163.119
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 德国12|1126ms|18Mbps|机房|纯净度99.8%
-- password: 'null'
-  port: 9002
-  server: 84.17.47.147
-  skip-cert-verify: true
-  sni: 84.17.47.147
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰41|1108ms|18Mbps|机房|纯净度96.4%
-- password: None
-  port: 443
-  server: 213.109.163.119
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国13|1121ms|20Mbps|机房|纯净度99.8%
-- type: http
-  server: 213.109.163.119
-  port: 443
-  tls: true
-  sni: 213.109.163.119
-  skip-cert-verify: true
-  name: 德国14|1134ms|20Mbps|机房|纯净度99.8%
-- type: http
-  server: 185.219.159.16
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 拉脱维亚01|1141ms|19Mbps|机房|纯净度99.0%
-- port: 443
-  server: 87.106.223.158
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  x-toolall-mihomo: true
-  name: 德国15|1141ms|17Mbps|机房|纯净度99.6%
-- password: None
-  port: 23856
-  server: 51.159.225.196
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰42|943ms|26Mbps|机房|纯净度100.0%
-- type: http
-  server: 77.221.136.60
-  port: 8443
-  tls: true
-  skip-cert-verify: true
-  name: 德国16|1163ms|4Mbps|机房|纯净度100.0%
-- type: http
-  server: 185.219.159.16
-  port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 拉脱维亚02|1148ms|21Mbps|机房|纯净度99.0%
-- port: 9002
-  server: 193.176.84.19
-  skip-cert-verify: true
-  sni: www.bing.com
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚08|1044ms|24Mbps|机房|纯净度100.0%
-- password: None
-  port: 443
-  server: 185.219.159.16
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 拉脱维亚03|1166ms|21Mbps|机房|纯净度99.0%
-- password: 'null'
-  port: 443
-  server: 87.106.223.158
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 德国17|1172ms|17Mbps|机房|纯净度99.6%
-- port: 8443
-  server: 77.221.136.60
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国18|1167ms|6Mbps|机房|纯净度100.0%
-- password: None
-  port: 443
-  server: 185.219.159.16
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 拉脱维亚04|1196ms|20Mbps|机房|纯净度99.0%
-- type: http
-  server: 185.219.159.15
-  port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 拉脱维亚05|1189ms|22Mbps|机房|纯净度99.0%
-- type: http
-  server: 87.106.223.158
-  port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 德国19|1081ms|18Mbps|机房|纯净度99.6%
+  name: 罗马尼亚08|1112ms|7Mbps|机房|纯净度100.0%
 - port: 443
   server: 185.219.159.15
   skip-cert-verify: true
   tls: true
   type: http
   udp: true
-  name: 拉脱维亚06|1216ms|22Mbps|机房|纯净度99.0%
-- port: 9002
-  server: 193.176.84.40
-  skip-cert-verify: true
-  sub_tag: Z001-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚09|1210ms|10Mbps|机房|纯净度100.0%
-- port: 443
-  server: 185.219.159.16
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 拉脱维亚07|1174ms|20Mbps|机房|纯净度99.0%
-- port: 443
-  server: 34.249.214.108
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 爱尔兰09|924ms|28Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.34
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚10|1211ms|19Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.34
-  port: 9002
-  skip-cert-verify: true
-  tls: true
-  name: 罗马尼亚11|1184ms|18Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.34
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚12|1249ms|18Mbps|机房|纯净度100.0%
-- port: 443
-  server: 185.219.159.15
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 拉脱维亚08|1218ms|22Mbps|机房|纯净度99.0%
-- port: 9002
-  server: 193.176.84.34
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚13|1201ms|17Mbps|机房|纯净度100.0%
-- type: http
-  server: 107.91.88.70
-  port: 8443
-  tls: true
-  sni: 107.91.88.70
-  skip-cert-verify: true
-  name: 美国29|1248ms|11Mbps|移动网络|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.27
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  x-toolall-mihomo: true
-  name: 罗马尼亚14|1221ms|24Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.34
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 罗马尼亚15|1226ms|17Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.40
-  port: 9002
-  skip-cert-verify: true
-  tls: true
-  name: 罗马尼亚16|1275ms|16Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.34
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚17|1231ms|18Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.39
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚18|1284ms|16Mbps|机房|纯净度100.0%
-- type: ss
-  server: 202.50.253.45
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利10|967ms|15Mbps|机房|纯净度95.3%
-- password: None
-  port: 9002
-  server: 193.176.84.40
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚19|1226ms|18Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.34
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚20|1236ms|18Mbps|机房|纯净度100.0%
-- port: 443
-  server: 176.94.74.21
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国20|1290ms|14Mbps|住宅|纯净度100.0%
-- type: http
-  server: 62.90.77.30
-  port: 443
-  tls: true
-  sni: 62.90.77.30
-  skip-cert-verify: true
-  name: 以色列01|1306ms|19Mbps|未知|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.40
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚21|1212ms|10Mbps|机房|纯净度100.0%
+  name: 拉脱维亚05|1290ms|18Mbps|机房|纯净度99.0%
 - password: 'null'
   port: 9002
   server: 193.176.84.33
@@ -1969,24 +1869,57 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚22|1297ms|20Mbps|机房|纯净度100.0%
+  name: 罗马尼亚09|1270ms|9Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.39
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚10|1246ms|12Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.33
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚11|1309ms|5Mbps|机房|纯净度100.0%
+- type: http
+  server: 103.153.135.118
+  port: 443
+  tls: true
+  sni: 103.153.135.118
+  skip-cert-verify: true
+  name: 印度尼西亚01|1341ms|14Mbps|住宅|纯净度98.2%
+- type: http
+  server: 185.219.159.16
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 拉脱维亚06|1308ms|13Mbps|机房|纯净度99.0%
+- port: 9002
+  server: 193.176.84.25
   skip-cert-verify: true
   sni: www.bing.com
   tls: true
   type: http
-  name: 罗马尼亚23|1333ms|9Mbps|机房|纯净度100.0%
+  name: 罗马尼亚12|1114ms|12Mbps|机房|纯净度100.0%
 - password: None
   port: 443
-  server: 62.90.77.30
+  server: 185.219.159.16
   skip-cert-verify: true
   sub_tag: K001-260618
   tls: true
   type: http
   username: ''
   udp: true
-  name: 以色列02|1292ms|20Mbps|未知|纯净度100.0%
+  name: 拉脱维亚07|1191ms|18Mbps|机房|纯净度99.0%
 - type: http
   server: 193.176.84.40
   port: 9002
@@ -1994,87 +1927,31 @@ proxies:
   password: None
   tls: true
   skip-cert-verify: true
-  name: 罗马尼亚24|1278ms|18Mbps|机房|纯净度100.0%
+  name: 罗马尼亚13|1352ms|12Mbps|机房|纯净度100.0%
 - type: http
-  server: 62.90.77.30
-  port: 443
+  server: 193.176.84.34
+  port: 9002
+  username: 'null'
+  password: 'null'
   tls: true
   skip-cert-verify: true
-  name: 以色列03|1287ms|20Mbps|未知|纯净度100.0%
+  name: 罗马尼亚14|1360ms|6Mbps|机房|纯净度100.0%
+- password: None
+  port: 8443
+  server: 18.206.28.143
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 美国31|825ms|19Mbps|机房|纯净度100.0%
 - password: None
   port: 9002
-  server: 193.176.84.39
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚25|1311ms|9Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.33
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚26|1320ms|16Mbps|机房|纯净度100.0%
-- port: 443
-  server: 62.90.77.30
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 以色列04|1296ms|19Mbps|未知|纯净度100.0%
-- port: 9002
-  server: 193.176.84.33
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚27|1320ms|11Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.33
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 罗马尼亚28|1309ms|11Mbps|机房|纯净度100.0%
-- type: http
-  server: 103.153.135.118
-  port: 443
-  tls: true
-  sni: 103.153.135.118
-  skip-cert-verify: true
-  name: 印度尼西亚01|1321ms|12Mbps|住宅|纯净度98.2%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.99
-  type: ss
-  udp: true
-  name: 意大利11|808ms|24Mbps|机房|纯净度95.3%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.39
-  skip-cert-verify: true
-  sni: 193.176.84.39
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚29|1371ms|16Mbps|机房|纯净度100.0%
-- port: 9002
   server: 193.176.84.40
   skip-cert-verify: true
-  sni: www.bing.com
+  sub_tag: P002-260618
   tls: true
   type: http
-  name: 罗马尼亚30|1312ms|12Mbps|机房|纯净度100.0%
+  udp: true
+  name: 罗马尼亚15|1390ms|13Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.33
   skip-cert-verify: true
@@ -2082,125 +1959,335 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚31|1386ms|18Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.33
+  name: 罗马尼亚16|1258ms|8Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.34
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
-  username: 'null'
   udp: true
-  name: 罗马尼亚32|1341ms|19Mbps|机房|纯净度100.0%
+  name: 罗马尼亚17|1424ms|8Mbps|机房|纯净度100.0%
 - type: http
-  server: 14.225.71.128
-  port: 8443
-  tls: true
-  skip-cert-verify: true
-  name: 越南01|1342ms|13Mbps|住宅|纯净度100.0%
-- port: 9002
-  server: 193.176.84.21
-  skip-cert-verify: true
-  sub_tag: Z001-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚33|1346ms|16Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.21
+  server: 193.176.84.19
+  port: 9002
   skip-cert-verify: true
   sni: www.bing.com
   tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚34|1400ms|17Mbps|机房|纯净度100.0%
-- port: 443
-  server: 91.92.250.33
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 波兰02|1027ms|21Mbps|机房|纯净度100.0%
-- type: socks5
-  server: 66.80.2.252
-  port: 62000
-  username: usereb7d
-  password: c0a34a
-  name: 新加坡01|1431ms|15Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.25
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚35|1416ms|8Mbps|机房|纯净度100.0%
+  name: 罗马尼亚18|1442ms|9Mbps|机房|纯净度100.0%
 - type: http
-  server: 193.176.84.25
-  port: 9002
-  skip-cert-verify: true
-  tls: true
-  name: 罗马尼亚36|1371ms|8Mbps|机房|纯净度100.0%
-- type: socks5
-  server: 168.222.8.4
-  port: 42000
-  username: JPjarpW3
-  password: ao3W5ZML
-  name: 泰国01|1444ms|14Mbps|机房|纯净度100.0%
-- port: 443
-  server: 217.92.132.233
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 德国21|1225ms|12Mbps|住宅|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.25
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚37|1404ms|18Mbps|机房|纯净度100.0%
-- type: http
-  server: 34.249.214.108
+  server: 151.115.54.133
   port: 443
+  username: 'null'
+  password: 'null'
   tls: true
-  sni: 34.249.214.108
+  sni: 151.115.54.133
   skip-cert-verify: true
-  name: 爱尔兰10|1060ms|30Mbps|机房|纯净度100.0%
+  name: 波兰02|1283ms|24Mbps|机房|纯净度99.9%
 - password: None
   port: 9002
-  server: 193.176.84.21
+  server: 193.176.84.34
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚38|1411ms|18Mbps|机房|纯净度100.0%
-- port: 9002
+  name: 罗马尼亚19|1417ms|13Mbps|机房|纯净度100.0%
+- type: http
   server: 193.176.84.25
+  port: 9002
   skip-cert-verify: true
-  sni: www.bing.com
   tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚39|1418ms|18Mbps|机房|纯净度100.0%
+  name: 罗马尼亚20|1257ms|5Mbps|机房|纯净度100.0%
 - type: socks5
   server: 131.143.142.21
   port: 62000
   username: uhugtm4f
   password: oogf0v53
-  name: 泰国02|1493ms|12Mbps|机房|纯净度100.0%
+  name: 泰国01|1328ms|11Mbps|机房|纯净度100.0%
 - type: http
   server: 193.176.84.39
   port: 9002
   skip-cert-verify: true
   tls: true
-  name: 罗马尼亚40|1317ms|6Mbps|机房|纯净度100.0%
+  name: 罗马尼亚21|1329ms|13Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.34
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚22|1370ms|7Mbps|机房|纯净度100.0%
+- type: http
+  server: 14.225.71.128
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 越南01|1453ms|12Mbps|住宅|纯净度100.0%
+- type: ss
+  server: 202.50.253.27
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: false
+  name: 意大利07|681ms|13Mbps|机房|纯净度95.3%
+- port: 9002
+  server: 193.176.84.40
+  skip-cert-verify: true
+  sub_tag: Z001-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚23|1390ms|7Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.34
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  name: 罗马尼亚24|1379ms|7Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.19
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚25|1328ms|8Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.19
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚26|1410ms|18Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.19
+  skip-cert-verify: true
+  sni: www.bing.com
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚27|1353ms|12Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.18
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚28|1143ms|14Mbps|机房|纯净度100.0%
+- port: 443
+  server: 185.219.159.16
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 拉脱维亚08|1314ms|18Mbps|机房|纯净度99.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.40
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚29|1373ms|7Mbps|机房|纯净度100.0%
+- type: socks5
+  server: 192.204.15.135
+  port: 42000
+  username: X3s3JteD
+  password: mpbK00Pl
+  name: 泰国02|1533ms|11Mbps|住宅|纯净度100.0%
+- type: socks5
+  server: 168.222.8.4
+  port: 42000
+  username: JPjarpW3
+  password: ao3W5ZML
+  name: 泰国03|1576ms|9Mbps|机房|纯净度100.0%
+- type: socks5
+  server: 203.84.138.59
+  port: 62000
+  username: 9tcjLp2W
+  password: RRWtX6XP
+  name: 印度尼西亚02|1584ms|10Mbps|未知|纯净度100.0%
+- type: socks5
+  server: 103.248.150.166
+  port: 42000
+  username: x0dM1dTw
+  password: ZWCdC3C1
+  name: 日本02|1408ms|12Mbps|未知|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.19
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 罗马尼亚30|1236ms|15Mbps|机房|纯净度100.0%
+- type: socks5
+  server: 66.80.2.252
+  port: 62000
+  username: usereb7d
+  password: c0a34a
+  name: 新加坡01|1676ms|13Mbps|机房|纯净度100.0%
+- type: socks5
+  server: 82.47.152.95
+  port: 42000
+  username: userLjVB
+  password: Ks4Iab43
+  name: 泰国04|1698ms|7Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.19
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 罗马尼亚31|1500ms|16Mbps|机房|纯净度100.0%
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.18
+  type: ss
+  udp: true
+  name: 意大利08|1554ms|22Mbps|机房|纯净度95.3%
+- password: None
+  port: 9002
+  server: 193.176.84.27
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  x-toolall-mihomo: true
+  name: 罗马尼亚32|1568ms|8Mbps|机房|纯净度100.0%
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.54
+  type: ss
+  udp: true
+  name: 意大利09|932ms|17Mbps|机房|纯净度95.3%
+- type: ss
+  server: 202.50.253.54
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: false
+  name: 意大利10|938ms|24Mbps|机房|纯净度95.3%
+- type: http
+  server: 193.176.84.40
+  port: 9002
+  skip-cert-verify: true
+  tls: true
+  name: 罗马尼亚33|1454ms|6Mbps|机房|纯净度100.0%
+- port: 443
+  server: 141.94.16.4
+  skip-cert-verify: true
+  sni: 141.94.16.4
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 法国09|1257ms|14Mbps|机房|纯净度99.8%
+- port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 法国10|1018ms|15Mbps|机房|纯净度100.0%
+- port: 8443
+  server: 44.217.145.28
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 美国32|189ms|34Mbps|机房|纯净度100.0%
+- server: 3.174.189.0
+  port: 443
+  type: vless
+  uuid: 2e69b088-6ef3-417f-8247-125cf257fafd
+  udp: true
+  tls: true
+  servername: d1b9pmaut2v26v.cloudfront.net
+  client-fingerprint: chrome
+  network: xhttp
+  xhttp-opts:
+    path: /cf
+    host: d1b9pmaut2v26v.cloudfront.net
+  name: 德国22|1402ms|4Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.34
+  port: 9002
+  skip-cert-verify: true
+  tls: true
+  name: 罗马尼亚34|1398ms|10Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.33
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 罗马尼亚35|1279ms|8Mbps|机房|纯净度100.0%
+- alpn:
+  - http/1.1
+  client-fingerprint: chrome
+  encryption: none
+  network: ws
+  port: 8443
+  server: 104.17.70.206
+  servername: free.sahanwickramasinghe.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: 3692de53-42e6-4aed-a522-40ec355dcd2f
+  ws-opts:
+    headers:
+      Host: free.sahanwickramasinghe.com
+      User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML,
+        like Gecko) Chrome/46.0.2490.86 Safari/537.36
+    path: /
+  xudp: true
+  name: 德国23|1343ms|24Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.19
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚36|1355ms|10Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 443
+  server: 103.97.88.154
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  username: 'null'
+  name: 荷兰45|1123ms|17Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.33
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚37|1323ms|6Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 9002
   server: 193.176.84.21
@@ -2210,153 +2297,63 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚41|1335ms|17Mbps|机房|纯净度100.0%
-- type: socks5
-  server: 103.248.150.166
-  port: 42000
-  username: x0dM1dTw
-  password: ZWCdC3C1
-  name: 日本03|1620ms|20Mbps|未知|纯净度100.0%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  name: 罗马尼亚38|1304ms|7Mbps|机房|纯净度100.0%
+- server: 202.50.253.18
   port: 19999
-  server: 202.50.253.90
   type: ss
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  name: 意大利11|1128ms|21Mbps|机房|纯净度95.3%
+- port: 443
+  server: 103.97.88.154
+  skip-cert-verify: true
+  sni: 4a8c2906c96058315dffbc2b0e7ff19b-98005bea43f9ac33.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
   udp: true
-  name: 意大利12|1024ms|22Mbps|机房|纯净度95.3%
+  name: 荷兰46|1163ms|20Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.33
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚39|1304ms|10Mbps|机房|纯净度100.0%
 - type: ss
   server: 202.50.253.54
   port: 19999
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   cipher: aes-256-gcm
-  udp: true
   tls: false
   skip-cert-verify: false
-  name: 意大利13|1206ms|5Mbps|机房|纯净度95.3%
-- type: ss
-  server: 202.50.253.18
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: false
-  name: 意大利14|938ms|15Mbps|机房|纯净度95.3%
+  name: 意大利12|1026ms|15Mbps|机房|纯净度95.3%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
   server: 202.50.253.72
   type: ss
-  name: 意大利15|847ms|22Mbps|机房|纯净度95.3%
+  udp: true
+  name: 意大利13|778ms|19Mbps|机房|纯净度95.3%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
   server: 202.50.253.45
-  type: ss
-  name: 意大利16|807ms|21Mbps|机房|纯净度95.3%
-- type: ss
-  server: 202.50.253.54
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利17|1135ms|5Mbps|机房|纯净度95.3%
-- type: ss
-  server: 202.50.253.27
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利18|1036ms|12Mbps|机房|纯净度95.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.99
   sub_tag: A004-260618
   type: ss
   udp: true
-  name: 意大利19|1050ms|22Mbps|机房|纯净度95.3%
-- password: None
-  port: 443
-  server: 154.26.139.24
+  name: 意大利14|893ms|18Mbps|机房|纯净度95.3%
+- port: 443
+  server: 152.69.230.221
   skip-cert-verify: true
-  sub_tag: K001-260618
+  sub_tag: R002-260618
   tls: true
   type: http
-  username: ''
   udp: true
-  name: 新加坡02|1716ms|10Mbps|机房|纯净度99.3%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.54
-  type: ss
-  udp: true
-  name: 意大利20|838ms|5Mbps|机房|纯净度95.3%
-- type: socks5
-  server: 192.204.15.135
-  port: 42000
-  username: X3s3JteD
-  password: mpbK00Pl
-  name: 泰国03|1893ms|11Mbps|住宅|纯净度100.0%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.72
-  type: ss
-  udp: true
-  name: 意大利21|907ms|16Mbps|机房|纯净度95.3%
-- network: ws
-  port: 80
-  server: www.true.th
-  tls: false
-  type: vless
-  udp: true
-  uuid: f4c5605a-8424-441e-b23d-d6384d012c28
-  ws-opts:
-    headers:
-      Host: dcm4kwis2exkw.cloudfront.net
-    path: /
-  name: 泰国04|1756ms|7Mbps|机房|纯净度98.8%
-- client-fingerprint: chrome
-  network: xhttp
-  port: 443
-  server: 3.174.189.0
-  servername: d1b9pmaut2v26v.cloudfront.net
-  tls: true
-  type: vless
-  udp: true
-  uuid: 2e69b088-6ef3-417f-8247-125cf257fafd
-  xhttp-opts:
-    host: d1b9pmaut2v26v.cloudfront.net
-    mode: auto
-    path: /cf
-  name: 德国22|1470ms|15Mbps|机房|纯净度100.0%
-- type: ss
-  server: 202.50.253.99
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: false
-  name: 意大利22|979ms|16Mbps|机房|纯净度95.3%
-- server: 162.35.38.156
-  port: 443
-  type: vless
-  uuid: a88d4614-2134-404c-9479-6aba1ca9cdfd
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: UkUbCx7k5ykWTJTr1jqCOxns6TwvTAbfR0JvJzuALjM
-    short-id: a62b22480f962a1d
-  servername: 2499dbt.us12.h1clayd.click
-  client-fingerprint: firefox
-  network: tcp
-  udp: true
-  name: 美国30|761ms|17Mbps|机房|纯净度99.8%
+  name: 韩国01|1397ms|22Mbps|机房|纯净度99.9%
 - password: 'null'
   port: 443
   server: 172.64.69.89
@@ -2366,13 +2363,13 @@ proxies:
   udp: true
   username: 'null'
   x-toolall-mihomo: true
-  name: 美国31|156ms|964Mbps|机房|纯净度未知
+  name: 美国33|213ms|1095Mbps|机房|纯净度未知
 - port: 443
   server: 172.64.69.89
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国32|170ms|511Mbps|机房|纯净度未知
+  name: 美国34|225ms|705Mbps|机房|纯净度未知
 - port: 443
   server: 172.64.69.89
   skip-cert-verify: true
@@ -2380,7 +2377,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国33|187ms|922Mbps|机房|纯净度未知
+  name: 美国35|244ms|767Mbps|机房|纯净度未知
 - password: e4b72b531a2d10900519
   port: 443
   server: 162.243.146.243
@@ -2390,24 +2387,71 @@ proxies:
   type: http
   username: testuser1
   udp: true
-  name: 美国34|294ms|4Mbps|机房|纯净度99.7%
+  name: 美国36|582ms|5Mbps|机房|纯净度99.7%
+- password: None
+  port: 9002
+  server: 84.17.47.123
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰47|647ms|19Mbps|机房|纯净度96.4%
 - password: 'null'
   port: 9002
-  server: 84.17.47.146
+  server: 84.17.47.123
   skip-cert-verify: true
   tls: true
   type: http
   username: 'null'
-  name: 荷兰43|684ms|30Mbps|机房|纯净度96.4%
+  udp: true
+  name: 荷兰48|658ms|19Mbps|机房|纯净度96.4%
 - password: None
   port: 9002
-  server: 84.17.47.146
+  server: 84.17.47.123
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 荷兰44|692ms|33Mbps|机房|纯净度96.4%
+  name: 荷兰49|661ms|19Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.123
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰50|663ms|19Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.123
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰51|667ms|15Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰52|685ms|33Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰53|666ms|30Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.125
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰54|686ms|24Mbps|机房|纯净度96.4%
 - password: 'null'
   port: 9002
   server: 84.17.47.125
@@ -2417,14 +2461,25 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 荷兰45|661ms|21Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.125
-  skip-cert-verify: true
+  name: 荷兰55|695ms|28Mbps|机房|纯净度96.4%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 82.196.9.7
+  sni: 52c40907.acsnet.co
   tls: true
   type: http
+  username: testuser1
+  name: 荷兰56|723ms|11Mbps|机房|纯净度99.9%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 82.196.9.7
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: testuser1
   udp: true
-  name: 荷兰46|675ms|15Mbps|机房|纯净度96.4%
+  name: 荷兰57|735ms|17Mbps|机房|纯净度99.9%
 - password: 'null'
   port: 9002
   server: 84.17.47.125
@@ -2432,7 +2487,107 @@ proxies:
   tls: true
   type: http
   username: 'null'
-  name: 荷兰47|694ms|19Mbps|机房|纯净度96.4%
+  name: 荷兰58|735ms|23Mbps|机房|纯净度96.4%
+- password: e4b72b531a2d10900519
+  port: 443
+  server: 82.196.9.7
+  sni: 52c40907.acsnet.co
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: testuser1
+  udp: true
+  name: 荷兰59|720ms|17Mbps|机房|纯净度99.9%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 荷兰60|821ms|32Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰61|858ms|32Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰62|856ms|32Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.126
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰63|867ms|32Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰64|914ms|18Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰65|919ms|20Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 荷兰66|921ms|15Mbps|机房|纯净度96.4%
+- password: None
+  port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 荷兰67|926ms|20Mbps|机房|纯净度96.4%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.149
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰68|936ms|21Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.146
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰69|972ms|20Mbps|机房|纯净度96.4%
+- password: 'null'
+  port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰70|965ms|20Mbps|机房|纯净度96.4%
 - password: ''
   port: 9002
   server: 84.17.47.146
@@ -2442,79 +2597,143 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 荷兰48|694ms|32Mbps|机房|纯净度96.4%
+  name: 荷兰71|982ms|27Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 84.17.47.146
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰72|979ms|28Mbps|机房|纯净度96.4%
 - password: None
   port: 9002
-  server: 84.17.47.125
+  server: 84.17.47.146
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 荷兰49|701ms|16Mbps|机房|纯净度96.4%
+  name: 荷兰73|966ms|26Mbps|机房|纯净度96.4%
 - password: 'null'
   port: 9002
   server: 84.17.47.146
   skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
   type: http
   username: 'null'
-  udp: true
-  name: 荷兰50|695ms|32Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.146
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰51|657ms|31Mbps|机房|纯净度96.4%
+  name: 荷兰74|1007ms|26Mbps|机房|纯净度96.4%
 - type: http
-  server: 84.17.47.146
+  server: 193.176.84.36
   port: 9002
   tls: true
+  sni: www.bing.com
   skip-cert-verify: true
-  name: 荷兰52|685ms|26Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.125
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰53|711ms|18Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.124
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰54|917ms|25Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.124
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰55|910ms|23Mbps|机房|纯净度96.4%
-- type: http
-  server: 151.115.54.133
+  name: 罗马尼亚40|991ms|14Mbps|机房|纯净度100.0%
+- password: e4b72b531a2d10900519
   port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 波兰03|821ms|24Mbps|机房|纯净度99.9%
-- password: None
-  port: 443
-  server: 151.115.54.133
+  server: 167.172.172.190
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 波兰04|882ms|27Mbps|机房|纯净度99.9%
+  username: testuser1
+  name: 德国24|1060ms|4Mbps|机房|纯净度95.9%
+- port: 9002
+  server: 84.17.47.124
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰75|1007ms|19Mbps|机房|纯净度96.4%
+- type: http
+  server: 193.176.84.36
+  port: 9002
+  skip-cert-verify: true
+  tls: true
+  udp: true
+  name: 罗马尼亚41|1039ms|6Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 84.17.47.124
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 荷兰76|1087ms|19Mbps|机房|纯净度96.4%
+- type: http
+  server: 84.17.47.124
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 荷兰77|1104ms|18Mbps|机房|纯净度96.4%
+- port: 9002
+  server: 193.176.84.36
+  skip-cert-verify: true
+  sni: www.bing.com
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚42|1026ms|7Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.17
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚43|1102ms|12Mbps|机房|纯净度92.6%
+- password: None
+  port: 9002
+  server: 193.176.84.16
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚44|1070ms|13Mbps|机房|纯净度92.6%
+- port: 9002
+  server: 193.176.84.24
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚45|1139ms|6Mbps|机房|纯净度100.0%
+- password: ''
+  port: 9002
+  server: 193.176.84.17
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 罗马尼亚46|1034ms|15Mbps|机房|纯净度92.6%
+- server: 147.45.153.29
+  port: 443
+  type: vless
+  uuid: 7ad63b26-bf70-4872-8fab-ebaf73a1e19d
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: LEziyH-E4k9hehGRJkVi1FadVObB_NZJy8U7oUCVWXU
+    short-id: b9120cd53ffd7bba
+  servername: patch-46.topp-con.xyz
+  client-fingerprint: firefox
+  network: tcp
+  udp: true
+  name: 德国25|1100ms|14Mbps|机房|纯净度99.8%
+- port: 9002
+  server: 193.176.84.17
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  name: 罗马尼亚47|1172ms|9Mbps|机房|纯净度92.6%
 - port: 443
   server: 151.115.54.133
   skip-cert-verify: true
@@ -2522,7 +2741,142 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 波兰05|862ms|27Mbps|机房|纯净度99.9%
+  name: 波兰03|1273ms|22Mbps|机房|纯净度99.9%
+- password: None
+  port: 9002
+  server: 193.176.84.17
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚48|1280ms|11Mbps|机房|纯净度92.6%
+- type: http
+  server: 193.176.84.24
+  port: 9002
+  tls: true
+  sni: www.bing.com
+  skip-cert-verify: true
+  name: 罗马尼亚49|1186ms|9Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.30
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 罗马尼亚50|1316ms|5Mbps|机房|纯净度92.6%
+- type: http
+  server: 151.115.54.133
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+  name: 波兰04|1285ms|22Mbps|机房|纯净度99.9%
+- password: None
+  port: 443
+  server: 151.115.54.133
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 波兰05|1273ms|25Mbps|机房|纯净度99.9%
+- port: 9002
+  server: 193.176.84.35
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚51|1302ms|18Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.35
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 罗马尼亚52|1318ms|21Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.35
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 193.176.84.35
+  skip-cert-verify: true
+  name: 罗马尼亚53|1324ms|17Mbps|机房|纯净度100.0%
+- delay: 1488
+  password: 'null'
+  port: 9002
+  server: 193.176.84.35
+  skip-cert-verify: true
+  sub_tag: G001-260618
+  tls: true
+  type: http
+  udp: true
+  username: 'null'
+  name: 罗马尼亚54|1298ms|13Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.24
+  port: 9002
+  skip-cert-verify: true
+  tls: true
+  name: 罗马尼亚55|1343ms|10Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.35
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚56|1301ms|12Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.35
+  skip-cert-verify: true
+  sni: 193.176.84.35
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚57|1248ms|8Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.24
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚58|1115ms|17Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.30
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚59|1340ms|6Mbps|机房|纯净度92.6%
+- port: 9002
+  server: 193.176.84.30
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚60|1358ms|7Mbps|机房|纯净度92.6%
+- password: None
+  port: 9002
+  server: 193.176.84.23
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚61|1341ms|22Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 443
   server: 151.115.54.133
@@ -2532,118 +2886,26 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 波兰06|832ms|27Mbps|机房|纯净度99.9%
+  name: 波兰06|1359ms|24Mbps|机房|纯净度99.9%
 - password: None
   port: 9002
-  server: 193.176.84.22
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚42|929ms|8Mbps|机房|纯净度100.0%
-- type: http
-  server: 84.17.47.124
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰56|922ms|25Mbps|机房|纯净度96.4%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.17
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚43|959ms|13Mbps|机房|纯净度92.6%
-- type: http
-  server: 193.176.84.20
-  port: 9002
-  skip-cert-verify: true
-  tls: true
-  name: 罗马尼亚44|940ms|24Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.24
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚45|922ms|13Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.24
-  port: 9002
-  skip-cert-verify: true
-  tls: true
-  name: 罗马尼亚46|925ms|13Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.32
-  port: 9002
-  tls: true
-  skip-cert-verify: true
-  name: 罗马尼亚47|910ms|10Mbps|机房|纯净度100.0%
-- type: http
-  server: 84.17.47.123
-  port: 9002
-  tls: true
-  skip-cert-verify: true
-  name: 荷兰57|970ms|20Mbps|机房|纯净度96.4%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.22
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚48|945ms|23Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.20
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚49|947ms|20Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 84.17.47.123
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰58|989ms|21Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 84.17.47.123
+  server: 193.176.84.38
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 荷兰59|984ms|21Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.149
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰60|1000ms|26Mbps|机房|纯净度96.4%
+  name: 罗马尼亚62|1429ms|8Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 9002
-  server: 193.176.84.37
+  server: 193.176.84.32
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚50|994ms|20Mbps|机房|纯净度100.0%
+  name: 罗马尼亚63|1439ms|8Mbps|机房|纯净度100.0%
 - delay: 2210
   port: 9002
   server: 193.176.84.32
@@ -2652,373 +2914,36 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚51|969ms|10Mbps|机房|纯净度100.0%
+  name: 罗马尼亚64|1424ms|9Mbps|机房|纯净度100.0%
 - password: None
   port: 9002
-  server: 193.176.84.17
+  server: 193.176.84.29
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚52|929ms|14Mbps|机房|纯净度92.6%
-- password: None
-  port: 9002
-  server: 193.176.84.32
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚53|998ms|16Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.24
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚54|952ms|12Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.17
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚55|953ms|12Mbps|机房|纯净度92.6%
-- port: 9002
-  server: 193.176.84.32
-  skip-cert-verify: true
-  sni: www.bing.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚56|949ms|8Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.20
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚57|1006ms|24Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.37
-  port: 9002
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  name: 罗马尼亚58|926ms|17Mbps|机房|纯净度100.0%
-- password: ''
-  port: 9002
-  server: 193.176.84.17
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 罗马尼亚59|938ms|12Mbps|机房|纯净度92.6%
-- port: 9002
-  server: 193.176.84.17
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚60|918ms|13Mbps|机房|纯净度92.6%
+  name: 罗马尼亚65|1405ms|5Mbps|机房|纯净度100.0%
 - password: 'null'
-  port: 9002
-  server: 84.17.47.123
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰61|982ms|22Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 193.176.84.24
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚61|980ms|14Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 84.17.47.123
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰62|1006ms|19Mbps|机房|纯净度96.4%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.32
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚62|1012ms|22Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.37
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚63|977ms|21Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.22
-  port: 9002
-  tls: true
-  skip-cert-verify: true
-  name: 罗马尼亚64|1017ms|24Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.20
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚65|947ms|24Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.37
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚66|1024ms|6Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.37
-  skip-cert-verify: true
-  sni: www.bing.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚67|1031ms|19Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 84.17.47.126
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  name: 荷兰63|1021ms|19Mbps|机房|纯净度96.4%
-- type: http
-  server: 193.176.84.24
-  port: 9002
-  tls: true
-  sni: www.bing.com
-  skip-cert-verify: true
-  name: 罗马尼亚68|939ms|13Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 84.17.47.149
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰64|1089ms|25Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 84.17.47.126
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰65|1048ms|20Mbps|机房|纯净度96.4%
-- password: 'null'
-  port: 9002
-  server: 84.17.47.149
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 荷兰66|1097ms|27Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 84.17.47.126
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰67|1080ms|19Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.126
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 荷兰68|1007ms|18Mbps|机房|纯净度96.4%
-- port: 9002
-  server: 84.17.47.149
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 荷兰69|1090ms|23Mbps|机房|纯净度96.4%
-- password: None
-  port: 9002
-  server: 84.17.47.149
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 荷兰70|1103ms|26Mbps|机房|纯净度96.4%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 167.172.172.190
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  username: testuser1
-  name: 德国23|1170ms|4Mbps|机房|纯净度95.9%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 167.172.172.190
-  skip-cert-verify: true
-  sni: a7acacbe.acsnet.co
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: testuser1
-  udp: true
-  name: 德国24|1160ms|4Mbps|机房|纯净度95.9%
-- port: 9002
-  server: 193.176.84.38
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚69|1216ms|23Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.38
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚70|1231ms|22Mbps|机房|纯净度100.0%
-- type: http
-  server: 167.172.172.190
-  port: 443
-  username: testuser1
-  password: e4b72b531a2d10900519
-  tls: true
-  sni: a7acacbe.acsnet.co
-  name: 德国25|1214ms|4Mbps|机房|纯净度95.9%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.27
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚71|1207ms|24Mbps|机房|纯净度100.0%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 82.196.9.7
-  sni: 52c40907.acsnet.co
-  tls: true
-  type: http
-  username: testuser1
-  name: 荷兰71|1246ms|19Mbps|机房|纯净度99.9%
-- port: 9002
-  server: 193.176.84.27
-  skip-cert-verify: true
-  sni: www.bing.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚72|1230ms|24Mbps|机房|纯净度100.0%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 82.196.9.7
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: testuser1
-  udp: true
-  name: 荷兰72|1251ms|21Mbps|机房|纯净度99.9%
-- type: http
-  server: 193.176.84.32
-  port: 9002
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  name: 罗马尼亚73|975ms|18Mbps|机房|纯净度100.0%
-- password: e4b72b531a2d10900519
-  port: 443
-  server: 82.196.9.7
-  sni: 52c40907.acsnet.co
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: testuser1
-  udp: true
-  name: 荷兰73|1249ms|21Mbps|机房|纯净度99.9%
-- port: 9002
-  server: 193.176.84.31
-  skip-cert-verify: true
-  sni: www.bing.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚74|1242ms|23Mbps|机房|纯净度100.0%
-- password: None
   port: 9002
   server: 193.176.84.31
   skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚75|1218ms|14Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.27
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚76|1217ms|24Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.38
-  skip-cert-verify: true
+  sub_tag: R002-260618
   tls: true
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚77|1266ms|22Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.23
+  name: 罗马尼亚66|1480ms|9Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.26
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
+  username: 'null'
   udp: true
-  name: 罗马尼亚78|1299ms|16Mbps|机房|纯净度100.0%
+  name: 罗马尼亚67|1460ms|7Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 9002
   server: 193.176.84.38
@@ -3029,89 +2954,7 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚79|1258ms|10Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.35
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚80|1279ms|16Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.26
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚81|1235ms|23Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.27
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 罗马尼亚82|1241ms|21Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.26
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚83|1214ms|18Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.31
-  port: 9002
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  name: 罗马尼亚84|1247ms|24Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.30
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚85|1314ms|19Mbps|机房|纯净度92.6%
-- port: 9002
-  server: 193.176.84.26
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  name: 罗马尼亚86|1233ms|22Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.27
-  port: 9002
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  name: 罗马尼亚87|1232ms|22Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.29
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚88|1234ms|13Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.31
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚89|1253ms|23Mbps|机房|纯净度100.0%
+  name: 罗马尼亚68|1454ms|7Mbps|机房|纯净度100.0%
 - delay: 1801
   port: 9002
   server: 193.176.84.31
@@ -3120,24 +2963,79 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚90|1265ms|22Mbps|机房|纯净度100.0%
+  name: 罗马尼亚69|1471ms|12Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.37
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚70|1512ms|11Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.37
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚71|1422ms|19Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.32
+  skip-cert-verify: true
+  sni: www.bing.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚72|1498ms|11Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.37
+  port: 9002
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  name: 罗马尼亚73|1437ms|21Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.32
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 罗马尼亚74|1487ms|11Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.27
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚75|1414ms|16Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.26
+  port: 9002
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  name: 罗马尼亚76|1512ms|16Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.38
   skip-cert-verify: true
   sni: www.bing.com
   tls: true
   type: http
-  udp: true
-  name: 罗马尼亚91|1276ms|22Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
+  name: 罗马尼亚77|1435ms|7Mbps|机房|纯净度100.0%
+- port: 9002
   server: 193.176.84.23
   skip-cert-verify: true
-  sub_tag: P002-260618
+  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚92|1252ms|6Mbps|机房|纯净度100.0%
+  name: 罗马尼亚78|1405ms|21Mbps|机房|纯净度100.0%
 - password: ''
   port: 9002
   server: 193.176.84.38
@@ -3147,48 +3045,7 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 罗马尼亚93|1281ms|16Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.35
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚94|1325ms|16Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.35
-  port: 9002
-  tls: true
-  skip-cert-verify: true
-  name: 罗马尼亚95|1334ms|15Mbps|机房|纯净度100.0%
-- password: 'null'
-  port: 9002
-  server: 193.176.84.35
-  skip-cert-verify: true
-  sni: 193.176.84.35
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 罗马尼亚96|1275ms|7Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.35
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 193.176.84.35
-  skip-cert-verify: true
-  name: 罗马尼亚97|1321ms|16Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.30
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 罗马尼亚98|1300ms|20Mbps|机房|纯净度92.6%
+  name: 罗马尼亚79|1495ms|7Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 9002
   server: 193.176.84.23
@@ -3198,7 +3055,49 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚99|1313ms|16Mbps|机房|纯净度100.0%
+  name: 罗马尼亚80|1322ms|8Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.32
+  port: 9002
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  name: 罗马尼亚81|1465ms|8Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.37
+  skip-cert-verify: true
+  sni: www.bing.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚82|1454ms|22Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.20
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚83|1499ms|11Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.38
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚84|1488ms|7Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.27
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚85|1621ms|11Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.16
   skip-cert-verify: true
@@ -3207,25 +3106,75 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚100|1359ms|18Mbps|机房|纯净度92.6%
+  name: 罗马尼亚86|1442ms|8Mbps|机房|纯净度92.6%
 - port: 9002
-  server: 193.176.84.30
+  server: 193.176.84.20
   skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚101|1361ms|16Mbps|机房|纯净度92.6%
-- password: 'null'
+  name: 罗马尼亚87|1605ms|8Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.27
   port: 9002
-  server: 193.176.84.30
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  name: 罗马尼亚88|1545ms|18Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.27
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 罗马尼亚89|1543ms|17Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.36
+  skip-cert-verify: true
+  tls: true
+  type: http
+  name: 罗马尼亚90|1057ms|7Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.20
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
+  udp: true
+  name: 罗马尼亚91|1466ms|8Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.32
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚92|1529ms|9Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.22
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚102|1274ms|9Mbps|机房|纯净度92.6%
+  name: 罗马尼亚93|1608ms|17Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.22
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+  name: 罗马尼亚94|1559ms|17Mbps|机房|纯净度100.0%
+- type: http
+  server: 193.176.84.20
+  port: 9002
+  skip-cert-verify: true
+  tls: true
+  name: 罗马尼亚95|1548ms|9Mbps|机房|纯净度100.0%
 - password: ''
   port: 9002
   server: 193.176.84.16
@@ -3235,56 +3184,49 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 罗马尼亚103|1360ms|18Mbps|机房|纯净度92.6%
-- password: None
-  port: 9002
-  server: 193.176.84.36
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚104|1419ms|11Mbps|机房|纯净度100.0%
-- type: http
-  server: 193.176.84.36
-  port: 9002
-  skip-cert-verify: true
-  tls: true
-  udp: true
-  name: 罗马尼亚105|1375ms|8Mbps|机房|纯净度100.0%
+  name: 罗马尼亚96|1260ms|6Mbps|机房|纯净度92.6%
 - port: 9002
   server: 193.176.84.30
   skip-cert-verify: true
-  sni: www.bing.com
+  sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚106|1373ms|19Mbps|机房|纯净度92.6%
+  name: 罗马尼亚97|1334ms|14Mbps|机房|纯净度92.6%
 - type: http
-  server: 193.176.84.36
+  server: 193.176.84.31
   port: 9002
-  tls: true
-  sni: www.bing.com
   skip-cert-verify: true
-  name: 罗马尼亚107|1446ms|17Mbps|机房|纯净度100.0%
+  sni: www.bing.com
+  tls: true
+  name: 罗马尼亚98|1451ms|5Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 9002
+  server: 193.176.84.17
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 罗马尼亚99|1193ms|7Mbps|机房|纯净度92.6%
 - port: 9002
-  server: 193.176.84.36
+  server: 193.176.84.23
   skip-cert-verify: true
   sni: www.bing.com
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚108|1378ms|11Mbps|机房|纯净度100.0%
-- password: None
-  port: 9002
-  server: 193.176.84.16
+  name: 罗马尼亚100|1379ms|14Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.26
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚109|1412ms|17Mbps|机房|纯净度92.6%
+  name: 罗马尼亚101|1519ms|7Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.29
   skip-cert-verify: true
@@ -3292,46 +3234,75 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚110|1249ms|18Mbps|机房|纯净度100.0%
+  name: 罗马尼亚102|1389ms|7Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.31
+  skip-cert-verify: true
+  sni: www.bing.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚103|1879ms|6Mbps|机房|纯净度100.0%
 - password: None
   port: 9002
   server: 193.176.84.36
   skip-cert-verify: true
-  tls: true
-  type: http
-  name: 罗马尼亚111|1440ms|16Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.23
-  skip-cert-verify: true
-  sni: www.bing.com
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚112|1292ms|16Mbps|机房|纯净度100.0%
-- type: ss
-  server: 202.50.253.72
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利23|907ms|19Mbps|机房|纯净度95.3%
+  name: 罗马尼亚104|1108ms|7Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.31
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚105|1606ms|10Mbps|机房|纯净度100.0%
+- password: None
+  port: 9002
+  server: 193.176.84.22
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚106|1520ms|12Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.37
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚107|1496ms|9Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.27
+  skip-cert-verify: true
+  sni: www.bing.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚108|1565ms|9Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 443
+  server: 213.109.163.119
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 德国26|691ms|12Mbps|机房|纯净度99.8%
 - password: None
   port: 8443
   server: 44.217.145.28
   skip-cert-verify: true
   tls: true
   type: http
-  name: 美国35|568ms|34Mbps|机房|纯净度100.0%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.54
-  sub_tag: B007-260618
-  type: ss
-  udp: true
-  name: 意大利24|861ms|5Mbps|机房|纯净度95.3%
+  name: 美国37|163ms|99Mbps|机房|纯净度100.0%
 - port: 443
   server: 216.107.139.82
   skip-cert-verify: true
@@ -3340,7 +3311,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 美国36|229ms|12Mbps|机房|纯净度98.0%
+  name: 美国38|314ms|37Mbps|机房|纯净度98.0%
 - password: None
   port: 8443
   server: 44.217.145.28
@@ -3350,7 +3321,7 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 美国37|534ms|160Mbps|机房|纯净度100.0%
+  name: 美国39|181ms|110Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.27
   skip-cert-verify: true
@@ -3358,7 +3329,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚113|1235ms|24Mbps|机房|纯净度100.0%
+  name: 罗马尼亚109|1732ms|15Mbps|机房|纯净度100.0%
 - password: None
   port: 9002
   server: 193.176.84.26
@@ -3367,7 +3338,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚114|1230ms|23Mbps|机房|纯净度100.0%
+  name: 罗马尼亚110|1631ms|7Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.22
   skip-cert-verify: true
@@ -3375,35 +3346,55 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚115|947ms|24Mbps|机房|纯净度100.0%
+  name: 罗马尼亚111|1672ms|10Mbps|机房|纯净度100.0%
+- password: 'null'
+  port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  name: 爱尔兰12|819ms|22Mbps|机房|纯净度100.0%
 - password: None
   port: 443
   server: 34.249.214.108
   skip-cert-verify: true
   tls: true
   type: http
-  name: 爱尔兰11|915ms|27Mbps|机房|纯净度100.0%
-- type: http
-  server: 152.69.230.221
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 韩国01|1078ms|17Mbps|机房|纯净度99.9%
-- cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  port: 19999
-  server: 202.50.253.18
-  sub_tag: B007-260618
-  type: ss
-  udp: true
-  name: 意大利25|685ms|11Mbps|机房|纯净度95.3%
+  name: 爱尔兰13|840ms|19Mbps|机房|纯净度100.0%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
   server: 202.50.253.36
   type: ss
   udp: true
-  name: 意大利26|1721ms|23Mbps|机房|纯净度95.3%
+  name: 意大利15|789ms|18Mbps|机房|纯净度95.3%
+- server: 193.160.208.240
+  port: 443
+  type: vless
+  uuid: 4777d90d-265b-4927-a0d1-63f36ed1421c
+  udp: true
+  tls: true
+  servername: 193.160.208.240
+  client-fingerprint: chrome
+  network: xhttp
+  xhttp-opts:
+    path: /assets/twru01/
+    host: 193.160.208.240
+    mode: auto
+  name: 德国27|1057ms|19Mbps|机房|纯净度100.0%
+- type: http
+  server: 152.69.230.221
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 韩国02|1421ms|22Mbps|机房|纯净度99.9%
+- server: 202.50.253.27
+  port: 19999
+  type: ss
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  name: 意大利16|929ms|17Mbps|机房|纯净度95.3%
 - password: None
   port: 443
   server: 51.158.243.91
@@ -3412,24 +3403,15 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 荷兰74|1012ms|22Mbps|机房|纯净度99.7%
-- port: 9002
-  server: 193.176.84.40
-  skip-cert-verify: true
-  sni: www.bing.com
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚116|1231ms|18Mbps|机房|纯净度100.0%
-- port: 9002
-  server: 193.176.84.26
-  skip-cert-verify: true
-  sni: www.bing.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 罗马尼亚117|1207ms|24Mbps|机房|纯净度100.0%
+  name: 荷兰78|629ms|18Mbps|机房|纯净度99.7%
+- type: ss
+  server: 202.50.253.18
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  tls: false
+  skip-cert-verify: false
+  name: 意大利17|817ms|29Mbps|机房|纯净度95.3%
 - password: 'null'
   port: 9002
   server: 193.176.84.36
@@ -3439,7 +3421,16 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚118|1417ms|17Mbps|机房|纯净度100.0%
+  name: 罗马尼亚112|1049ms|5Mbps|机房|纯净度100.0%
+- port: 9002
+  server: 193.176.84.26
+  skip-cert-verify: true
+  sni: www.bing.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚113|1596ms|11Mbps|机房|纯净度100.0%
 - type: ss
   server: 202.50.253.36
   port: 19999
@@ -3447,7 +3438,15 @@ proxies:
   cipher: aes-256-gcm
   tls: false
   skip-cert-verify: false
-  name: 意大利27|946ms|24Mbps|机房|纯净度95.3%
+  name: 意大利18|777ms|15Mbps|机房|纯净度95.3%
+- port: 9002
+  server: 193.176.84.40
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚114|1379ms|13Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 9002
   server: 193.176.84.16
@@ -3457,7 +3456,15 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 罗马尼亚119|1403ms|17Mbps|机房|纯净度92.6%
+  name: 罗马尼亚115|1137ms|7Mbps|机房|纯净度92.6%
+- port: 9002
+  server: 193.176.84.39
+  skip-cert-verify: true
+  sni: www.bing.com
+  tls: true
+  type: http
+  udp: true
+  name: 罗马尼亚116|1317ms|12Mbps|机房|纯净度100.0%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
@@ -3465,14 +3472,14 @@ proxies:
   sub_tag: B007-260618
   type: ss
   udp: true
-  name: 意大利28|878ms|26Mbps|机房|纯净度95.3%
+  name: 意大利19|839ms|19Mbps|机房|纯净度95.3%
 - port: 9002
   server: 193.176.84.30
   skip-cert-verify: true
   sni: www.bing.com
   tls: true
   type: http
-  name: 罗马尼亚120|1382ms|19Mbps|机房|纯净度92.6%
+  name: 罗马尼亚117|1274ms|7Mbps|机房|纯净度92.6%
 - port: 443
   server: 185.246.153.28
   skip-cert-verify: true
@@ -3481,13 +3488,13 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 荷兰75|661ms|24Mbps|机房|纯净度99.6%
+  name: 荷兰79|1120ms|23Mbps|机房|纯净度99.6%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
   server: 202.50.253.54
   type: ss
-  name: 意大利29|823ms|5Mbps|机房|纯净度95.3%
+  name: 意大利20|1353ms|24Mbps|机房|纯净度95.3%
 - port: 443
   server: 45.134.9.41
   skip-cert-verify: true
@@ -3496,7 +3503,13 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: MX04|548ms|16Mbps|机房|纯净度97.3%
+  name: MX04|552ms|23Mbps|机房|纯净度97.3%
+- type: http
+  server: 44.217.145.28
+  port: 8443
+  tls: true
+  skip-cert-verify: true
+  name: 美国40|179ms|92Mbps|机房|纯净度100.0%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
@@ -3504,20 +3517,28 @@ proxies:
   sub_tag: A004-260618
   type: ss
   udp: true
-  name: 意大利30|1137ms|20Mbps|机房|纯净度95.3%
-- type: http
-  server: 44.217.145.28
-  port: 8443
-  tls: true
+  name: 意大利21|898ms|15Mbps|机房|纯净度95.3%
+- port: 9002
+  server: 193.176.84.33
   skip-cert-verify: true
-  name: 美国38|520ms|38Mbps|机房|纯净度100.0%
+  sni: www.bing.com
+  tls: true
+  type: http
+  name: 罗马尼亚118|1319ms|9Mbps|机房|纯净度100.0%
+- port: 443
+  server: 34.249.214.108
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 爱尔兰14|822ms|23Mbps|机房|纯净度100.0%
 - port: 443
   server: 216.107.139.82
   skip-cert-verify: true
   sni: 991cc80f13caf81d3426ddebb2da7f49-92ff472ddc24e5b7.apache-iv.com
   tls: true
   type: http
-  name: 美国39|228ms|48Mbps|机房|纯净度98.0%
+  name: 美国41|319ms|17Mbps|机房|纯净度98.0%
 - port: 9002
   server: 193.176.84.25
   skip-cert-verify: true
@@ -3525,13 +3546,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚121|1387ms|17Mbps|机房|纯净度100.0%
-- port: 443
-  server: 141.94.16.4
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 法国08|812ms|23Mbps|机房|纯净度99.8%
+  name: 罗马尼亚119|1084ms|5Mbps|机房|纯净度100.0%
 - port: 9002
   server: 193.176.84.22
   skip-cert-verify: true
@@ -3539,7 +3554,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 罗马尼亚122|968ms|14Mbps|机房|纯净度100.0%
+  name: 罗马尼亚120|1485ms|5Mbps|机房|纯净度100.0%
 - port: 443
   server: 142.44.210.129
   skip-cert-verify: true
@@ -3547,7 +3562,7 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 加拿大01|332ms|29Mbps|机房|纯净度98.8%
+  name: 加拿大01|461ms|33Mbps|机房|纯净度98.8%
 - password: 'null'
   port: 443
   server: 185.140.209.235
@@ -3557,15 +3572,25 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 荷兰76|936ms|22Mbps|机房|纯净度99.6%
-- type: ss
-  server: 202.50.253.99
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  tls: false
-  skip-cert-verify: false
-  name: 意大利31|1070ms|19Mbps|机房|纯净度95.3%
+  name: 荷兰80|898ms|12Mbps|机房|纯净度99.6%
+- client-fingerprint: chrome
+  encryption: none
+  network: xhttp
+  port: 443
+  server: 200.102.179.69
+  sub_tag: S001-260618
+  tls: true
+  type: vless
+  udp: true
+  uuid: 7592ca5c-b352-4562-8856-a9c936a3331b
+  xhttp-opts:
+    host: dmbdnpctq8hjxx.hat.onl
+    mode: auto
+    path: /hls/014373eq/seg
+  xudp: true
+  packet-encoding: xudp
+  servername: dmbdnpctq8hjxx.hat.onl
+  name: 美国42|861ms|31Mbps|机房|纯净度100.0%
 - password: None
   port: 443
   server: 89.150.35.94
@@ -3574,16 +3599,38 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 荷兰77|621ms|74Mbps|机房|纯净度99.6%
-- password: None
-  port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  tls: true
-  type: http
+  name: 荷兰81|782ms|15Mbps|机房|纯净度99.6%
+- type: vless
+  server: 200.102.179.69
+  port: 443
+  uuid: 7592ca5c-b352-4562-8856-a9c936a3331b
   udp: true
-  name: 美国40|284ms|4Mbps|机房|纯净度100.0%
+  tls: true
+  servername: dmbdnpctq8hjxx.hat.onl
+  sni: dmbdnpctq8hjxx.hat.onl
+  skip-cert-verify: false
+  client-fingerprint: firefox
+  network: xhttp
+  xhttp-opts:
+    path: /hls/014373eq/seg
+    host: dmbdnpctq8hjxx.hat.onl
+    mode: auto
+  name: 美国43|706ms|203Mbps|机房|纯净度100.0%
+- server: 79.182.39.131
+  port: 443
+  type: vless
+  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
+  udp: true
+  tls: true
+  servername: 717252g.nl8.h1clayd.click
+  reality-opts:
+    public-key: PD8Jdlg3xB9QY--jwQjp8PFPzCS8-Oryw6-HWBcHMFU
+    short-id: d3bd772514c87d28
+  client-fingerprint: chrome
+  network: grpc
+  grpc-opts:
+    grpc-service-name: 204adda7e3da
+  name: 荷兰82|360ms|152Mbps|机房|纯净度100.0%
 - port: 443
   server: 185.140.209.235
   skip-cert-verify: true
@@ -3592,25 +3639,37 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 荷兰78|1016ms|21Mbps|机房|纯净度99.6%
-- password: 'null'
-  port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  username: 'null'
+  name: 荷兰83|891ms|10Mbps|机房|纯净度99.6%
+- type: vless
+  server: 200.102.179.69
+  port: 443
+  uuid: 7592ca5c-b352-4562-8856-a9c936a3331b
   udp: true
-  name: 美国41|331ms|4Mbps|机房|纯净度100.0%
-- port: 443
-  server: 193.35.104.196
-  skip-cert-verify: true
-  sub_tag: R002-260618
   tls: true
-  type: http
+  servername: dmbdnpctq8hjxx.hat.onl
+  sni: dmbdnpctq8hjxx.hat.onl
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: xhttp
+  xhttp-opts:
+    path: /hls/014373eq/seg
+    host: dmbdnpctq8hjxx.hat.onl
+    mode: auto
+  name: 美国44|923ms|182Mbps|机房|纯净度100.0%
+- client-fingerprint: chrome
+  network: xhttp
+  port: 443
+  server: 200.102.179.69
+  servername: dmbdnpctq8hjxx.hat.onl
+  tls: true
+  type: vless
   udp: true
-  name: 捷克01|830ms|14Mbps|未知|纯净度100.0%
+  uuid: 7592ca5c-b352-4562-8856-a9c936a3331b
+  xhttp-opts:
+    host: dmbdnpctq8hjxx.hat.onl
+    mode: auto
+    path: /hls/014373eq/seg
+  name: 美国45|802ms|31Mbps|机房|纯净度100.0%
 - password: 'null'
   port: 443
   server: 89.150.35.94
@@ -3619,44 +3678,37 @@ proxies:
   type: http
   username: 'null'
   udp: true
-  name: 荷兰79|663ms|32Mbps|机房|纯净度99.6%
-- port: 8443
-  server: 44.248.167.117
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
+  name: 荷兰84|766ms|10Mbps|机房|纯净度99.6%
+- cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  port: 19999
+  server: 202.50.253.81
+  sub_tag: A004-260618
+  type: ss
   udp: true
-  name: 美国42|1568ms|5Mbps|机房|纯净度100.0%
-- port: 443
-  server: 89.150.35.94
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
+  name: 意大利22|929ms|26Mbps|机房|纯净度95.3%
+- type: ss
+  server: 202.50.253.81
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
   udp: true
-  name: 荷兰80|656ms|29Mbps|机房|纯净度99.6%
-- port: 443
-  server: 110.173.188.221
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 印度01|1940ms|5Mbps|住宅|纯净度100.0%
+  tls: false
+  skip-cert-verify: false
+  name: 意大利23|1036ms|15Mbps|机房|纯净度95.3%
 - server: 202.50.253.63
   port: 19999
   type: ss
   cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  name: 意大利32|892ms|26Mbps|机房|纯净度95.3%
+  name: 意大利24|750ms|19Mbps|机房|纯净度95.3%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
   server: 202.50.253.63
   type: ss
   udp: true
-  name: 意大利33|1087ms|23Mbps|机房|纯净度95.3%
+  name: 意大利25|1049ms|16Mbps|机房|纯净度95.3%
 - cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   port: 19999
@@ -3664,16 +3716,15 @@ proxies:
   sub_tag: A004-260618
   type: ss
   udp: true
-  name: 意大利34|898ms|23Mbps|机房|纯净度95.3%
+  name: 意大利26|835ms|13Mbps|机房|纯净度95.3%
 - type: ss
   server: 202.50.253.63
   port: 19999
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   cipher: aes-256-gcm
-  udp: true
   tls: false
   skip-cert-verify: false
-  name: 意大利35|855ms|24Mbps|机房|纯净度95.3%
+  name: 意大利27|795ms|17Mbps|机房|纯净度95.3%
 - password: None
   port: 443
   server: 5.255.118.82
@@ -3682,7 +3733,30 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 荷兰81|668ms|4Mbps|机房|纯净度98.8%
+  name: 荷兰85|915ms|25Mbps|机房|纯净度98.8%
+- password: 'null'
+  port: 443
+  server: 5.255.118.82
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 荷兰86|957ms|15Mbps|机房|纯净度98.8%
+- server: 153.56.228.151
+  port: 443
+  type: vless
+  uuid: 4618cebd-e1e9-45c3-be98-d9d6e3ee8bef
+  udp: true
+  tls: true
+  servername: bbcdd4t.de-p2.h1clayd.click
+  reality-opts:
+    public-key: n9cdr2Qf9h3S_jf5Rcd15fl-4fxuztHvlexE7G-QvW8
+    short-id: 1aab0b827885a8b4
+  client-fingerprint: firefox
+  network: tcp
+  name: 德国28|784ms|17Mbps|机房|纯净度100.0%
 - cipher: aes-128-gcm
   name: 🍓 请前往官网重新获取订阅
   password: subscription-unavailable
@@ -3701,380 +3775,381 @@ proxy-groups:
   - 🌏 台湾／新加坡
   - 🍓 小草莓（免测）
   - DIRECT
-  - 美国01|169ms|826Mbps|机房|纯净度未知
-  - 美国02|196ms|691Mbps|机房|纯净度未知
-  - 美国03|214ms|204Mbps|机房|纯净度99.9%
-  - 美国04|199ms|711Mbps|机房|纯净度未知
-  - 美国05|206ms|938Mbps|机房|纯净度未知
-  - 美国06|218ms|251Mbps|机房|纯净度99.9%
-  - 美国07|218ms|1188Mbps|机房|纯净度未知
-  - 美国08|214ms|771Mbps|机房|纯净度未知
-  - 美国09|220ms|264Mbps|机房|纯净度99.9%
-  - 美国10|202ms|188Mbps|机房|纯净度99.9%
-  - 美国11|206ms|1450Mbps|机房|纯净度未知
-  - 美国12|236ms|235Mbps|机房|纯净度99.9%
-  - 美国13|282ms|502Mbps|机房|纯净度100.0%
-  - 美国14|298ms|4Mbps|机房|纯净度99.7%
-  - 美国15|289ms|364Mbps|机房|纯净度100.0%
-  - 美国16|301ms|500Mbps|机房|纯净度100.0%
-  - 美国17|298ms|518Mbps|机房|纯净度100.0%
-  - 美国18|488ms|473Mbps|机房|纯净度99.6%
-  - 德国01|489ms|311Mbps|未知|纯净度100.0%
-  - 爱尔兰01|538ms|280Mbps|机房|纯净度100.0%
-  - 爱尔兰02|533ms|253Mbps|机房|纯净度100.0%
-  - 爱尔兰03|541ms|248Mbps|机房|纯净度100.0%
-  - 美国19|528ms|390Mbps|机房|纯净度100.0%
-  - 美国20|525ms|552Mbps|机房|纯净度100.0%
-  - 美国21|510ms|374Mbps|机房|纯净度100.0%
-  - 爱尔兰04|542ms|277Mbps|机房|纯净度100.0%
-  - 美国22|558ms|160Mbps|机房|纯净度100.0%
-  - 爱尔兰05|552ms|260Mbps|机房|纯净度100.0%
-  - 美国23|565ms|118Mbps|机房|纯净度100.0%
-  - MX01|564ms|19Mbps|机房|纯净度97.3%
-  - MX02|569ms|14Mbps|机房|纯净度100.0%
-  - 美国24|545ms|122Mbps|机房|纯净度100.0%
-  - 美国25|599ms|288Mbps|机房|纯净度98.7%
-  - 法国01|627ms|20Mbps|机房|纯净度99.2%
-  - 法国02|620ms|21Mbps|机房|纯净度99.2%
-  - 荷兰01|652ms|25Mbps|机房|纯净度99.6%
-  - 荷兰02|659ms|28Mbps|机房|纯净度96.4%
-  - 美国26|660ms|274Mbps|机房|纯净度98.7%
-  - 德国02|711ms|30Mbps|机房|纯净度100.0%
-  - 德国03|718ms|30Mbps|机房|纯净度100.0%
-  - MX03|707ms|21Mbps|机房|纯净度100.0%
-  - 荷兰03|710ms|32Mbps|机房|纯净度96.4%
-  - 奥地利01|694ms|13Mbps|机房|纯净度100.0%
-  - 英国01|737ms|28Mbps|机房|纯净度100.0%
-  - 德国04|698ms|29Mbps|机房|纯净度100.0%
-  - 荷兰04|678ms|29Mbps|机房|纯净度96.4%
-  - 美国27|592ms|15Mbps|机房|纯净度100.0%
-  - BR01|876ms|25Mbps|机房|纯净度100.0%
-  - BR02|870ms|25Mbps|机房|纯净度100.0%
-  - 荷兰05|888ms|25Mbps|机房|纯净度100.0%
-  - 荷兰06|891ms|24Mbps|机房|纯净度100.0%
-  - 荷兰07|891ms|25Mbps|机房|纯净度100.0%
-  - 爱尔兰06|903ms|26Mbps|机房|纯净度100.0%
-  - BR03|903ms|26Mbps|机房|纯净度100.0%
-  - 芬兰01|869ms|18Mbps|机房|纯净度99.9%
-  - 意大利01|905ms|21Mbps|机房|纯净度95.3%
-  - BR04|886ms|25Mbps|机房|纯净度100.0%
-  - 意大利02|886ms|21Mbps|机房|纯净度95.3%
-  - 荷兰08|910ms|32Mbps|机房|纯净度96.4%
-  - BR05|924ms|24Mbps|机房|纯净度100.0%
-  - 荷兰09|914ms|33Mbps|机房|纯净度96.4%
-  - BR06|911ms|24Mbps|机房|纯净度100.0%
-  - 意大利03|885ms|24Mbps|机房|纯净度95.3%
-  - 荷兰10|929ms|27Mbps|机房|纯净度100.0%
-  - 波兰01|918ms|31Mbps|机房|纯净度100.0%
-  - 荷兰11|910ms|32Mbps|机房|纯净度96.4%
-  - 荷兰12|923ms|32Mbps|机房|纯净度96.4%
-  - 爱尔兰07|913ms|31Mbps|机房|纯净度100.0%
-  - 荷兰13|909ms|30Mbps|机房|纯净度96.4%
-  - 芬兰02|840ms|16Mbps|机房|纯净度99.9%
-  - 芬兰03|869ms|22Mbps|机房|纯净度99.9%
-  - 芬兰04|894ms|21Mbps|机房|纯净度99.9%
-  - 爱尔兰08|913ms|29Mbps|机房|纯净度100.0%
-  - 荷兰14|933ms|22Mbps|机房|纯净度100.0%
-  - 荷兰15|906ms|31Mbps|机房|纯净度96.4%
-  - 荷兰16|938ms|30Mbps|机房|纯净度96.4%
-  - 意大利04|884ms|21Mbps|机房|纯净度95.3%
-  - 罗马尼亚01|948ms|14Mbps|机房|纯净度100.0%
-  - 日本01|957ms|20Mbps|未知|纯净度100.0%
-  - 意大利05|864ms|22Mbps|机房|纯净度95.3%
-  - 荷兰17|962ms|14Mbps|机房|纯净度96.4%
-  - 法国03|959ms|11Mbps|机房|纯净度100.0%
-  - 法国04|975ms|7Mbps|机房|纯净度100.0%
-  - 法国05|969ms|24Mbps|机房|纯净度100.0%
-  - 荷兰18|938ms|26Mbps|机房|纯净度100.0%
-  - 罗马尼亚02|954ms|12Mbps|机房|纯净度100.0%
-  - 日本02|919ms|18Mbps|机房|纯净度100.0%
-  - 荷兰19|961ms|27Mbps|机房|纯净度100.0%
-  - 荷兰20|991ms|22Mbps|机房|纯净度99.7%
-  - 罗马尼亚03|951ms|14Mbps|机房|纯净度100.0%
-  - 荷兰21|966ms|25Mbps|机房|纯净度100.0%
-  - 法国06|991ms|23Mbps|机房|纯净度100.0%
-  - 荷兰22|926ms|28Mbps|机房|纯净度100.0%
-  - 荷兰23|972ms|29Mbps|机房|纯净度100.0%
-  - 法国07|980ms|11Mbps|机房|纯净度100.0%
-  - 意大利06|878ms|21Mbps|机房|纯净度95.3%
-  - 荷兰24|961ms|27Mbps|机房|纯净度100.0%
-  - 美国28|741ms|6Mbps|机房|纯净度99.8%
-  - 荷兰25|968ms|27Mbps|机房|纯净度100.0%
-  - 意大利07|840ms|24Mbps|机房|纯净度95.3%
-  - 荷兰26|991ms|20Mbps|机房|纯净度99.7%
-  - 荷兰27|1000ms|20Mbps|机房|纯净度99.7%
-  - 荷兰28|992ms|19Mbps|机房|纯净度99.7%
-  - 德国05|969ms|17Mbps|机房|纯净度99.8%
-  - 罗马尼亚04|980ms|24Mbps|机房|纯净度100.0%
-  - 奥地利02|1026ms|22Mbps|机房|纯净度100.0%
-  - 荷兰29|990ms|21Mbps|机房|纯净度99.7%
-  - 荷兰30|1009ms|21Mbps|机房|纯净度99.7%
-  - 德国06|1040ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚05|939ms|23Mbps|机房|纯净度100.0%
-  - 意大利08|919ms|13Mbps|机房|纯净度95.3%
-  - 罗马尼亚06|964ms|9Mbps|机房|纯净度100.0%
-  - 罗马尼亚07|1019ms|22Mbps|机房|纯净度100.0%
-  - 德国07|1041ms|24Mbps|机房|纯净度100.0%
-  - 德国08|1057ms|23Mbps|机房|纯净度100.0%
-  - 荷兰31|669ms|32Mbps|机房|纯净度96.4%
-  - 荷兰32|1042ms|19Mbps|机房|纯净度96.4%
-  - 荷兰33|1039ms|6Mbps|机房|纯净度96.4%
-  - 意大利09|823ms|20Mbps|机房|纯净度95.3%
-  - 荷兰34|1079ms|17Mbps|机房|纯净度96.4%
-  - 荷兰35|1095ms|17Mbps|机房|纯净度96.4%
-  - 荷兰36|1117ms|17Mbps|机房|纯净度96.4%
-  - 荷兰37|967ms|19Mbps|机房|纯净度96.4%
-  - 荷兰38|1100ms|21Mbps|机房|纯净度96.4%
-  - 荷兰39|1098ms|19Mbps|机房|纯净度96.4%
-  - 德国09|1114ms|22Mbps|机房|纯净度99.8%
-  - 德国10|1124ms|17Mbps|机房|纯净度99.8%
-  - 荷兰40|1046ms|19Mbps|机房|纯净度96.4%
-  - 德国11|1107ms|21Mbps|机房|纯净度99.8%
-  - 德国12|1126ms|18Mbps|机房|纯净度99.8%
-  - 荷兰41|1108ms|18Mbps|机房|纯净度96.4%
-  - 德国13|1121ms|20Mbps|机房|纯净度99.8%
-  - 德国14|1134ms|20Mbps|机房|纯净度99.8%
-  - 拉脱维亚01|1141ms|19Mbps|机房|纯净度99.0%
-  - 德国15|1141ms|17Mbps|机房|纯净度99.6%
-  - 荷兰42|943ms|26Mbps|机房|纯净度100.0%
-  - 德国16|1163ms|4Mbps|机房|纯净度100.0%
-  - 拉脱维亚02|1148ms|21Mbps|机房|纯净度99.0%
-  - 罗马尼亚08|1044ms|24Mbps|机房|纯净度100.0%
-  - 拉脱维亚03|1166ms|21Mbps|机房|纯净度99.0%
-  - 德国17|1172ms|17Mbps|机房|纯净度99.6%
-  - 德国18|1167ms|6Mbps|机房|纯净度100.0%
-  - 拉脱维亚04|1196ms|20Mbps|机房|纯净度99.0%
-  - 拉脱维亚05|1189ms|22Mbps|机房|纯净度99.0%
-  - 德国19|1081ms|18Mbps|机房|纯净度99.6%
-  - 拉脱维亚06|1216ms|22Mbps|机房|纯净度99.0%
-  - 罗马尼亚09|1210ms|10Mbps|机房|纯净度100.0%
-  - 拉脱维亚07|1174ms|20Mbps|机房|纯净度99.0%
-  - 爱尔兰09|924ms|28Mbps|机房|纯净度100.0%
-  - 罗马尼亚10|1211ms|19Mbps|机房|纯净度100.0%
-  - 罗马尼亚11|1184ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚12|1249ms|18Mbps|机房|纯净度100.0%
-  - 拉脱维亚08|1218ms|22Mbps|机房|纯净度99.0%
-  - 罗马尼亚13|1201ms|17Mbps|机房|纯净度100.0%
-  - 美国29|1248ms|11Mbps|移动网络|纯净度100.0%
-  - 罗马尼亚14|1221ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚15|1226ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚16|1275ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚17|1231ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚18|1284ms|16Mbps|机房|纯净度100.0%
-  - 意大利10|967ms|15Mbps|机房|纯净度95.3%
-  - 罗马尼亚19|1226ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚20|1236ms|18Mbps|机房|纯净度100.0%
-  - 德国20|1290ms|14Mbps|住宅|纯净度100.0%
-  - 以色列01|1306ms|19Mbps|未知|纯净度100.0%
-  - 罗马尼亚21|1212ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚22|1297ms|20Mbps|机房|纯净度100.0%
-  - 罗马尼亚23|1333ms|9Mbps|机房|纯净度100.0%
-  - 以色列02|1292ms|20Mbps|未知|纯净度100.0%
-  - 罗马尼亚24|1278ms|18Mbps|机房|纯净度100.0%
-  - 以色列03|1287ms|20Mbps|未知|纯净度100.0%
-  - 罗马尼亚25|1311ms|9Mbps|机房|纯净度100.0%
-  - 罗马尼亚26|1320ms|16Mbps|机房|纯净度100.0%
-  - 以色列04|1296ms|19Mbps|未知|纯净度100.0%
-  - 罗马尼亚27|1320ms|11Mbps|机房|纯净度100.0%
-  - 罗马尼亚28|1309ms|11Mbps|机房|纯净度100.0%
-  - 印度尼西亚01|1321ms|12Mbps|住宅|纯净度98.2%
-  - 意大利11|808ms|24Mbps|机房|纯净度95.3%
-  - 罗马尼亚29|1371ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚30|1312ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚31|1386ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚32|1341ms|19Mbps|机房|纯净度100.0%
-  - 越南01|1342ms|13Mbps|住宅|纯净度100.0%
-  - 罗马尼亚33|1346ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚34|1400ms|17Mbps|机房|纯净度100.0%
-  - 波兰02|1027ms|21Mbps|机房|纯净度100.0%
-  - 新加坡01|1431ms|15Mbps|机房|纯净度100.0%
-  - 罗马尼亚35|1416ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚36|1371ms|8Mbps|机房|纯净度100.0%
-  - 泰国01|1444ms|14Mbps|机房|纯净度100.0%
-  - 德国21|1225ms|12Mbps|住宅|纯净度100.0%
-  - 罗马尼亚37|1404ms|18Mbps|机房|纯净度100.0%
-  - 爱尔兰10|1060ms|30Mbps|机房|纯净度100.0%
-  - 罗马尼亚38|1411ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚39|1418ms|18Mbps|机房|纯净度100.0%
-  - 泰国02|1493ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚40|1317ms|6Mbps|机房|纯净度100.0%
-  - 罗马尼亚41|1335ms|17Mbps|机房|纯净度100.0%
-  - 日本03|1620ms|20Mbps|未知|纯净度100.0%
-  - 意大利12|1024ms|22Mbps|机房|纯净度95.3%
-  - 意大利13|1206ms|5Mbps|机房|纯净度95.3%
-  - 意大利14|938ms|15Mbps|机房|纯净度95.3%
-  - 意大利15|847ms|22Mbps|机房|纯净度95.3%
-  - 意大利16|807ms|21Mbps|机房|纯净度95.3%
-  - 意大利17|1135ms|5Mbps|机房|纯净度95.3%
-  - 意大利18|1036ms|12Mbps|机房|纯净度95.3%
-  - 意大利19|1050ms|22Mbps|机房|纯净度95.3%
-  - 新加坡02|1716ms|10Mbps|机房|纯净度99.3%
-  - 意大利20|838ms|5Mbps|机房|纯净度95.3%
-  - 泰国03|1893ms|11Mbps|住宅|纯净度100.0%
-  - 意大利21|907ms|16Mbps|机房|纯净度95.3%
-  - 泰国04|1756ms|7Mbps|机房|纯净度98.8%
-  - 德国22|1470ms|15Mbps|机房|纯净度100.0%
-  - 意大利22|979ms|16Mbps|机房|纯净度95.3%
-  - 美国30|761ms|17Mbps|机房|纯净度99.8%
-  - 美国31|156ms|964Mbps|机房|纯净度未知
-  - 美国32|170ms|511Mbps|机房|纯净度未知
-  - 美国33|187ms|922Mbps|机房|纯净度未知
-  - 美国34|294ms|4Mbps|机房|纯净度99.7%
-  - 荷兰43|684ms|30Mbps|机房|纯净度96.4%
-  - 荷兰44|692ms|33Mbps|机房|纯净度96.4%
-  - 荷兰45|661ms|21Mbps|机房|纯净度96.4%
-  - 荷兰46|675ms|15Mbps|机房|纯净度96.4%
-  - 荷兰47|694ms|19Mbps|机房|纯净度96.4%
-  - 荷兰48|694ms|32Mbps|机房|纯净度96.4%
-  - 荷兰49|701ms|16Mbps|机房|纯净度96.4%
-  - 荷兰50|695ms|32Mbps|机房|纯净度96.4%
-  - 荷兰51|657ms|31Mbps|机房|纯净度96.4%
-  - 荷兰52|685ms|26Mbps|机房|纯净度96.4%
-  - 荷兰53|711ms|18Mbps|机房|纯净度96.4%
-  - 荷兰54|917ms|25Mbps|机房|纯净度96.4%
-  - 荷兰55|910ms|23Mbps|机房|纯净度96.4%
-  - 波兰03|821ms|24Mbps|机房|纯净度99.9%
-  - 波兰04|882ms|27Mbps|机房|纯净度99.9%
-  - 波兰05|862ms|27Mbps|机房|纯净度99.9%
-  - 波兰06|832ms|27Mbps|机房|纯净度99.9%
-  - 罗马尼亚42|929ms|8Mbps|机房|纯净度100.0%
-  - 荷兰56|922ms|25Mbps|机房|纯净度96.4%
-  - 罗马尼亚43|959ms|13Mbps|机房|纯净度92.6%
-  - 罗马尼亚44|940ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚45|922ms|13Mbps|机房|纯净度100.0%
-  - 罗马尼亚46|925ms|13Mbps|机房|纯净度100.0%
-  - 罗马尼亚47|910ms|10Mbps|机房|纯净度100.0%
-  - 荷兰57|970ms|20Mbps|机房|纯净度96.4%
-  - 罗马尼亚48|945ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚49|947ms|20Mbps|机房|纯净度100.0%
-  - 荷兰58|989ms|21Mbps|机房|纯净度96.4%
-  - 荷兰59|984ms|21Mbps|机房|纯净度96.4%
-  - 荷兰60|1000ms|26Mbps|机房|纯净度96.4%
-  - 罗马尼亚50|994ms|20Mbps|机房|纯净度100.0%
-  - 罗马尼亚51|969ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚52|929ms|14Mbps|机房|纯净度92.6%
-  - 罗马尼亚53|998ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚54|952ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚55|953ms|12Mbps|机房|纯净度92.6%
-  - 罗马尼亚56|949ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚57|1006ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚58|926ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚59|938ms|12Mbps|机房|纯净度92.6%
-  - 罗马尼亚60|918ms|13Mbps|机房|纯净度92.6%
-  - 荷兰61|982ms|22Mbps|机房|纯净度96.4%
-  - 罗马尼亚61|980ms|14Mbps|机房|纯净度100.0%
-  - 荷兰62|1006ms|19Mbps|机房|纯净度96.4%
-  - 罗马尼亚62|1012ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚63|977ms|21Mbps|机房|纯净度100.0%
-  - 罗马尼亚64|1017ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚65|947ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚66|1024ms|6Mbps|机房|纯净度100.0%
-  - 罗马尼亚67|1031ms|19Mbps|机房|纯净度100.0%
-  - 荷兰63|1021ms|19Mbps|机房|纯净度96.4%
-  - 罗马尼亚68|939ms|13Mbps|机房|纯净度100.0%
-  - 荷兰64|1089ms|25Mbps|机房|纯净度96.4%
-  - 荷兰65|1048ms|20Mbps|机房|纯净度96.4%
-  - 荷兰66|1097ms|27Mbps|机房|纯净度96.4%
-  - 荷兰67|1080ms|19Mbps|机房|纯净度96.4%
-  - 荷兰68|1007ms|18Mbps|机房|纯净度96.4%
-  - 荷兰69|1090ms|23Mbps|机房|纯净度96.4%
-  - 荷兰70|1103ms|26Mbps|机房|纯净度96.4%
-  - 德国23|1170ms|4Mbps|机房|纯净度95.9%
-  - 德国24|1160ms|4Mbps|机房|纯净度95.9%
-  - 罗马尼亚69|1216ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚70|1231ms|22Mbps|机房|纯净度100.0%
-  - 德国25|1214ms|4Mbps|机房|纯净度95.9%
-  - 罗马尼亚71|1207ms|24Mbps|机房|纯净度100.0%
-  - 荷兰71|1246ms|19Mbps|机房|纯净度99.9%
-  - 罗马尼亚72|1230ms|24Mbps|机房|纯净度100.0%
-  - 荷兰72|1251ms|21Mbps|机房|纯净度99.9%
-  - 罗马尼亚73|975ms|18Mbps|机房|纯净度100.0%
-  - 荷兰73|1249ms|21Mbps|机房|纯净度99.9%
-  - 罗马尼亚74|1242ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚75|1218ms|14Mbps|机房|纯净度100.0%
-  - 罗马尼亚76|1217ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚77|1266ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚78|1299ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚79|1258ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚80|1279ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚81|1235ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚82|1241ms|21Mbps|机房|纯净度100.0%
-  - 罗马尼亚83|1214ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚84|1247ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚85|1314ms|19Mbps|机房|纯净度92.6%
-  - 罗马尼亚86|1233ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚87|1232ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚88|1234ms|13Mbps|机房|纯净度100.0%
-  - 罗马尼亚89|1253ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚90|1265ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚91|1276ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚92|1252ms|6Mbps|机房|纯净度100.0%
-  - 罗马尼亚93|1281ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚94|1325ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚95|1334ms|15Mbps|机房|纯净度100.0%
-  - 罗马尼亚96|1275ms|7Mbps|机房|纯净度100.0%
-  - 罗马尼亚97|1321ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚98|1300ms|20Mbps|机房|纯净度92.6%
-  - 罗马尼亚99|1313ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚100|1359ms|18Mbps|机房|纯净度92.6%
-  - 罗马尼亚101|1361ms|16Mbps|机房|纯净度92.6%
-  - 罗马尼亚102|1274ms|9Mbps|机房|纯净度92.6%
-  - 罗马尼亚103|1360ms|18Mbps|机房|纯净度92.6%
-  - 罗马尼亚104|1419ms|11Mbps|机房|纯净度100.0%
-  - 罗马尼亚105|1375ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚106|1373ms|19Mbps|机房|纯净度92.6%
-  - 罗马尼亚107|1446ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚108|1378ms|11Mbps|机房|纯净度100.0%
-  - 罗马尼亚109|1412ms|17Mbps|机房|纯净度92.6%
-  - 罗马尼亚110|1249ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚111|1440ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚112|1292ms|16Mbps|机房|纯净度100.0%
-  - 意大利23|907ms|19Mbps|机房|纯净度95.3%
-  - 美国35|568ms|34Mbps|机房|纯净度100.0%
-  - 意大利24|861ms|5Mbps|机房|纯净度95.3%
-  - 美国36|229ms|12Mbps|机房|纯净度98.0%
-  - 美国37|534ms|160Mbps|机房|纯净度100.0%
-  - 罗马尼亚113|1235ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚114|1230ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚115|947ms|24Mbps|机房|纯净度100.0%
-  - 爱尔兰11|915ms|27Mbps|机房|纯净度100.0%
-  - 韩国01|1078ms|17Mbps|机房|纯净度99.9%
-  - 意大利25|685ms|11Mbps|机房|纯净度95.3%
-  - 意大利26|1721ms|23Mbps|机房|纯净度95.3%
-  - 荷兰74|1012ms|22Mbps|机房|纯净度99.7%
-  - 罗马尼亚116|1231ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚117|1207ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚118|1417ms|17Mbps|机房|纯净度100.0%
-  - 意大利27|946ms|24Mbps|机房|纯净度95.3%
-  - 罗马尼亚119|1403ms|17Mbps|机房|纯净度92.6%
-  - 意大利28|878ms|26Mbps|机房|纯净度95.3%
-  - 罗马尼亚120|1382ms|19Mbps|机房|纯净度92.6%
-  - 荷兰75|661ms|24Mbps|机房|纯净度99.6%
-  - 意大利29|823ms|5Mbps|机房|纯净度95.3%
-  - MX04|548ms|16Mbps|机房|纯净度97.3%
-  - 意大利30|1137ms|20Mbps|机房|纯净度95.3%
-  - 美国38|520ms|38Mbps|机房|纯净度100.0%
-  - 美国39|228ms|48Mbps|机房|纯净度98.0%
-  - 罗马尼亚121|1387ms|17Mbps|机房|纯净度100.0%
-  - 法国08|812ms|23Mbps|机房|纯净度99.8%
-  - 罗马尼亚122|968ms|14Mbps|机房|纯净度100.0%
-  - 加拿大01|332ms|29Mbps|机房|纯净度98.8%
-  - 荷兰76|936ms|22Mbps|机房|纯净度99.6%
-  - 意大利31|1070ms|19Mbps|机房|纯净度95.3%
-  - 荷兰77|621ms|74Mbps|机房|纯净度99.6%
-  - 美国40|284ms|4Mbps|机房|纯净度100.0%
-  - 荷兰78|1016ms|21Mbps|机房|纯净度99.6%
-  - 美国41|331ms|4Mbps|机房|纯净度100.0%
-  - 捷克01|830ms|14Mbps|未知|纯净度100.0%
-  - 荷兰79|663ms|32Mbps|机房|纯净度99.6%
-  - 美国42|1568ms|5Mbps|机房|纯净度100.0%
-  - 荷兰80|656ms|29Mbps|机房|纯净度99.6%
-  - 印度01|1940ms|5Mbps|住宅|纯净度100.0%
-  - 意大利32|892ms|26Mbps|机房|纯净度95.3%
-  - 意大利33|1087ms|23Mbps|机房|纯净度95.3%
-  - 意大利34|898ms|23Mbps|机房|纯净度95.3%
-  - 意大利35|855ms|24Mbps|机房|纯净度95.3%
-  - 荷兰81|668ms|4Mbps|机房|纯净度98.8%
+  - 美国01|202ms|583Mbps|机房|纯净度100.0%
+  - 美国02|209ms|1476Mbps|机房|纯净度未知
+  - 美国03|212ms|964Mbps|机房|纯净度未知
+  - 美国04|211ms|495Mbps|机房|纯净度100.0%
+  - 美国05|212ms|598Mbps|机房|纯净度100.0%
+  - 美国06|228ms|640Mbps|机房|纯净度未知
+  - 美国07|220ms|1320Mbps|机房|纯净度未知
+  - 美国08|216ms|1538Mbps|机房|纯净度未知
+  - 美国09|216ms|556Mbps|机房|纯净度100.0%
+  - 美国10|218ms|1058Mbps|机房|纯净度未知
+  - 美国11|239ms|1044Mbps|机房|纯净度未知
+  - 美国12|360ms|181Mbps|机房|纯净度99.9%
+  - 美国13|391ms|177Mbps|机房|纯净度99.9%
+  - 美国14|394ms|304Mbps|机房|纯净度99.9%
+  - 美国15|411ms|268Mbps|机房|纯净度99.9%
+  - 美国16|428ms|21Mbps|机房|纯净度100.0%
+  - 荷兰01|417ms|26Mbps|机房|纯净度100.0%
+  - MX01|446ms|17Mbps|机房|纯净度100.0%
+  - 美国17|530ms|32Mbps|机房|纯净度100.0%
+  - 美国18|503ms|165Mbps|机房|纯净度99.6%
+  - 美国19|384ms|275Mbps|机房|纯净度99.9%
+  - 美国20|516ms|28Mbps|机房|纯净度100.0%
+  - MX02|556ms|21Mbps|机房|纯净度97.3%
+  - 荷兰02|625ms|17Mbps|机房|纯净度99.7%
+  - 美国21|593ms|178Mbps|机房|纯净度98.7%
+  - 荷兰03|622ms|16Mbps|机房|纯净度99.7%
+  - 荷兰04|625ms|16Mbps|机房|纯净度99.7%
+  - 荷兰05|627ms|19Mbps|机房|纯净度99.7%
+  - 美国22|606ms|106Mbps|机房|纯净度98.7%
+  - 美国23|596ms|159Mbps|机房|纯净度100.0%
+  - 荷兰06|655ms|18Mbps|机房|纯净度99.7%
+  - 意大利01|615ms|18Mbps|机房|纯净度95.3%
+  - 荷兰07|628ms|13Mbps|机房|纯净度99.7%
+  - 意大利02|632ms|17Mbps|机房|纯净度95.3%
+  - 德国01|687ms|9Mbps|机房|纯净度99.8%
+  - 德国02|692ms|16Mbps|机房|纯净度99.8%
+  - 德国03|699ms|15Mbps|机房|纯净度99.8%
+  - 德国04|699ms|14Mbps|机房|纯净度99.8%
+  - 美国24|507ms|28Mbps|机房|纯净度100.0%
+  - 美国25|609ms|255Mbps|机房|纯净度98.7%
+  - 德国05|707ms|14Mbps|机房|纯净度99.8%
+  - 德国06|707ms|16Mbps|机房|纯净度99.8%
+  - 美国26|630ms|11Mbps|机房|纯净度99.9%
+  - 意大利03|746ms|19Mbps|机房|纯净度95.3%
+  - 法国01|790ms|25Mbps|机房|纯净度99.2%
+  - 法国02|799ms|26Mbps|机房|纯净度99.2%
+  - 爱尔兰01|820ms|20Mbps|机房|纯净度100.0%
+  - 爱尔兰02|825ms|6Mbps|机房|纯净度100.0%
+  - 爱尔兰03|825ms|264Mbps|机房|纯净度100.0%
+  - 爱尔兰04|827ms|231Mbps|机房|纯净度100.0%
+  - 爱尔兰05|812ms|23Mbps|机房|纯净度100.0%
+  - 爱尔兰06|822ms|277Mbps|机房|纯净度100.0%
+  - 爱尔兰07|834ms|21Mbps|机房|纯净度100.0%
+  - 爱尔兰08|842ms|286Mbps|机房|纯净度100.0%
+  - 荷兰08|839ms|29Mbps|机房|纯净度96.4%
+  - 荷兰09|853ms|32Mbps|机房|纯净度96.4%
+  - 荷兰10|856ms|31Mbps|机房|纯净度96.4%
+  - 爱尔兰09|833ms|33Mbps|机房|纯净度100.0%
+  - 爱尔兰10|839ms|155Mbps|机房|纯净度100.0%
+  - 美国27|617ms|236Mbps|机房|纯净度98.7%
+  - 荷兰11|846ms|33Mbps|机房|纯净度96.4%
+  - 荷兰12|855ms|29Mbps|机房|纯净度96.4%
+  - 荷兰13|862ms|29Mbps|机房|纯净度96.4%
+  - 意大利04|589ms|15Mbps|机房|纯净度95.3%
+  - 荷兰14|860ms|29Mbps|机房|纯净度96.4%
+  - 荷兰15|835ms|27Mbps|机房|纯净度96.4%
+  - 荷兰16|881ms|18Mbps|机房|纯净度100.0%
+  - 荷兰17|876ms|31Mbps|机房|纯净度96.4%
+  - 荷兰18|884ms|19Mbps|机房|纯净度100.0%
+  - 荷兰19|885ms|16Mbps|机房|纯净度100.0%
+  - 荷兰20|883ms|20Mbps|机房|纯净度100.0%
+  - 荷兰21|879ms|18Mbps|机房|纯净度100.0%
+  - 德国07|863ms|21Mbps|机房|纯净度100.0%
+  - 荷兰22|884ms|17Mbps|机房|纯净度100.0%
+  - 美国28|613ms|161Mbps|机房|纯净度100.0%
+  - 德国08|904ms|23Mbps|机房|纯净度100.0%
+  - 德国09|896ms|27Mbps|机房|纯净度100.0%
+  - 荷兰23|879ms|14Mbps|机房|纯净度100.0%
+  - 德国10|926ms|14Mbps|机房|纯净度100.0%
+  - 荷兰24|876ms|18Mbps|机房|纯净度100.0%
+  - 德国11|929ms|16Mbps|机房|纯净度100.0%
+  - 德国12|942ms|15Mbps|机房|纯净度100.0%
+  - 日本01|892ms|20Mbps|未知|纯净度100.0%
+  - 法国03|963ms|18Mbps|机房|纯净度100.0%
+  - 荷兰25|886ms|18Mbps|机房|纯净度100.0%
+  - 荷兰26|967ms|17Mbps|机房|纯净度100.0%
+  - 法国04|967ms|17Mbps|机房|纯净度100.0%
+  - 荷兰27|976ms|25Mbps|机房|纯净度96.4%
+  - 荷兰28|954ms|17Mbps|机房|纯净度100.0%
+  - 意大利05|771ms|19Mbps|机房|纯净度95.3%
+  - 荷兰29|979ms|25Mbps|机房|纯净度96.4%
+  - 荷兰30|977ms|25Mbps|机房|纯净度96.4%
+  - 荷兰31|990ms|25Mbps|机房|纯净度96.4%
+  - 荷兰32|999ms|23Mbps|机房|纯净度96.4%
+  - 荷兰33|883ms|18Mbps|机房|纯净度100.0%
+  - 荷兰34|996ms|25Mbps|机房|纯净度96.4%
+  - 荷兰35|982ms|25Mbps|机房|纯净度96.4%
+  - 荷兰36|991ms|23Mbps|机房|纯净度96.4%
+  - 法国05|980ms|17Mbps|机房|纯净度100.0%
+  - 荷兰37|962ms|18Mbps|机房|纯净度100.0%
+  - 荷兰38|1004ms|30Mbps|机房|纯净度96.4%
+  - 法国06|1009ms|17Mbps|机房|纯净度100.0%
+  - 德国13|999ms|17Mbps|机房|纯净度100.0%
+  - 美国29|680ms|96Mbps|机房|纯净度98.7%
+  - 荷兰39|974ms|22Mbps|机房|纯净度96.4%
+  - 荷兰40|978ms|25Mbps|机房|纯净度96.4%
+  - 荷兰41|863ms|28Mbps|机房|纯净度96.4%
+  - BR01|1065ms|22Mbps|机房|纯净度100.0%
+  - BR02|1060ms|16Mbps|机房|纯净度100.0%
+  - 意大利06|845ms|9Mbps|机房|纯净度95.3%
+  - BR03|1067ms|20Mbps|机房|纯净度100.0%
+  - 法国07|1052ms|23Mbps|机房|纯净度99.2%
+  - BR04|1045ms|15Mbps|机房|纯净度100.0%
+  - BR05|1078ms|17Mbps|机房|纯净度100.0%
+  - BR06|1089ms|18Mbps|机房|纯净度100.0%
+  - 芬兰01|971ms|16Mbps|机房|纯净度99.9%
+  - MX03|677ms|24Mbps|机房|纯净度100.0%
+  - 荷兰42|1117ms|18Mbps|机房|纯净度99.6%
+  - 德国14|1041ms|8Mbps|机房|纯净度100.0%
+  - 荷兰43|1125ms|26Mbps|机房|纯净度99.6%
+  - 美国30|1021ms|10Mbps|移动网络|纯净度100.0%
+  - 德国15|964ms|7Mbps|住宅|纯净度100.0%
+  - 罗马尼亚01|1123ms|13Mbps|机房|纯净度100.0%
+  - 荷兰44|841ms|28Mbps|机房|纯净度96.4%
+  - 罗马尼亚02|1147ms|5Mbps|机房|纯净度100.0%
+  - 法国08|977ms|17Mbps|机房|纯净度100.0%
+  - 芬兰02|1208ms|17Mbps|机房|纯净度99.9%
+  - 以色列01|1231ms|13Mbps|未知|纯净度100.0%
+  - 以色列02|1242ms|12Mbps|未知|纯净度100.0%
+  - 德国16|1251ms|26Mbps|机房|纯净度99.6%
+  - 德国17|1001ms|26Mbps|机房|纯净度99.6%
+  - 德国18|1222ms|6Mbps|机房|纯净度100.0%
+  - 以色列03|1240ms|12Mbps|未知|纯净度100.0%
+  - 罗马尼亚03|1249ms|6Mbps|机房|纯净度100.0%
+  - 德国19|1258ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚04|1212ms|17Mbps|机房|纯净度100.0%
+  - 拉脱维亚01|1155ms|17Mbps|机房|纯净度99.0%
+  - 德国20|1140ms|28Mbps|机房|纯净度99.6%
+  - 拉脱维亚02|1284ms|14Mbps|机房|纯净度99.0%
+  - 爱尔兰11|817ms|23Mbps|机房|纯净度100.0%
+  - 德国21|1296ms|28Mbps|机房|纯净度99.6%
+  - 拉脱维亚03|1226ms|18Mbps|机房|纯净度99.0%
+  - 芬兰03|1210ms|18Mbps|机房|纯净度99.9%
+  - 罗马尼亚05|1266ms|12Mbps|机房|纯净度100.0%
+  - 以色列04|1249ms|11Mbps|未知|纯净度100.0%
+  - 拉脱维亚04|1205ms|15Mbps|机房|纯净度99.0%
+  - 芬兰04|1024ms|15Mbps|机房|纯净度99.9%
+  - 罗马尼亚06|1191ms|17Mbps|机房|纯净度100.0%
+  - 波兰01|1182ms|25Mbps|机房|纯净度100.0%
+  - 罗马尼亚07|1130ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚08|1112ms|7Mbps|机房|纯净度100.0%
+  - 拉脱维亚05|1290ms|18Mbps|机房|纯净度99.0%
+  - 罗马尼亚09|1270ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚10|1246ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚11|1309ms|5Mbps|机房|纯净度100.0%
+  - 印度尼西亚01|1341ms|14Mbps|住宅|纯净度98.2%
+  - 拉脱维亚06|1308ms|13Mbps|机房|纯净度99.0%
+  - 罗马尼亚12|1114ms|12Mbps|机房|纯净度100.0%
+  - 拉脱维亚07|1191ms|18Mbps|机房|纯净度99.0%
+  - 罗马尼亚13|1352ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚14|1360ms|6Mbps|机房|纯净度100.0%
+  - 美国31|825ms|19Mbps|机房|纯净度100.0%
+  - 罗马尼亚15|1390ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚16|1258ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚17|1424ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚18|1442ms|9Mbps|机房|纯净度100.0%
+  - 波兰02|1283ms|24Mbps|机房|纯净度99.9%
+  - 罗马尼亚19|1417ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚20|1257ms|5Mbps|机房|纯净度100.0%
+  - 泰国01|1328ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚21|1329ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚22|1370ms|7Mbps|机房|纯净度100.0%
+  - 越南01|1453ms|12Mbps|住宅|纯净度100.0%
+  - 意大利07|681ms|13Mbps|机房|纯净度95.3%
+  - 罗马尼亚23|1390ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚24|1379ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚25|1328ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚26|1410ms|18Mbps|机房|纯净度100.0%
+  - 罗马尼亚27|1353ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚28|1143ms|14Mbps|机房|纯净度100.0%
+  - 拉脱维亚08|1314ms|18Mbps|机房|纯净度99.0%
+  - 罗马尼亚29|1373ms|7Mbps|机房|纯净度100.0%
+  - 泰国02|1533ms|11Mbps|住宅|纯净度100.0%
+  - 泰国03|1576ms|9Mbps|机房|纯净度100.0%
+  - 印度尼西亚02|1584ms|10Mbps|未知|纯净度100.0%
+  - 日本02|1408ms|12Mbps|未知|纯净度100.0%
+  - 罗马尼亚30|1236ms|15Mbps|机房|纯净度100.0%
+  - 新加坡01|1676ms|13Mbps|机房|纯净度100.0%
+  - 泰国04|1698ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚31|1500ms|16Mbps|机房|纯净度100.0%
+  - 意大利08|1554ms|22Mbps|机房|纯净度95.3%
+  - 罗马尼亚32|1568ms|8Mbps|机房|纯净度100.0%
+  - 意大利09|932ms|17Mbps|机房|纯净度95.3%
+  - 意大利10|938ms|24Mbps|机房|纯净度95.3%
+  - 罗马尼亚33|1454ms|6Mbps|机房|纯净度100.0%
+  - 法国09|1257ms|14Mbps|机房|纯净度99.8%
+  - 法国10|1018ms|15Mbps|机房|纯净度100.0%
+  - 美国32|189ms|34Mbps|机房|纯净度100.0%
+  - 德国22|1402ms|4Mbps|机房|纯净度100.0%
+  - 罗马尼亚34|1398ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚35|1279ms|8Mbps|机房|纯净度100.0%
+  - 德国23|1343ms|24Mbps|机房|纯净度100.0%
+  - 罗马尼亚36|1355ms|10Mbps|机房|纯净度100.0%
+  - 荷兰45|1123ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚37|1323ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚38|1304ms|7Mbps|机房|纯净度100.0%
+  - 意大利11|1128ms|21Mbps|机房|纯净度95.3%
+  - 荷兰46|1163ms|20Mbps|机房|纯净度100.0%
+  - 罗马尼亚39|1304ms|10Mbps|机房|纯净度100.0%
+  - 意大利12|1026ms|15Mbps|机房|纯净度95.3%
+  - 意大利13|778ms|19Mbps|机房|纯净度95.3%
+  - 意大利14|893ms|18Mbps|机房|纯净度95.3%
+  - 韩国01|1397ms|22Mbps|机房|纯净度99.9%
+  - 美国33|213ms|1095Mbps|机房|纯净度未知
+  - 美国34|225ms|705Mbps|机房|纯净度未知
+  - 美国35|244ms|767Mbps|机房|纯净度未知
+  - 美国36|582ms|5Mbps|机房|纯净度99.7%
+  - 荷兰47|647ms|19Mbps|机房|纯净度96.4%
+  - 荷兰48|658ms|19Mbps|机房|纯净度96.4%
+  - 荷兰49|661ms|19Mbps|机房|纯净度96.4%
+  - 荷兰50|663ms|19Mbps|机房|纯净度96.4%
+  - 荷兰51|667ms|15Mbps|机房|纯净度96.4%
+  - 荷兰52|685ms|33Mbps|机房|纯净度96.4%
+  - 荷兰53|666ms|30Mbps|机房|纯净度96.4%
+  - 荷兰54|686ms|24Mbps|机房|纯净度96.4%
+  - 荷兰55|695ms|28Mbps|机房|纯净度96.4%
+  - 荷兰56|723ms|11Mbps|机房|纯净度99.9%
+  - 荷兰57|735ms|17Mbps|机房|纯净度99.9%
+  - 荷兰58|735ms|23Mbps|机房|纯净度96.4%
+  - 荷兰59|720ms|17Mbps|机房|纯净度99.9%
+  - 荷兰60|821ms|32Mbps|机房|纯净度96.4%
+  - 荷兰61|858ms|32Mbps|机房|纯净度96.4%
+  - 荷兰62|856ms|32Mbps|机房|纯净度96.4%
+  - 荷兰63|867ms|32Mbps|机房|纯净度96.4%
+  - 荷兰64|914ms|18Mbps|机房|纯净度96.4%
+  - 荷兰65|919ms|20Mbps|机房|纯净度96.4%
+  - 荷兰66|921ms|15Mbps|机房|纯净度96.4%
+  - 荷兰67|926ms|20Mbps|机房|纯净度96.4%
+  - 荷兰68|936ms|21Mbps|机房|纯净度96.4%
+  - 荷兰69|972ms|20Mbps|机房|纯净度96.4%
+  - 荷兰70|965ms|20Mbps|机房|纯净度96.4%
+  - 荷兰71|982ms|27Mbps|机房|纯净度96.4%
+  - 荷兰72|979ms|28Mbps|机房|纯净度96.4%
+  - 荷兰73|966ms|26Mbps|机房|纯净度96.4%
+  - 荷兰74|1007ms|26Mbps|机房|纯净度96.4%
+  - 罗马尼亚40|991ms|14Mbps|机房|纯净度100.0%
+  - 德国24|1060ms|4Mbps|机房|纯净度95.9%
+  - 荷兰75|1007ms|19Mbps|机房|纯净度96.4%
+  - 罗马尼亚41|1039ms|6Mbps|机房|纯净度100.0%
+  - 荷兰76|1087ms|19Mbps|机房|纯净度96.4%
+  - 荷兰77|1104ms|18Mbps|机房|纯净度96.4%
+  - 罗马尼亚42|1026ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚43|1102ms|12Mbps|机房|纯净度92.6%
+  - 罗马尼亚44|1070ms|13Mbps|机房|纯净度92.6%
+  - 罗马尼亚45|1139ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚46|1034ms|15Mbps|机房|纯净度92.6%
+  - 德国25|1100ms|14Mbps|机房|纯净度99.8%
+  - 罗马尼亚47|1172ms|9Mbps|机房|纯净度92.6%
+  - 波兰03|1273ms|22Mbps|机房|纯净度99.9%
+  - 罗马尼亚48|1280ms|11Mbps|机房|纯净度92.6%
+  - 罗马尼亚49|1186ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚50|1316ms|5Mbps|机房|纯净度92.6%
+  - 波兰04|1285ms|22Mbps|机房|纯净度99.9%
+  - 波兰05|1273ms|25Mbps|机房|纯净度99.9%
+  - 罗马尼亚51|1302ms|18Mbps|机房|纯净度100.0%
+  - 罗马尼亚52|1318ms|21Mbps|机房|纯净度100.0%
+  - 罗马尼亚53|1324ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚54|1298ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚55|1343ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚56|1301ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚57|1248ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚58|1115ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚59|1340ms|6Mbps|机房|纯净度92.6%
+  - 罗马尼亚60|1358ms|7Mbps|机房|纯净度92.6%
+  - 罗马尼亚61|1341ms|22Mbps|机房|纯净度100.0%
+  - 波兰06|1359ms|24Mbps|机房|纯净度99.9%
+  - 罗马尼亚62|1429ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚63|1439ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚64|1424ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚65|1405ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚66|1480ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚67|1460ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚68|1454ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚69|1471ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚70|1512ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚71|1422ms|19Mbps|机房|纯净度100.0%
+  - 罗马尼亚72|1498ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚73|1437ms|21Mbps|机房|纯净度100.0%
+  - 罗马尼亚74|1487ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚75|1414ms|16Mbps|机房|纯净度100.0%
+  - 罗马尼亚76|1512ms|16Mbps|机房|纯净度100.0%
+  - 罗马尼亚77|1435ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚78|1405ms|21Mbps|机房|纯净度100.0%
+  - 罗马尼亚79|1495ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚80|1322ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚81|1465ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚82|1454ms|22Mbps|机房|纯净度100.0%
+  - 罗马尼亚83|1499ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚84|1488ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚85|1621ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚86|1442ms|8Mbps|机房|纯净度92.6%
+  - 罗马尼亚87|1605ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚88|1545ms|18Mbps|机房|纯净度100.0%
+  - 罗马尼亚89|1543ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚90|1057ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚91|1466ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚92|1529ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚93|1608ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚94|1559ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚95|1548ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚96|1260ms|6Mbps|机房|纯净度92.6%
+  - 罗马尼亚97|1334ms|14Mbps|机房|纯净度92.6%
+  - 罗马尼亚98|1451ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚99|1193ms|7Mbps|机房|纯净度92.6%
+  - 罗马尼亚100|1379ms|14Mbps|机房|纯净度100.0%
+  - 罗马尼亚101|1519ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚102|1389ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚103|1879ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚104|1108ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚105|1606ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚106|1520ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚107|1496ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚108|1565ms|9Mbps|机房|纯净度100.0%
+  - 德国26|691ms|12Mbps|机房|纯净度99.8%
+  - 美国37|163ms|99Mbps|机房|纯净度100.0%
+  - 美国38|314ms|37Mbps|机房|纯净度98.0%
+  - 美国39|181ms|110Mbps|机房|纯净度100.0%
+  - 罗马尼亚109|1732ms|15Mbps|机房|纯净度100.0%
+  - 罗马尼亚110|1631ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚111|1672ms|10Mbps|机房|纯净度100.0%
+  - 爱尔兰12|819ms|22Mbps|机房|纯净度100.0%
+  - 爱尔兰13|840ms|19Mbps|机房|纯净度100.0%
+  - 意大利15|789ms|18Mbps|机房|纯净度95.3%
+  - 德国27|1057ms|19Mbps|机房|纯净度100.0%
+  - 韩国02|1421ms|22Mbps|机房|纯净度99.9%
+  - 意大利16|929ms|17Mbps|机房|纯净度95.3%
+  - 荷兰78|629ms|18Mbps|机房|纯净度99.7%
+  - 意大利17|817ms|29Mbps|机房|纯净度95.3%
+  - 罗马尼亚112|1049ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚113|1596ms|11Mbps|机房|纯净度100.0%
+  - 意大利18|777ms|15Mbps|机房|纯净度95.3%
+  - 罗马尼亚114|1379ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚115|1137ms|7Mbps|机房|纯净度92.6%
+  - 罗马尼亚116|1317ms|12Mbps|机房|纯净度100.0%
+  - 意大利19|839ms|19Mbps|机房|纯净度95.3%
+  - 罗马尼亚117|1274ms|7Mbps|机房|纯净度92.6%
+  - 荷兰79|1120ms|23Mbps|机房|纯净度99.6%
+  - 意大利20|1353ms|24Mbps|机房|纯净度95.3%
+  - MX04|552ms|23Mbps|机房|纯净度97.3%
+  - 美国40|179ms|92Mbps|机房|纯净度100.0%
+  - 意大利21|898ms|15Mbps|机房|纯净度95.3%
+  - 罗马尼亚118|1319ms|9Mbps|机房|纯净度100.0%
+  - 爱尔兰14|822ms|23Mbps|机房|纯净度100.0%
+  - 美国41|319ms|17Mbps|机房|纯净度98.0%
+  - 罗马尼亚119|1084ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚120|1485ms|5Mbps|机房|纯净度100.0%
+  - 加拿大01|461ms|33Mbps|机房|纯净度98.8%
+  - 荷兰80|898ms|12Mbps|机房|纯净度99.6%
+  - 美国42|861ms|31Mbps|机房|纯净度100.0%
+  - 荷兰81|782ms|15Mbps|机房|纯净度99.6%
+  - 美国43|706ms|203Mbps|机房|纯净度100.0%
+  - 荷兰82|360ms|152Mbps|机房|纯净度100.0%
+  - 荷兰83|891ms|10Mbps|机房|纯净度99.6%
+  - 美国44|923ms|182Mbps|机房|纯净度100.0%
+  - 美国45|802ms|31Mbps|机房|纯净度100.0%
+  - 荷兰84|766ms|10Mbps|机房|纯净度99.6%
+  - 意大利22|929ms|26Mbps|机房|纯净度95.3%
+  - 意大利23|1036ms|15Mbps|机房|纯净度95.3%
+  - 意大利24|750ms|19Mbps|机房|纯净度95.3%
+  - 意大利25|1049ms|16Mbps|机房|纯净度95.3%
+  - 意大利26|835ms|13Mbps|机房|纯净度95.3%
+  - 意大利27|795ms|17Mbps|机房|纯净度95.3%
+  - 荷兰85|915ms|25Mbps|机房|纯净度98.8%
+  - 荷兰86|957ms|15Mbps|机房|纯净度98.8%
+  - 德国28|784ms|17Mbps|机房|纯净度100.0%
   - 🍓 请前往官网重新获取订阅
   url: https://claude.ai/cdn-cgi/trace
   interval: 120
@@ -4085,221 +4160,219 @@ proxy-groups:
 - name: ⭐ 综合优选
   type: url-test
   proxies:
-  - 美国01|169ms|826Mbps|机房|纯净度未知
-  - 美国02|196ms|691Mbps|机房|纯净度未知
-  - 美国03|214ms|204Mbps|机房|纯净度99.9%
-  - 美国04|199ms|711Mbps|机房|纯净度未知
-  - 美国05|206ms|938Mbps|机房|纯净度未知
-  - 美国06|218ms|251Mbps|机房|纯净度99.9%
-  - 美国07|218ms|1188Mbps|机房|纯净度未知
-  - 美国08|214ms|771Mbps|机房|纯净度未知
-  - 美国09|220ms|264Mbps|机房|纯净度99.9%
-  - 美国10|202ms|188Mbps|机房|纯净度99.9%
-  - 美国11|206ms|1450Mbps|机房|纯净度未知
-  - 美国12|236ms|235Mbps|机房|纯净度99.9%
-  - 美国13|282ms|502Mbps|机房|纯净度100.0%
-  - 美国14|298ms|4Mbps|机房|纯净度99.7%
-  - 美国15|289ms|364Mbps|机房|纯净度100.0%
-  - 美国16|301ms|500Mbps|机房|纯净度100.0%
-  - 美国17|298ms|518Mbps|机房|纯净度100.0%
-  - 美国18|488ms|473Mbps|机房|纯净度99.6%
-  - 德国01|489ms|311Mbps|未知|纯净度100.0%
-  - 爱尔兰01|538ms|280Mbps|机房|纯净度100.0%
-  - 爱尔兰02|533ms|253Mbps|机房|纯净度100.0%
-  - 爱尔兰03|541ms|248Mbps|机房|纯净度100.0%
-  - 美国19|528ms|390Mbps|机房|纯净度100.0%
-  - 美国20|525ms|552Mbps|机房|纯净度100.0%
-  - 美国21|510ms|374Mbps|机房|纯净度100.0%
-  - 爱尔兰04|542ms|277Mbps|机房|纯净度100.0%
-  - 美国22|558ms|160Mbps|机房|纯净度100.0%
-  - 爱尔兰05|552ms|260Mbps|机房|纯净度100.0%
-  - 美国23|565ms|118Mbps|机房|纯净度100.0%
-  - MX01|564ms|19Mbps|机房|纯净度97.3%
-  - MX02|569ms|14Mbps|机房|纯净度100.0%
-  - 美国24|545ms|122Mbps|机房|纯净度100.0%
-  - 美国25|599ms|288Mbps|机房|纯净度98.7%
-  - 法国01|627ms|20Mbps|机房|纯净度99.2%
-  - 法国02|620ms|21Mbps|机房|纯净度99.2%
-  - 荷兰01|652ms|25Mbps|机房|纯净度99.6%
-  - 荷兰02|659ms|28Mbps|机房|纯净度96.4%
-  - 美国26|660ms|274Mbps|机房|纯净度98.7%
-  - 德国02|711ms|30Mbps|机房|纯净度100.0%
-  - 德国03|718ms|30Mbps|机房|纯净度100.0%
-  - MX03|707ms|21Mbps|机房|纯净度100.0%
-  - 荷兰03|710ms|32Mbps|机房|纯净度96.4%
-  - 奥地利01|694ms|13Mbps|机房|纯净度100.0%
-  - 英国01|737ms|28Mbps|机房|纯净度100.0%
-  - 德国04|698ms|29Mbps|机房|纯净度100.0%
-  - 荷兰04|678ms|29Mbps|机房|纯净度96.4%
-  - 美国27|592ms|15Mbps|机房|纯净度100.0%
-  - BR01|876ms|25Mbps|机房|纯净度100.0%
-  - BR02|870ms|25Mbps|机房|纯净度100.0%
-  - 荷兰05|888ms|25Mbps|机房|纯净度100.0%
-  - 荷兰06|891ms|24Mbps|机房|纯净度100.0%
-  - 荷兰07|891ms|25Mbps|机房|纯净度100.0%
-  - 爱尔兰06|903ms|26Mbps|机房|纯净度100.0%
-  - BR03|903ms|26Mbps|机房|纯净度100.0%
-  - 芬兰01|869ms|18Mbps|机房|纯净度99.9%
-  - 意大利01|905ms|21Mbps|机房|纯净度95.3%
-  - BR04|886ms|25Mbps|机房|纯净度100.0%
-  - 意大利02|886ms|21Mbps|机房|纯净度95.3%
-  - 荷兰08|910ms|32Mbps|机房|纯净度96.4%
-  - BR05|924ms|24Mbps|机房|纯净度100.0%
-  - 荷兰09|914ms|33Mbps|机房|纯净度96.4%
-  - BR06|911ms|24Mbps|机房|纯净度100.0%
-  - 意大利03|885ms|24Mbps|机房|纯净度95.3%
-  - 荷兰10|929ms|27Mbps|机房|纯净度100.0%
-  - 波兰01|918ms|31Mbps|机房|纯净度100.0%
-  - 荷兰11|910ms|32Mbps|机房|纯净度96.4%
-  - 荷兰12|923ms|32Mbps|机房|纯净度96.4%
-  - 爱尔兰07|913ms|31Mbps|机房|纯净度100.0%
-  - 荷兰13|909ms|30Mbps|机房|纯净度96.4%
-  - 芬兰02|840ms|16Mbps|机房|纯净度99.9%
-  - 芬兰03|869ms|22Mbps|机房|纯净度99.9%
-  - 芬兰04|894ms|21Mbps|机房|纯净度99.9%
-  - 爱尔兰08|913ms|29Mbps|机房|纯净度100.0%
-  - 荷兰14|933ms|22Mbps|机房|纯净度100.0%
-  - 荷兰15|906ms|31Mbps|机房|纯净度96.4%
-  - 荷兰16|938ms|30Mbps|机房|纯净度96.4%
-  - 意大利04|884ms|21Mbps|机房|纯净度95.3%
-  - 罗马尼亚01|948ms|14Mbps|机房|纯净度100.0%
-  - 日本01|957ms|20Mbps|未知|纯净度100.0%
-  - 意大利05|864ms|22Mbps|机房|纯净度95.3%
-  - 荷兰17|962ms|14Mbps|机房|纯净度96.4%
-  - 法国03|959ms|11Mbps|机房|纯净度100.0%
-  - 法国04|975ms|7Mbps|机房|纯净度100.0%
-  - 法国05|969ms|24Mbps|机房|纯净度100.0%
-  - 荷兰18|938ms|26Mbps|机房|纯净度100.0%
-  - 罗马尼亚02|954ms|12Mbps|机房|纯净度100.0%
-  - 日本02|919ms|18Mbps|机房|纯净度100.0%
-  - 荷兰19|961ms|27Mbps|机房|纯净度100.0%
-  - 荷兰20|991ms|22Mbps|机房|纯净度99.7%
-  - 罗马尼亚03|951ms|14Mbps|机房|纯净度100.0%
-  - 荷兰21|966ms|25Mbps|机房|纯净度100.0%
-  - 法国06|991ms|23Mbps|机房|纯净度100.0%
-  - 荷兰22|926ms|28Mbps|机房|纯净度100.0%
-  - 荷兰23|972ms|29Mbps|机房|纯净度100.0%
-  - 法国07|980ms|11Mbps|机房|纯净度100.0%
-  - 意大利06|878ms|21Mbps|机房|纯净度95.3%
-  - 荷兰24|961ms|27Mbps|机房|纯净度100.0%
-  - 美国28|741ms|6Mbps|机房|纯净度99.8%
-  - 荷兰25|968ms|27Mbps|机房|纯净度100.0%
-  - 意大利07|840ms|24Mbps|机房|纯净度95.3%
-  - 荷兰26|991ms|20Mbps|机房|纯净度99.7%
-  - 荷兰27|1000ms|20Mbps|机房|纯净度99.7%
-  - 荷兰28|992ms|19Mbps|机房|纯净度99.7%
-  - 德国05|969ms|17Mbps|机房|纯净度99.8%
-  - 罗马尼亚04|980ms|24Mbps|机房|纯净度100.0%
-  - 奥地利02|1026ms|22Mbps|机房|纯净度100.0%
-  - 荷兰29|990ms|21Mbps|机房|纯净度99.7%
-  - 荷兰30|1009ms|21Mbps|机房|纯净度99.7%
-  - 德国06|1040ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚05|939ms|23Mbps|机房|纯净度100.0%
-  - 意大利08|919ms|13Mbps|机房|纯净度95.3%
-  - 罗马尼亚06|964ms|9Mbps|机房|纯净度100.0%
-  - 罗马尼亚07|1019ms|22Mbps|机房|纯净度100.0%
-  - 德国07|1041ms|24Mbps|机房|纯净度100.0%
-  - 德国08|1057ms|23Mbps|机房|纯净度100.0%
-  - 荷兰31|669ms|32Mbps|机房|纯净度96.4%
-  - 荷兰32|1042ms|19Mbps|机房|纯净度96.4%
-  - 荷兰33|1039ms|6Mbps|机房|纯净度96.4%
-  - 意大利09|823ms|20Mbps|机房|纯净度95.3%
-  - 荷兰34|1079ms|17Mbps|机房|纯净度96.4%
-  - 荷兰35|1095ms|17Mbps|机房|纯净度96.4%
-  - 荷兰36|1117ms|17Mbps|机房|纯净度96.4%
-  - 荷兰37|967ms|19Mbps|机房|纯净度96.4%
-  - 荷兰38|1100ms|21Mbps|机房|纯净度96.4%
-  - 荷兰39|1098ms|19Mbps|机房|纯净度96.4%
-  - 德国09|1114ms|22Mbps|机房|纯净度99.8%
-  - 德国10|1124ms|17Mbps|机房|纯净度99.8%
-  - 荷兰40|1046ms|19Mbps|机房|纯净度96.4%
-  - 德国11|1107ms|21Mbps|机房|纯净度99.8%
-  - 德国12|1126ms|18Mbps|机房|纯净度99.8%
-  - 荷兰41|1108ms|18Mbps|机房|纯净度96.4%
-  - 德国13|1121ms|20Mbps|机房|纯净度99.8%
-  - 德国14|1134ms|20Mbps|机房|纯净度99.8%
-  - 拉脱维亚01|1141ms|19Mbps|机房|纯净度99.0%
-  - 德国15|1141ms|17Mbps|机房|纯净度99.6%
-  - 荷兰42|943ms|26Mbps|机房|纯净度100.0%
-  - 德国16|1163ms|4Mbps|机房|纯净度100.0%
-  - 拉脱维亚02|1148ms|21Mbps|机房|纯净度99.0%
-  - 罗马尼亚08|1044ms|24Mbps|机房|纯净度100.0%
-  - 拉脱维亚03|1166ms|21Mbps|机房|纯净度99.0%
-  - 德国17|1172ms|17Mbps|机房|纯净度99.6%
-  - 德国18|1167ms|6Mbps|机房|纯净度100.0%
-  - 拉脱维亚04|1196ms|20Mbps|机房|纯净度99.0%
-  - 拉脱维亚05|1189ms|22Mbps|机房|纯净度99.0%
-  - 德国19|1081ms|18Mbps|机房|纯净度99.6%
-  - 拉脱维亚06|1216ms|22Mbps|机房|纯净度99.0%
-  - 罗马尼亚09|1210ms|10Mbps|机房|纯净度100.0%
-  - 拉脱维亚07|1174ms|20Mbps|机房|纯净度99.0%
-  - 爱尔兰09|924ms|28Mbps|机房|纯净度100.0%
-  - 罗马尼亚10|1211ms|19Mbps|机房|纯净度100.0%
-  - 罗马尼亚11|1184ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚12|1249ms|18Mbps|机房|纯净度100.0%
-  - 拉脱维亚08|1218ms|22Mbps|机房|纯净度99.0%
-  - 罗马尼亚13|1201ms|17Mbps|机房|纯净度100.0%
-  - 美国29|1248ms|11Mbps|移动网络|纯净度100.0%
-  - 罗马尼亚14|1221ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚15|1226ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚16|1275ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚17|1231ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚18|1284ms|16Mbps|机房|纯净度100.0%
-  - 意大利10|967ms|15Mbps|机房|纯净度95.3%
-  - 罗马尼亚19|1226ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚20|1236ms|18Mbps|机房|纯净度100.0%
-  - 德国20|1290ms|14Mbps|住宅|纯净度100.0%
-  - 以色列01|1306ms|19Mbps|未知|纯净度100.0%
-  - 罗马尼亚21|1212ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚22|1297ms|20Mbps|机房|纯净度100.0%
-  - 罗马尼亚23|1333ms|9Mbps|机房|纯净度100.0%
-  - 以色列02|1292ms|20Mbps|未知|纯净度100.0%
-  - 罗马尼亚24|1278ms|18Mbps|机房|纯净度100.0%
-  - 以色列03|1287ms|20Mbps|未知|纯净度100.0%
-  - 罗马尼亚25|1311ms|9Mbps|机房|纯净度100.0%
-  - 罗马尼亚26|1320ms|16Mbps|机房|纯净度100.0%
-  - 以色列04|1296ms|19Mbps|未知|纯净度100.0%
-  - 罗马尼亚27|1320ms|11Mbps|机房|纯净度100.0%
-  - 罗马尼亚28|1309ms|11Mbps|机房|纯净度100.0%
-  - 印度尼西亚01|1321ms|12Mbps|住宅|纯净度98.2%
-  - 意大利11|808ms|24Mbps|机房|纯净度95.3%
-  - 罗马尼亚29|1371ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚30|1312ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚31|1386ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚32|1341ms|19Mbps|机房|纯净度100.0%
-  - 越南01|1342ms|13Mbps|住宅|纯净度100.0%
-  - 罗马尼亚33|1346ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚34|1400ms|17Mbps|机房|纯净度100.0%
-  - 波兰02|1027ms|21Mbps|机房|纯净度100.0%
-  - 新加坡01|1431ms|15Mbps|机房|纯净度100.0%
-  - 罗马尼亚35|1416ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚36|1371ms|8Mbps|机房|纯净度100.0%
-  - 泰国01|1444ms|14Mbps|机房|纯净度100.0%
-  - 德国21|1225ms|12Mbps|住宅|纯净度100.0%
-  - 罗马尼亚37|1404ms|18Mbps|机房|纯净度100.0%
-  - 爱尔兰10|1060ms|30Mbps|机房|纯净度100.0%
-  - 罗马尼亚38|1411ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚39|1418ms|18Mbps|机房|纯净度100.0%
-  - 泰国02|1493ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚40|1317ms|6Mbps|机房|纯净度100.0%
-  - 罗马尼亚41|1335ms|17Mbps|机房|纯净度100.0%
-  - 日本03|1620ms|20Mbps|未知|纯净度100.0%
-  - 意大利12|1024ms|22Mbps|机房|纯净度95.3%
-  - 意大利13|1206ms|5Mbps|机房|纯净度95.3%
-  - 意大利14|938ms|15Mbps|机房|纯净度95.3%
-  - 意大利15|847ms|22Mbps|机房|纯净度95.3%
-  - 意大利16|807ms|21Mbps|机房|纯净度95.3%
-  - 意大利17|1135ms|5Mbps|机房|纯净度95.3%
-  - 意大利18|1036ms|12Mbps|机房|纯净度95.3%
-  - 意大利19|1050ms|22Mbps|机房|纯净度95.3%
-  - 新加坡02|1716ms|10Mbps|机房|纯净度99.3%
-  - 意大利20|838ms|5Mbps|机房|纯净度95.3%
-  - 泰国03|1893ms|11Mbps|住宅|纯净度100.0%
-  - 意大利21|907ms|16Mbps|机房|纯净度95.3%
-  - 泰国04|1756ms|7Mbps|机房|纯净度98.8%
-  - 德国22|1470ms|15Mbps|机房|纯净度100.0%
-  - 意大利22|979ms|16Mbps|机房|纯净度95.3%
-  - 美国30|761ms|17Mbps|机房|纯净度99.8%
+  - 美国01|202ms|583Mbps|机房|纯净度100.0%
+  - 美国02|209ms|1476Mbps|机房|纯净度未知
+  - 美国03|212ms|964Mbps|机房|纯净度未知
+  - 美国04|211ms|495Mbps|机房|纯净度100.0%
+  - 美国05|212ms|598Mbps|机房|纯净度100.0%
+  - 美国06|228ms|640Mbps|机房|纯净度未知
+  - 美国07|220ms|1320Mbps|机房|纯净度未知
+  - 美国08|216ms|1538Mbps|机房|纯净度未知
+  - 美国09|216ms|556Mbps|机房|纯净度100.0%
+  - 美国10|218ms|1058Mbps|机房|纯净度未知
+  - 美国11|239ms|1044Mbps|机房|纯净度未知
+  - 美国12|360ms|181Mbps|机房|纯净度99.9%
+  - 美国13|391ms|177Mbps|机房|纯净度99.9%
+  - 美国14|394ms|304Mbps|机房|纯净度99.9%
+  - 美国15|411ms|268Mbps|机房|纯净度99.9%
+  - 美国16|428ms|21Mbps|机房|纯净度100.0%
+  - 荷兰01|417ms|26Mbps|机房|纯净度100.0%
+  - MX01|446ms|17Mbps|机房|纯净度100.0%
+  - 美国17|530ms|32Mbps|机房|纯净度100.0%
+  - 美国18|503ms|165Mbps|机房|纯净度99.6%
+  - 美国19|384ms|275Mbps|机房|纯净度99.9%
+  - 美国20|516ms|28Mbps|机房|纯净度100.0%
+  - MX02|556ms|21Mbps|机房|纯净度97.3%
+  - 荷兰02|625ms|17Mbps|机房|纯净度99.7%
+  - 美国21|593ms|178Mbps|机房|纯净度98.7%
+  - 荷兰03|622ms|16Mbps|机房|纯净度99.7%
+  - 荷兰04|625ms|16Mbps|机房|纯净度99.7%
+  - 荷兰05|627ms|19Mbps|机房|纯净度99.7%
+  - 美国22|606ms|106Mbps|机房|纯净度98.7%
+  - 美国23|596ms|159Mbps|机房|纯净度100.0%
+  - 荷兰06|655ms|18Mbps|机房|纯净度99.7%
+  - 意大利01|615ms|18Mbps|机房|纯净度95.3%
+  - 荷兰07|628ms|13Mbps|机房|纯净度99.7%
+  - 意大利02|632ms|17Mbps|机房|纯净度95.3%
+  - 德国01|687ms|9Mbps|机房|纯净度99.8%
+  - 德国02|692ms|16Mbps|机房|纯净度99.8%
+  - 德国03|699ms|15Mbps|机房|纯净度99.8%
+  - 德国04|699ms|14Mbps|机房|纯净度99.8%
+  - 美国24|507ms|28Mbps|机房|纯净度100.0%
+  - 美国25|609ms|255Mbps|机房|纯净度98.7%
+  - 德国05|707ms|14Mbps|机房|纯净度99.8%
+  - 德国06|707ms|16Mbps|机房|纯净度99.8%
+  - 美国26|630ms|11Mbps|机房|纯净度99.9%
+  - 意大利03|746ms|19Mbps|机房|纯净度95.3%
+  - 法国01|790ms|25Mbps|机房|纯净度99.2%
+  - 法国02|799ms|26Mbps|机房|纯净度99.2%
+  - 爱尔兰01|820ms|20Mbps|机房|纯净度100.0%
+  - 爱尔兰02|825ms|6Mbps|机房|纯净度100.0%
+  - 爱尔兰03|825ms|264Mbps|机房|纯净度100.0%
+  - 爱尔兰04|827ms|231Mbps|机房|纯净度100.0%
+  - 爱尔兰05|812ms|23Mbps|机房|纯净度100.0%
+  - 爱尔兰06|822ms|277Mbps|机房|纯净度100.0%
+  - 爱尔兰07|834ms|21Mbps|机房|纯净度100.0%
+  - 爱尔兰08|842ms|286Mbps|机房|纯净度100.0%
+  - 荷兰08|839ms|29Mbps|机房|纯净度96.4%
+  - 荷兰09|853ms|32Mbps|机房|纯净度96.4%
+  - 荷兰10|856ms|31Mbps|机房|纯净度96.4%
+  - 爱尔兰09|833ms|33Mbps|机房|纯净度100.0%
+  - 爱尔兰10|839ms|155Mbps|机房|纯净度100.0%
+  - 美国27|617ms|236Mbps|机房|纯净度98.7%
+  - 荷兰11|846ms|33Mbps|机房|纯净度96.4%
+  - 荷兰12|855ms|29Mbps|机房|纯净度96.4%
+  - 荷兰13|862ms|29Mbps|机房|纯净度96.4%
+  - 意大利04|589ms|15Mbps|机房|纯净度95.3%
+  - 荷兰14|860ms|29Mbps|机房|纯净度96.4%
+  - 荷兰15|835ms|27Mbps|机房|纯净度96.4%
+  - 荷兰16|881ms|18Mbps|机房|纯净度100.0%
+  - 荷兰17|876ms|31Mbps|机房|纯净度96.4%
+  - 荷兰18|884ms|19Mbps|机房|纯净度100.0%
+  - 荷兰19|885ms|16Mbps|机房|纯净度100.0%
+  - 荷兰20|883ms|20Mbps|机房|纯净度100.0%
+  - 荷兰21|879ms|18Mbps|机房|纯净度100.0%
+  - 德国07|863ms|21Mbps|机房|纯净度100.0%
+  - 荷兰22|884ms|17Mbps|机房|纯净度100.0%
+  - 美国28|613ms|161Mbps|机房|纯净度100.0%
+  - 德国08|904ms|23Mbps|机房|纯净度100.0%
+  - 德国09|896ms|27Mbps|机房|纯净度100.0%
+  - 荷兰23|879ms|14Mbps|机房|纯净度100.0%
+  - 德国10|926ms|14Mbps|机房|纯净度100.0%
+  - 荷兰24|876ms|18Mbps|机房|纯净度100.0%
+  - 德国11|929ms|16Mbps|机房|纯净度100.0%
+  - 德国12|942ms|15Mbps|机房|纯净度100.0%
+  - 日本01|892ms|20Mbps|未知|纯净度100.0%
+  - 法国03|963ms|18Mbps|机房|纯净度100.0%
+  - 荷兰25|886ms|18Mbps|机房|纯净度100.0%
+  - 荷兰26|967ms|17Mbps|机房|纯净度100.0%
+  - 法国04|967ms|17Mbps|机房|纯净度100.0%
+  - 荷兰27|976ms|25Mbps|机房|纯净度96.4%
+  - 荷兰28|954ms|17Mbps|机房|纯净度100.0%
+  - 意大利05|771ms|19Mbps|机房|纯净度95.3%
+  - 荷兰29|979ms|25Mbps|机房|纯净度96.4%
+  - 荷兰30|977ms|25Mbps|机房|纯净度96.4%
+  - 荷兰31|990ms|25Mbps|机房|纯净度96.4%
+  - 荷兰32|999ms|23Mbps|机房|纯净度96.4%
+  - 荷兰33|883ms|18Mbps|机房|纯净度100.0%
+  - 荷兰34|996ms|25Mbps|机房|纯净度96.4%
+  - 荷兰35|982ms|25Mbps|机房|纯净度96.4%
+  - 荷兰36|991ms|23Mbps|机房|纯净度96.4%
+  - 法国05|980ms|17Mbps|机房|纯净度100.0%
+  - 荷兰37|962ms|18Mbps|机房|纯净度100.0%
+  - 荷兰38|1004ms|30Mbps|机房|纯净度96.4%
+  - 法国06|1009ms|17Mbps|机房|纯净度100.0%
+  - 德国13|999ms|17Mbps|机房|纯净度100.0%
+  - 美国29|680ms|96Mbps|机房|纯净度98.7%
+  - 荷兰39|974ms|22Mbps|机房|纯净度96.4%
+  - 荷兰40|978ms|25Mbps|机房|纯净度96.4%
+  - 荷兰41|863ms|28Mbps|机房|纯净度96.4%
+  - BR01|1065ms|22Mbps|机房|纯净度100.0%
+  - BR02|1060ms|16Mbps|机房|纯净度100.0%
+  - 意大利06|845ms|9Mbps|机房|纯净度95.3%
+  - BR03|1067ms|20Mbps|机房|纯净度100.0%
+  - 法国07|1052ms|23Mbps|机房|纯净度99.2%
+  - BR04|1045ms|15Mbps|机房|纯净度100.0%
+  - BR05|1078ms|17Mbps|机房|纯净度100.0%
+  - BR06|1089ms|18Mbps|机房|纯净度100.0%
+  - 芬兰01|971ms|16Mbps|机房|纯净度99.9%
+  - MX03|677ms|24Mbps|机房|纯净度100.0%
+  - 荷兰42|1117ms|18Mbps|机房|纯净度99.6%
+  - 德国14|1041ms|8Mbps|机房|纯净度100.0%
+  - 荷兰43|1125ms|26Mbps|机房|纯净度99.6%
+  - 美国30|1021ms|10Mbps|移动网络|纯净度100.0%
+  - 德国15|964ms|7Mbps|住宅|纯净度100.0%
+  - 罗马尼亚01|1123ms|13Mbps|机房|纯净度100.0%
+  - 荷兰44|841ms|28Mbps|机房|纯净度96.4%
+  - 罗马尼亚02|1147ms|5Mbps|机房|纯净度100.0%
+  - 法国08|977ms|17Mbps|机房|纯净度100.0%
+  - 芬兰02|1208ms|17Mbps|机房|纯净度99.9%
+  - 以色列01|1231ms|13Mbps|未知|纯净度100.0%
+  - 以色列02|1242ms|12Mbps|未知|纯净度100.0%
+  - 德国16|1251ms|26Mbps|机房|纯净度99.6%
+  - 德国17|1001ms|26Mbps|机房|纯净度99.6%
+  - 德国18|1222ms|6Mbps|机房|纯净度100.0%
+  - 以色列03|1240ms|12Mbps|未知|纯净度100.0%
+  - 罗马尼亚03|1249ms|6Mbps|机房|纯净度100.0%
+  - 德国19|1258ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚04|1212ms|17Mbps|机房|纯净度100.0%
+  - 拉脱维亚01|1155ms|17Mbps|机房|纯净度99.0%
+  - 德国20|1140ms|28Mbps|机房|纯净度99.6%
+  - 拉脱维亚02|1284ms|14Mbps|机房|纯净度99.0%
+  - 爱尔兰11|817ms|23Mbps|机房|纯净度100.0%
+  - 德国21|1296ms|28Mbps|机房|纯净度99.6%
+  - 拉脱维亚03|1226ms|18Mbps|机房|纯净度99.0%
+  - 芬兰03|1210ms|18Mbps|机房|纯净度99.9%
+  - 罗马尼亚05|1266ms|12Mbps|机房|纯净度100.0%
+  - 以色列04|1249ms|11Mbps|未知|纯净度100.0%
+  - 拉脱维亚04|1205ms|15Mbps|机房|纯净度99.0%
+  - 芬兰04|1024ms|15Mbps|机房|纯净度99.9%
+  - 罗马尼亚06|1191ms|17Mbps|机房|纯净度100.0%
+  - 波兰01|1182ms|25Mbps|机房|纯净度100.0%
+  - 罗马尼亚07|1130ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚08|1112ms|7Mbps|机房|纯净度100.0%
+  - 拉脱维亚05|1290ms|18Mbps|机房|纯净度99.0%
+  - 罗马尼亚09|1270ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚10|1246ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚11|1309ms|5Mbps|机房|纯净度100.0%
+  - 印度尼西亚01|1341ms|14Mbps|住宅|纯净度98.2%
+  - 拉脱维亚06|1308ms|13Mbps|机房|纯净度99.0%
+  - 罗马尼亚12|1114ms|12Mbps|机房|纯净度100.0%
+  - 拉脱维亚07|1191ms|18Mbps|机房|纯净度99.0%
+  - 罗马尼亚13|1352ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚14|1360ms|6Mbps|机房|纯净度100.0%
+  - 美国31|825ms|19Mbps|机房|纯净度100.0%
+  - 罗马尼亚15|1390ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚16|1258ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚17|1424ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚18|1442ms|9Mbps|机房|纯净度100.0%
+  - 波兰02|1283ms|24Mbps|机房|纯净度99.9%
+  - 罗马尼亚19|1417ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚20|1257ms|5Mbps|机房|纯净度100.0%
+  - 泰国01|1328ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚21|1329ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚22|1370ms|7Mbps|机房|纯净度100.0%
+  - 越南01|1453ms|12Mbps|住宅|纯净度100.0%
+  - 意大利07|681ms|13Mbps|机房|纯净度95.3%
+  - 罗马尼亚23|1390ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚24|1379ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚25|1328ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚26|1410ms|18Mbps|机房|纯净度100.0%
+  - 罗马尼亚27|1353ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚28|1143ms|14Mbps|机房|纯净度100.0%
+  - 拉脱维亚08|1314ms|18Mbps|机房|纯净度99.0%
+  - 罗马尼亚29|1373ms|7Mbps|机房|纯净度100.0%
+  - 泰国02|1533ms|11Mbps|住宅|纯净度100.0%
+  - 泰国03|1576ms|9Mbps|机房|纯净度100.0%
+  - 印度尼西亚02|1584ms|10Mbps|未知|纯净度100.0%
+  - 日本02|1408ms|12Mbps|未知|纯净度100.0%
+  - 罗马尼亚30|1236ms|15Mbps|机房|纯净度100.0%
+  - 新加坡01|1676ms|13Mbps|机房|纯净度100.0%
+  - 泰国04|1698ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚31|1500ms|16Mbps|机房|纯净度100.0%
+  - 意大利08|1554ms|22Mbps|机房|纯净度95.3%
+  - 罗马尼亚32|1568ms|8Mbps|机房|纯净度100.0%
+  - 意大利09|932ms|17Mbps|机房|纯净度95.3%
+  - 意大利10|938ms|24Mbps|机房|纯净度95.3%
+  - 罗马尼亚33|1454ms|6Mbps|机房|纯净度100.0%
+  - 法国09|1257ms|14Mbps|机房|纯净度99.8%
+  - 法国10|1018ms|15Mbps|机房|纯净度100.0%
+  - 美国32|189ms|34Mbps|机房|纯净度100.0%
+  - 德国22|1402ms|4Mbps|机房|纯净度100.0%
+  - 罗马尼亚34|1398ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚35|1279ms|8Mbps|机房|纯净度100.0%
+  - 德国23|1343ms|24Mbps|机房|纯净度100.0%
+  - 罗马尼亚36|1355ms|10Mbps|机房|纯净度100.0%
+  - 荷兰45|1123ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚37|1323ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚38|1304ms|7Mbps|机房|纯净度100.0%
+  - 意大利11|1128ms|21Mbps|机房|纯净度95.3%
+  - 荷兰46|1163ms|20Mbps|机房|纯净度100.0%
+  - 罗马尼亚39|1304ms|10Mbps|机房|纯净度100.0%
+  - 意大利12|1026ms|15Mbps|机房|纯净度95.3%
+  - 意大利13|778ms|19Mbps|机房|纯净度95.3%
+  - 意大利14|893ms|18Mbps|机房|纯净度95.3%
+  - 韩国01|1397ms|22Mbps|机房|纯净度99.9%
   url: https://claude.ai/cdn-cgi/trace
   interval: 120
   lazy: false
@@ -4309,380 +4382,381 @@ proxy-groups:
 - name: 🚄 中速下载
   type: url-test
   proxies:
-  - 美国23|565ms|118Mbps|机房|纯净度100.0%
-  - 美国31|156ms|964Mbps|机房|纯净度未知
-  - 美国32|170ms|511Mbps|机房|纯净度未知
-  - 美国22|558ms|160Mbps|机房|纯净度100.0%
-  - 美国21|510ms|374Mbps|机房|纯净度100.0%
-  - 美国11|206ms|1450Mbps|机房|纯净度未知
-  - 美国20|525ms|552Mbps|机房|纯净度100.0%
-  - 美国07|218ms|1188Mbps|机房|纯净度未知
-  - 美国33|187ms|922Mbps|机房|纯净度未知
-  - 美国05|206ms|938Mbps|机房|纯净度未知
-  - 美国18|488ms|473Mbps|机房|纯净度99.6%
-  - 美国13|282ms|502Mbps|机房|纯净度100.0%
-  - 美国17|298ms|518Mbps|机房|纯净度100.0%
-  - 美国16|301ms|500Mbps|机房|纯净度100.0%
-  - 美国06|218ms|251Mbps|机房|纯净度99.9%
-  - 美国09|220ms|264Mbps|机房|纯净度99.9%
-  - 美国39|228ms|48Mbps|机房|纯净度98.0%
-  - 美国03|214ms|204Mbps|机房|纯净度99.9%
-  - 美国19|528ms|390Mbps|机房|纯净度100.0%
-  - 美国12|236ms|235Mbps|机房|纯净度99.9%
-  - 美国10|202ms|188Mbps|机房|纯净度99.9%
-  - 美国15|289ms|364Mbps|机房|纯净度100.0%
-  - 美国04|199ms|711Mbps|机房|纯净度未知
-  - 美国01|169ms|826Mbps|机房|纯净度未知
-  - 美国08|214ms|771Mbps|机房|纯净度未知
-  - 美国02|196ms|691Mbps|机房|纯净度未知
-  - 美国26|660ms|274Mbps|机房|纯净度98.7%
-  - 德国01|489ms|311Mbps|未知|纯净度100.0%
-  - 爱尔兰05|552ms|260Mbps|机房|纯净度100.0%
-  - 美国38|520ms|38Mbps|机房|纯净度100.0%
-  - 爱尔兰04|542ms|277Mbps|机房|纯净度100.0%
-  - 美国24|545ms|122Mbps|机房|纯净度100.0%
-  - 爱尔兰03|541ms|248Mbps|机房|纯净度100.0%
-  - 爱尔兰02|533ms|253Mbps|机房|纯净度100.0%
-  - 爱尔兰01|538ms|280Mbps|机房|纯净度100.0%
-  - 美国37|534ms|160Mbps|机房|纯净度100.0%
-  - 美国25|599ms|288Mbps|机房|纯净度98.7%
-  - 荷兰77|621ms|74Mbps|机房|纯净度99.6%
-  - 美国35|568ms|34Mbps|机房|纯净度100.0%
-  - 荷兰44|692ms|33Mbps|机房|纯净度96.4%
-  - 荷兰09|914ms|33Mbps|机房|纯净度96.4%
-  - 荷兰50|695ms|32Mbps|机房|纯净度96.4%
-  - 荷兰08|910ms|32Mbps|机房|纯净度96.4%
-  - 荷兰31|669ms|32Mbps|机房|纯净度96.4%
-  - 荷兰11|910ms|32Mbps|机房|纯净度96.4%
-  - 荷兰03|710ms|32Mbps|机房|纯净度96.4%
-  - 荷兰48|694ms|32Mbps|机房|纯净度96.4%
-  - 荷兰79|663ms|32Mbps|机房|纯净度99.6%
-  - 荷兰12|923ms|32Mbps|机房|纯净度96.4%
-  - 荷兰15|906ms|31Mbps|机房|纯净度96.4%
-  - 爱尔兰07|913ms|31Mbps|机房|纯净度100.0%
-  - 波兰01|918ms|31Mbps|机房|纯净度100.0%
-  - 荷兰51|657ms|31Mbps|机房|纯净度96.4%
-  - 爱尔兰10|1060ms|30Mbps|机房|纯净度100.0%
-  - 德国02|711ms|30Mbps|机房|纯净度100.0%
-  - 荷兰16|938ms|30Mbps|机房|纯净度96.4%
-  - 荷兰13|909ms|30Mbps|机房|纯净度96.4%
-  - 荷兰43|684ms|30Mbps|机房|纯净度96.4%
-  - 德国03|718ms|30Mbps|机房|纯净度100.0%
-  - 加拿大01|332ms|29Mbps|机房|纯净度98.8%
-  - 荷兰80|656ms|29Mbps|机房|纯净度99.6%
-  - 德国04|698ms|29Mbps|机房|纯净度100.0%
-  - 爱尔兰08|913ms|29Mbps|机房|纯净度100.0%
-  - 荷兰04|678ms|29Mbps|机房|纯净度96.4%
-  - 荷兰23|972ms|29Mbps|机房|纯净度100.0%
-  - 荷兰02|659ms|28Mbps|机房|纯净度96.4%
-  - 荷兰22|926ms|28Mbps|机房|纯净度100.0%
-  - 英国01|737ms|28Mbps|机房|纯净度100.0%
-  - 爱尔兰09|924ms|28Mbps|机房|纯净度100.0%
-  - 爱尔兰11|915ms|27Mbps|机房|纯净度100.0%
-  - 波兰06|832ms|27Mbps|机房|纯净度99.9%
-  - 荷兰25|968ms|27Mbps|机房|纯净度100.0%
-  - 荷兰24|961ms|27Mbps|机房|纯净度100.0%
-  - 荷兰10|929ms|27Mbps|机房|纯净度100.0%
-  - 波兰04|882ms|27Mbps|机房|纯净度99.9%
-  - 荷兰19|961ms|27Mbps|机房|纯净度100.0%
-  - 波兰05|862ms|27Mbps|机房|纯净度99.9%
-  - 荷兰66|1097ms|27Mbps|机房|纯净度96.4%
-  - 荷兰60|1000ms|26Mbps|机房|纯净度96.4%
-  - 意大利32|892ms|26Mbps|机房|纯净度95.3%
-  - 爱尔兰06|903ms|26Mbps|机房|纯净度100.0%
-  - 荷兰42|943ms|26Mbps|机房|纯净度100.0%
-  - 荷兰18|938ms|26Mbps|机房|纯净度100.0%
-  - 荷兰52|685ms|26Mbps|机房|纯净度96.4%
-  - BR03|903ms|26Mbps|机房|纯净度100.0%
-  - 荷兰70|1103ms|26Mbps|机房|纯净度96.4%
-  - 意大利28|878ms|26Mbps|机房|纯净度95.3%
-  - BR01|876ms|25Mbps|机房|纯净度100.0%
-  - BR02|870ms|25Mbps|机房|纯净度100.0%
-  - 荷兰64|1089ms|25Mbps|机房|纯净度96.4%
-  - 荷兰07|891ms|25Mbps|机房|纯净度100.0%
-  - 荷兰01|652ms|25Mbps|机房|纯净度99.6%
-  - BR04|886ms|25Mbps|机房|纯净度100.0%
-  - 荷兰56|922ms|25Mbps|机房|纯净度96.4%
-  - 荷兰54|917ms|25Mbps|机房|纯净度96.4%
-  - 荷兰21|966ms|25Mbps|机房|纯净度100.0%
-  - 荷兰05|888ms|25Mbps|机房|纯净度100.0%
-  - 罗马尼亚117|1207ms|24Mbps|机房|纯净度100.0%
-  - 意大利35|855ms|24Mbps|机房|纯净度95.3%
-  - BR06|911ms|24Mbps|机房|纯净度100.0%
-  - 波兰03|821ms|24Mbps|机房|纯净度99.9%
-  - 罗马尼亚14|1221ms|24Mbps|机房|纯净度100.0%
-  - 荷兰75|661ms|24Mbps|机房|纯净度99.6%
-  - 意大利07|840ms|24Mbps|机房|纯净度95.3%
-  - 罗马尼亚84|1247ms|24Mbps|机房|纯净度100.0%
-  - 荷兰06|891ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚08|1044ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚76|1217ms|24Mbps|机房|纯净度100.0%
-  - 意大利03|885ms|24Mbps|机房|纯净度95.3%
-  - 罗马尼亚44|940ms|24Mbps|机房|纯净度100.0%
-  - 法国05|969ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚113|1235ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚65|947ms|24Mbps|机房|纯净度100.0%
-  - BR05|924ms|24Mbps|机房|纯净度100.0%
-  - 意大利11|808ms|24Mbps|机房|纯净度95.3%
-  - 意大利27|946ms|24Mbps|机房|纯净度95.3%
-  - 罗马尼亚115|947ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚64|1017ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚71|1207ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚72|1230ms|24Mbps|机房|纯净度100.0%
-  - 德国07|1041ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚57|1006ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚04|980ms|24Mbps|机房|纯净度100.0%
-  - 罗马尼亚114|1230ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚89|1253ms|23Mbps|机房|纯净度100.0%
-  - 意大利34|898ms|23Mbps|机房|纯净度95.3%
-  - 罗马尼亚81|1235ms|23Mbps|机房|纯净度100.0%
-  - 荷兰55|910ms|23Mbps|机房|纯净度96.4%
-  - 罗马尼亚69|1216ms|23Mbps|机房|纯净度100.0%
-  - 意大利26|1721ms|23Mbps|机房|纯净度95.3%
-  - 罗马尼亚48|945ms|23Mbps|机房|纯净度100.0%
-  - 罗马尼亚74|1242ms|23Mbps|机房|纯净度100.0%
-  - 德国08|1057ms|23Mbps|机房|纯净度100.0%
-  - 法国08|812ms|23Mbps|机房|纯净度99.8%
-  - 罗马尼亚05|939ms|23Mbps|机房|纯净度100.0%
-  - 法国06|991ms|23Mbps|机房|纯净度100.0%
-  - 荷兰69|1090ms|23Mbps|机房|纯净度96.4%
-  - 意大利33|1087ms|23Mbps|机房|纯净度95.3%
-  - 荷兰20|991ms|22Mbps|机房|纯净度99.7%
-  - 拉脱维亚06|1216ms|22Mbps|机房|纯净度99.0%
-  - 拉脱维亚05|1189ms|22Mbps|机房|纯净度99.0%
-  - 荷兰74|1012ms|22Mbps|机房|纯净度99.7%
-  - 意大利19|1050ms|22Mbps|机房|纯净度95.3%
-  - 罗马尼亚86|1233ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚91|1276ms|22Mbps|机房|纯净度100.0%
-  - 芬兰03|869ms|22Mbps|机房|纯净度99.9%
-  - 罗马尼亚77|1266ms|22Mbps|机房|纯净度100.0%
-  - 荷兰14|933ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚87|1232ms|22Mbps|机房|纯净度100.0%
-  - 意大利12|1024ms|22Mbps|机房|纯净度95.3%
-  - 罗马尼亚07|1019ms|22Mbps|机房|纯净度100.0%
-  - 罗马尼亚70|1231ms|22Mbps|机房|纯净度100.0%
-  - 荷兰61|982ms|22Mbps|机房|纯净度96.4%
-  - 罗马尼亚62|1012ms|22Mbps|机房|纯净度100.0%
-  - 荷兰76|936ms|22Mbps|机房|纯净度99.6%
-  - 德国06|1040ms|22Mbps|机房|纯净度100.0%
-  - 奥地利02|1026ms|22Mbps|机房|纯净度100.0%
-  - 意大利15|847ms|22Mbps|机房|纯净度95.3%
-  - 拉脱维亚08|1218ms|22Mbps|机房|纯净度99.0%
-  - 德国09|1114ms|22Mbps|机房|纯净度99.8%
-  - 意大利05|864ms|22Mbps|机房|纯净度95.3%
-  - 罗马尼亚90|1265ms|22Mbps|机房|纯净度100.0%
-  - 意大利06|878ms|21Mbps|机房|纯净度95.3%
-  - 意大利01|905ms|21Mbps|机房|纯净度95.3%
-  - 罗马尼亚82|1241ms|21Mbps|机房|纯净度100.0%
-  - 意大利16|807ms|21Mbps|机房|纯净度95.3%
-  - 荷兰73|1249ms|21Mbps|机房|纯净度99.9%
-  - 芬兰04|894ms|21Mbps|机房|纯净度99.9%
-  - 荷兰29|990ms|21Mbps|机房|纯净度99.7%
-  - 波兰02|1027ms|21Mbps|机房|纯净度100.0%
-  - 意大利04|884ms|21Mbps|机房|纯净度95.3%
-  - 荷兰78|1016ms|21Mbps|机房|纯净度99.6%
-  - 意大利02|886ms|21Mbps|机房|纯净度95.3%
-  - 罗马尼亚63|977ms|21Mbps|机房|纯净度100.0%
-  - 荷兰58|989ms|21Mbps|机房|纯净度96.4%
-  - 荷兰38|1100ms|21Mbps|机房|纯净度96.4%
-  - 拉脱维亚02|1148ms|21Mbps|机房|纯净度99.0%
-  - 德国11|1107ms|21Mbps|机房|纯净度99.8%
-  - 拉脱维亚03|1166ms|21Mbps|机房|纯净度99.0%
-  - 荷兰72|1251ms|21Mbps|机房|纯净度99.9%
-  - 法国02|620ms|21Mbps|机房|纯净度99.2%
-  - 荷兰59|984ms|21Mbps|机房|纯净度96.4%
-  - 荷兰30|1009ms|21Mbps|机房|纯净度99.7%
-  - MX03|707ms|21Mbps|机房|纯净度100.0%
-  - 荷兰45|661ms|21Mbps|机房|纯净度96.4%
-  - 以色列03|1287ms|20Mbps|未知|纯净度100.0%
-  - 拉脱维亚07|1174ms|20Mbps|机房|纯净度99.0%
-  - 拉脱维亚04|1196ms|20Mbps|机房|纯净度99.0%
-  - 罗马尼亚50|994ms|20Mbps|机房|纯净度100.0%
-  - 荷兰26|991ms|20Mbps|机房|纯净度99.7%
-  - 日本03|1620ms|20Mbps|未知|纯净度100.0%
-  - 荷兰65|1048ms|20Mbps|机房|纯净度96.4%
-  - 荷兰57|970ms|20Mbps|机房|纯净度96.4%
-  - 罗马尼亚22|1297ms|20Mbps|机房|纯净度100.0%
-  - 意大利30|1137ms|20Mbps|机房|纯净度95.3%
-  - 德国13|1121ms|20Mbps|机房|纯净度99.8%
-  - 荷兰27|1000ms|20Mbps|机房|纯净度99.7%
-  - 罗马尼亚49|947ms|20Mbps|机房|纯净度100.0%
-  - 以色列02|1292ms|20Mbps|未知|纯净度100.0%
-  - 日本01|957ms|20Mbps|未知|纯净度100.0%
-  - 罗马尼亚98|1300ms|20Mbps|机房|纯净度92.6%
-  - 法国01|627ms|20Mbps|机房|纯净度99.2%
-  - 意大利09|823ms|20Mbps|机房|纯净度95.3%
-  - 德国14|1134ms|20Mbps|机房|纯净度99.8%
-  - 以色列01|1306ms|19Mbps|未知|纯净度100.0%
-  - 荷兰63|1021ms|19Mbps|机房|纯净度96.4%
-  - 荷兰39|1098ms|19Mbps|机房|纯净度96.4%
-  - 荷兰32|1042ms|19Mbps|机房|纯净度96.4%
-  - 意大利31|1070ms|19Mbps|机房|纯净度95.3%
-  - 罗马尼亚120|1382ms|19Mbps|机房|纯净度92.6%
-  - 意大利23|907ms|19Mbps|机房|纯净度95.3%
-  - 荷兰40|1046ms|19Mbps|机房|纯净度96.4%
-  - 荷兰37|967ms|19Mbps|机房|纯净度96.4%
-  - 荷兰67|1080ms|19Mbps|机房|纯净度96.4%
-  - 荷兰62|1006ms|19Mbps|机房|纯净度96.4%
-  - 以色列04|1296ms|19Mbps|未知|纯净度100.0%
-  - 罗马尼亚106|1373ms|19Mbps|机房|纯净度92.6%
-  - MX01|564ms|19Mbps|机房|纯净度97.3%
-  - 荷兰47|694ms|19Mbps|机房|纯净度96.4%
-  - 罗马尼亚85|1314ms|19Mbps|机房|纯净度92.6%
-  - 罗马尼亚67|1031ms|19Mbps|机房|纯净度100.0%
-  - 拉脱维亚01|1141ms|19Mbps|机房|纯净度99.0%
-  - 荷兰71|1246ms|19Mbps|机房|纯净度99.9%
-  - 罗马尼亚32|1341ms|19Mbps|机房|纯净度100.0%
-  - 荷兰28|992ms|19Mbps|机房|纯净度99.7%
-  - 罗马尼亚10|1211ms|19Mbps|机房|纯净度100.0%
-  - 德国12|1126ms|18Mbps|机房|纯净度99.8%
-  - 荷兰68|1007ms|18Mbps|机房|纯净度96.4%
-  - 芬兰01|869ms|18Mbps|机房|纯净度99.9%
-  - 荷兰53|711ms|18Mbps|机房|纯净度96.4%
-  - 罗马尼亚17|1231ms|18Mbps|机房|纯净度100.0%
-  - 日本02|919ms|18Mbps|机房|纯净度100.0%
-  - 德国19|1081ms|18Mbps|机房|纯净度99.6%
-  - 罗马尼亚12|1249ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚73|975ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚37|1404ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚31|1386ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚38|1411ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚39|1418ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚100|1359ms|18Mbps|机房|纯净度92.6%
-  - 荷兰41|1108ms|18Mbps|机房|纯净度96.4%
-  - 罗马尼亚103|1360ms|18Mbps|机房|纯净度92.6%
-  - 罗马尼亚116|1231ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚24|1278ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚110|1249ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚83|1214ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚19|1226ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚11|1184ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚20|1236ms|18Mbps|机房|纯净度100.0%
-  - 罗马尼亚41|1335ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚13|1201ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚118|1417ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚15|1226ms|17Mbps|机房|纯净度100.0%
-  - 德国05|969ms|17Mbps|机房|纯净度99.8%
-  - 罗马尼亚121|1387ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚34|1400ms|17Mbps|机房|纯净度100.0%
-  - 罗马尼亚107|1446ms|17Mbps|机房|纯净度100.0%
-  - 美国30|761ms|17Mbps|机房|纯净度99.8%
-  - 德国10|1124ms|17Mbps|机房|纯净度99.8%
-  - 韩国01|1078ms|17Mbps|机房|纯净度99.9%
-  - 德国17|1172ms|17Mbps|机房|纯净度99.6%
-  - 荷兰36|1117ms|17Mbps|机房|纯净度96.4%
-  - 荷兰35|1095ms|17Mbps|机房|纯净度96.4%
-  - 罗马尼亚109|1412ms|17Mbps|机房|纯净度92.6%
-  - 荷兰34|1079ms|17Mbps|机房|纯净度96.4%
-  - 罗马尼亚119|1403ms|17Mbps|机房|纯净度92.6%
-  - 罗马尼亚58|926ms|17Mbps|机房|纯净度100.0%
-  - 德国15|1141ms|17Mbps|机房|纯净度99.6%
-  - 意大利21|907ms|16Mbps|机房|纯净度95.3%
-  - MX04|548ms|16Mbps|机房|纯净度97.3%
-  - 罗马尼亚78|1299ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚94|1325ms|16Mbps|机房|纯净度100.0%
-  - 荷兰49|701ms|16Mbps|机房|纯净度96.4%
-  - 罗马尼亚33|1346ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚53|998ms|16Mbps|机房|纯净度100.0%
-  - 意大利22|979ms|16Mbps|机房|纯净度95.3%
-  - 罗马尼亚97|1321ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚99|1313ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚26|1320ms|16Mbps|机房|纯净度100.0%
-  - 芬兰02|840ms|16Mbps|机房|纯净度99.9%
-  - 罗马尼亚111|1440ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚93|1281ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚29|1371ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚101|1361ms|16Mbps|机房|纯净度92.6%
-  - 罗马尼亚112|1292ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚80|1279ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚16|1275ms|16Mbps|机房|纯净度100.0%
-  - 罗马尼亚18|1284ms|16Mbps|机房|纯净度100.0%
-  - 新加坡01|1431ms|15Mbps|机房|纯净度100.0%
-  - 荷兰46|675ms|15Mbps|机房|纯净度96.4%
-  - 德国22|1470ms|15Mbps|机房|纯净度100.0%
-  - 意大利10|967ms|15Mbps|机房|纯净度95.3%
-  - 美国27|592ms|15Mbps|机房|纯净度100.0%
-  - 意大利14|938ms|15Mbps|机房|纯净度95.3%
-  - 罗马尼亚95|1334ms|15Mbps|机房|纯净度100.0%
-  - 罗马尼亚61|980ms|14Mbps|机房|纯净度100.0%
-  - 罗马尼亚122|968ms|14Mbps|机房|纯净度100.0%
-  - 荷兰17|962ms|14Mbps|机房|纯净度96.4%
-  - 捷克01|830ms|14Mbps|未知|纯净度100.0%
-  - 德国20|1290ms|14Mbps|住宅|纯净度100.0%
-  - 罗马尼亚03|951ms|14Mbps|机房|纯净度100.0%
-  - 泰国01|1444ms|14Mbps|机房|纯净度100.0%
-  - MX02|569ms|14Mbps|机房|纯净度100.0%
-  - 罗马尼亚52|929ms|14Mbps|机房|纯净度92.6%
-  - 罗马尼亚75|1218ms|14Mbps|机房|纯净度100.0%
-  - 罗马尼亚01|948ms|14Mbps|机房|纯净度100.0%
-  - 罗马尼亚43|959ms|13Mbps|机房|纯净度92.6%
-  - 罗马尼亚45|922ms|13Mbps|机房|纯净度100.0%
-  - 意大利08|919ms|13Mbps|机房|纯净度95.3%
-  - 罗马尼亚88|1234ms|13Mbps|机房|纯净度100.0%
-  - 奥地利01|694ms|13Mbps|机房|纯净度100.0%
-  - 罗马尼亚68|939ms|13Mbps|机房|纯净度100.0%
-  - 罗马尼亚60|918ms|13Mbps|机房|纯净度92.6%
-  - 罗马尼亚46|925ms|13Mbps|机房|纯净度100.0%
-  - 越南01|1342ms|13Mbps|住宅|纯净度100.0%
-  - 德国21|1225ms|12Mbps|住宅|纯净度100.0%
-  - 美国36|229ms|12Mbps|机房|纯净度98.0%
-  - 罗马尼亚54|952ms|12Mbps|机房|纯净度100.0%
-  - 印度尼西亚01|1321ms|12Mbps|住宅|纯净度98.2%
-  - 罗马尼亚59|938ms|12Mbps|机房|纯净度92.6%
-  - 意大利18|1036ms|12Mbps|机房|纯净度95.3%
-  - 罗马尼亚02|954ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚30|1312ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚55|953ms|12Mbps|机房|纯净度92.6%
-  - 泰国02|1493ms|12Mbps|机房|纯净度100.0%
-  - 罗马尼亚28|1309ms|11Mbps|机房|纯净度100.0%
-  - 美国29|1248ms|11Mbps|移动网络|纯净度100.0%
-  - 罗马尼亚27|1320ms|11Mbps|机房|纯净度100.0%
-  - 罗马尼亚108|1378ms|11Mbps|机房|纯净度100.0%
-  - 法国07|980ms|11Mbps|机房|纯净度100.0%
-  - 意大利25|685ms|11Mbps|机房|纯净度95.3%
-  - 法国03|959ms|11Mbps|机房|纯净度100.0%
-  - 泰国03|1893ms|11Mbps|住宅|纯净度100.0%
-  - 罗马尼亚104|1419ms|11Mbps|机房|纯净度100.0%
-  - 罗马尼亚21|1212ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚09|1210ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚79|1258ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚47|910ms|10Mbps|机房|纯净度100.0%
-  - 新加坡02|1716ms|10Mbps|机房|纯净度99.3%
-  - 罗马尼亚51|969ms|10Mbps|机房|纯净度100.0%
-  - 罗马尼亚102|1274ms|9Mbps|机房|纯净度92.6%
-  - 罗马尼亚25|1311ms|9Mbps|机房|纯净度100.0%
-  - 罗马尼亚23|1333ms|9Mbps|机房|纯净度100.0%
-  - 罗马尼亚06|964ms|9Mbps|机房|纯净度100.0%
-  - 罗马尼亚105|1375ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚56|949ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚36|1371ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚42|929ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚35|1416ms|8Mbps|机房|纯净度100.0%
-  - 罗马尼亚96|1275ms|7Mbps|机房|纯净度100.0%
-  - 泰国04|1756ms|7Mbps|机房|纯净度98.8%
-  - 法国04|975ms|7Mbps|机房|纯净度100.0%
-  - 罗马尼亚40|1317ms|6Mbps|机房|纯净度100.0%
-  - 罗马尼亚92|1252ms|6Mbps|机房|纯净度100.0%
-  - 荷兰33|1039ms|6Mbps|机房|纯净度96.4%
-  - 罗马尼亚66|1024ms|6Mbps|机房|纯净度100.0%
-  - 美国28|741ms|6Mbps|机房|纯净度99.8%
-  - 德国18|1167ms|6Mbps|机房|纯净度100.0%
-  - 意大利24|861ms|5Mbps|机房|纯净度95.3%
-  - 意大利29|823ms|5Mbps|机房|纯净度95.3%
-  - 意大利13|1206ms|5Mbps|机房|纯净度95.3%
-  - 意大利17|1135ms|5Mbps|机房|纯净度95.3%
-  - 意大利20|838ms|5Mbps|机房|纯净度95.3%
-  - 印度01|1940ms|5Mbps|住宅|纯净度100.0%
-  - 美国42|1568ms|5Mbps|机房|纯净度100.0%
-  - 荷兰81|668ms|4Mbps|机房|纯净度98.8%
-  - 美国34|294ms|4Mbps|机房|纯净度99.7%
-  - 美国14|298ms|4Mbps|机房|纯净度99.7%
-  - 德国16|1163ms|4Mbps|机房|纯净度100.0%
-  - 美国41|331ms|4Mbps|机房|纯净度100.0%
-  - 美国40|284ms|4Mbps|机房|纯净度100.0%
-  - 德国24|1160ms|4Mbps|机房|纯净度95.9%
-  - 德国23|1170ms|4Mbps|机房|纯净度95.9%
-  - 德国25|1214ms|4Mbps|机房|纯净度95.9%
+  - 美国34|225ms|705Mbps|机房|纯净度未知
+  - 美国02|209ms|1476Mbps|机房|纯净度未知
+  - 美国08|216ms|1538Mbps|机房|纯净度未知
+  - 美国07|220ms|1320Mbps|机房|纯净度未知
+  - 美国11|239ms|1044Mbps|机房|纯净度未知
+  - 美国33|213ms|1095Mbps|机房|纯净度未知
+  - 美国35|244ms|767Mbps|机房|纯净度未知
+  - 美国06|228ms|640Mbps|机房|纯净度未知
+  - 美国10|218ms|1058Mbps|机房|纯净度未知
+  - 美国43|706ms|203Mbps|机房|纯净度100.0%
+  - 美国44|923ms|182Mbps|机房|纯净度100.0%
+  - 美国01|202ms|583Mbps|机房|纯净度100.0%
+  - 美国23|596ms|159Mbps|机房|纯净度100.0%
+  - 美国13|391ms|177Mbps|机房|纯净度99.9%
+  - 美国28|613ms|161Mbps|机房|纯净度100.0%
+  - 美国12|360ms|181Mbps|机房|纯净度99.9%
+  - 荷兰82|360ms|152Mbps|机房|纯净度100.0%
+  - 美国19|384ms|275Mbps|机房|纯净度99.9%
+  - 美国03|212ms|964Mbps|机房|纯净度未知
+  - 美国05|212ms|598Mbps|机房|纯净度100.0%
+  - 美国15|411ms|268Mbps|机房|纯净度99.9%
+  - 美国04|211ms|495Mbps|机房|纯净度100.0%
+  - 美国21|593ms|178Mbps|机房|纯净度98.7%
+  - 美国29|680ms|96Mbps|机房|纯净度98.7%
+  - 美国09|216ms|556Mbps|机房|纯净度100.0%
+  - 美国18|503ms|165Mbps|机房|纯净度99.6%
+  - 美国22|606ms|106Mbps|机房|纯净度98.7%
+  - 美国37|163ms|99Mbps|机房|纯净度100.0%
+  - 美国14|394ms|304Mbps|机房|纯净度99.9%
+  - 美国39|181ms|110Mbps|机房|纯净度100.0%
+  - 爱尔兰08|842ms|286Mbps|机房|纯净度100.0%
+  - 爱尔兰04|827ms|231Mbps|机房|纯净度100.0%
+  - 美国38|314ms|37Mbps|机房|纯净度98.0%
+  - 爱尔兰03|825ms|264Mbps|机房|纯净度100.0%
+  - 美国40|179ms|92Mbps|机房|纯净度100.0%
+  - 爱尔兰10|839ms|155Mbps|机房|纯净度100.0%
+  - 美国25|609ms|255Mbps|机房|纯净度98.7%
+  - 美国27|617ms|236Mbps|机房|纯净度98.7%
+  - 爱尔兰06|822ms|277Mbps|机房|纯净度100.0%
+  - 美国32|189ms|34Mbps|机房|纯净度100.0%
+  - 爱尔兰09|833ms|33Mbps|机房|纯净度100.0%
+  - 加拿大01|461ms|33Mbps|机房|纯净度98.8%
+  - 荷兰52|685ms|33Mbps|机房|纯净度96.4%
+  - 荷兰11|846ms|33Mbps|机房|纯净度96.4%
+  - 荷兰61|858ms|32Mbps|机房|纯净度96.4%
+  - 荷兰09|853ms|32Mbps|机房|纯净度96.4%
+  - 美国17|530ms|32Mbps|机房|纯净度100.0%
+  - 荷兰63|867ms|32Mbps|机房|纯净度96.4%
+  - 荷兰62|856ms|32Mbps|机房|纯净度96.4%
+  - 荷兰60|821ms|32Mbps|机房|纯净度96.4%
+  - 美国42|861ms|31Mbps|机房|纯净度100.0%
+  - 荷兰10|856ms|31Mbps|机房|纯净度96.4%
+  - 荷兰17|876ms|31Mbps|机房|纯净度96.4%
+  - 美国45|802ms|31Mbps|机房|纯净度100.0%
+  - 荷兰53|666ms|30Mbps|机房|纯净度96.4%
+  - 荷兰38|1004ms|30Mbps|机房|纯净度96.4%
+  - 荷兰08|839ms|29Mbps|机房|纯净度96.4%
+  - 荷兰13|862ms|29Mbps|机房|纯净度96.4%
+  - 荷兰14|860ms|29Mbps|机房|纯净度96.4%
+  - 荷兰12|855ms|29Mbps|机房|纯净度96.4%
+  - 意大利17|817ms|29Mbps|机房|纯净度95.3%
+  - 荷兰55|695ms|28Mbps|机房|纯净度96.4%
+  - 德国21|1296ms|28Mbps|机房|纯净度99.6%
+  - 德国20|1140ms|28Mbps|机房|纯净度99.6%
+  - 美国24|507ms|28Mbps|机房|纯净度100.0%
+  - 荷兰44|841ms|28Mbps|机房|纯净度96.4%
+  - 荷兰41|863ms|28Mbps|机房|纯净度96.4%
+  - 美国20|516ms|28Mbps|机房|纯净度100.0%
+  - 荷兰72|979ms|28Mbps|机房|纯净度96.4%
+  - 荷兰15|835ms|27Mbps|机房|纯净度96.4%
+  - 德国09|896ms|27Mbps|机房|纯净度100.0%
+  - 荷兰71|982ms|27Mbps|机房|纯净度96.4%
+  - 荷兰01|417ms|26Mbps|机房|纯净度100.0%
+  - 意大利22|929ms|26Mbps|机房|纯净度95.3%
+  - 德国16|1251ms|26Mbps|机房|纯净度99.6%
+  - 荷兰73|966ms|26Mbps|机房|纯净度96.4%
+  - 德国17|1001ms|26Mbps|机房|纯净度99.6%
+  - 法国02|799ms|26Mbps|机房|纯净度99.2%
+  - 荷兰74|1007ms|26Mbps|机房|纯净度96.4%
+  - 荷兰43|1125ms|26Mbps|机房|纯净度99.6%
+  - 荷兰31|990ms|25Mbps|机房|纯净度96.4%
+  - 荷兰35|982ms|25Mbps|机房|纯净度96.4%
+  - 波兰01|1182ms|25Mbps|机房|纯净度100.0%
+  - 荷兰40|978ms|25Mbps|机房|纯净度96.4%
+  - 法国01|790ms|25Mbps|机房|纯净度99.2%
+  - 荷兰27|976ms|25Mbps|机房|纯净度96.4%
+  - 荷兰29|979ms|25Mbps|机房|纯净度96.4%
+  - 波兰05|1273ms|25Mbps|机房|纯净度99.9%
+  - 荷兰30|977ms|25Mbps|机房|纯净度96.4%
+  - 荷兰34|996ms|25Mbps|机房|纯净度96.4%
+  - 荷兰85|915ms|25Mbps|机房|纯净度98.8%
+  - MX03|677ms|24Mbps|机房|纯净度100.0%
+  - 德国23|1343ms|24Mbps|机房|纯净度100.0%
+  - 意大利20|1353ms|24Mbps|机房|纯净度95.3%
+  - 意大利10|938ms|24Mbps|机房|纯净度95.3%
+  - 荷兰54|686ms|24Mbps|机房|纯净度96.4%
+  - 波兰02|1283ms|24Mbps|机房|纯净度99.9%
+  - 波兰06|1359ms|24Mbps|机房|纯净度99.9%
+  - 法国07|1052ms|23Mbps|机房|纯净度99.2%
+  - 荷兰58|735ms|23Mbps|机房|纯净度96.4%
+  - 德国08|904ms|23Mbps|机房|纯净度100.0%
+  - 荷兰36|991ms|23Mbps|机房|纯净度96.4%
+  - 爱尔兰05|812ms|23Mbps|机房|纯净度100.0%
+  - 荷兰79|1120ms|23Mbps|机房|纯净度99.6%
+  - 荷兰32|999ms|23Mbps|机房|纯净度96.4%
+  - 爱尔兰14|822ms|23Mbps|机房|纯净度100.0%
+  - MX04|552ms|23Mbps|机房|纯净度97.3%
+  - 爱尔兰11|817ms|23Mbps|机房|纯净度100.0%
+  - 罗马尼亚82|1454ms|22Mbps|机房|纯净度100.0%
+  - 意大利08|1554ms|22Mbps|机房|纯净度95.3%
+  - 韩国02|1421ms|22Mbps|机房|纯净度99.9%
+  - 罗马尼亚61|1341ms|22Mbps|机房|纯净度100.0%
+  - 韩国01|1397ms|22Mbps|机房|纯净度99.9%
+  - 波兰04|1285ms|22Mbps|机房|纯净度99.9%
+  - BR01|1065ms|22Mbps|机房|纯净度100.0%
+  - 荷兰39|974ms|22Mbps|机房|纯净度96.4%
+  - 爱尔兰12|819ms|22Mbps|机房|纯净度100.0%
+  - 波兰03|1273ms|22Mbps|机房|纯净度99.9%
+  - 美国16|428ms|21Mbps|机房|纯净度100.0%
+  - 罗马尼亚73|1437ms|21Mbps|机房|纯净度100.0%
+  - 德国07|863ms|21Mbps|机房|纯净度100.0%
+  - MX02|556ms|21Mbps|机房|纯净度97.3%
+  - 荷兰68|936ms|21Mbps|机房|纯净度96.4%
+  - 罗马尼亚52|1318ms|21Mbps|机房|纯净度100.0%
+  - 爱尔兰07|834ms|21Mbps|机房|纯净度100.0%
+  - 意大利11|1128ms|21Mbps|机房|纯净度95.3%
+  - 罗马尼亚78|1405ms|21Mbps|机房|纯净度100.0%
+  - 荷兰65|919ms|20Mbps|机房|纯净度96.4%
+  - 荷兰69|972ms|20Mbps|机房|纯净度96.4%
+  - 日本01|892ms|20Mbps|未知|纯净度100.0%
+  - 爱尔兰01|820ms|20Mbps|机房|纯净度100.0%
+  - 荷兰70|965ms|20Mbps|机房|纯净度96.4%
+  - 荷兰46|1163ms|20Mbps|机房|纯净度100.0%
+  - 荷兰67|926ms|20Mbps|机房|纯净度96.4%
+  - BR03|1067ms|20Mbps|机房|纯净度100.0%
+  - 荷兰20|883ms|20Mbps|机房|纯净度100.0%
+  - 荷兰75|1007ms|19Mbps|机房|纯净度96.4%
+  - 荷兰47|647ms|19Mbps|机房|纯净度96.4%
+  - 爱尔兰13|840ms|19Mbps|机房|纯净度100.0%
+  - 德国27|1057ms|19Mbps|机房|纯净度100.0%
+  - 荷兰50|663ms|19Mbps|机房|纯净度96.4%
+  - 荷兰18|884ms|19Mbps|机房|纯净度100.0%
+  - 罗马尼亚71|1422ms|19Mbps|机房|纯净度100.0%
+  - 荷兰76|1087ms|19Mbps|机房|纯净度96.4%
+  - 意大利13|778ms|19Mbps|机房|纯净度95.3%
+  - 荷兰48|658ms|19Mbps|机房|纯净度96.4%
+  - 意大利05|771ms|19Mbps|机房|纯净度95.3%
+  - 荷兰49|661ms|19Mbps|机房|纯净度96.4%
+  - 荷兰05|627ms|19Mbps|机房|纯净度99.7%
+  - 美国31|825ms|19Mbps|机房|纯净度100.0%
+  - 意大利19|839ms|19Mbps|机房|纯净度95.3%
+  - 意大利24|750ms|19Mbps|机房|纯净度95.3%
+  - 意大利03|746ms|19Mbps|机房|纯净度95.3%
+  - 意大利14|893ms|18Mbps|机房|纯净度95.3%
+  - 荷兰25|886ms|18Mbps|机房|纯净度100.0%
+  - 荷兰42|1117ms|18Mbps|机房|纯净度99.6%
+  - 意大利15|789ms|18Mbps|机房|纯净度95.3%
+  - 荷兰64|914ms|18Mbps|机房|纯净度96.4%
+  - 荷兰77|1104ms|18Mbps|机房|纯净度96.4%
+  - 罗马尼亚88|1545ms|18Mbps|机房|纯净度100.0%
+  - 芬兰03|1210ms|18Mbps|机房|纯净度99.9%
+  - 荷兰21|879ms|18Mbps|机房|纯净度100.0%
+  - 荷兰16|881ms|18Mbps|机房|纯净度100.0%
+  - 荷兰37|962ms|18Mbps|机房|纯净度100.0%
+  - 荷兰06|655ms|18Mbps|机房|纯净度99.7%
+  - BR06|1089ms|18Mbps|机房|纯净度100.0%
+  - 罗马尼亚51|1302ms|18Mbps|机房|纯净度100.0%
+  - 荷兰33|883ms|18Mbps|机房|纯净度100.0%
+  - 罗马尼亚26|1410ms|18Mbps|机房|纯净度100.0%
+  - 拉脱维亚07|1191ms|18Mbps|机房|纯净度99.0%
+  - 拉脱维亚05|1290ms|18Mbps|机房|纯净度99.0%
+  - 荷兰78|629ms|18Mbps|机房|纯净度99.7%
+  - 法国03|963ms|18Mbps|机房|纯净度100.0%
+  - 拉脱维亚03|1226ms|18Mbps|机房|纯净度99.0%
+  - 意大利01|615ms|18Mbps|机房|纯净度95.3%
+  - 荷兰24|876ms|18Mbps|机房|纯净度100.0%
+  - 拉脱维亚08|1314ms|18Mbps|机房|纯净度99.0%
+  - 罗马尼亚89|1543ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚94|1559ms|17Mbps|机房|纯净度100.0%
+  - 荷兰45|1123ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚58|1115ms|17Mbps|机房|纯净度100.0%
+  - 意大利09|932ms|17Mbps|机房|纯净度95.3%
+  - 法国05|980ms|17Mbps|机房|纯净度100.0%
+  - 芬兰02|1208ms|17Mbps|机房|纯净度99.9%
+  - MX01|446ms|17Mbps|机房|纯净度100.0%
+  - 法国08|977ms|17Mbps|机房|纯净度100.0%
+  - 意大利27|795ms|17Mbps|机房|纯净度95.3%
+  - 荷兰22|884ms|17Mbps|机房|纯净度100.0%
+  - 拉脱维亚01|1155ms|17Mbps|机房|纯净度99.0%
+  - 法国04|967ms|17Mbps|机房|纯净度100.0%
+  - 法国06|1009ms|17Mbps|机房|纯净度100.0%
+  - 德国13|999ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚04|1212ms|17Mbps|机房|纯净度100.0%
+  - BR05|1078ms|17Mbps|机房|纯净度100.0%
+  - 意大利02|632ms|17Mbps|机房|纯净度95.3%
+  - 荷兰28|954ms|17Mbps|机房|纯净度100.0%
+  - 意大利16|929ms|17Mbps|机房|纯净度95.3%
+  - 荷兰02|625ms|17Mbps|机房|纯净度99.7%
+  - 罗马尼亚06|1191ms|17Mbps|机房|纯净度100.0%
+  - 德国28|784ms|17Mbps|机房|纯净度100.0%
+  - 罗马尼亚53|1324ms|17Mbps|机房|纯净度100.0%
+  - 美国41|319ms|17Mbps|机房|纯净度98.0%
+  - 罗马尼亚93|1608ms|17Mbps|机房|纯净度100.0%
+  - 荷兰26|967ms|17Mbps|机房|纯净度100.0%
+  - 荷兰57|735ms|17Mbps|机房|纯净度99.9%
+  - 荷兰59|720ms|17Mbps|机房|纯净度99.9%
+  - 意大利25|1049ms|16Mbps|机房|纯净度95.3%
+  - 罗马尼亚75|1414ms|16Mbps|机房|纯净度100.0%
+  - 荷兰03|622ms|16Mbps|机房|纯净度99.7%
+  - 荷兰19|885ms|16Mbps|机房|纯净度100.0%
+  - 罗马尼亚76|1512ms|16Mbps|机房|纯净度100.0%
+  - 芬兰01|971ms|16Mbps|机房|纯净度99.9%
+  - BR02|1060ms|16Mbps|机房|纯净度100.0%
+  - 德国02|692ms|16Mbps|机房|纯净度99.8%
+  - 德国11|929ms|16Mbps|机房|纯净度100.0%
+  - 荷兰04|625ms|16Mbps|机房|纯净度99.7%
+  - 德国06|707ms|16Mbps|机房|纯净度99.8%
+  - 罗马尼亚31|1500ms|16Mbps|机房|纯净度100.0%
+  - 意大利04|589ms|15Mbps|机房|纯净度95.3%
+  - BR04|1045ms|15Mbps|机房|纯净度100.0%
+  - 荷兰51|667ms|15Mbps|机房|纯净度96.4%
+  - 罗马尼亚109|1732ms|15Mbps|机房|纯净度100.0%
+  - 德国03|699ms|15Mbps|机房|纯净度99.8%
+  - 意大利18|777ms|15Mbps|机房|纯净度95.3%
+  - 罗马尼亚30|1236ms|15Mbps|机房|纯净度100.0%
+  - 法国10|1018ms|15Mbps|机房|纯净度100.0%
+  - 罗马尼亚46|1034ms|15Mbps|机房|纯净度92.6%
+  - 荷兰81|782ms|15Mbps|机房|纯净度99.6%
+  - 拉脱维亚04|1205ms|15Mbps|机房|纯净度99.0%
+  - 荷兰66|921ms|15Mbps|机房|纯净度96.4%
+  - 德国12|942ms|15Mbps|机房|纯净度100.0%
+  - 芬兰04|1024ms|15Mbps|机房|纯净度99.9%
+  - 意大利12|1026ms|15Mbps|机房|纯净度95.3%
+  - 荷兰86|957ms|15Mbps|机房|纯净度98.8%
+  - 意大利23|1036ms|15Mbps|机房|纯净度95.3%
+  - 意大利21|898ms|15Mbps|机房|纯净度95.3%
+  - 德国05|707ms|14Mbps|机房|纯净度99.8%
+  - 罗马尼亚100|1379ms|14Mbps|机房|纯净度100.0%
+  - 荷兰23|879ms|14Mbps|机房|纯净度100.0%
+  - 罗马尼亚97|1334ms|14Mbps|机房|纯净度92.6%
+  - 罗马尼亚40|991ms|14Mbps|机房|纯净度100.0%
+  - 罗马尼亚28|1143ms|14Mbps|机房|纯净度100.0%
+  - 拉脱维亚02|1284ms|14Mbps|机房|纯净度99.0%
+  - 德国25|1100ms|14Mbps|机房|纯净度99.8%
+  - 法国09|1257ms|14Mbps|机房|纯净度99.8%
+  - 德国10|926ms|14Mbps|机房|纯净度100.0%
+  - 印度尼西亚01|1341ms|14Mbps|住宅|纯净度98.2%
+  - 德国04|699ms|14Mbps|机房|纯净度99.8%
+  - 荷兰07|628ms|13Mbps|机房|纯净度99.7%
+  - 以色列01|1231ms|13Mbps|未知|纯净度100.0%
+  - 罗马尼亚01|1123ms|13Mbps|机房|纯净度100.0%
+  - 新加坡01|1676ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚44|1070ms|13Mbps|机房|纯净度92.6%
+  - 罗马尼亚114|1379ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚15|1390ms|13Mbps|机房|纯净度100.0%
+  - 罗马尼亚21|1329ms|13Mbps|机房|纯净度100.0%
+  - 意大利26|835ms|13Mbps|机房|纯净度95.3%
+  - 罗马尼亚19|1417ms|13Mbps|机房|纯净度100.0%
+  - 意大利07|681ms|13Mbps|机房|纯净度95.3%
+  - 拉脱维亚06|1308ms|13Mbps|机房|纯净度99.0%
+  - 罗马尼亚54|1298ms|13Mbps|机房|纯净度100.0%
+  - 以色列02|1242ms|12Mbps|未知|纯净度100.0%
+  - 罗马尼亚05|1266ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚43|1102ms|12Mbps|机房|纯净度92.6%
+  - 罗马尼亚12|1114ms|12Mbps|机房|纯净度100.0%
+  - 日本02|1408ms|12Mbps|未知|纯净度100.0%
+  - 罗马尼亚13|1352ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚116|1317ms|12Mbps|机房|纯净度100.0%
+  - 荷兰80|898ms|12Mbps|机房|纯净度99.6%
+  - 罗马尼亚27|1353ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚69|1471ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚10|1246ms|12Mbps|机房|纯净度100.0%
+  - 德国26|691ms|12Mbps|机房|纯净度99.8%
+  - 罗马尼亚56|1301ms|12Mbps|机房|纯净度100.0%
+  - 罗马尼亚106|1520ms|12Mbps|机房|纯净度100.0%
+  - 以色列03|1240ms|12Mbps|未知|纯净度100.0%
+  - 越南01|1453ms|12Mbps|住宅|纯净度100.0%
+  - 罗马尼亚83|1499ms|11Mbps|机房|纯净度100.0%
+  - 美国26|630ms|11Mbps|机房|纯净度99.9%
+  - 以色列04|1249ms|11Mbps|未知|纯净度100.0%
+  - 罗马尼亚48|1280ms|11Mbps|机房|纯净度92.6%
+  - 泰国02|1533ms|11Mbps|住宅|纯净度100.0%
+  - 罗马尼亚85|1621ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚74|1487ms|11Mbps|机房|纯净度100.0%
+  - 泰国01|1328ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚113|1596ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚70|1512ms|11Mbps|机房|纯净度100.0%
+  - 罗马尼亚72|1498ms|11Mbps|机房|纯净度100.0%
+  - 荷兰56|723ms|11Mbps|机房|纯净度99.9%
+  - 荷兰83|891ms|10Mbps|机房|纯净度99.6%
+  - 印度尼西亚02|1584ms|10Mbps|未知|纯净度100.0%
+  - 罗马尼亚105|1606ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚34|1398ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚55|1343ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚111|1672ms|10Mbps|机房|纯净度100.0%
+  - 荷兰84|766ms|10Mbps|机房|纯净度99.6%
+  - 美国30|1021ms|10Mbps|移动网络|纯净度100.0%
+  - 罗马尼亚39|1304ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚36|1355ms|10Mbps|机房|纯净度100.0%
+  - 罗马尼亚95|1548ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚47|1172ms|9Mbps|机房|纯净度92.6%
+  - 罗马尼亚49|1186ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚64|1424ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚108|1565ms|9Mbps|机房|纯净度100.0%
+  - 意大利06|845ms|9Mbps|机房|纯净度95.3%
+  - 德国01|687ms|9Mbps|机房|纯净度99.8%
+  - 罗马尼亚107|1496ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚118|1319ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚09|1270ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚66|1480ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚92|1529ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚18|1442ms|9Mbps|机房|纯净度100.0%
+  - 泰国03|1576ms|9Mbps|机房|纯净度100.0%
+  - 罗马尼亚25|1328ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚62|1429ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚32|1568ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚63|1439ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚57|1248ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚80|1322ms|8Mbps|机房|纯净度100.0%
+  - 德国14|1041ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚87|1605ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚91|1466ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚81|1465ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚16|1258ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚35|1279ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚17|1424ms|8Mbps|机房|纯净度100.0%
+  - 罗马尼亚86|1442ms|8Mbps|机房|纯净度92.6%
+  - 泰国04|1698ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚60|1358ms|7Mbps|机房|纯净度92.6%
+  - 罗马尼亚08|1112ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚99|1193ms|7Mbps|机房|纯净度92.6%
+  - 罗马尼亚22|1370ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚42|1026ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚102|1389ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚115|1137ms|7Mbps|机房|纯净度92.6%
+  - 罗马尼亚24|1379ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚110|1631ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚77|1435ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚38|1304ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚68|1454ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚104|1108ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚90|1057ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚101|1519ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚29|1373ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚79|1495ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚67|1460ms|7Mbps|机房|纯净度100.0%
+  - 德国15|964ms|7Mbps|住宅|纯净度100.0%
+  - 罗马尼亚84|1488ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚23|1390ms|7Mbps|机房|纯净度100.0%
+  - 罗马尼亚117|1274ms|7Mbps|机房|纯净度92.6%
+  - 罗马尼亚45|1139ms|6Mbps|机房|纯净度100.0%
+  - 德国18|1222ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚96|1260ms|6Mbps|机房|纯净度92.6%
+  - 罗马尼亚59|1340ms|6Mbps|机房|纯净度92.6%
+  - 罗马尼亚33|1454ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚41|1039ms|6Mbps|机房|纯净度100.0%
+  - 德国19|1258ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚37|1323ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚103|1879ms|6Mbps|机房|纯净度100.0%
+  - 爱尔兰02|825ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚14|1360ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚07|1130ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚03|1249ms|6Mbps|机房|纯净度100.0%
+  - 罗马尼亚120|1485ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚02|1147ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚112|1049ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚50|1316ms|5Mbps|机房|纯净度92.6%
+  - 罗马尼亚119|1084ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚98|1451ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚11|1309ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚65|1405ms|5Mbps|机房|纯净度100.0%
+  - 罗马尼亚20|1257ms|5Mbps|机房|纯净度100.0%
+  - 美国36|582ms|5Mbps|机房|纯净度99.7%
+  - 德国22|1402ms|4Mbps|机房|纯净度100.0%
+  - 德国24|1060ms|4Mbps|机房|纯净度95.9%
   url: https://claude.ai/cdn-cgi/trace
   interval: 120
   lazy: false
@@ -4692,43 +4766,44 @@ proxy-groups:
 - name: ⚡ 高速下载
   type: url-test
   proxies:
-  - 美国11|206ms|1450Mbps|机房|纯净度未知
-  - 美国07|218ms|1188Mbps|机房|纯净度未知
-  - 美国31|156ms|964Mbps|机房|纯净度未知
-  - 美国05|206ms|938Mbps|机房|纯净度未知
-  - 美国33|187ms|922Mbps|机房|纯净度未知
-  - 美国01|169ms|826Mbps|机房|纯净度未知
-  - 美国08|214ms|771Mbps|机房|纯净度未知
-  - 美国04|199ms|711Mbps|机房|纯净度未知
-  - 美国02|196ms|691Mbps|机房|纯净度未知
-  - 美国20|525ms|552Mbps|机房|纯净度100.0%
-  - 美国17|298ms|518Mbps|机房|纯净度100.0%
-  - 美国32|170ms|511Mbps|机房|纯净度未知
-  - 美国13|282ms|502Mbps|机房|纯净度100.0%
-  - 美国16|301ms|500Mbps|机房|纯净度100.0%
-  - 美国18|488ms|473Mbps|机房|纯净度99.6%
-  - 美国19|528ms|390Mbps|机房|纯净度100.0%
-  - 美国21|510ms|374Mbps|机房|纯净度100.0%
-  - 美国15|289ms|364Mbps|机房|纯净度100.0%
-  - 德国01|489ms|311Mbps|未知|纯净度100.0%
-  - 美国25|599ms|288Mbps|机房|纯净度98.7%
-  - 爱尔兰01|538ms|280Mbps|机房|纯净度100.0%
-  - 爱尔兰04|542ms|277Mbps|机房|纯净度100.0%
-  - 美国26|660ms|274Mbps|机房|纯净度98.7%
-  - 美国09|220ms|264Mbps|机房|纯净度99.9%
-  - 爱尔兰05|552ms|260Mbps|机房|纯净度100.0%
-  - 爱尔兰02|533ms|253Mbps|机房|纯净度100.0%
-  - 美国06|218ms|251Mbps|机房|纯净度99.9%
-  - 爱尔兰03|541ms|248Mbps|机房|纯净度100.0%
-  - 美国12|236ms|235Mbps|机房|纯净度99.9%
-  - 美国03|214ms|204Mbps|机房|纯净度99.9%
-  - 美国10|202ms|188Mbps|机房|纯净度99.9%
-  - 美国37|534ms|160Mbps|机房|纯净度100.0%
-  - 美国22|558ms|160Mbps|机房|纯净度100.0%
-  - 美国24|545ms|122Mbps|机房|纯净度100.0%
-  - 美国23|565ms|118Mbps|机房|纯净度100.0%
-  - 荷兰77|621ms|74Mbps|机房|纯净度99.6%
-  - 美国39|228ms|48Mbps|机房|纯净度98.0%
+  - 美国08|216ms|1538Mbps|机房|纯净度未知
+  - 美国02|209ms|1476Mbps|机房|纯净度未知
+  - 美国07|220ms|1320Mbps|机房|纯净度未知
+  - 美国33|213ms|1095Mbps|机房|纯净度未知
+  - 美国10|218ms|1058Mbps|机房|纯净度未知
+  - 美国11|239ms|1044Mbps|机房|纯净度未知
+  - 美国03|212ms|964Mbps|机房|纯净度未知
+  - 美国35|244ms|767Mbps|机房|纯净度未知
+  - 美国34|225ms|705Mbps|机房|纯净度未知
+  - 美国06|228ms|640Mbps|机房|纯净度未知
+  - 美国05|212ms|598Mbps|机房|纯净度100.0%
+  - 美国01|202ms|583Mbps|机房|纯净度100.0%
+  - 美国09|216ms|556Mbps|机房|纯净度100.0%
+  - 美国04|211ms|495Mbps|机房|纯净度100.0%
+  - 美国14|394ms|304Mbps|机房|纯净度99.9%
+  - 爱尔兰08|842ms|286Mbps|机房|纯净度100.0%
+  - 爱尔兰06|822ms|277Mbps|机房|纯净度100.0%
+  - 美国19|384ms|275Mbps|机房|纯净度99.9%
+  - 美国15|411ms|268Mbps|机房|纯净度99.9%
+  - 爱尔兰03|825ms|264Mbps|机房|纯净度100.0%
+  - 美国25|609ms|255Mbps|机房|纯净度98.7%
+  - 美国27|617ms|236Mbps|机房|纯净度98.7%
+  - 爱尔兰04|827ms|231Mbps|机房|纯净度100.0%
+  - 美国43|706ms|203Mbps|机房|纯净度100.0%
+  - 美国44|923ms|182Mbps|机房|纯净度100.0%
+  - 美国12|360ms|181Mbps|机房|纯净度99.9%
+  - 美国21|593ms|178Mbps|机房|纯净度98.7%
+  - 美国13|391ms|177Mbps|机房|纯净度99.9%
+  - 美国18|503ms|165Mbps|机房|纯净度99.6%
+  - 美国28|613ms|161Mbps|机房|纯净度100.0%
+  - 美国23|596ms|159Mbps|机房|纯净度100.0%
+  - 爱尔兰10|839ms|155Mbps|机房|纯净度100.0%
+  - 荷兰82|360ms|152Mbps|机房|纯净度100.0%
+  - 美国39|181ms|110Mbps|机房|纯净度100.0%
+  - 美国22|606ms|106Mbps|机房|纯净度98.7%
+  - 美国37|163ms|99Mbps|机房|纯净度100.0%
+  - 美国29|680ms|96Mbps|机房|纯净度98.7%
+  - 美国40|179ms|92Mbps|机房|纯净度100.0%
   url: https://claude.ai/cdn-cgi/trace
   interval: 120
   lazy: false
@@ -4738,30 +4813,30 @@ proxy-groups:
 - name: 🏠 非机房 IP
   type: url-test
   proxies:
-  - 德国01|489ms|311Mbps|未知|纯净度100.0%
-  - MX01|564ms|19Mbps|机房|纯净度97.3%
-  - 法国01|627ms|20Mbps|机房|纯净度99.2%
-  - 奥地利01|694ms|13Mbps|机房|纯净度100.0%
-  - 芬兰01|869ms|18Mbps|机房|纯净度99.9%
-  - 日本01|957ms|20Mbps|未知|纯净度100.0%
-  - 日本02|919ms|18Mbps|机房|纯净度100.0%
-  - 拉脱维亚01|1141ms|19Mbps|机房|纯净度99.0%
-  - 拉脱维亚05|1189ms|22Mbps|机房|纯净度99.0%
-  - 美国29|1248ms|11Mbps|移动网络|纯净度100.0%
-  - 德国20|1290ms|14Mbps|住宅|纯净度100.0%
-  - 以色列01|1306ms|19Mbps|未知|纯净度100.0%
-  - 印度尼西亚01|1321ms|12Mbps|住宅|纯净度98.2%
-  - 越南01|1342ms|13Mbps|住宅|纯净度100.0%
-  - 新加坡01|1431ms|15Mbps|机房|纯净度100.0%
-  - 泰国01|1444ms|14Mbps|机房|纯净度100.0%
-  - 德国21|1225ms|12Mbps|住宅|纯净度100.0%
-  - 日本03|1620ms|20Mbps|未知|纯净度100.0%
-  - 泰国03|1893ms|11Mbps|住宅|纯净度100.0%
-  - 泰国04|1756ms|7Mbps|机房|纯净度98.8%
-  - 美国36|229ms|12Mbps|机房|纯净度98.0%
-  - 荷兰76|936ms|22Mbps|机房|纯净度99.6%
-  - 捷克01|830ms|14Mbps|未知|纯净度100.0%
-  - 印度01|1940ms|5Mbps|住宅|纯净度100.0%
+  - MX02|556ms|21Mbps|机房|纯净度97.3%
+  - 法国01|790ms|25Mbps|机房|纯净度99.2%
+  - 日本01|892ms|20Mbps|未知|纯净度100.0%
+  - 德国13|999ms|17Mbps|机房|纯净度100.0%
+  - 法国07|1052ms|23Mbps|机房|纯净度99.2%
+  - 芬兰01|971ms|16Mbps|机房|纯净度99.9%
+  - 美国30|1021ms|10Mbps|移动网络|纯净度100.0%
+  - 德国15|964ms|7Mbps|住宅|纯净度100.0%
+  - 以色列01|1231ms|13Mbps|未知|纯净度100.0%
+  - 拉脱维亚01|1155ms|17Mbps|机房|纯净度99.0%
+  - 拉脱维亚03|1226ms|18Mbps|机房|纯净度99.0%
+  - 印度尼西亚01|1341ms|14Mbps|住宅|纯净度98.2%
+  - 越南01|1453ms|12Mbps|住宅|纯净度100.0%
+  - 泰国02|1533ms|11Mbps|住宅|纯净度100.0%
+  - 泰国03|1576ms|9Mbps|机房|纯净度100.0%
+  - 印度尼西亚02|1584ms|10Mbps|未知|纯净度100.0%
+  - 日本02|1408ms|12Mbps|未知|纯净度100.0%
+  - 新加坡01|1676ms|13Mbps|机房|纯净度100.0%
+  - 泰国04|1698ms|7Mbps|机房|纯净度100.0%
+  - 荷兰45|1123ms|17Mbps|机房|纯净度100.0%
+  - 美国38|314ms|37Mbps|机房|纯净度98.0%
+  - 荷兰80|898ms|12Mbps|机房|纯净度99.6%
+  - 美国42|861ms|31Mbps|机房|纯净度100.0%
+  - 德国28|784ms|17Mbps|机房|纯净度100.0%
   url: https://claude.ai/cdn-cgi/trace
   interval: 120
   lazy: false
@@ -4771,8 +4846,7 @@ proxy-groups:
 - name: 🌏 台湾／新加坡
   type: url-test
   proxies:
-  - 新加坡01|1431ms|15Mbps|机房|纯净度100.0%
-  - 新加坡02|1716ms|10Mbps|机房|纯净度99.3%
+  - 新加坡01|1676ms|13Mbps|机房|纯净度100.0%
   url: https://claude.ai/cdn-cgi/trace
   interval: 120
   lazy: false
