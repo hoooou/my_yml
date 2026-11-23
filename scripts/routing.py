@@ -79,8 +79,15 @@ def optimize_routing(config):
                  'IP-CIDR6,::/0,REJECT,no-resolve']
     claude_rules = ([f'DOMAIN-SUFFIX,{domain},{GLOBAL}' for domain in CLAUDE_DOMAINS]
                     + [f'IP-CIDR,{cidr},{GLOBAL},no-resolve' for cidr in ANTHROPIC_CIDRS])
+    # 浏览器的 QUIC（UDP 443）：大部分落地节点（vless/ws、http、socks 等）转发不了 UDP，mihomo 会放弃
+    # 命中的代理规则、一路落到末尾直连，Claude 等站点就看到真实 IP。拒掉后浏览器自动回退 TCP，TCP 才走代理。
+    # STUN（WebRTC 探测真实 IP）一并拒掉，写法与用户自己的 Clash 配置一致。
+    quic_rules = ['AND,((NETWORK,UDP),(DST-PORT,443)),REJECT',
+                  'AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT',
+                  'AND,((NETWORK,UDP),(DST-PORT,19302-19309)),REJECT',
+                  r'DOMAIN-REGEX,^stun[0-9]*\.,REJECT']
     rules = (rule_set('company-internal', 'DIRECT')
-             + rule_set('private', 'DIRECT') + lan_rules + claude_rules
+             + rule_set('private', 'DIRECT') + lan_rules + quic_rules + claude_rules
              + rule_set('reject', 'REJECT')
              + process_custom + rule_set('app-proxy', GLOBAL) + rule_set('app-direct', 'DIRECT')
              + rule_set('app-proxy-domains', GLOBAL) + rule_set('app-direct-domains', 'DIRECT')

@@ -177,3 +177,17 @@ class RoutingTests(unittest.TestCase):
         compiled = copy.deepcopy(config)
         r.optimize_routing(config)
         self.assertEqual(config, compiled)
+
+
+class QuicStunRulesTest(unittest.TestCase):
+    def test_udp_443_and_stun_are_rejected_before_claude_rules(self):
+        import routing
+        config = {'rules': [], 'dns': {}}
+        routing.optimize_routing(config)
+        rules = config['rules']
+        quic = rules.index('AND,((NETWORK,UDP),(DST-PORT,443)),REJECT')
+        self.assertLess(quic, rules.index('DOMAIN-SUFFIX,claude.ai,' + routing.GLOBAL))
+        for rule in ('AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT',
+                     'AND,((NETWORK,UDP),(DST-PORT,19302-19309)),REJECT',
+                     r'DOMAIN-REGEX,^stun[0-9]*\.,REJECT'):
+            self.assertIn(rule, rules)
