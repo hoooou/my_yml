@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-23T09:57:37+08:00",
+  "updated_at": "2026-11-23T15:34:05+08:00",
   "scope": "all_subscriptions",
   "schema_version": 22,
   "selection_policy": {
@@ -543435,9 +543435,9 @@
   "quality_change": {
     "available": true,
     "differences": {
-      "observed_nodes": 32,
-      "passed_observations": 62,
-      "unrecovered_nodes": -38,
+      "observed_nodes": 0,
+      "passed_observations": 0,
+      "unrecovered_nodes": 0,
       "multi_period_nodes": 0
     }
   },
@@ -549534,7 +549534,11 @@
   },
   "measurements_updated_at": "2026-11-23T09:56:56+08:00",
   "publication_mode": "full",
-  "measurement_recovery": null,
+  "measurement_recovery": {
+    "source_run": "45094111093",
+    "measurements_updated_at": "2026-11-23T09:56:56+08:00",
+    "new_probes": false
+  },
   "group_latency_policy": {
     "url": "https://claude.ai/cdn-cgi/trace",
     "interval_seconds": 120,
@@ -550192,7 +550196,7 @@
   "ip_reputation_policy": {
     "provider": "ipapi.is",
     "scope": "quick_download_passed_unique_exits",
-    "configured": true,
+    "configured": false,
     "lookup_budget_per_run": 900,
     "purity_formula": "100 * (1 - company.abuser_score_numeric_ratio)",
     "score_scope": "company_network_not_individual_ip",
@@ -550884,10 +550888,10 @@
   },
   "chain": {
     "fronts": 98,
-    "landings": 273,
+    "landings": 290,
     "chain_enabled": true
   },
-  "source_run": "45094111093",
+  "source_run": "45131819605",
   "stage_summary": [
     {
       "id": "sources",

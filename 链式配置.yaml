@@ -1,4 +1,4 @@
-# 链式配置；2026-11-23T09:57:37+08:00；规则复用优选配置，节点已内联
+# 链式配置；2026-11-23T15:34:05+08:00；规则复用优选配置，节点已内联
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -11029,6 +11029,195 @@ proxies:
       Host: 129.146.77.248
   name: 美国187|366ms|40Mbps|机房|纯净度100.0%
   dialer-proxy: 🌉 前置
+- client-fingerprint: chrome
+  encryption: none
+  network: tcp
+  port: 443
+  server: kuruish.org
+  sub_tag: M003-260806
+  tls: true
+  type: vless
+  udp: true
+  uuid: 03fcc618-b93d-6796-6aed-8a38c975d581
+  xudp: true
+  packet-encoding: xudp
+  servername: kuruish.org
+  name: 日本01|242ms|21Mbps|机房|纯净度98.0%
+  dialer-proxy: 🌉 前置
+- server: dg4.ianai.it.com
+  port: 443
+  type: trojan
+  password: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  udp: true
+  sni: dg4.ianai.it.com
+  network: tcp
+  name: 日本02|501ms|21Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- cipher: aes-128-gcm
+  password: Bwlqh7GcFB
+  port: 53758
+  server: 168.138.205.100
+  sub_tag: M003-260806
+  type: ss
+  udp: true
+  name: 日本03|451ms|20Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- alterId: '0'
+  cipher: auto
+  network: raw
+  port: 443
+  server: 140.238.2.250
+  skip-cert-verify: false
+  sub_tag: C002-260622
+  tls: false
+  type: vmess
+  udp: true
+  uuid: 41a7089a-040b-4538-8b8d-010902405bde
+  xudp: true
+  packet-encoding: xudp
+  name: 韩国01|666ms|19Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- server: 158.101.151.157
+  port: 443
+  type: vless
+  uuid: 66171cbe-0b4b-4b24-99f6-d5a822f4dc9a
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: www.microsoft.com
+  reality-opts:
+    public-key: 99eQkMBHqOEKororOWKFlmH8M0o9VaVpV9w1vQIxhz8
+    short-id: 684c7531e599dec0
+  client-fingerprint: firefox
+  network: tcp
+  name: 日本04|541ms|19Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- server: 161.33.20.255
+  port: 8880
+  type: vmess
+  uuid: e0856508-d693-450a-a099-455091dc4f25
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: false
+  network: ws
+  ws-opts:
+    path: /e0856508-d693-450a-a099-455091dc4f25-vm
+  name: 日本05|519ms|18Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- type: socks5
+  server: 103.248.150.166
+  port: 42000
+  username: x0dM1dTw
+  password: ZWCdC3C1
+  name: 日本06|1057ms|17Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- server: jpg1api.jumpernode.site
+  port: 443
+  type: vless
+  uuid: d508df52-3acb-483f-85d2-3fd5f6a76808
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: buybox.amazon.com
+  reality-opts:
+    public-key: dtNeCNIcRgs8_EKIJg_oTJEsiA8KBU-QaE1yVpkoX0I
+    short-id: 2c92d6
+  client-fingerprint: chrome
+  network: tcp
+  name: 日本07|567ms|17Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- password: 0ab6c98dae3b48e8b9c4a776b6c9c19a
+  port: 443
+  server: 158.247.253.243
+  skip-cert-verify: true
+  sni: connectgraduateswithjobopeningsandgrowprofessionally.com
+  type: trojan
+  name: 韩国02|1355ms|17Mbps|机房|纯净度99.9%
+  dialer-proxy: 🌉 前置
+- password: EGJDy5Kg
+  port: 42000
+  server: 103.248.150.50
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  type: socks5
+  username: paZFN3JA
+  udp: true
+  name: 日本08|1032ms|16Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- cipher: aes-128-gcm
+  password: Bwlqh7GcFB
+  port: 53758
+  server: jpa.123069.xyz
+  sub_tag: M003-260806
+  type: ss
+  udp: true
+  name: 日本09|453ms|16Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- type: socks5
+  server: 103.248.150.238
+  port: 42000
+  username: tB4vN7qP
+  password: J5rM2xL9
+  name: 日本10|995ms|16Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- type: vmess
+  network: ws
+  server: 132.145.80.230
+  port: 80
+  uuid: 5155860e-d07d-46c3-9128-3afbd84626c7
+  udp: true
+  alterId: 0
+  cipher: auto
+  ws-opts:
+    headers:
+      Host: kr02.a0a.xyz
+    path: /cctv13.m3u8
+  name: 韩国03|782ms|11Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- server: 168.110.63.247
+  port: 8081
+  type: vmess
+  uuid: c3bde296-8e44-4b8c-a325-577d5b3cc7c8
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: false
+  network: ws
+  ws-opts:
+    path: /vless
+  name: 日本11|501ms|10Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- network: ws
+  port: 25555
+  server: 152.69.226.63
+  tls: false
+  type: vless
+  uuid: 27c5483f-17f4-48ae-9a04-def53d88440d
+  ws-opts:
+    path: /
+  name: 韩国04|1419ms|10Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
+- client-fingerprint: chrome
+  network: tcp
+  password: p5jTPcffLgi4gaNOJd2KUTb9YEPBBD5B
+  port: 56127
+  server: 154.90.62.70
+  skip-cert-verify: true
+  sni: 154.90.62.70
+  sub_tag: A004-260618
+  type: trojan
+  udp: true
+  name: 韩国05|970ms|9Mbps|机房|纯净度99.2%
+  dialer-proxy: 🌉 前置
+- type: http
+  server: 152.69.230.221
+  port: 443
+  tls: true
+  sni: 152.69.230.221
+  skip-cert-verify: true
+  name: 韩国06|852ms|6Mbps|机房|纯净度100.0%
+  dialer-proxy: 🌉 前置
 proxy-groups:
 - name: 🌉 前置
   type: select
@@ -11499,6 +11688,8 @@ proxy-groups:
   - 🇺🇸 美国节点
   - 🏢 美国机房
   - 🏠 美国住宅
+  - 🇯🇵 日本
+  - 🇰🇷 韩国
   - 🇪🇺 欧洲
   - 🌐 全部节点
   - DIRECT
@@ -11619,20 +11810,20 @@ proxy-groups:
   lazy: true
   proxies:
   - visa中国优选
-  - US 移动优选www.whoer.net 213ms
-  - GB 移动优选zabc.net 202ms
-  - DE 移动优选cfip.1323123.xyz 225ms
-  - GB 移动优选networksolutions.com 169ms
-  - nrtcfdns.zone.id
-  - 官方优选icook.hk
-  - US 移动优选vegasgeek.com 212ms
-  - US 移动优选aandd.co.jp 239ms
-  - US 移动优选www.government.is 216ms
-  - 官方优选time.is
-  - GB 移动优选www.spacex.com 171ms
-  - cf.0sm.com
-  - 官方优选icook.tw
+  - GB 移动优选rargb.to 215ms
+  - US 移动优选cdnjs.com 222ms
+  - cfip.1323123.xyz
   - US 移动优选www.transgenderdor.org 309ms
+  - DE 移动优选cfip.1323123.xyz 225ms
+  - 官方优选icook.tw
+  - 官方优选icook.hk
+  - US 移动优选aandd.co.jp 239ms
+  - GB 移动优选redis.io 248ms
+  - US 移动优选singapore.com 265ms
+  - WeTest.Vip维护
+  - cf-cname.xingpingcn.top
+  - US 移动优选vegasgeek.com 212ms
+  - US 移动优选www.moc.gov.tw 243ms
 - name: 🇺🇸 美国节点
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -12031,6 +12222,41 @@ proxy-groups:
   - 美国152|576ms|271Mbps|住宅|纯净度100.0%
   - 美国154|272ms|265Mbps|住宅|纯净度100.0%
   - 美国155|382ms|260Mbps|住宅|纯净度100.0%
+- name: 🇯🇵 日本
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+  interval: 120
+  timeout: 3000
+  expected-status: 204
+  tolerance: 100
+  lazy: false
+  proxies:
+  - 日本01|242ms|21Mbps|机房|纯净度98.0%
+  - 日本02|501ms|21Mbps|机房|纯净度100.0%
+  - 日本03|451ms|20Mbps|机房|纯净度100.0%
+  - 日本04|541ms|19Mbps|机房|纯净度100.0%
+  - 日本05|519ms|18Mbps|机房|纯净度100.0%
+  - 日本06|1057ms|17Mbps|机房|纯净度100.0%
+  - 日本07|567ms|17Mbps|机房|纯净度100.0%
+  - 日本08|1032ms|16Mbps|机房|纯净度100.0%
+  - 日本09|453ms|16Mbps|机房|纯净度100.0%
+  - 日本10|995ms|16Mbps|机房|纯净度100.0%
+  - 日本11|501ms|10Mbps|机房|纯净度100.0%
+- name: 🇰🇷 韩国
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+  interval: 120
+  timeout: 3000
+  expected-status: 204
+  tolerance: 100
+  lazy: false
+  proxies:
+  - 韩国01|666ms|19Mbps|机房|纯净度100.0%
+  - 韩国02|1355ms|17Mbps|机房|纯净度99.9%
+  - 韩国03|782ms|11Mbps|机房|纯净度100.0%
+  - 韩国04|1419ms|10Mbps|机房|纯净度100.0%
+  - 韩国05|970ms|9Mbps|机房|纯净度99.2%
+  - 韩国06|852ms|6Mbps|机房|纯净度100.0%
 - name: 🇪🇺 欧洲
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -12386,3 +12612,20 @@ proxy-groups:
   - 美国185|342ms|45Mbps|机房|纯净度100.0%
   - 美国186|322ms|41Mbps|机房|纯净度100.0%
   - 美国187|366ms|40Mbps|机房|纯净度100.0%
+  - 日本01|242ms|21Mbps|机房|纯净度98.0%
+  - 日本02|501ms|21Mbps|机房|纯净度100.0%
+  - 日本03|451ms|20Mbps|机房|纯净度100.0%
+  - 韩国01|666ms|19Mbps|机房|纯净度100.0%
+  - 日本04|541ms|19Mbps|机房|纯净度100.0%
+  - 日本05|519ms|18Mbps|机房|纯净度100.0%
+  - 日本06|1057ms|17Mbps|机房|纯净度100.0%
+  - 日本07|567ms|17Mbps|机房|纯净度100.0%
+  - 韩国02|1355ms|17Mbps|机房|纯净度99.9%
+  - 日本08|1032ms|16Mbps|机房|纯净度100.0%
+  - 日本09|453ms|16Mbps|机房|纯净度100.0%
+  - 日本10|995ms|16Mbps|机房|纯净度100.0%
+  - 韩国03|782ms|11Mbps|机房|纯净度100.0%
+  - 日本11|501ms|10Mbps|机房|纯净度100.0%
+  - 韩国04|1419ms|10Mbps|机房|纯净度100.0%
+  - 韩国05|970ms|9Mbps|机房|纯净度99.2%
+  - 韩国06|852ms|6Mbps|机房|纯净度100.0%
