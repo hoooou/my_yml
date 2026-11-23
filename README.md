@@ -102,11 +102,10 @@ https://raw.githubusercontent.com/hoooou/my_yml/main/%E9%93%BE%E5%BC%8F%E9%85%8D
 | ⚡ 高速下载 | 综合合格池内 Cloudflare 100MB 完整通过，按该次速度排序 |
 | 🏠 非机房 IP | 综合合格池内明确 hosting=false、没有出口矛盾；按独立出口 IP 去重 |
 | 🌏 台湾／新加坡 | trace 确认 TW/SG；入口、必过网站/API、SSL、1MB 和稳定性仍须通过 |
-| 🍓 小草莓（免测） | 用户指定订阅在最终生成时追加，保留原名；单独 select，不测速、不淘汰、不进各优选组 |
 
 香港整体最多 30 个，非香港不限数量。中速／高速组保留所有满足条件的已入选节点，不另取前 30，组间可重叠、数量不能相加；空组显示 REJECT，不用失败节点补足。
 
-小草莓是用户明确授权的免测例外，地址放在 Actions Secret `UNTESTED_SUBSCRIPTION_URL`，不写进仓库。只在全部筛选完成后追加 `proxies`，不接受来源自己的规则或 DNS；名称加 `🍓 ` 前缀，不伪造延迟、带宽、住宅或纯净度；获取失败时本轮不含免测节点，其余照常发布。
+免测订阅（“小草莓”）功能已停用：workflow 不再传入 `UNTESTED_SUBSCRIPTION_URL`，发布结果里不含免测节点；`scripts/untested_subscription.py` 保留但不会被触发，需要时在 workflow 的发布步骤里把这个 Secret 加回环境变量即可。
 
 全局组用 select、默认综合优选；其他组 url-test，每 120 秒测一轮、3 秒超时、切换容差 100ms、不 lazy。只有单轮探测失败（节点真的不通）才立刻切走；当前节点只是变慢、没有慢出 100ms 就不换。
 
