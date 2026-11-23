@@ -27,7 +27,8 @@ FRONT_PREFIX = '🛫 '
 FRONT_TEST_GROUP = '🛫 前置节点'
 # 用户自己的订阅：流水线拉下来当免测前置用，直接写进配置；客户端不再需要拉 provider。
 # 注意：地址写在仓库里，token 会随仓库公开。
-EXT_SUB_URL = 'https://vs.yieti.top/sub?token=e6f485b6ba8929fa37ea6eddebb3ab87&clash'
+# 2026-11-23：原订阅域名 yieti.top 已弃用，这里置空即不生成该组；以后接新订阅只要填这一行。
+EXT_SUB_URL = ''
 EXT_GROUP = '🛫 yieti'
 EXT_AUTO_GROUP = '🛫 yieti 自动'
 EXT_AUTO_SIZE = 15  # 自动组最多放这么多个
@@ -256,7 +257,7 @@ def external_fronts(url=EXT_SUB_URL):
     import yaml
     from select_nodes import session
 
-    if os.environ.get('CHAIN_EXTERNAL_SUB') == 'off':
+    if os.environ.get('CHAIN_EXTERNAL_SUB') == 'off' or not url:
         return []
     if url in _EXTERNAL_CACHE:
         return copy.deepcopy(_EXTERNAL_CACHE[url])

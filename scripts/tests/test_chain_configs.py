@@ -206,6 +206,17 @@ class RenderTest(unittest.TestCase):
         self.assertEqual([n['name'] for n in nodes], ['US01'])
         self.assertEqual(client.get.call_args.kwargs['headers']['User-Agent'], 'clash-verge/v1.0')
 
+    def test_empty_subscription_url_means_no_external_group(self):
+        with mock.patch.dict('os.environ', {'CHAIN_EXTERNAL_SUB': 'on'}), \
+                mock.patch('select_nodes.session') as session:
+            self.assertEqual(cc.external_fronts(''), [])
+            session.assert_not_called()
+        self.assertEqual(cc.EXT_SUB_URL, '')
+        config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), [])
+        names = [g['name'] for g in config['proxy-groups']]
+        self.assertNotIn(cc.EXT_GROUP, names)
+        self.assertNotIn(cc.EXT_AUTO_GROUP, names)
+
     def test_previous_chain_nodes_are_reused_when_the_subscription_fails(self):
         import json, tempfile
         config = cc.render_chain(base_config(), fronts_fixture(), landings_fixture(), ext_fixture())
