@@ -392,14 +392,14 @@ class ProxyipLandingTest(unittest.TestCase):
         with mock.patch.dict('os.environ', {'CHAIN_EXTERNAL_SUB': 'off'}):
             self.assertEqual(cc.proxyip_landings(), [])
 
-    def test_extra_landings_get_turkey_group_and_combined_group(self):
+    def test_extra_landings_get_turkey_group_and_no_combined_group(self):
         extra = [{'name': '土耳其01|ProxyIP|1.1.1.1|CF站点出口|纯净度未知', 'type': 'vless',
                   'server': '1.2.3.4', 'port': 443}]
         for config in (cc.render_landing(base_config(), landings_fixture() + extra),
                        cc.render_chain(base_config(), fronts_fixture(), landings_fixture() + extra)):
             groups = {g['name']: g for g in config['proxy-groups']}
             self.assertEqual(groups['🇹🇷 土耳其']['proxies'], [extra[0]['name']])
-            self.assertEqual(groups['🌏 日韩土']['proxies'], [extra[0]['name']])
+            self.assertNotIn('🌏 日韩土', groups)
 
     def test_build_appends_extra_landings_without_duplicates(self):
         for target in ('availability.required_websites_passed', 'app_tls.passed', 'stability.passed',
