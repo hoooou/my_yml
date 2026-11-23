@@ -1,4 +1,4 @@
-# 后置配置；2026-11-23T16:27:53+08:00；290 个
+# 后置配置；2026-11-23T17:36:38+08:00；297 个
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -3695,6 +3695,104 @@ proxies:
   sni: 152.69.230.221
   skip-cert-verify: true
   name: 韩国06|852ms|6Mbps|机房|纯净度100.0%
+- name: 土耳其01|ProxyIP|82.26.198.25|CF站点出口|纯净度未知
+  type: vless
+  server: 172.67.72.145
+  port: 443
+  uuid: 9c16b478-aa02-41a1-859f-872f6d1ccf1a
+  tls: true
+  servername: worker.happybot.space
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /proxyip=82.26.198.25
+    headers:
+      Host: worker.happybot.space
+- name: 土耳其02|ProxyIP|78.135.83.8|CF站点出口|纯净度未知
+  type: vless
+  server: 172.67.72.145
+  port: 443
+  uuid: 9c16b478-aa02-41a1-859f-872f6d1ccf1a
+  tls: true
+  servername: worker.happybot.space
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /proxyip=78.135.83.8
+    headers:
+      Host: worker.happybot.space
+- name: 土耳其03|ProxyIP|201.50.115.20|CF站点出口|纯净度未知
+  type: vless
+  server: 172.67.72.145
+  port: 443
+  uuid: 9c16b478-aa02-41a1-859f-872f6d1ccf1a
+  tls: true
+  servername: worker.happybot.space
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /proxyip=201.50.115.20
+    headers:
+      Host: worker.happybot.space
+- name: 土耳其04|ProxyIP|82.26.136.195:8443|CF站点出口|纯净度未知
+  type: vless
+  server: 172.67.72.145
+  port: 443
+  uuid: 9c16b478-aa02-41a1-859f-872f6d1ccf1a
+  tls: true
+  servername: worker.happybot.space
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /proxyip=82.26.136.195:8443
+    headers:
+      Host: worker.happybot.space
+- name: 土耳其05|ProxyIP|213.155.119.28|CF站点出口|纯净度未知
+  type: vless
+  server: 172.67.72.145
+  port: 443
+  uuid: 9c16b478-aa02-41a1-859f-872f6d1ccf1a
+  tls: true
+  servername: worker.happybot.space
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /proxyip=213.155.119.28
+    headers:
+      Host: worker.happybot.space
+- name: 土耳其06|ProxyIP|82.26.198.89|CF站点出口|纯净度未知
+  type: vless
+  server: 172.67.72.145
+  port: 443
+  uuid: 9c16b478-aa02-41a1-859f-872f6d1ccf1a
+  tls: true
+  servername: worker.happybot.space
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /proxyip=82.26.198.89
+    headers:
+      Host: worker.happybot.space
+- name: 土耳其07|ProxyIP|178.157.15.73|CF站点出口|纯净度未知
+  type: vless
+  server: 172.67.72.145
+  port: 443
+  uuid: 9c16b478-aa02-41a1-859f-872f6d1ccf1a
+  tls: true
+  servername: worker.happybot.space
+  skip-cert-verify: false
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /proxyip=178.157.15.73
+    headers:
+      Host: worker.happybot.space
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -3704,6 +3802,8 @@ proxy-groups:
   - 🏠 美国住宅
   - 🇯🇵 日本
   - 🇰🇷 韩国
+  - 🇹🇷 土耳其
+  - 🌏 日韩土
   - 🇪🇺 欧洲
   - 🌐 全部节点
   - DIRECT
@@ -4140,6 +4240,55 @@ proxy-groups:
   - 韩国04|1419ms|10Mbps|机房|纯净度100.0%
   - 韩国05|970ms|9Mbps|机房|纯净度99.2%
   - 韩国06|852ms|6Mbps|机房|纯净度100.0%
+- name: 🇹🇷 土耳其
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+  interval: 120
+  timeout: 3000
+  expected-status: 204
+  tolerance: 100
+  lazy: false
+  proxies:
+  - 土耳其01|ProxyIP|82.26.198.25|CF站点出口|纯净度未知
+  - 土耳其02|ProxyIP|78.135.83.8|CF站点出口|纯净度未知
+  - 土耳其03|ProxyIP|201.50.115.20|CF站点出口|纯净度未知
+  - 土耳其04|ProxyIP|82.26.136.195:8443|CF站点出口|纯净度未知
+  - 土耳其05|ProxyIP|213.155.119.28|CF站点出口|纯净度未知
+  - 土耳其06|ProxyIP|82.26.198.89|CF站点出口|纯净度未知
+  - 土耳其07|ProxyIP|178.157.15.73|CF站点出口|纯净度未知
+- name: 🌏 日韩土
+  type: url-test
+  url: http://www.gstatic.com/generate_204
+  interval: 120
+  timeout: 3000
+  expected-status: 204
+  tolerance: 100
+  lazy: false
+  proxies:
+  - 日本01|242ms|21Mbps|机房|纯净度98.0%
+  - 日本02|501ms|21Mbps|机房|纯净度100.0%
+  - 日本03|451ms|20Mbps|机房|纯净度100.0%
+  - 韩国01|666ms|19Mbps|机房|纯净度100.0%
+  - 日本04|541ms|19Mbps|机房|纯净度100.0%
+  - 日本05|519ms|18Mbps|机房|纯净度100.0%
+  - 日本06|1057ms|17Mbps|机房|纯净度100.0%
+  - 日本07|567ms|17Mbps|机房|纯净度100.0%
+  - 韩国02|1355ms|17Mbps|机房|纯净度99.9%
+  - 日本08|1032ms|16Mbps|机房|纯净度100.0%
+  - 日本09|453ms|16Mbps|机房|纯净度100.0%
+  - 日本10|995ms|16Mbps|机房|纯净度100.0%
+  - 韩国03|782ms|11Mbps|机房|纯净度100.0%
+  - 日本11|501ms|10Mbps|机房|纯净度100.0%
+  - 韩国04|1419ms|10Mbps|机房|纯净度100.0%
+  - 韩国05|970ms|9Mbps|机房|纯净度99.2%
+  - 韩国06|852ms|6Mbps|机房|纯净度100.0%
+  - 土耳其01|ProxyIP|82.26.198.25|CF站点出口|纯净度未知
+  - 土耳其02|ProxyIP|78.135.83.8|CF站点出口|纯净度未知
+  - 土耳其03|ProxyIP|201.50.115.20|CF站点出口|纯净度未知
+  - 土耳其04|ProxyIP|82.26.136.195:8443|CF站点出口|纯净度未知
+  - 土耳其05|ProxyIP|213.155.119.28|CF站点出口|纯净度未知
+  - 土耳其06|ProxyIP|82.26.198.89|CF站点出口|纯净度未知
+  - 土耳其07|ProxyIP|178.157.15.73|CF站点出口|纯净度未知
 - name: 🇪🇺 欧洲
   type: url-test
   url: http://www.gstatic.com/generate_204
@@ -4512,3 +4661,10 @@ proxy-groups:
   - 韩国04|1419ms|10Mbps|机房|纯净度100.0%
   - 韩国05|970ms|9Mbps|机房|纯净度99.2%
   - 韩国06|852ms|6Mbps|机房|纯净度100.0%
+  - 土耳其01|ProxyIP|82.26.198.25|CF站点出口|纯净度未知
+  - 土耳其02|ProxyIP|78.135.83.8|CF站点出口|纯净度未知
+  - 土耳其03|ProxyIP|201.50.115.20|CF站点出口|纯净度未知
+  - 土耳其04|ProxyIP|82.26.136.195:8443|CF站点出口|纯净度未知
+  - 土耳其05|ProxyIP|213.155.119.28|CF站点出口|纯净度未知
+  - 土耳其06|ProxyIP|82.26.198.89|CF站点出口|纯净度未知
+  - 土耳其07|ProxyIP|178.157.15.73|CF站点出口|纯净度未知
