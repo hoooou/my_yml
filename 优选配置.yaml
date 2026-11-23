@@ -1,4 +1,4 @@
-# 分阶段检测；2026-11-23T15:34:05+08:00；检测轮数和下载设置见连通性报告
+# 分阶段检测；2026-11-23T16:27:53+08:00；检测轮数和下载设置见连通性报告
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -3422,13 +3422,6 @@ proxies:
   type: http
   udp: true
   name: 荷兰99|651ms|29Mbps|机房|纯净度98.4%
-- cipher: aes-128-gcm
-  name: 🍓 请前往官网重新获取订阅
-  password: subscription-unavailable
-  port: 1
-  server: 127.0.0.1
-  type: ss
-  udp: true
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -3438,7 +3431,6 @@ proxy-groups:
   - ⚡ 高速下载
   - 🏠 非机房 IP
   - 🌏 台湾／新加坡
-  - 🍓 小草莓（免测）
   - DIRECT
   - 美国01|299ms|593Mbps|机房|纯净度100.0%
   - 美国02|299ms|514Mbps|机房|纯净度100.0%
@@ -3771,7 +3763,6 @@ proxy-groups:
   - 德国40|231ms|34Mbps|机房|纯净度未知
   - 德国41|224ms|31Mbps|机房|纯净度未知
   - 荷兰99|651ms|29Mbps|机房|纯净度98.4%
-  - 🍓 请前往官网重新获取订阅
   url: https://claude.ai/cdn-cgi/trace
   interval: 120
   lazy: false
@@ -4478,7 +4469,3 @@ proxy-groups:
   timeout: 3000
   expected-status: 200
   tolerance: 100
-- name: 🍓 小草莓（免测）
-  type: select
-  proxies:
-  - 🍓 请前往官网重新获取订阅
