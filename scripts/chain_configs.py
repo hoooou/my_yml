@@ -32,6 +32,9 @@ EXT_GROUP = '🛫 yieti'
 EXT_AUTO_GROUP = '🛫 yieti 自动'
 EXT_AUTO_SIZE = 15  # 自动组最多放这么多个
 EXT_AUTO_PER_REGION = 3  # 每个地区最多挑这么多个
+# 日本、韩国、土耳其的免费落地节点几乎都够不上 100MB 单目标门槛（实测 5MB 多在 1–3 MiB/s），
+# 但用户要这三个地区的出口：这三个地区只要 5MB 完整通过即可，其余门槛不变。
+RELAXED_LANDING_COUNTRIES = ('JP', 'KR', 'TR')
 FRONT_GROUP = '🌉 前置'
 AUTO_GROUP = '🔄 自动前置'
 GLOBAL_GROUP = '🚀 全局选择'
@@ -74,6 +77,7 @@ def _landing_gates(record, mapping):
     from availability import required_websites_passed, tcp_supported
     import app_tls
     import high_speed
+    import medium_speed
     import stability
 
     # 落地只收 TCP 类型：前置可能是 http/socks5，转发不了 UDP，
@@ -96,9 +100,12 @@ def _landing_gates(record, mapping):
         return False
     if (record.get('quick3_download') or {}).get('status') != 'passed':
         return False
-    # 落地是整条链的出口，100MB 单目标不过就不收。
+    # 落地是整条链的出口，100MB 单目标不过就不收；日本、韩国、土耳其改看 5MB 是否完整跑完。
     if not high_speed.passed(record.get('high_speed_download') or {}):
-        return False
+        if (record.get('exit') or {}).get('country_code') not in RELAXED_LANDING_COUNTRIES:
+            return False
+        if not medium_speed.passed(record.get('medium_speed_download') or {}):
+            return False
     if (record.get('upload_precheck') or {}).get('status') != 'passed':
         return False
     if record.get('stability') is not None and not stability.passed(record.get('stability')):
@@ -437,6 +444,8 @@ def render_landing(base, landings):
         _group(US_HOSTING_GROUP, [n for n in us if US_HOSTING_MARK in str(n)]),
         _group(US_RESIDENTIAL_GROUP, [n for n in us if US_RESIDENTIAL_MARK in str(n)]),
         _group('🇯🇵 日本', [n for n in names if str(n).startswith('日本')]),
+        _group('🇰🇷 韩国', [n for n in names if str(n).startswith('韩国')]),
+        _group('🇹🇷 土耳其', [n for n in names if str(n).startswith('土耳其')]),
         _group('🇸🇬 新加坡', [n for n in names if str(n).startswith('新加坡')]),
         _group('🇪🇺 欧洲', eu),
         _group('🌐 全部节点', names),
@@ -474,6 +483,8 @@ def render_chain(base, fronts, landings, ext_fronts=()):
         _group(US_HOSTING_GROUP, [n for n in us if US_HOSTING_MARK in str(n)]),
         _group(US_RESIDENTIAL_GROUP, [n for n in us if US_RESIDENTIAL_MARK in str(n)]),
         _group('🇯🇵 日本', [n for n in names if str(n).startswith('日本')]),
+        _group('🇰🇷 韩国', [n for n in names if str(n).startswith('韩国')]),
+        _group('🇹🇷 土耳其', [n for n in names if str(n).startswith('土耳其')]),
         _group('🇸🇬 新加坡', [n for n in names if str(n).startswith('新加坡')]),
         _group('🇪🇺 欧洲', eu),
         _group('🌐 全部节点', names),

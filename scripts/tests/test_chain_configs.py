@@ -105,6 +105,23 @@ class SelectionTest(unittest.TestCase):
         with mock.patch('high_speed.passed', return_value=False):
             self.assertEqual(cc.select_landings(records, {'n0': node(0)}), [])
 
+    def test_landing_100mb_relaxed_for_jp_kr_tr_only(self):
+        # 日本、韩国、土耳其：100MB 没过但 5MB 完整通过，照收；美国同样情况仍排除。
+        medium_ok = {'status': 'passed'}
+        for country, expected in (('JP', 1), ('KR', 1), ('TR', 1), ('US', 0)):
+            records = [record(0, exit_country=country)]
+            records[0]['medium_speed_download'] = medium_ok
+            with mock.patch('high_speed.passed', return_value=False), \
+                    mock.patch('medium_speed.passed', return_value=True):
+                got = cc.select_landings(records, {'n0': node(0)})
+            self.assertEqual(len(got), expected, country)
+
+    def test_landing_relaxed_still_requires_5mb(self):
+        records = [record(0, exit_country='JP')]
+        with mock.patch('high_speed.passed', return_value=False), \
+                mock.patch('medium_speed.passed', return_value=False):
+            self.assertEqual(cc.select_landings(records, {'n0': node(0)}), [])
+
     def test_landing_names_use_exit_country_and_speed_order(self):
         records = [record(0, exit_country='US'), record(1, exit_country='US'),
                    record(2, exit_country='JP')]
@@ -306,6 +323,23 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(groups[cc.US_RESIDENTIAL_GROUP]['proxies'], ['美国02|120ms|60Mbps|住宅|纯净度98%'])
         self.assertEqual(groups[cc.GLOBAL_GROUP]['proxies'][:3],
                          [cc.US_GROUP, cc.US_HOSTING_GROUP, cc.US_RESIDENTIAL_GROUP])
+
+
+class RegionGroupTest(unittest.TestCase):
+    def test_korea_turkey_groups_in_landing_and_chain(self):
+        landings = [
+            {'name': '日本01|100ms|20Mbps|机房|纯净度未知', 'server': '1.1.1.1', 'port': 80, 'type': 'http'},
+            {'name': '韩国01|100ms|20Mbps|机房|纯净度未知', 'server': '1.1.1.2', 'port': 80, 'type': 'http'},
+            {'name': '土耳其01|100ms|20Mbps|机房|纯净度未知', 'server': '1.1.1.3', 'port': 80, 'type': 'http'},
+        ]
+        for config in (cc.render_landing(base_config(), landings),
+                       cc.render_chain(base_config(), fronts_fixture(), landings)):
+            groups = {g['name']: g for g in config['proxy-groups']}
+            self.assertEqual(groups['🇰🇷 韩国']['proxies'], [landings[1]['name']])
+            self.assertEqual(groups['🇹🇷 土耳其']['proxies'], [landings[2]['name']])
+            self.assertEqual(groups['🇯🇵 日本']['proxies'], [landings[0]['name']])
+            self.assertIn('🇰🇷 韩国', groups[cc.GLOBAL_GROUP]['proxies'])
+            self.assertIn('🇹🇷 土耳其', groups[cc.GLOBAL_GROUP]['proxies'])
 
 
 class BuildTest(unittest.TestCase):
