@@ -1706,7 +1706,8 @@ def main():
     if args.phase in ('all', 'publish'):
         try:
             front_cfg, landing_cfg, chain_cfg, chain_summary = chain_configs.build(
-                config, records, mapping, chain_configs.external_fronts())
+                config, records, mapping, chain_configs.external_fronts(),
+                extra_landings=chain_configs.proxyip_landings())
         except Exception as error:  # never block the main subscription on the optional chain
             print(f'链式产物生成失败：{type(error).__name__}: {error}', flush=True)
             front_cfg = landing_cfg = chain_cfg = None

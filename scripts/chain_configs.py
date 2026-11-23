@@ -233,6 +233,64 @@ def _group(name, nodes):
             'proxies': nodes}
 
 
+# 土耳其落地：公开订阅里几乎没有土耳其出口，改用 edgetunnel-proxyip 仓库筛出来的土耳其 ProxyIP，
+# 经自己的 Worker（WebSocket，path=/proxyip=<IP>）出去。注意 ProxyIP 只对 Cloudflare 托管的站点生效，
+# 访问非 CF 站点时仍从 Worker 自己的位置出口，所以这批节点只代表「CF 站点的土耳其出口」。
+# 地址写在仓库里，token 与 UUID 会随公开配置公开。
+PROXYIP_LISTS = (('土耳其', 'https://raw.githubusercontent.com/hoooou/edgetunnel-proxyip/main/proxyip/tr.txt'),)
+WORKER_SUB_URL = 'https://worker.happybot.space/sub?token=3822a3adae9c0cc9270bdd7823060366&clash'
+PROXYIP_MARK = '|ProxyIP|'
+
+
+def previous_proxyip_landings(path='后置配置.yaml'):
+    """上一版后置配置里的 ProxyIP 节点；这一轮拉取失败时用它顶上，避免整组消失。"""
+    import yaml
+    from pathlib import Path
+
+    try:
+        data = yaml.safe_load(Path(path).read_text(encoding='utf-8'))
+        return [copy.deepcopy(n) for n in data.get('proxies') or [] if PROXYIP_MARK in str(n.get('name'))]
+    except Exception:
+        return []
+
+
+def proxyip_landings(lists=PROXYIP_LISTS, sub_url=WORKER_SUB_URL):
+    """每个 ProxyIP 生成一个落地节点：Worker 的 WebSocket 节点 + path=/proxyip=<IP[:端口]>。"""
+    import os
+    import yaml
+    from select_nodes import session
+
+    if os.environ.get('CHAIN_EXTERNAL_SUB') == 'off' or not lists or not sub_url:
+        return []
+    try:
+        with session() as client:
+            headers = {'User-Agent': 'clash-verge/v1.0'}
+            response = client.get(sub_url, timeout=(5, 30), headers=headers)
+            response.raise_for_status()
+            worker = next(n for n in (yaml.safe_load(response.text) or {}).get('proxies') or []
+                          if n.get('type') == 'vless' and n.get('uuid'))
+            entries = {}
+            for region, url in lists:
+                answer = client.get(url, timeout=(5, 20), headers=headers)
+                answer.raise_for_status()
+                entries[region] = [x.strip() for x in answer.text.strip().split(',') if x.strip()]
+    except Exception:
+        print('ProxyIP 落地节点拉取失败，沿用上一版', flush=True)
+        return previous_proxyip_landings()
+    host = worker.get('servername') or (worker.get('xhttp-opts') or {}).get('host') or worker['server']
+    nodes = []
+    for region, items in entries.items():
+        for number, item in enumerate(items, 1):
+            nodes.append({
+                'name': f'{region}{number:02d}{PROXYIP_MARK}{item}|CF站点出口|纯净度未知',
+                'type': 'vless', 'server': worker['server'], 'port': worker.get('port', 443),
+                'uuid': worker['uuid'], 'tls': True, 'servername': host,
+                'skip-cert-verify': False, 'client-fingerprint': worker.get('client-fingerprint', 'chrome'),
+                'network': 'ws', 'ws-opts': {'path': f'/proxyip={item}', 'headers': {'Host': host}},
+            })
+    return nodes or previous_proxyip_landings()
+
+
 _EXTERNAL_CACHE = {}
 
 
@@ -447,6 +505,7 @@ def render_landing(base, landings):
         _group('🇯🇵 日本', [n for n in names if str(n).startswith('日本')]),
         _group('🇰🇷 韩国', [n for n in names if str(n).startswith('韩国')]),
         _group('🇹🇷 土耳其', [n for n in names if str(n).startswith('土耳其')]),
+        _group('🌏 日韩土', [n for n in names if str(n).startswith(('日本', '韩国', '土耳其'))]),
         _group('🇸🇬 新加坡', [n for n in names if str(n).startswith('新加坡')]),
         _group('🇪🇺 欧洲', eu),
         _group('🌐 全部节点', names),
@@ -486,6 +545,7 @@ def render_chain(base, fronts, landings, ext_fronts=()):
         _group('🇯🇵 日本', [n for n in names if str(n).startswith('日本')]),
         _group('🇰🇷 韩国', [n for n in names if str(n).startswith('韩国')]),
         _group('🇹🇷 土耳其', [n for n in names if str(n).startswith('土耳其')]),
+        _group('🌏 日韩土', [n for n in names if str(n).startswith(('日本', '韩国', '土耳其'))]),
         _group('🇸🇬 新加坡', [n for n in names if str(n).startswith('新加坡')]),
         _group('🇪🇺 欧洲', eu),
         _group('🌐 全部节点', names),
@@ -516,10 +576,15 @@ def render_chain(base, fronts, landings, ext_fronts=()):
     return config
 
 
-def build(base, records, mapping, ext_fronts=()):
+def build(base, records, mapping, ext_fronts=(), extra_landings=()):
     """Return (front_config, landing_config, chain_config, summary)."""
     fronts = select_fronts(records, mapping)
     landings = select_landings(records, mapping)
+    taken = {node['name'] for node in landings}
+    for node in extra_landings:
+        if node['name'] not in taken:
+            taken.add(node['name'])
+            landings.append(copy.deepcopy(node))
     summary = {
         'fronts': len(fronts),
         'landings': len(landings),

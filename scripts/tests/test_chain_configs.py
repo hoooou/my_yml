@@ -353,6 +353,71 @@ class RegionGroupTest(unittest.TestCase):
             self.assertIn('🇹🇷 土耳其', groups[cc.GLOBAL_GROUP]['proxies'])
 
 
+class ProxyipLandingTest(unittest.TestCase):
+    SUB = ('proxies:\n  - {name: w, type: vless, server: 1.2.3.4, port: 443, uuid: u-1, tls: true,'
+           ' servername: w.example.com, network: xhttp, client-fingerprint: chrome}\n')
+
+    def fetch(self, tr='82.26.198.25,82.26.136.195:8443\n'):
+        def get(url, **kwargs):
+            response = mock.Mock(); response.raise_for_status = lambda: None
+            response.text = self.SUB if 'sub' in url else tr
+            return response
+        return get
+
+    def test_each_proxyip_becomes_a_websocket_landing(self):
+        with mock.patch.dict('os.environ', {'CHAIN_EXTERNAL_SUB': 'on'}), \
+                mock.patch('select_nodes.session') as session:
+            session.return_value.__enter__.return_value.get.side_effect = self.fetch()
+            nodes = cc.proxyip_landings((('土耳其', 'https://x/tr.txt'),), 'https://x/sub')
+        self.assertEqual(len(nodes), 2)
+        self.assertTrue(nodes[0]['name'].startswith('土耳其01|ProxyIP|82.26.198.25'))
+        self.assertEqual(nodes[1]['ws-opts']['path'], '/proxyip=82.26.136.195:8443')
+        self.assertEqual((nodes[0]['network'], nodes[0]['server'], nodes[0]['servername']),
+                         ('ws', '1.2.3.4', 'w.example.com'))
+        self.assertNotIn('xhttp-opts', nodes[0])
+
+    def test_failure_reuses_previous_nodes_and_off_returns_nothing(self):
+        import tempfile, yaml
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / '后置配置.yaml'
+            path.write_text(yaml.safe_dump({'proxies': [
+                {'name': '土耳其01|ProxyIP|1.1.1.1|CF站点出口|纯净度未知'}, {'name': '美国01|x'}]},
+                allow_unicode=True), encoding='utf-8')
+            self.assertEqual(len(cc.previous_proxyip_landings(str(path))), 1)
+        with mock.patch.dict('os.environ', {'CHAIN_EXTERNAL_SUB': 'on'}), \
+                mock.patch('select_nodes.session') as session, \
+                mock.patch.object(cc, 'previous_proxyip_landings', return_value=['kept']):
+            session.return_value.__enter__.return_value.get.side_effect = OSError('down')
+            self.assertEqual(cc.proxyip_landings((('土耳其', 'u'),), 's'), ['kept'])
+        with mock.patch.dict('os.environ', {'CHAIN_EXTERNAL_SUB': 'off'}):
+            self.assertEqual(cc.proxyip_landings(), [])
+
+    def test_extra_landings_get_turkey_group_and_combined_group(self):
+        extra = [{'name': '土耳其01|ProxyIP|1.1.1.1|CF站点出口|纯净度未知', 'type': 'vless',
+                  'server': '1.2.3.4', 'port': 443}]
+        for config in (cc.render_landing(base_config(), landings_fixture() + extra),
+                       cc.render_chain(base_config(), fronts_fixture(), landings_fixture() + extra)):
+            groups = {g['name']: g for g in config['proxy-groups']}
+            self.assertEqual(groups['🇹🇷 土耳其']['proxies'], [extra[0]['name']])
+            self.assertEqual(groups['🌏 日韩土']['proxies'], [extra[0]['name']])
+
+    def test_build_appends_extra_landings_without_duplicates(self):
+        for target in ('availability.required_websites_passed', 'app_tls.passed', 'stability.passed',
+                       'availability.tcp_supported', 'high_speed.passed'):
+            module, name = target.rsplit('.', 1)
+            p = mock.patch(f'{module}.{name}', return_value=True); p.start(); self.addCleanup(p.stop)
+        p = mock.patch.object(cc, 'is_cloudflare', return_value=False); p.start(); self.addCleanup(p.stop)
+        extra = [{'name': '土耳其01|ProxyIP|1.1.1.1|CF站点出口|纯净度未知', 'type': 'vless',
+                  'server': '1.2.3.4', 'port': 443}]
+        _, landing, chain, summary = cc.build(base_config(), [record(0), record(1)],
+                                              {'n0': node(0, server='1.1.1.1'), 'n1': node(1, server='2.2.2.2')},
+                                              extra_landings=extra * 2)
+        self.assertEqual(summary['landings'], 3)
+        self.assertIn(extra[0]['name'], [n['name'] for n in landing['proxies']])
+        self.assertEqual(next(n for n in chain['proxies'] if n['name'] == extra[0]['name'])['dialer-proxy'],
+                         cc.FRONT_GROUP)
+
+
 class BuildTest(unittest.TestCase):
     def setUp(self):
         for target in ('availability.required_websites_passed', 'app_tls.passed',
