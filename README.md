@@ -211,7 +211,7 @@ ChatGPT API：`api.openai.com/compliance/cookie_requirements`，要求预期地�
 <!-- latest-detection:start -->
 ## 节点检测报告
 
-**当前订阅：331 个节点。** 全量检测；报告更新 11-23 17:36:38（北京时间）。
+**当前订阅：331 个节点。** 全量检测；报告更新 11-23 17:55:48（北京时间）。
 
 本次沿用[已完成的全量检测](https://github.com/hoooou/my_yml/actions/runs/45094111093)修复发布和分组，没有重新测速；测量时间保留。
 
@@ -367,5 +367,5 @@ YouTube资源诊断：检查1767个节点，发现并请求3516个资源，响�
 持续轮次为多个新连接、应用TLS和连接池请求的联合结果；请求数合计96996，连接池请求失败12635。
 末尾尚未恢复3567个节点；最长连续失败5轮。失败不混入成功响应P95，样本少于100不展示P99。
 
-[本轮Actions及原始测量附件](https://github.com/hoooou/my_yml/actions/runs/45148342706)。原始附件保留7天。
+[本轮Actions及原始测量附件](https://github.com/hoooou/my_yml/actions/runs/45151161825)。原始附件保留7天。
 <!-- latest-detection:end -->
