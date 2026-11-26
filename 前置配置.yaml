@@ -1,4 +1,4 @@
-# 前置配置；2026-11-25T20:36:52+08:00；103 个
+# 前置配置；2026-11-26T08:04:43+08:00；117 个
 mixed-port: 7890
 allow-lan: false
 mode: rule
@@ -553,16 +553,6 @@ sniffer:
   - +.push.apple.com
 proxies:
 - type: anytls
-  server: a54ge.df6h451rh.xin
-  port: 443
-  password: 0324fbc29561
-  tls: true
-  servername: docs.microsoft.com
-  sni: docs.microsoft.com
-  skip-cert-verify: true
-  client-fingerprint: chrome
-  name: 🛫 01|105ms|2Mbps
-- type: anytls
   server: 5641sdds.df6h451rh.xin
   port: 443
   password: 0324fbc29561
@@ -571,7 +561,69 @@ proxies:
   sni: images.ctfassets.net
   skip-cert-verify: true
   client-fingerprint: chrome
-  name: 🛫 02|154ms|9Mbps
+  name: 🛫 01|53ms|13Mbps
+- type: vless
+  server: free.fugui.lol
+  port: 19482
+  uuid: ead3595f-4020-4e76-a3ec-c248e1a2f2f7
+  flow: xtls-rprx-vision
+  udp: true
+  tls: true
+  servername: swdist.apple.com
+  sni: swdist.apple.com
+  skip-cert-verify: true
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: IjWYbHNrZb3UCQxsTJyekEOA3tHq42L6Jw3O8MmLYVQ
+    short-id: fa514b83
+  name: 🛫 02|86ms|?Mbps
+- type: anytls
+  server: site.ddddd.site
+  port: 36039
+  password: 517406f2-6d1e-4a83-a614-aeda01165379
+  udp: true
+  sni: virtual.ubuntu24.com
+  skip-cert-verify: true
+  client-fingerprint: chrome
+  name: 🛫 03|92ms|5Mbps
+- client-fingerprint: chrome
+  password: 0324fbc29561
+  port: 443
+  server: a54ge.df6h451rh.xin
+  skip-cert-verify: true
+  sni: docs.microsoft.com
+  type: anytls
+  udp: true
+  name: 🛫 04|104ms|4Mbps
+- server: vps3.nemnogogo.com
+  port: 443
+  type: vless
+  uuid: 38308ff1-5aa9-494f-a25a-0f2870d56b3e
+  tls: true
+  alpn:
+  - h2
+  servername: vps3.nemnogogo.com
+  client-fingerprint: firefox
+  network: grpc
+  grpc-opts:
+    grpc-mode: gun
+    grpc-service-name: mobile.api.Event
+  udp: true
+  name: 🛫 05|171ms|41Mbps
+- type: vless
+  server: 15b171g.nl7.h1clayd.click
+  port: 443
+  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
+  tls: true
+  servername: 15b171g.nl7.h1clayd.click
+  client-fingerprint: firefox
+  network: grpc
+  grpc-opts:
+    grpc-service-name: 5b79e8a94241
+  reality-opts:
+    public-key: zbz--PMjcIC4Ggr3j-ibDf0fzXRTj0lM_HzjPJyMkVE
+    short-id: 50a749f0eccb628c
+  name: 🛫 06|179ms|6Mbps
 - password: exaxgqkKkd0TAMrCxeonWg==
   port: 443
   server: usgp1-cdn-route.couldflare-cdn.com
@@ -579,75 +631,135 @@ proxies:
   type: http
   udp: true
   username: mrwdfNTD8M79LCukCieldrqZWqs=
-  name: 🛫 03|186ms|43Mbps
-- alpn:
-  - h2
-  client-fingerprint: firefox
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: mobile.api.Event
-  network: grpc
+  name: 🛫 07|184ms|39Mbps
+- server: leviko-ru4448.shopingggg.ir
   port: 443
-  server: vps3.nemnogogo.com
-  servername: vps3.nemnogogo.com
-  tls: true
   type: vless
-  udp: true
   uuid: 38308ff1-5aa9-494f-a25a-0f2870d56b3e
-  name: 🛫 04|192ms|46Mbps
-- alpn:
+  tls: true
+  alpn:
   - h2
+  servername: vps3.nemnogogo.com
   client-fingerprint: chrome
+  network: grpc
   grpc-opts:
     grpc-mode: gun
     grpc-service-name: mobile.api.Event
-  network: grpc
-  port: 443
-  server: leviko-ru4448.shopingggg.ir
-  servername: vps3.nemnogogo.com
-  tls: true
+  udp: true
+  name: 🛫 08|203ms|47Mbps
+- server: leviko-hk5711.shopingggg.ir
+  port: 2083
   type: vless
+  uuid: 490dc3b4-8d1d-49fd-840e-bd5277b41557
   udp: true
-  uuid: 38308ff1-5aa9-494f-a25a-0f2870d56b3e
-  name: 🛫 05|248ms|34Mbps
-- client-fingerprint: chrome
-  password: 2902c46c8493
+  tls: false
+  network: grpc
+  grpc-opts:
+    grpc-service-name: service-41f6a2a01377
+  name: 🛫 09|229ms|7Mbps
+- server: api.ferrin.uk
   port: 443
-  server: ibsdsf.df6h451rh.xin
-  skip-cert-verify: true
-  sni: docs.microsoft.com
-  type: anytls
+  type: vless
+  uuid: 7d1a74fd-8a38-4a29-863f-5da53a9e557e
   udp: true
-  name: 🛫 06|1163ms|21Mbps
-- port: 1080
-  server: 59.11.209.162
-  skip-cert-verify: true
-  type: socks5
-  name: 🛫 07|97ms|21Mbps
-- port: 443
-  server: 185.140.209.235
-  skip-cert-verify: true
-  sni: 482c8436a1f7c908b48a1757abb5dd79-ce85c45206570905.apache-iv.com
-  sub_tag: R002-260618
   tls: true
-  type: http
-  udp: true
-  name: 🛫 08|161ms|2Mbps
-- type: http
-  server: 150.230.14.159
-  port: 443
-  tls: true
-  skip-cert-verify: true
-  name: 🛫 09|162ms|19Mbps
-- password: None
-  port: 9090
-  server: 185.53.129.141
+  servername: 7d1a74fd.ferrin.uk
+  client-fingerprint: chrome
+  network: xhttp
+  xhttp-opts:
+    path: /es
+    host: 7d1a74fd.ferrin.uk
+    mode: stream-one
+  name: 🛫 10|279ms|10Mbps
+- port: 3128
+  server: 119.28.24.235
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 10|162ms|?Mbps
+  name: 🛫 11|47ms|14Mbps
+- password: None
+  port: 343
+  server: 133.18.200.207
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 12|63ms|7Mbps
+- port: 1080
+  server: 59.11.209.162
+  skip-cert-verify: true
+  type: socks5
+  name: 🛫 13|67ms|14Mbps
+- password: ''
+  port: 8443
+  server: 64.176.51.83
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 🛫 14|130ms|?Mbps
+- type: ss
+  server: 47.254.167.157
+  port: 443
+  password: 8yO3ANWefuuGs1lRKXECQA1FEhxlWFV2ppQMcBaZo5Y=
+  cipher: 2022-blake3-chacha20-poly1305
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 15|153ms|31Mbps
+- port: 443
+  server: 185.246.153.42
+  skip-cert-verify: true
+  sni: 482c8436a1f7c908b48a1757abb5dd79-3791fb4df2db250b.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 16|154ms|16Mbps
+- server: 47.254.128.109
+  port: 443
+  type: ss
+  cipher: 2022-blake3-chacha20-poly1305
+  password: 8yO3ANWefuuGs1lRKXECQA1FEhxlWFV2ppQMcBaZo5Y=
+  udp: true
+  name: 🛫 17|155ms|30Mbps
+- type: http
+  server: 150.230.14.159
+  port: 443
+  tls: true
+  skip-cert-verify: true
+  name: 🛫 18|158ms|12Mbps
+- port: 443
+  server: 103.82.101.44
+  skip-cert-verify: true
+  sni: f3a61d8406d537345747f99f8a281007-3f754ed5da1bba09.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  x-toolall-mihomo: true
+  name: 🛫 19|163ms|23Mbps
+- port: 9443
+  server: 149.36.51.157
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 20|165ms|18Mbps
+- port: 443
+  server: 103.82.101.43
+  skip-cert-verify: true
+  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 21|169ms|9Mbps
 - client-fingerprint: firefox
   network: xhttp
   port: 443
@@ -660,49 +772,33 @@ proxies:
   xhttp-opts:
     mode: auto
     path: /assets/twru01/
-  name: 🛫 11|165ms|16Mbps
-- port: 443
-  server: 103.82.101.44
-  skip-cert-verify: true
-  sni: f3a61d8406d537345747f99f8a281007-3f754ed5da1bba09.apache-iv.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 12|167ms|15Mbps
-- client-fingerprint: firefox
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: mobile.api.Event
-  network: grpc
-  port: 443
+  name: 🛫 22|174ms|15Mbps
+- type: vless
   server: 201.24.116.192
-  servername: vps3.nemnogogo.com
-  tls: true
-  type: vless
-  udp: true
-  uuid: 38308ff1-5aa9-494f-a25a-0f2870d56b3e
-  name: 🛫 13|169ms|50Mbps
-- server: 72.56.1.44
   port: 443
-  type: vless
-  uuid: 0b6a7fe0-206b-4071-9f96-cd397d1ec01a
+  uuid: 38308ff1-5aa9-494f-a25a-0f2870d56b3e
   udp: true
+  network: grpc
   tls: true
-  servername: birchmeadow.moltex.click
+  servername: vps3.nemnogogo.com
   client-fingerprint: firefox
+  grpc-opts:
+    grpc-service-name: mobile.api.Event
+  name: 🛫 23|175ms|40Mbps
+- client-fingerprint: firefox
   network: ws
+  port: 443
+  server: 81.49.182.202
+  servername: accessfooter.cleanfoodshop.org
+  tls: true
+  type: vless
+  udp: true
+  uuid: 58e22afd-bf74-4736-984d-63a8ca03d7f0
   ws-opts:
-    path: /api/de6/stream
     headers:
-      Host: birchmeadow.moltex.click
-  name: 🛫 14|171ms|2Mbps
-- type: socks5
-  server: 66.80.2.252
-  port: 62000
-  username: usereb7d
-  password: c0a34a
-  name: 🛫 15|174ms|16Mbps
+      Host: accessfooter.cleanfoodshop.org
+    path: /media/ws/
+  name: 🛫 24|176ms|12Mbps
 - client-fingerprint: firefox
   grpc-opts:
     grpc-mode: gun
@@ -715,48 +811,63 @@ proxies:
   type: vless
   udp: true
   uuid: 38308ff1-5aa9-494f-a25a-0f2870d56b3e
-  name: 🛫 16|177ms|43Mbps
-- password: 'null'
+  name: 🛫 25|178ms|47Mbps
+- server: 104.19.166.218
   port: 443
-  server: 193.233.75.115
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
+  type: vmess
+  uuid: a9f9a249-1832-424c-9820-57af75107acc
+  alterId: 0
+  cipher: auto
   udp: true
-  name: 🛫 17|184ms|5Mbps
+  tls: true
+  servername: assumption-universities-weekend-litigation.trycloudflare.com
+  network: ws
+  ws-opts:
+    path: /ferdolans7
+    headers:
+      Host: assumption-universities-weekend-litigation.trycloudflare.com
+  name: 🛫 26|194ms|17Mbps
+- password: jHsK2gqs
+  port: 62000
+  server: 103.184.113.236
+  sub_tag: R002-260618
+  type: socks5
+  username: qT46DZLv
+  udp: true
+  name: 🛫 27|198ms|10Mbps
 - password: None
   port: 443
-  server: 185.245.84.50
+  server: 193.233.75.115
   skip-cert-verify: true
   sub_tag: P002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 18|193ms|21Mbps
-- password: l1tlrdx52v
+  name: 🛫 28|200ms|27Mbps
+- type: socks5
+  server: 23.230.200.176
   port: 62000
-  server: 66.253.2.69
-  type: socks5
-  username: u_rb1dba2
-  name: 🛫 19|193ms|?Mbps
+  username: u1f0cijj
+  password: ppyefe3k
+  name: 🛫 29|201ms|17Mbps
+- password: ''
+  port: 443
+  server: 14.225.71.128
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 🛫 30|202ms|9Mbps
 - port: 443
-  server: 185.219.159.16
+  server: 152.69.230.221
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 20|207ms|22Mbps
-- port: 443
-  server: 82.66.235.221
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  x-toolall-mihomo: true
-  name: 🛫 21|207ms|12Mbps
+  name: 🛫 31|204ms|14Mbps
 - password: None
   port: 443
   server: 172.64.68.89
@@ -766,49 +877,7 @@ proxies:
   type: http
   udp: true
   x-toolall-mihomo: true
-  name: 🛫 22|208ms|48Mbps
-- type: vless
-  server: 179.255.104.98
-  port: 8444
-  uuid: 2213c487-5f41-41e2-8248-978d684085ed
-  flow: xtls-rprx-vision
-  tls: true
-  servername: www.apple.com
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: eohUrMrf6VZGvWDyEuc65DVEtfaPoKhUx8c9TT9QERk
-    short-id: 2cd4c08a84f8492b
-  name: 🛫 23|212ms|45Mbps
-- port: 443
-  server: 103.82.101.43
-  skip-cert-verify: true
-  sni: 76d1d3ecadca44efa2339867d7dfc9a1-8e928736d0f8dbdc.apache-iv.com
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  x-toolall-mihomo: true
-  name: 🛫 24|215ms|19Mbps
-- port: 443
-  server: 91.92.250.33
-  skip-cert-verify: true
-  tls: true
-  type: http
-  name: 🛫 25|216ms|21Mbps
-- port: 6103
-  server: 87.98.174.157
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 26|216ms|1Mbps
-- port: 443
-  server: 172.64.69.89
-  skip-cert-verify: true
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 27|217ms|230Mbps
+  name: 🛫 32|206ms|185Mbps
 - server: 188.114.98.0
   port: 443
   type: vless
@@ -821,7 +890,23 @@ proxies:
     path: /media/ws/
     headers:
       Host: payablemeta.cleanfoodshop.org
-  name: 🛫 28|223ms|13Mbps
+  name: 🛫 33|206ms|13Mbps
+- type: vless
+  network: ws
+  server: 141.193.213.20
+  port: 8443
+  uuid: 4d8d9640-7cc7-4c55-ba54-6ce0d1709541
+  servername: matrix.learnpodedu.com
+  skip-cert-verify: false
+  tls: true
+  udp: true
+  tfo: false
+  client-fingerprint: chrome
+  ws-opts:
+    headers:
+      Host: matrix.learnpodedu.com
+    path: /
+  name: 🛫 34|206ms|?Mbps
 - encryption: none
   grpc-opts:
     grpc-service-name: service-41f6a2a01377
@@ -834,7 +919,44 @@ proxies:
   uuid: 490dc3b4-8d1d-49fd-840e-bd5277b41557
   xudp: true
   packet-encoding: xudp
-  name: 🛫 29|225ms|6Mbps
+  name: 🛫 35|208ms|7Mbps
+- port: 443
+  server: 172.64.69.89
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 36|212ms|303Mbps
+- password: None
+  port: 9090
+  server: 104.248.151.93
+  sub_tag: R002-260618
+  type: http
+  udp: true
+  name: 🛫 37|212ms|4Mbps
+- port: 6103
+  server: 87.98.174.157
+  skip-cert-verify: true
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 38|214ms|17Mbps
+- port: 443
+  server: 91.92.250.33
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 39|215ms|12Mbps
+- port: 443
+  server: 217.92.132.233
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 40|215ms|10Mbps
 - password: None
   port: 443
   server: 84.235.228.156
@@ -844,45 +966,70 @@ proxies:
   type: http
   username: ''
   udp: true
-  name: 🛫 30|227ms|19Mbps
-- password: 75bPoRcB
+  name: 🛫 41|219ms|6Mbps
+- password: jHsK2gqs
   port: 62000
-  server: 216.132.114.27
+  server: 103.184.113.190
+  sub_tag: R002-260618
   type: socks5
-  username: JzufiJ62
-  name: 🛫 31|228ms|80Mbps
-- password: KsPAxZGn
-  port: 42000
-  server: 94.194.166.52
+  username: qT46DZLv
+  udp: true
+  name: 🛫 42|222ms|10Mbps
+- password: None
+  port: 443
+  server: 82.66.235.221
   skip-cert-verify: true
-  type: socks5
-  username: userLRgK
-  name: 🛫 32|232ms|16Mbps
-- password: zdnivBaI
-  port: 62000
-  server: 109.66.136.42
-  sub_tag: R002-260618
-  type: socks5
-  username: r3ZzP8WW
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
   udp: true
-  name: 🛫 33|232ms|11Mbps
-- password: YlRoWvE0dL_cUqS94wPeKnA4
-  port: 62000
-  server: 87.84.49.245
-  sub_tag: R002-260618
-  type: socks5
-  username: ks878449260d
-  udp: true
-  name: 🛫 34|236ms|13Mbps
+  name: 🛫 43|223ms|13Mbps
 - port: 443
-  server: 176.94.74.21
+  server: 185.219.159.16
   skip-cert-verify: true
-  sni: 176.94.74.21
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 35|236ms|13Mbps
+  name: 🛫 44|224ms|17Mbps
+- port: 443
+  server: 169.150.248.17
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 45|226ms|20Mbps
+- server: 185.134.203.106
+  port: 443
+  type: vless
+  uuid: 3af3f8f0-569f-4dd3-be99-2ef4bfe7867c
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: api.vk.me
+  reality-opts:
+    public-key: fNfokzklCF4l_c8k8PciOCjm5ecNoF_sNLjEtaO-xzI
+    short-id: db04ce8bdb8900f1
+  client-fingerprint: firefox
+  network: tcp
+  name: 🛫 46|230ms|21Mbps
+- password: l1tlrdx52v
+  port: 62000
+  server: 66.253.2.69
+  sub_tag: R002-260618
+  type: socks5
+  username: u_rb1dba2
+  udp: true
+  name: 🛫 47|231ms|56Mbps
+- password: YlRoWvE0dL_cUqS94wPeKnA4
+  port: 62000
+  server: 87.84.49.206
+  skip-cert-verify: true
+  type: socks5
+  username: ks878449260d
+  name: 🛫 48|231ms|12Mbps
 - port: 443
   server: 178.248.73.58
   skip-cert-verify: true
@@ -890,148 +1037,23 @@ proxies:
   tls: true
   type: http
   udp: true
-  name: 🛫 36|236ms|9Mbps
-- password: DJy1T0dt
-  port: 42000
-  server: 144.225.47.8
-  sub_tag: R002-260618
-  type: socks5
-  username: Tek2x6av
-  udp: true
-  name: 🛫 37|239ms|15Mbps
-- password: YlRoWvE0dL_cUqS94wPeKnA4
+  name: 🛫 49|232ms|13Mbps
+- password: 75bPoRcB
   port: 62000
-  server: 87.84.49.206
-  skip-cert-verify: true
-  type: socks5
-  username: ks878449260d
-  name: 🛫 38|240ms|11Mbps
-- type: socks5
-  server: 82.47.154.22
-  port: 42000
-  username: userMGEj
-  password: KsySvCAP
-  name: 🛫 39|240ms|3Mbps
-- type: socks5
-  server: 87.81.70.250
-  port: 42000
-  username: user2523
-  password: Ksnervw2
-  name: 🛫 40|241ms|11Mbps
-- password: sZnD8GTz
-  port: 42000
-  server: 144.225.47.106
+  server: 216.132.114.27
   sub_tag: R002-260618
   type: socks5
-  username: DJy1T0dt
+  username: JzufiJ62
   udp: true
-  name: 🛫 41|241ms|8Mbps
-- password: mpbK00Pl
-  port: 42000
-  server: 192.204.15.192
-  sub_tag: R002-260618
-  type: socks5
-  username: X3s3JteD
-  udp: true
-  name: 🛫 42|242ms|14Mbps
-- type: ss
-  server: 202.50.253.90
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 43|244ms|20Mbps
-- password: YlRoWvE0dL_cUqS94wPeKnA4
+  name: 🛫 50|235ms|60Mbps
+- password: RRWtX6XP
   port: 62000
-  server: 87.84.49.140
+  server: 203.84.138.59
   sub_tag: R002-260618
   type: socks5
-  username: ks878449260d
+  username: 9tcjLp2W
   udp: true
-  name: 🛫 44|244ms|13Mbps
-- password: ao3W5ZML
-  port: 42000
-  server: 168.222.8.119
-  sub_tag: R002-260618
-  type: socks5
-  username: JPjarpW3
-  udp: true
-  name: 🛫 45|244ms|12Mbps
-- password: lcFa8dTH
-  port: 62000
-  server: 94.194.165.96
-  sub_tag: R002-260618
-  type: socks5
-  username: QyVdo5ks
-  udp: true
-  name: 🛫 46|244ms|12Mbps
-- type: socks5
-  server: 94.194.165.131
-  port: 62000
-  username: QyVdo5ks
-  password: lcFa8dTH
-  name: 🛫 47|246ms|24Mbps
-- password: sZnD8GTz
-  port: 42000
-  server: 144.225.47.158
-  skip-cert-verify: true
-  sub_tag: P002-260618
-  type: socks5
-  username: DJy1T0dt
-  udp: true
-  name: 🛫 48|246ms|14Mbps
-- type: ss
-  server: 202.50.253.45
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 49|248ms|4Mbps
-- type: ss
-  server: 202.50.253.54
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 50|249ms|19Mbps
-- type: ss
-  server: 202.50.253.63
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 51|250ms|18Mbps
-- type: socks5
-  server: 45.201.39.74
-  port: 62000
-  username: y2stTQnf
-  password: wj2sNvDu
-  name: 🛫 52|250ms|13Mbps
-- password: Ks4Iab43
-  port: 42000
-  server: 82.47.152.151
-  sub_tag: R002-260618
-  type: socks5
-  username: userLjVB
-  udp: true
-  name: 🛫 53|250ms|12Mbps
-- type: ss
-  server: 202.50.253.81
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 54|250ms|8Mbps
+  name: 🛫 51|237ms|10Mbps
 - password: e4b72b531a2d10900519
   port: 443
   server: 82.196.9.7
@@ -1041,78 +1063,16 @@ proxies:
   type: http
   username: testuser1
   udp: true
-  name: 🛫 55|253ms|18Mbps
-- type: socks5
-  server: 144.225.47.82
-  port: 42000
-  username: Tek2x6av
-  password: DJy1T0dt
-  name: 🛫 56|254ms|30Mbps
-- password: mpbK00Pl
-  port: 42000
-  server: 192.204.15.135
-  sub_tag: R002-260618
-  type: socks5
-  username: X3s3JteD
-  udp: true
-  name: 🛫 57|254ms|11Mbps
-- password: zdnivBaI
-  port: 62000
-  server: 109.66.136.194
-  sub_tag: R002-260618
-  type: socks5
-  username: r3ZzP8WW
-  udp: true
-  name: 🛫 58|255ms|14Mbps
-- port: 8443
-  server: 77.221.136.60
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 59|258ms|6Mbps
-- port: 443
-  server: 162.217.114.50
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 60|259ms|25Mbps
-- password: 'null'
-  port: 443
-  server: 62.90.77.30
-  skip-cert-verify: true
-  tls: true
-  type: http
-  username: 'null'
-  udp: true
-  name: 🛫 61|260ms|12Mbps
-- type: socks5
-  server: 109.66.136.234
-  port: 62000
-  username: r3ZzP8WW
-  password: zdnivBaI
-  name: 🛫 62|262ms|7Mbps
+  name: 🛫 52|241ms|24Mbps
 - type: ss
-  server: 202.50.253.18
+  server: 202.50.253.36
   port: 19999
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   cipher: aes-256-gcm
   udp: true
   tls: false
   skip-cert-verify: true
-  name: 🛫 63|263ms|30Mbps
-- type: ss
-  server: 202.50.253.72
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 64|266ms|21Mbps
+  name: 🛫 53|242ms|17Mbps
 - type: ss
   server: 202.50.253.99
   port: 19999
@@ -1121,14 +1081,271 @@ proxies:
   udp: true
   tls: false
   skip-cert-verify: true
-  name: 🛫 65|269ms|24Mbps
+  name: 🛫 54|243ms|16Mbps
+- password: lcFa8dTH
+  port: 62000
+  server: 94.194.165.96
+  sub_tag: R002-260618
+  type: socks5
+  username: QyVdo5ks
+  udp: true
+  name: 🛫 55|244ms|20Mbps
+- type: ss
+  server: 202.50.253.63
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 56|244ms|18Mbps
+- password: KsPAxZGn
+  port: 42000
+  server: 94.194.166.52
+  skip-cert-verify: true
+  type: socks5
+  username: userLRgK
+  name: 🛫 57|244ms|16Mbps
+- password: ''
+  port: 9443
+  server: 152.233.50.145
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 🛫 58|245ms|298Mbps
+- type: ss
+  server: 202.50.253.45
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 59|246ms|18Mbps
+- password: VAwyJQX0iKMJiyCw5UVK9wGH
+  port: 42000
+  server: 103.14.164.202
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  type: socks5
+  username: route164JIa2CBPxfy
+  udp: true
+  name: 🛫 60|247ms|11Mbps
+- type: socks5
+  server: 82.47.152.44
+  port: 42000
+  username: userLjVB
+  password: Ks4Iab43
+  name: 🛫 61|247ms|11Mbps
+- password: zdnivBaI
+  port: 62000
+  server: 109.66.136.194
+  sub_tag: R002-260618
+  type: socks5
+  username: r3ZzP8WW
+  udp: true
+  name: 🛫 62|248ms|11Mbps
+- type: socks5
+  server: 144.225.47.82
+  port: 42000
+  username: Tek2x6av
+  password: DJy1T0dt
+  name: 🛫 63|249ms|7Mbps
+- type: socks5
+  server: 94.194.165.131
+  port: 62000
+  username: QyVdo5ks
+  password: lcFa8dTH
+  name: 🛫 64|250ms|31Mbps
+- type: ss
+  server: 202.50.253.27
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 65|250ms|30Mbps
+- type: ss
+  server: 202.50.253.18
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 66|250ms|17Mbps
+- password: ''
+  port: 8443
+  server: 14.225.71.128
+  skip-cert-verify: true
+  sub_tag: K001-260618
+  tls: true
+  type: http
+  username: ''
+  udp: true
+  name: 🛫 67|250ms|14Mbps
+- password: DJy1T0dt
+  port: 42000
+  server: 144.225.47.161
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  type: socks5
+  username: Tek2x6av
+  udp: true
+  name: 🛫 68|252ms|21Mbps
+- port: 443
+  server: 176.94.74.21
+  skip-cert-verify: true
+  sni: 176.94.74.21
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 69|252ms|17Mbps
+- port: 443
+  server: 45.134.9.41
+  skip-cert-verify: true
+  sni: 991cc80f13caf81d3426ddebb2da7f49-240d6105b6ef86f0.apache-iv.com
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 70|254ms|26Mbps
+- password: VAwyJQX0iKMJiyCw5UVK9wGH
+  port: 42000
+  server: 103.14.164.30
+  sub_tag: R002-260618
+  type: socks5
+  username: route164JIa2CBPxfy
+  udp: true
+  name: 🛫 71|254ms|10Mbps
+- password: YlRoWvE0dL_cUqS94wPeKnA4
+  port: 62000
+  server: 87.84.49.140
+  sub_tag: R002-260618
+  type: socks5
+  username: ks878449260d
+  udp: true
+  name: 🛫 72|255ms|9Mbps
+- password: zdnivBaI
+  port: 62000
+  server: 109.66.136.42
+  sub_tag: R002-260618
+  type: socks5
+  username: r3ZzP8WW
+  udp: true
+  name: 🛫 73|256ms|7Mbps
+- type: ss
+  server: 202.50.253.72
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 74|259ms|29Mbps
+- type: vless
+  server: 196.199.122.2
+  port: 443
+  uuid: 4201786b-d99b-4147-a5f0-20d47acddb81
+  flow: xtls-rprx-vision
+  udp: true
+  tls: true
+  servername: 7aa271t.es1.h1clayd.click
+  sni: 7aa271t.es1.h1clayd.click
+  skip-cert-verify: true
+  client-fingerprint: firefox
+  reality-opts:
+    public-key: ZSmetD4e9QG5CiXhniHg5HJB68L4kwbgAkJmMHtVwEE
+    short-id: 42426c882c5fcd41
+  name: 🛫 75|259ms|?Mbps
+- type: ss
+  server: 202.50.253.90
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 76|260ms|30Mbps
+- type: socks5
+  server: 82.47.154.22
+  port: 42000
+  username: userMGEj
+  password: KsySvCAP
+  name: 🛫 77|261ms|11Mbps
+- password: YlRoWvE0dL_cUqS94wPeKnA4
+  port: 62000
+  server: 87.84.49.245
+  sub_tag: R002-260618
+  type: socks5
+  username: ks878449260d
+  udp: true
+  name: 🛫 78|262ms|11Mbps
+- type: socks5
+  server: 192.204.15.135
+  port: 42000
+  username: X3s3JteD
+  password: mpbK00Pl
+  name: 🛫 79|262ms|10Mbps
+- password: mpbK00Pl
+  port: 42000
+  server: 192.204.15.192
+  sub_tag: R002-260618
+  type: socks5
+  username: X3s3JteD
+  udp: true
+  name: 🛫 80|262ms|9Mbps
 - type: http
   server: 107.91.88.70
   port: 8443
   tls: true
   sni: 107.91.88.70
   skip-cert-verify: true
-  name: 🛫 66|269ms|8Mbps
+  name: 🛫 81|262ms|4Mbps
+- password: None
+  port: 443
+  server: 89.150.35.94
+  skip-cert-verify: true
+  sub_tag: P002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 82|263ms|17Mbps
+- type: socks5
+  server: 45.201.39.74
+  port: 62000
+  username: y2stTQnf
+  password: wj2sNvDu
+  name: 🛫 83|263ms|12Mbps
+- port: 443
+  server: 162.217.114.50
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 84|265ms|111Mbps
+- password: 2j7CCZQb
+  port: 62000
+  server: 94.194.164.203
+  sub_tag: R002-260618
+  type: socks5
+  username: rVkkraqT
+  udp: true
+  name: 🛫 85|265ms|22Mbps
+- password: 'null'
+  port: 443
+  server: 62.90.77.30
+  skip-cert-verify: true
+  tls: true
+  type: http
+  username: 'null'
+  udp: true
+  name: 🛫 86|265ms|12Mbps
 - password: e4b72b531a2d10900519
   port: 443
   server: 107.151.238.27
@@ -1138,49 +1355,15 @@ proxies:
   type: http
   username: testuser1
   udp: true
-  name: 🛫 67|269ms|?Mbps
-- password: 2j7CCZQb
-  port: 62000
-  server: 94.194.164.203
-  sub_tag: R002-260618
-  type: socks5
-  username: rVkkraqT
-  udp: true
-  name: 🛫 68|270ms|9Mbps
-- password: KT5hiU8o
-  port: 42000
-  server: 104.234.70.82
-  sub_tag: R002-260618
-  type: socks5
-  username: rnt2L4XO
-  udp: true
-  name: 🛫 69|271ms|10Mbps
-- type: ss
-  server: 202.50.253.27
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 70|273ms|21Mbps
-- type: ss
-  server: 202.50.253.36
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: true
-  name: 🛫 71|273ms|18Mbps
-- port: 443
-  server: 217.92.132.233
+  name: 🛫 87|265ms|2Mbps
+- port: 8443
+  server: 77.221.136.60
   skip-cert-verify: true
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 72|273ms|10Mbps
+  name: 🛫 88|267ms|7Mbps
 - password: e4b72b531a2d10900519
   port: 443
   server: 167.172.172.190
@@ -1190,149 +1373,109 @@ proxies:
   type: http
   udp: true
   username: testuser1
-  name: 🛫 73|281ms|4Mbps
+  name: 🛫 89|269ms|2Mbps
+- type: socks5
+  server: 221.133.22.195
+  port: 62000
+  username: KUs4xRXd
+  password: 480w0Yy4
+  name: 🛫 90|270ms|12Mbps
+- type: socks5
+  server: 109.66.136.234
+  port: 62000
+  username: r3ZzP8WW
+  password: zdnivBaI
+  name: 🛫 91|272ms|9Mbps
+- server: 165.231.157.126
+  port: 8443
+  type: vless
+  uuid: 0173d52e-8e1b-4681-831e-11529677b72f
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: api-6b04608f.adhil.uk
+  client-fingerprint: safari
+  network: tcp
+  name: 🛫 92|272ms|3Mbps
+- password: sZnD8GTz
+  port: 42000
+  server: 144.225.47.68
+  type: socks5
+  username: DJy1T0dt
+  name: 🛫 93|273ms|16Mbps
 - port: 443
-  server: 45.134.9.41
+  server: 142.44.210.129
   skip-cert-verify: true
-  sni: 991cc80f13caf81d3426ddebb2da7f49-240d6105b6ef86f0.apache-iv.com
   sub_tag: R002-260618
   tls: true
   type: http
   udp: true
-  name: 🛫 74|293ms|4Mbps
-- port: 443
-  server: 152.69.230.221
+  name: 🛫 94|274ms|26Mbps
+- password: sZnD8GTz
+  port: 42000
+  server: 144.225.47.158
   skip-cert-verify: true
+  sub_tag: P002-260618
+  type: socks5
+  username: DJy1T0dt
+  udp: true
+  name: 🛫 95|274ms|21Mbps
+- type: ss
+  server: 202.50.253.81
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 96|275ms|17Mbps
+- type: http
+  server: 130.17.13.234
+  port: 8443
   tls: true
-  type: http
-  name: 🛫 75|296ms|8Mbps
-- password: jHsK2gqs
-  port: 62000
-  server: 103.184.113.190
+  skip-cert-verify: true
+  name: 🛫 97|275ms|16Mbps
+- type: ss
+  server: 202.50.253.54
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: true
+  name: 🛫 98|276ms|30Mbps
+- password: JdFlrZhqHP
+  port: 1080
+  server: 69.16.157.244
   sub_tag: R002-260618
   type: socks5
-  username: qT46DZLv
+  username: ufCobhydz4Wd
   udp: true
-  name: 🛫 76|306ms|12Mbps
+  name: 🛫 99|276ms|4Mbps
 - password: ''
-  port: 443
-  server: 14.225.71.128
+  port: 38182
+  server: 69.55.49.177
   skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
+  sub_tag: S001-260618
+  type: socks5
   username: ''
   udp: true
-  name: 🛫 77|309ms|14Mbps
+  name: 🛫 100|277ms|21Mbps
+- port: 443
+  server: 193.35.104.196
+  skip-cert-verify: true
+  sub_tag: R002-260618
+  tls: true
+  type: http
+  udp: true
+  name: 🛫 101|277ms|5Mbps
 - password: APJ7RmY9
   port: 62000
   server: 202.155.99.212
   skip-cert-verify: true
   type: socks5
   username: gebHTLF6
-  name: 🛫 78|317ms|11Mbps
-- type: socks5
-  server: 221.133.22.195
-  port: 62000
-  username: KUs4xRXd
-  password: 480w0Yy4
-  name: 🛫 79|320ms|11Mbps
-- password: sZnD8GTz
-  port: 42000
-  server: 144.225.47.68
-  type: socks5
-  username: DJy1T0dt
-  name: 🛫 80|323ms|12Mbps
-- password: jHsK2gqs
-  port: 62000
-  server: 103.184.113.236
-  type: socks5
-  username: qT46DZLv
-  name: 🛫 81|326ms|6Mbps
-- password: kingstar123++
-  port: 62000
-  server: 23.230.200.250
-  sub_tag: R002-260618
-  type: socks5
-  username: kingstar123
-  udp: true
-  name: 🛫 82|328ms|12Mbps
-- password: ''
-  port: 8443
-  server: 14.225.71.128
-  skip-cert-verify: true
-  sub_tag: K001-260618
-  tls: true
-  type: http
-  username: ''
-  udp: true
-  name: 🛫 83|332ms|13Mbps
-- password: VvUAFi2E
-  port: 62000
-  server: 72.57.228.87
-  skip-cert-verify: true
-  type: socks5
-  username: UBXich0K
-  name: 🛫 84|343ms|52Mbps
-- type: http
-  server: 74.208.250.147
-  port: 8443
-  tls: true
-  sni: 74.208.250.147
-  skip-cert-verify: true
-  name: 🛫 85|348ms|25Mbps
-- server: 213.183.45.23
-  port: 8454
-  type: vless
-  uuid: eb62cabf-5901-403a-aa0c-b1d9ed1b346d
-  udp: true
-  tls: true
-  servername: store.plumstatic.com
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /ws
-    headers:
-      Host: store.plumstatic.com
-  name: 🛫 86|348ms|10Mbps
-- password: None
-  port: 38182
-  server: 69.55.49.177
-  skip-cert-verify: true
-  type: socks5
-  name: 🛫 87|363ms|26Mbps
-- password: 0mvrt5jb
-  port: 62000
-  server: 191.7.129.133
-  sub_tag: R002-260618
-  type: socks5
-  username: uwrgfkwg
-  udp: true
-  name: 🛫 88|364ms|16Mbps
-- port: 443
-  server: 154.26.139.24
-  skip-cert-verify: true
-  sub_tag: R002-260618
-  tls: true
-  type: http
-  udp: true
-  name: 🛫 89|370ms|8Mbps
-- password: VvUAFi2E
-  port: 62000
-  server: 72.57.228.30
-  sub_tag: R002-260618
-  type: socks5
-  username: UBXich0K
-  udp: true
-  name: 🛫 90|372ms|45Mbps
-- password: 1pB7HV6u
-  port: 42000
-  server: 151.246.109.158
-  sub_tag: R002-260618
-  type: socks5
-  username: AJ3d9gJw
-  udp: true
-  name: 🛫 91|378ms|13Mbps
+  name: 🛫 102|281ms|10Mbps
 - password: EGJDy5Kg
   port: 42000
   server: 103.248.150.50
@@ -1341,26 +1484,30 @@ proxies:
   type: socks5
   username: paZFN3JA
   udp: true
-  name: 🛫 92|395ms|20Mbps
-- password: JdFlrZhqHP
-  port: 1080
-  server: 69.16.157.244
-  type: socks5
-  username: ufCobhydz4Wd
-  name: 🛫 93|398ms|16Mbps
-- password: J5rM2xL9
+  name: 🛫 103|305ms|21Mbps
+- password: DJy1T0dt
   port: 42000
-  server: 103.248.150.238
+  server: 144.225.47.8
+  sub_tag: R002-260618
+  type: socks5
+  username: Tek2x6av
+  udp: true
+  name: 🛫 104|317ms|7Mbps
+- password: VvUAFi2E
+  port: 62000
+  server: 72.57.228.87
   skip-cert-verify: true
   type: socks5
-  username: tB4vN7qP
-  name: 🛫 94|400ms|12Mbps
-- type: socks5
-  server: 103.248.150.166
-  port: 42000
-  username: x0dM1dTw
-  password: ZWCdC3C1
-  name: 🛫 95|417ms|16Mbps
+  username: UBXich0K
+  name: 🛫 105|340ms|32Mbps
+- password: VvUAFi2E
+  port: 62000
+  server: 72.57.228.30
+  sub_tag: R002-260618
+  type: socks5
+  username: UBXich0K
+  udp: true
+  name: 🛫 106|340ms|16Mbps
 - password: 1pB7HV6u
   port: 42000
   server: 151.246.109.86
@@ -1368,58 +1515,30 @@ proxies:
   type: socks5
   username: AJ3d9gJw
   udp: true
-  name: 🛫 96|418ms|?Mbps
-- server: 213.183.41.31
-  port: 8459
-  type: vless
-  uuid: eb62cabf-5901-403a-aa0c-b1d9ed1b346d
-  udp: true
-  tls: true
-  servername: photos.plumstatic.com
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /ws
-    headers:
-      Host: photos.plumstatic.com
-  name: 🛫 97|469ms|9Mbps
-- server: 213.183.41.31
-  port: 8463
-  type: vless
-  uuid: eb62cabf-5901-403a-aa0c-b1d9ed1b346d
-  udp: true
-  tls: true
-  servername: share.plumstatic.com
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /ws
-    headers:
-      Host: share.plumstatic.com
-  name: 🛫 98|576ms|6Mbps
-- port: 3128
-  server: 119.28.24.235
+  name: 🛫 107|353ms|2Mbps
+- password: None
+  port: 443
+  server: 154.26.139.24
   skip-cert-verify: true
-  sub_tag: P002-260618
+  sub_tag: K001-260618
   tls: true
   type: http
+  username: ''
   udp: true
-  name: 🛫 99|1059ms|19Mbps
-- type: socks5
-  server: 23.230.200.176
-  port: 62000
-  username: u1f0cijj
-  password: ppyefe3k
-  name: 🛫 100|1290ms|8Mbps
-- password: DJy1T0dt
-  port: 42000
-  server: 144.225.47.161
+  name: 🛫 108|358ms|10Mbps
+- type: http
+  server: 74.208.250.147
+  port: 8443
+  tls: true
+  sni: 74.208.250.147
   skip-cert-verify: true
-  sub_tag: P002-260618
-  type: socks5
-  username: Tek2x6av
-  udp: true
-  name: 🛫 101|1298ms|8Mbps
+  name: 🛫 109|363ms|31Mbps
+- type: socks5
+  server: 103.248.150.166
+  port: 42000
+  username: x0dM1dTw
+  password: ZWCdC3C1
+  name: 🛫 110|366ms|21Mbps
 - password: fAgE2jqK
   port: 42000
   server: 151.246.108.69
@@ -1427,15 +1546,69 @@ proxies:
   type: socks5
   username: h87527jJ
   udp: true
-  name: 🛫 102|1368ms|9Mbps
-- port: 443
-  server: 193.35.104.196
-  skip-cert-verify: true
-  sub_tag: R002-260618
+  name: 🛫 111|371ms|11Mbps
+- server: 213.183.45.23
+  port: 8454
+  type: vless
+  uuid: eb62cabf-5901-403a-aa0c-b1d9ed1b346d
   tls: true
-  type: http
+  servername: store.plumstatic.com
+  client-fingerprint: firefox
+  network: ws
+  ws-opts:
+    path: /ws
   udp: true
-  name: 🛫 103|2310ms|3Mbps
+  name: 🛫 112|375ms|11Mbps
+- client-fingerprint: firefox
+  network: ws
+  port: 443
+  server: 185.247.224.206
+  servername: accessfooter.cleanfoodshop.org
+  tls: true
+  type: vless
+  uuid: 58e22afd-bf74-4736-984d-63a8ca03d7f0
+  ws-opts:
+    headers:
+      Host: accessfooter.cleanfoodshop.org
+    path: /media/ws/
+  name: 🛫 113|377ms|14Mbps
+- password: J5rM2xL9
+  port: 42000
+  server: 103.248.150.238
+  skip-cert-verify: true
+  type: socks5
+  username: tB4vN7qP
+  name: 🛫 114|396ms|18Mbps
+- client-fingerprint: firefox
+  network: ws
+  port: 8459
+  server: 213.183.41.31
+  servername: photos.plumstatic.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: eb62cabf-5901-403a-aa0c-b1d9ed1b346d
+  ws-opts:
+    path: /ws
+  name: 🛫 115|461ms|5Mbps
+- client-fingerprint: firefox
+  network: ws
+  port: 8463
+  server: 213.183.41.31
+  servername: share.plumstatic.com
+  tls: true
+  type: vless
+  udp: true
+  uuid: eb62cabf-5901-403a-aa0c-b1d9ed1b346d
+  ws-opts:
+    path: /ws
+  name: 🛫 116|578ms|6Mbps
+- type: socks5
+  server: 66.80.2.252
+  port: 62000
+  username: usereb7d
+  password: c0a34a
+  name: 🛫 117|1124ms|11Mbps
 proxy-groups:
 - name: 🚀 全局选择
   type: select
@@ -1451,106 +1624,120 @@ proxy-groups:
   tolerance: 100
   lazy: false
   proxies:
-  - 🛫 01|105ms|2Mbps
-  - 🛫 02|154ms|9Mbps
-  - 🛫 03|186ms|43Mbps
-  - 🛫 04|192ms|46Mbps
-  - 🛫 05|248ms|34Mbps
-  - 🛫 06|1163ms|21Mbps
-  - 🛫 07|97ms|21Mbps
-  - 🛫 08|161ms|2Mbps
-  - 🛫 09|162ms|19Mbps
-  - 🛫 10|162ms|?Mbps
-  - 🛫 11|165ms|16Mbps
-  - 🛫 12|167ms|15Mbps
-  - 🛫 13|169ms|50Mbps
-  - 🛫 14|171ms|2Mbps
-  - 🛫 15|174ms|16Mbps
-  - 🛫 16|177ms|43Mbps
-  - 🛫 17|184ms|5Mbps
-  - 🛫 18|193ms|21Mbps
-  - 🛫 19|193ms|?Mbps
-  - 🛫 20|207ms|22Mbps
-  - 🛫 21|207ms|12Mbps
-  - 🛫 22|208ms|48Mbps
-  - 🛫 23|212ms|45Mbps
-  - 🛫 24|215ms|19Mbps
-  - 🛫 25|216ms|21Mbps
-  - 🛫 26|216ms|1Mbps
-  - 🛫 27|217ms|230Mbps
-  - 🛫 28|223ms|13Mbps
-  - 🛫 29|225ms|6Mbps
-  - 🛫 30|227ms|19Mbps
-  - 🛫 31|228ms|80Mbps
-  - 🛫 32|232ms|16Mbps
-  - 🛫 33|232ms|11Mbps
-  - 🛫 34|236ms|13Mbps
-  - 🛫 35|236ms|13Mbps
-  - 🛫 36|236ms|9Mbps
-  - 🛫 37|239ms|15Mbps
-  - 🛫 38|240ms|11Mbps
-  - 🛫 39|240ms|3Mbps
-  - 🛫 40|241ms|11Mbps
-  - 🛫 41|241ms|8Mbps
-  - 🛫 42|242ms|14Mbps
-  - 🛫 43|244ms|20Mbps
-  - 🛫 44|244ms|13Mbps
-  - 🛫 45|244ms|12Mbps
-  - 🛫 46|244ms|12Mbps
-  - 🛫 47|246ms|24Mbps
-  - 🛫 48|246ms|14Mbps
-  - 🛫 49|248ms|4Mbps
-  - 🛫 50|249ms|19Mbps
-  - 🛫 51|250ms|18Mbps
-  - 🛫 52|250ms|13Mbps
-  - 🛫 53|250ms|12Mbps
-  - 🛫 54|250ms|8Mbps
-  - 🛫 55|253ms|18Mbps
-  - 🛫 56|254ms|30Mbps
-  - 🛫 57|254ms|11Mbps
-  - 🛫 58|255ms|14Mbps
-  - 🛫 59|258ms|6Mbps
-  - 🛫 60|259ms|25Mbps
-  - 🛫 61|260ms|12Mbps
-  - 🛫 62|262ms|7Mbps
-  - 🛫 63|263ms|30Mbps
-  - 🛫 64|266ms|21Mbps
-  - 🛫 65|269ms|24Mbps
-  - 🛫 66|269ms|8Mbps
-  - 🛫 67|269ms|?Mbps
-  - 🛫 68|270ms|9Mbps
-  - 🛫 69|271ms|10Mbps
-  - 🛫 70|273ms|21Mbps
-  - 🛫 71|273ms|18Mbps
-  - 🛫 72|273ms|10Mbps
-  - 🛫 73|281ms|4Mbps
-  - 🛫 74|293ms|4Mbps
-  - 🛫 75|296ms|8Mbps
-  - 🛫 76|306ms|12Mbps
-  - 🛫 77|309ms|14Mbps
-  - 🛫 78|317ms|11Mbps
-  - 🛫 79|320ms|11Mbps
-  - 🛫 80|323ms|12Mbps
-  - 🛫 81|326ms|6Mbps
-  - 🛫 82|328ms|12Mbps
-  - 🛫 83|332ms|13Mbps
-  - 🛫 84|343ms|52Mbps
-  - 🛫 85|348ms|25Mbps
-  - 🛫 86|348ms|10Mbps
-  - 🛫 87|363ms|26Mbps
-  - 🛫 88|364ms|16Mbps
-  - 🛫 89|370ms|8Mbps
-  - 🛫 90|372ms|45Mbps
-  - 🛫 91|378ms|13Mbps
-  - 🛫 92|395ms|20Mbps
-  - 🛫 93|398ms|16Mbps
-  - 🛫 94|400ms|12Mbps
-  - 🛫 95|417ms|16Mbps
-  - 🛫 96|418ms|?Mbps
-  - 🛫 97|469ms|9Mbps
-  - 🛫 98|576ms|6Mbps
-  - 🛫 99|1059ms|19Mbps
-  - 🛫 100|1290ms|8Mbps
-  - 🛫 101|1298ms|8Mbps
-  - 🛫 102|1368ms|9Mbps
-  - 🛫 103|2310ms|3Mbps
+  - 🛫 01|53ms|13Mbps
+  - 🛫 02|86ms|?Mbps
+  - 🛫 03|92ms|5Mbps
+  - 🛫 04|104ms|4Mbps
+  - 🛫 05|171ms|41Mbps
+  - 🛫 06|179ms|6Mbps
+  - 🛫 07|184ms|39Mbps
+  - 🛫 08|203ms|47Mbps
+  - 🛫 09|229ms|7Mbps
+  - 🛫 10|279ms|10Mbps
+  - 🛫 11|47ms|14Mbps
+  - 🛫 12|63ms|7Mbps
+  - 🛫 13|67ms|14Mbps
+  - 🛫 14|130ms|?Mbps
+  - 🛫 15|153ms|31Mbps
+  - 🛫 16|154ms|16Mbps
+  - 🛫 17|155ms|30Mbps
+  - 🛫 18|158ms|12Mbps
+  - 🛫 19|163ms|23Mbps
+  - 🛫 20|165ms|18Mbps
+  - 🛫 21|169ms|9Mbps
+  - 🛫 22|174ms|15Mbps
+  - 🛫 23|175ms|40Mbps
+  - 🛫 24|176ms|12Mbps
+  - 🛫 25|178ms|47Mbps
+  - 🛫 26|194ms|17Mbps
+  - 🛫 27|198ms|10Mbps
+  - 🛫 28|200ms|27Mbps
+  - 🛫 29|201ms|17Mbps
+  - 🛫 30|202ms|9Mbps
+  - 🛫 31|204ms|14Mbps
+  - 🛫 32|206ms|185Mbps
+  - 🛫 33|206ms|13Mbps
+  - 🛫 34|206ms|?Mbps
+  - 🛫 35|208ms|7Mbps
+  - 🛫 36|212ms|303Mbps
+  - 🛫 37|212ms|4Mbps
+  - 🛫 38|214ms|17Mbps
+  - 🛫 39|215ms|12Mbps
+  - 🛫 40|215ms|10Mbps
+  - 🛫 41|219ms|6Mbps
+  - 🛫 42|222ms|10Mbps
+  - 🛫 43|223ms|13Mbps
+  - 🛫 44|224ms|17Mbps
+  - 🛫 45|226ms|20Mbps
+  - 🛫 46|230ms|21Mbps
+  - 🛫 47|231ms|56Mbps
+  - 🛫 48|231ms|12Mbps
+  - 🛫 49|232ms|13Mbps
+  - 🛫 50|235ms|60Mbps
+  - 🛫 51|237ms|10Mbps
+  - 🛫 52|241ms|24Mbps
+  - 🛫 53|242ms|17Mbps
+  - 🛫 54|243ms|16Mbps
+  - 🛫 55|244ms|20Mbps
+  - 🛫 56|244ms|18Mbps
+  - 🛫 57|244ms|16Mbps
+  - 🛫 58|245ms|298Mbps
+  - 🛫 59|246ms|18Mbps
+  - 🛫 60|247ms|11Mbps
+  - 🛫 61|247ms|11Mbps
+  - 🛫 62|248ms|11Mbps
+  - 🛫 63|249ms|7Mbps
+  - 🛫 64|250ms|31Mbps
+  - 🛫 65|250ms|30Mbps
+  - 🛫 66|250ms|17Mbps
+  - 🛫 67|250ms|14Mbps
+  - 🛫 68|252ms|21Mbps
+  - 🛫 69|252ms|17Mbps
+  - 🛫 70|254ms|26Mbps
+  - 🛫 71|254ms|10Mbps
+  - 🛫 72|255ms|9Mbps
+  - 🛫 73|256ms|7Mbps
+  - 🛫 74|259ms|29Mbps
+  - 🛫 75|259ms|?Mbps
+  - 🛫 76|260ms|30Mbps
+  - 🛫 77|261ms|11Mbps
+  - 🛫 78|262ms|11Mbps
+  - 🛫 79|262ms|10Mbps
+  - 🛫 80|262ms|9Mbps
+  - 🛫 81|262ms|4Mbps
+  - 🛫 82|263ms|17Mbps
+  - 🛫 83|263ms|12Mbps
+  - 🛫 84|265ms|111Mbps
+  - 🛫 85|265ms|22Mbps
+  - 🛫 86|265ms|12Mbps
+  - 🛫 87|265ms|2Mbps
+  - 🛫 88|267ms|7Mbps
+  - 🛫 89|269ms|2Mbps
+  - 🛫 90|270ms|12Mbps
+  - 🛫 91|272ms|9Mbps
+  - 🛫 92|272ms|3Mbps
+  - 🛫 93|273ms|16Mbps
+  - 🛫 94|274ms|26Mbps
+  - 🛫 95|274ms|21Mbps
+  - 🛫 96|275ms|17Mbps
+  - 🛫 97|275ms|16Mbps
+  - 🛫 98|276ms|30Mbps
+  - 🛫 99|276ms|4Mbps
+  - 🛫 100|277ms|21Mbps
+  - 🛫 101|277ms|5Mbps
+  - 🛫 102|281ms|10Mbps
+  - 🛫 103|305ms|21Mbps
+  - 🛫 104|317ms|7Mbps
+  - 🛫 105|340ms|32Mbps
+  - 🛫 106|340ms|16Mbps
+  - 🛫 107|353ms|2Mbps
+  - 🛫 108|358ms|10Mbps
+  - 🛫 109|363ms|31Mbps
+  - 🛫 110|366ms|21Mbps
+  - 🛫 111|371ms|11Mbps
+  - 🛫 112|375ms|11Mbps
+  - 🛫 113|377ms|14Mbps
+  - 🛫 114|396ms|18Mbps
+  - 🛫 115|461ms|5Mbps
+  - 🛫 116|578ms|6Mbps
+  - 🛫 117|1124ms|11Mbps
